@@ -1,2 +1,5 @@
+-> Migrar los archivos estaticos
 python manage.py collectstatic
+
+-> Cargar los productos excel
 python manage.py cargar_productos
