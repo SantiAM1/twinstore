@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block contenidomain %}
+<h2><a href="{{ url_categoria }}"> {{ categoria }} </a></h2>
+<ul>
+    <h3>--Productos--</h3>
+    {% for producto in productos %}
+        <li>{{ producto.nombre }} - {{ producto.precio }}</li>
+    {% empty %}
+        <li>No hay productos en esta categoría.</li>
+    {% endfor %}
+</ul>
+<ul>
+    <h3>--Subcategorias--</h3>
+    {% for url_subcategoria in urls_subcategorias %}
+        <li><a href="{{url_subcategoria}}">{{url_subcategoria}}</a></li>
+    {% empty %}
+        <li>No hay subcategorias en esta categoría.</li>
+    {% endfor %}
+</ul>
+<ul>
+    {% if marcas %}
+        <h3>--Marcas--</h3>
+        {% for marca in marcas %}
+            <li><img src="{{ marca.imagen.url }}" alt="Imagen de {{ marca }}" style="width: 64px;"></li>
+        {% empty %}
+        {% endfor %}
+    {% endif %}
+</ul>
+{% endblock contenidomain %}
+
+{% block contacto %}
+{% endblock contacto %}

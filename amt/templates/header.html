@@ -1,0 +1,99 @@
+{% load static %}
+<div class="header flex flex-column">
+    <div class="header-item flex top-header-item">
+        <a href="{% url 'core:home' %}"><img src="{% static 'img/logo.png' %}" alt="LOGO" class="logo"></a>
+        <form class="busqueda b-arriba">
+            <input type="text" placeholder="Buscar Productos..." class="busqueda-input border_none bg-transparent">
+            <button class="busqueda-boton border_none bg-transparent cursor_pointer"><i class="bi bi-search lupa"></i></button>
+        </form>
+        <div class="box-cliente_login flex">
+            <a href="#" class="ser-cliente">Quiero ser cliente</a>
+            <a href="#" class="login"><i class="bi bi-person-fill-lock"></i>Iniciar sesión</a>
+        </div>
+    </div>
+    <div class="header-item flex">
+        <button class="menu-toggle display_none bg-transparent cursor_pointer" id="abrir-menu"><i class="bi bi-list bars-menu"></i>Menu</button>
+        <nav class="navbar" id="nav">
+            <div class="box-productos-display flex display_none " id="box-productos-display">
+                <ul class="ul-productos-display">
+                    <li class="nav-productos-items flex categoria-selec" id="prod_item-componentes"><i class="bi bi-cpu"></i>Componentes</li>
+                    <li class="nav-productos-items flex" id="prod_item-computos"><i class="bi bi-pc-display"></i>Computos</li>
+                    <li class="nav-productos-items flex" id="prod_item-accesorios"><i class="bi bi-headphones"></i>Accesorios</li>
+                    <li class="nav-productos-items flex" id="prod_item-impresion"><i class="bi bi-printer"></i>Impresion</li>
+                    <li class="nav-productos-items flex" id="prod_item-gaming"><i class="bi bi-controller"></i>Gaming</li>
+                </ul>
+                <div class="result-productos-display flex" id="result-productos-display">
+                    <div class="result-productos-column flex">
+                        <a href="#" class="result-productos-titulo">Hardware</a>
+                        <a href="#" class="hover_pad_weight">Gabinetes</a>
+                        <a href="#" class="hover_pad_weight">Placas de video</a>
+                        <a href="#" class="hover_pad_weight">Motherboards</a>
+                        <a href="#" class="hover_pad_weight">Procesadores</a>
+                        <a href="#" class="hover_pad_weight">Fuentes</a>
+                        <a href="#" class="hover_pad_weight">Coolers</a>
+                    </div>
+                    <div class="result-productos-column flex">
+                        <a href="#" class="result-productos-titulo">Almacenamiento</a>
+                        <a href="#" class="hover_pad_weight">Discos Internos</a>
+                        <a href="#" class="hover_pad_weight">Discos Internos SSD</a>
+                        <a href="#" class="hover_pad_weight">Discos Externos</a>
+                        <a href="#" class="hover_pad_weight">Discos Externos SSD</a>
+                        <a href="#" class="hover_pad_weight">Pen Drive</a>
+                        <a href="#" class="hover_pad_weight">Memorias Flash</a>
+                    </div>
+                    <div class="result-productos-column flex">
+                        <a href="#" class="result-productos-titulo">Memoria Ram</a>
+                        <a href="#" class="hover_pad_weight">Memorias Notebook</a>
+                        <a href="#" class="hover_pad_weight">Memorias PC</a>
+                    </div>
+                </div>
+            </div>
+            <ul class="nav-list flex">
+                <li>
+                    <button class="nav__boton nav__item flex" id="boton-productos">
+                        <i class="bi bi-cpu icon_navbar"></i>
+                        <div>
+                            Productos<i class="bi bi-chevron-down"></i>
+                        </div>
+                    </button>
+                </li>
+                <li>
+                    <button class="nav__boton nav__item flex">
+                        <i class="bi bi-box-seam icon_navbar"></i>
+                        <div>
+                            Marcas<i class="bi bi-chevron-down"></i>
+                        </div>
+                    </button>
+                </li>
+                <li>
+                    <a href="#" class="nav__link nav__item">
+                    <i class="bi bi-person icon_navbar"></i>
+                    Quienes somos
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'core:local' %}" class="nav__link nav__item">
+                    <i class="bi bi-building icon_navbar"></i>
+                    Nuestro Local
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav__link nav__item">
+                    <i class="bi bi-gear icon_navbar"></i>
+                    Servicio Tecnico
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav__link nav__item">
+                    <i class="bi bi-chat icon_navbar"></i>
+                    Contacto
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <form class="busqueda b-abajo display_none">
+            <input type="text" placeholder="Buscar Productos..." class="busqueda-input border_none bg-transparent">
+            <button class="busqueda-boton border_none bg-transparent cursor_pointer"><i class="bi bi-search lupa"></i></button>
+        </form>
+    </div>
+</div>

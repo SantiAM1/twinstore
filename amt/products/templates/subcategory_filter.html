@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block contenidomain %}
+<h2><a href="{{url_categoria}}">{{ categoria }}</a> > <a href="{{url_subcategoria}}">{{ subcategoria }}</a></h2>
+<ul>
+    <h3>--Productos--</h3>
+    {% for producto in productos %}
+        <li>{{ producto.nombre }} - {{ producto.precio }}</li>
+    {% empty %}
+        <li>No hay productos en esta categoría.</li>
+    {% endfor %}
+</ul>
+<ul>
+    <h3>--Marcas--</h3>
+    {% for marca in marcas %}
+        <li>{{ marca }}</li>
+    {% empty %}
+        <li>No hay marcas en esta categoría.</li>
+    {% endfor %}
+</ul>
+<ul>
+    {% if atributos_dict %}
+        <h3>--{{ clave }}--</h3>
+        {% for atributo in atributos_dict %}
+            <li>{{ atributo }}</li>
+        {% endfor %}
+    {% endif %}
+</ul>
+{% endblock contenidomain %}
+
+{% block contacto %}
+{% endblock contacto %}
