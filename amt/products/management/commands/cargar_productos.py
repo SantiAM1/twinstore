@@ -14,18 +14,29 @@ class Command(BaseCommand):
             return
 
         for _, fila in df.iterrows():
+            # Obtiene o crea la marca
             marca, _ = Marca.objects.get_or_create(nombre=fila['Marca'])
-            categoria, _ = Categoria.objects.get_or_create(nombre=fila['Categoria'])
-            sub_categoria, _ = SubCategoria.objects.get_or_create(nombre=fila['Sub-categoria'], categoria=categoria)
 
+            # Obtiene la subcategoría y su categoría asociada
+            try:
+                sub_categoria = SubCategoria.objects.get(nombre=fila['Sub-categoria'])
+                categoria = sub_categoria.categoria  # Obtiene la categoría vinculada a la subcategoría
+            except SubCategoria.DoesNotExist:
+                self.stdout.write(self.style.ERROR(f'La subcategoría "{fila["Sub-categoria"]}" no existe en la base de datos'))
+                continue
+
+            # Genera un SKU único
+            sku = f"{marca.nombre[:3].upper()}-{sub_categoria.nombre[:3].upper()}-{uuid.uuid4().hex[:6].upper()}"
+
+            # Crea o actualiza el producto
             producto, created = Producto.objects.get_or_create(
                 nombre=fila['Producto'],
                 defaults={
                     'marca': marca,
-                    'categoria': categoria,
                     'sub_categoria': sub_categoria,
                     'precio': fila['Precio'],
-                    'descuento': fila['Descuento']
+                    'descuento': fila['Descuento'],
+                    'sku': sku
                 }
             )
 
@@ -33,23 +44,9 @@ class Command(BaseCommand):
             if not created:
                 producto.precio = fila['Precio']
                 producto.descuento = fila['Descuento']
+                # Solo asigna un SKU si aún no existe
+                if not producto.sku:
+                    producto.sku = sku
                 producto.save()
-
-            # Manejo de atributos adicionales
-            # Inalámbrico
-            if 'Conectividad' in fila and pd.notna(fila['Conectividad']):
-                Atributos.objects.update_or_create(
-                    producto=producto,
-                    clave='Conectividad',
-                    defaults={'valor': fila['Conectividad']}
-                )
-
-            # Almacenamiento
-            if 'Almacenamiento' in fila and pd.notna(fila['Almacenamiento']):
-                Atributos.objects.update_or_create(
-                    producto=producto,
-                    clave='Almacenamiento',
-                    defaults={'valor': fila['Almacenamiento']}
-                )
         
         self.stdout.write(self.style.SUCCESS('Productos cargados exitosamente'))
