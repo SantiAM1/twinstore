@@ -1,31 +1,44 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block contenidomain %}
-<h2><a href="{{url_categoria}}">{{ categoria }}</a> > <a href="{{url_subcategoria}}">{{ subcategoria }}</a></h2>
-<ul>
-    <h3>--Productos--</h3>
-    {% for producto in productos %}
-        <li>{{ producto.nombre }} - {{ producto.precio }}</li>
-    {% empty %}
-        <li>No hay productos en esta categoría.</li>
-    {% endfor %}
-</ul>
-<ul>
-    <h3>--Marcas--</h3>
-    {% for marca in marcas %}
-        <li>{{ marca }}</li>
-    {% empty %}
-        <li>No hay marcas en esta categoría.</li>
-    {% endfor %}
-</ul>
-<ul>
-    {% if atributos_dict %}
-        <h3>--{{ clave }}--</h3>
-        {% for atributo in atributos_dict %}
-            <li>{{ atributo }}</li>
-        {% endfor %}
-    {% endif %}
-</ul>
+<div class="product-box">
+    <nav class="flex justify-between items-center products-nav">
+        <div>
+            <a href="{% url 'core:home' %}" class="decoration-none product-outside-link">Inicio</a>
+            <i class="bi bi-chevron-right product-outside-link"></i>
+            <a href="{% url 'products:categoria' categoria=categoria %}" class="decoration-none product-outside-link">{{categoria}}</a>
+            <i class="bi bi-chevron-right product-outside-link"></i>
+            <span> {{sub_categoria}} </span>
+        </div>
+        <div class="flex justify-between gap-1rem items-center">
+            Mostrando {{cantidad_productos}} resultados
+            <form method="GET" id="filterForm">
+                <select name="ordenby" id="ordenby" onchange="document.getElementById('filterForm').submit();" class="product-ordenby">
+                    <option value="" disabled selected>Filtros &#x2630;</option>
+                    <option value="date">Ordenar por los últimos</option>
+                    <option value="price_lower">Ordenar por precio: bajo a alto</option>
+                    <option value="price_higher">Ordenar por precio: alto a bajo</option>
+                </select>
+            </form>
+        </div>
+    </nav>
+    <div class="flex gap-1rem product-box-grid">
+        <main class="flex justify-center flex-grow">
+            <div class="grid-container">
+                {% for producto, imagen_url in productos_imagen %}
+                    <div class="product-card">
+                        {% if imagen_url %}
+                            {% include 'cards_dinamic.html' with img_url=imagen_url product_name=producto.nombre product_price=producto.precio only %}
+                        {% else %}
+                            {% include 'cards_static.html' with img_url='img/prod_default.jpg' product_name=producto.nombre product_price=producto.precio only %}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</div>
 {% endblock contenidomain %}
 
 {% block contacto %}

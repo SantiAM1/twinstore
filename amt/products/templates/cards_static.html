@@ -1,0 +1,9 @@
+{% load static %}
+<a href="{% url 'products:producto' product_name=product_name %}" class="decoration-none">
+    <img 
+        src="{% static img_url %}" 
+        alt="{{ product_name }}">
+        <span>{{ product_name }}</span>
+</a>
+<p>${{product_price}}</p>
+<button>Comprar</button>

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contenidomain %}
+<div class="product-box">
+    {{producto.nombre}} - Precio:{{producto.precio}} - Codigo SKU:{{producto.sku}} -Categorias:{{producto.sub_categoria.categoria}}>{{producto.sub_categoria}}
+</div>
+{% endblock contenidomain %}
+
+{% block contacto %}
+{% endblock contacto %}

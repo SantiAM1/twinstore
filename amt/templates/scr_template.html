@@ -43,9 +43,9 @@
         `,
         'prod_item-accesorios': `
             <div class="result-productos-column flex">
-                <a href="#" class="result-productos-titulo">Perifericos</a>
-                <a href="#" class="hover_pad_weight">Teclados</a>
-                <a href="#" class="hover_pad_weight">Mouse</a>
+                <a href="{% url 'products:categoria' categoria='Perifericos' %}" class="result-productos-titulo">Periféricos</a>
+                <a href="{% url 'products:subcategoria' categoria='Perifericos' sub_categoria='Teclados' %}" class="hover_pad_weight">Teclados</a>
+                <a href="{% url 'products:subcategoria' categoria='Perifericos' sub_categoria='Mouse' %}" class="hover_pad_weight">Mouse</a>
                 <a href="#" class="hover_pad_weight">Auriculares</a>
                 <a href="#" class="hover_pad_weight">Webcams</a>
                 <a href="#" class="hover_pad_weight">Micrófonos</a>

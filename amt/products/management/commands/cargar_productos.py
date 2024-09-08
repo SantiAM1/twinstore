@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 import pandas as pd
-from products.models import Producto, Marca, Categoria, SubCategoria, Atributos
+import uuid
+from products.models import Producto, Marca, Categoria, SubCategoria
 
 class Command(BaseCommand):
     help = 'Carga productos desde un archivo Excel'

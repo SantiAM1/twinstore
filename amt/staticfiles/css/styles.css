@@ -23,7 +23,7 @@ body {
     background-color: var(--primary-color);
 }
 
-main {
+.divider-header-body {
     margin-top: 7rem;
 }
 
