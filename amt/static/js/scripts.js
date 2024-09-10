@@ -29,3 +29,30 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+function scrollToImage(index) {
+    const slider = document.querySelector('.product-slider');
+    const imageWidth = slider.querySelector('img').clientWidth;
+    const scrollPosition = index * imageWidth;
+
+    console.log("Índice:", index, "Posición de desplazamiento:", scrollPosition);
+
+    slider.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+    });
+}
+
+let quantity = 1;
+function increaseQuantity() {
+    if (quantity < 10) {
+        quantity++;
+        document.getElementById("quantity").value = quantity;
+    }
+}
+function decreaseQuantity() {
+    if (quantity > 1) {
+        quantity--;
+        document.getElementById("quantity").value = quantity;
+    }
+}
