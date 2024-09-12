@@ -107,26 +107,44 @@ header {
     gap: 2rem;
 }
 
-/* --------Login Register-------- */
-.box-cliente_login {
+/* --------Login Carrito-------- */
+.box-carrito_login {
     gap: 0.5rem;
 }
 
-.header-item .box-cliente_login a {
+.header-item .box-carrito_login a {
     padding: 0.8rem;
     text-align: center;
-}
-
-.ser-cliente {
-    color: #fff;
-    background-color: var(--primary-color);
-    border-radius: 10px;
 }
 
 .login {
     color: var(--color-amt);
     border-radius: 10px;
     outline: var(--color-amt) solid 2px;
+}
+
+.carrito {
+    color: #fff;
+    border-radius: 10px;
+    background-color: var(--color-amt);
+    font-size: 1rem!important;
+    text-align: center;
+    position: relative;
+}
+
+.carrito-cantidad {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* --------Navbar-------- */
@@ -654,5 +672,11 @@ footer {
     }
     .product-box{
         padding: 1rem;
+    }
+    .carrito {
+        font-size: 1.3rem!important;
+    }
+    .carrito-total-precio {
+        display: none;
     }
 }

@@ -6,8 +6,16 @@
             <input type="text" placeholder="Buscar Productos..." class="busqueda-input border_none bg-transparent">
             <button class="busqueda-boton border_none bg-transparent cursor_pointer"><i class="bi bi-search lupa"></i></button>
         </form>
-        <div class="box-cliente_login flex">
-            <a href="#" class="ser-cliente">Quiero ser cliente</a>
+        <div class="box-carrito_login flex">
+            <a href="#" class="carrito flex items-center">
+                <div class="carrito-total-precio">
+                    Carrito / ${{total_precio}}
+                </div>
+                <i class="bi bi-cart-fill"></i>
+                <div class="carrito-cantidad">
+                    {{total_productos}}
+                </div>
+            </a>
             <a href="#" class="login"><i class="bi bi-person-fill-lock"></i>Iniciar sesión</a>
         </div>
     </div>

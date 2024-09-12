@@ -40,13 +40,22 @@
             <div class="flex flex-column gap-1rem">
                 <p class="product-title-precio">${{producto.precio}}</p>
                 <div class="flex gap-1rem items-center" style="height: 40px;">
-                    <div class="quantity-container">
-                        <button class="decrement" onclick="decreaseQuantity()"><i class="bi bi-dash"></i></button>
-                        <input type="text" id="quantity" value="1" readonly>
-                        <button class="increment" onclick="increaseQuantity()"><i class="bi bi-plus"></i></button>
-                    </div>
-                    <a href="#" class="decoration-none flex items-center product-cart">Agregar al Carrito<i class="bi bi-cart"></i></a>
+                    <form action="{% url 'cart:agregar' producto.id %}" method="POST" class="flex items-center">
+                        {% csrf_token %} <!-- Protección contra ataques CSRF en Django -->
+                        <div class="quantity-container">
+                            <button type="button" class="decrement" onclick="decreaseQuantity()"><i class="bi bi-dash"></i></button>
+                            <input type="text" id="quantity" name="cantidad" value="1" readonly>
+                            <button type="button" class="increment" onclick="increaseQuantity()"><i class="bi bi-plus"></i></button>
+                        </div>
+                        <!-- Input oculto para enviar el ID del producto -->
+                        <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                        <!-- Botón para agregar al carrito -->
+                        <button type="submit" class="decoration-none flex items-center product-cart">
+                            Agregar al Carrito<i class="bi bi-cart"></i>
+                        </button>
+                    </form>
                 </div>
+                
                 <p class="product-title-data">Codigo SKU:{{producto.sku}}</p>
                 <p class="product-title-data">Categoria:{{producto.sub_categoria}}</p>
             </div>
