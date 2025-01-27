@@ -7,7 +7,7 @@
             <button class="busqueda-boton border_none bg-transparent cursor_pointer"><i class="bi bi-search lupa"></i></button>
         </form>
         <div class="box-carrito_login flex">
-            <a href="#" class="carrito flex items-center">
+            <a href="{% url 'cart:home' %}" class="carrito flex items-center">
                 <div class="carrito-total-precio">
                     Carrito / ${{total_precio}}
                 </div>

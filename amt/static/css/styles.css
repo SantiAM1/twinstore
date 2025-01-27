@@ -33,6 +33,14 @@ justify-center
 
 body {
     background-color: var(--primary-color);
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-box {
+    flex: 1;
 }
 
 .divider-content {
@@ -278,7 +286,7 @@ header {
 
 /* --------Cards y Prod grid-------- */
 .product-box {
-    max-width: 1080px;
+    width: 1024px;
     margin: auto;
     padding: 2rem;
 }
@@ -542,6 +550,7 @@ footer {
     align-items: center;
     justify-content: center;
     gap: 1rem;
+    margin-top: auto;
 }
 .link-box-footer {
     width: 70%;
@@ -619,6 +628,10 @@ footer {
     .grid-container {
         grid-template-columns: repeat(3, 1fr);
     }
+    .product-box {
+        width: 90%;
+    }
+
 }
 
 @media screen and (max-width: 800px) {

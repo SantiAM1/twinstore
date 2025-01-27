@@ -3,7 +3,13 @@ from .models import Producto, Carrito, Pedido
 
 # Create your views here.
 def home(request):
-    return HttpResponse("carro")
+    if not request.user.is_authenticated:
+        pass
+    else:
+        carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
+        return render(request,'ver_carrito.html',{
+            'carrito':carrito
+        })
 
 def agregar_al_carrito(request, producto_id):
     if request.method == 'POST':
@@ -22,6 +28,7 @@ def agregar_al_carrito(request, producto_id):
                 }
             request.session['carrito'] = carrito_sesion
             return HttpResponse(f"Usuario: {request.session.get('carrito', {})}")
+
         else:
             carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
             try:
@@ -32,4 +39,4 @@ def agregar_al_carrito(request, producto_id):
                 pedido = Pedido.objects.create(producto=producto, cantidad=cantidad)
                 carrito.pedidos.add(pedido)
 
-            return redirect('products:producto', product_name=producto.nombre)
+        return redirect('products:producto', product_name=producto.nombre)

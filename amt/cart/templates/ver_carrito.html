@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block section %}
+{% endblock section %}
+
+{% block contenidomain %}
+    Carrito {{carrito}}
+    {% for pedido in carrito.pedidos.all %}
+        <p>{{pedido}}</p>
+    {% endfor %}
+{% endblock contenidomain %}
+
+{% block contacto %}
+{% endblock contacto %}
