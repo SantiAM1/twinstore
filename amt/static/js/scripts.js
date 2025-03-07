@@ -56,3 +56,19 @@ function decreaseQuantity() {
         document.getElementById("quantity").value = quantity;
     }
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    const userMenu = document.querySelector(".user-menu");
+    const dropdown = document.getElementById("userDropdown");
+
+    userMenu.addEventListener("click", function(event) {
+        event.stopPropagation(); // Evita que el clic en el menú lo cierre inmediatamente
+        dropdown.classList.toggle("show");
+    });
+
+    document.addEventListener("click", function(event) {
+        if (!userMenu.contains(event.target)) {
+            dropdown.classList.remove("show"); // Cierra el menú si se hace clic fuera
+        }
+    });
+});

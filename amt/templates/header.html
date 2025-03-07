@@ -6,8 +6,8 @@
             <input type="text" placeholder="Buscar Productos..." class="busqueda-input border_none bg-transparent">
             <button class="busqueda-boton border_none bg-transparent cursor_pointer"><i class="bi bi-search lupa"></i></button>
         </form>
-        <div class="box-carrito_login flex">
-            <a href="{% url 'cart:home' %}" class="carrito flex items-center">
+        <div class="box-carrito_login flex items-center">
+            <a href="{% url 'cart:ver_carrito' %}" class="carrito flex items-center">
                 <div class="carrito-total-precio">
                     Carrito / ${{total_precio}}
                 </div>
@@ -16,7 +16,23 @@
                     {{total_productos}}
                 </div>
             </a>
-            <a href="#" class="login"><i class="bi bi-person-fill-lock"></i>Iniciar sesión</a>
+            <div class="user-menu cursor_pointer" onclick="toggleMenu()">
+                <div class="user-icon flex items-center">
+                    <i class="bi bi-person"></i>  <!-- Icono de usuario -->
+                    <i class="bi bi-chevron-down"></i> <!-- Flecha hacia abajo -->
+                </div>
+        
+                <ul class="dropdown list-none" id="userDropdown">
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'users:perfil' %}">Perfil</a></li>
+                        <li><a href="#">Mis Pedidos</a></li>
+                        <li><a href="{% url 'users:logout' %}">Cerrar Sesión</a></li>
+                    {% else %}
+                        <li><a href="{% url 'users:login' %}">Iniciar Sesión</a></li>
+                        <li><a href="{% url 'users:registro' %}">Registrarse</a></li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </div>
     <div class="header-item flex">

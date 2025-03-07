@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'products',
     'core',
-    'cart'
+    'cart',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -136,3 +137,19 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SITE_URL = "http://127.0.0.1:8000"
+
+# Configuración de SMTP para enviar emails con Gmail
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'santiaguirre.lam@gmail.com'  # Reemplázalo con tu dirección de Gmail
+EMAIL_HOST_PASSWORD = 'aluc xeog iyiq lkur'  # Usa una contraseña de aplicación en vez de tu contraseña normal
+
+# Configurar la URL de login
+LOGIN_URL = "/usuario/login/"
+
+MERCADOPAGO_PUBLIC_KEY = "APP_USR-af870896-2a1f-49b0-8bf4-5e5a0d887878"
+MERCADOPAGO_ACCESS_TOKEN = "APP_USR-1446495638811835-030623-0a55628b2e7fba74a867cb1200b71eb0-722027219"

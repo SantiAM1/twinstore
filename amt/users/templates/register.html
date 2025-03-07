@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Local - AMT</title>
+{% endblock head %}
+
+{% block contenidomain %}
+<div class="form-container">
+    <h2>Registrarse</h2>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <p class="error-message">{{ form.username.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <p class="error-message">{{ form.email.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.password }}
+            {% if form.password.errors %}
+                <p class="error-message">{{ form.password.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <div>
+            {{ form.password_confirm }}
+            {% if form.password_confirm.errors %}
+                <p class="error-message">{{ form.password_confirm.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="form-button">Registrarse</button>
+    </form>
+</div>
+
+<style>
+    .error-message {
+        color: red;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock contenidomain %}
+
+{% block contacto %}
+{% endblock contacto %}

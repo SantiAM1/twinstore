@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = 'Carga imágenes de productos desde una estructura de directorios basada en SKUs'
 
     def add_arguments(self, parser):
-        # Opcional: Agregar argumentos al comando si es necesario, por ejemplo, especificar un path base
+        # - Opcional: Agregar argumentos al comando si es necesario, por ejemplo, especificar un path base
         parser.add_argument('--path', type=str, help='Ruta base donde se encuentran las carpetas de SKUs')
 
     def handle(self, *args, **options):
@@ -17,7 +17,7 @@ class Command(BaseCommand):
             if os.path.exists(ruta_sku):
                 for filename in os.listdir(ruta_sku):
                     ruta_completa = os.path.join(ruta_sku, filename)
-                    # Verificar si la imagen ya existe para el producto
+                    # ! Verificar si la imagen ya existe para el producto
                     if not ImagenProducto.objects.filter(producto=producto, imagen=filename).exists():
                         with open(ruta_completa, 'rb') as f:
                             imagen = ImageFile(f, name=filename)

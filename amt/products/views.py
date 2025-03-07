@@ -60,7 +60,7 @@ def ordenby(request, productos):
 def get_prod_img(productos):
     productos_imagen = []
     for producto in productos:
-        imagen_principal = producto.imagenes.filter(imagen__endswith='_1.jpg').first()
+        imagen_principal = producto.imagenes.first()
         if imagen_principal:
             imagen_url = imagen_principal.imagen.url
         else:

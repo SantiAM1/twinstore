@@ -125,10 +125,62 @@ header {
     text-align: center;
 }
 
-.login {
-    color: var(--color-amt);
-    border-radius: 10px;
-    outline: var(--color-amt) solid 2px;
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-icon {
+    gap: 5px;
+    font-size: 1.2rem;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.dropdown {
+    z-index: 1000;
+    position: absolute;
+    top: 45px;
+    right: 0;
+    background: #fff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 0;
+    min-width: 150px;
+    opacity: 0;
+    transform: translateY(-10px);
+    visibility: hidden;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+}
+
+.dropdown li {
+    padding: 0px 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem; /* Reducir tamaño */
+    transition: background 0.3s ease, border-radius 0.3s ease;
+}
+
+.dropdown li:last-child {
+    border-bottom: none;
+}
+
+.dropdown li a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+    font-weight: 600;
+}
+
+.dropdown li:hover {
+    background: #f5f5f5;
+    border-radius: 8px;
+}
+
+.dropdown.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear;
 }
 
 .carrito {
@@ -482,6 +534,7 @@ header {
 .quantity-container {
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .quantity-container button {
@@ -502,7 +555,7 @@ header {
 }
 
 .quantity-container input {
-    width: 50px;
+    width: 40px;
     text-align: center;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -510,6 +563,188 @@ header {
     height: 40px;
 }
 
+/* ---------Carrito---------*/
+.cart-box {
+    margin: 1rem;
+    max-width: 1080px;
+    width: 100%;
+    margin: auto;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.cart-prod-cantidad {
+    text-align: start;
+}
+
+.cart-prod-cantidad p {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+}
+
+.cart-items {
+    width: 60%;
+}
+
+.cart-table {
+    width: 100%;
+}
+
+.cart-table thead tr th {
+    font-size: 1.1rem;
+    font-weight: lighter;
+}
+
+.cart-divider-side {
+    border-right: 2px solid #bbbbbb;
+}
+
+.cart-divider-main {
+    border-bottom: 2px solid #bbbbbb;
+}
+
+.cart-divider-prod {
+    border-bottom: 1px solid #d6d6d6;
+}
+
+.items-center td {
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.cart-prod {
+    gap: 1rem;
+}
+
+.cart-prod span {
+    color: #545454;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.cart-prod-delete {
+    font-size: 1.5rem;
+    color: #9a9a9a;
+    transition: all ease 0.2s;
+}
+
+.cart-prod-responsive {
+    gap: 0.5rem;
+    position: relative;
+}
+
+.cart-prod-delete:hover {
+    color: #000;
+}
+
+.cart-prod-img {
+    height: 50px;
+    width: 50px;
+    object-fit: cover;
+}
+
+.continue-shopping {
+    padding: 0.5rem;
+    outline: var(--color-amt) 2px solid;
+    max-width: 220px;
+    text-align: center;
+    font-weight: bold;
+    color: var(--color-amt);
+    transition: all ease 0.3s;
+}
+
+.continue-shopping:hover {
+    background-color: var(--color-amt);
+    color: white;
+}
+
+.cart-price-sub {
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+.cart-finish {
+    width: 40%;
+}
+
+.cart-finish-table caption {
+    text-align: start;
+    width: 100%;
+    border-bottom: 2px solid #bbbbbb;
+    font-size: 1.1rem;
+    font-weight: lighter;
+    padding: 0.1rem;
+}
+
+.cart-finish-table {
+    padding-top: 1rem;
+    width: 100%;
+}
+
+.cart-finish-table tr th {
+    text-align: start;
+    padding: 0.3rem;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight:normal;
+}
+
+.cart-finish-table tr td {
+    text-align: end;
+    padding-right: 0.3rem;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: bold;
+}
+
+.cart-finish-shipping {
+    font-weight: normal !important
+}
+
+.cart-finish-info {
+    border: #000;
+}
+
+.cart-finish-button {
+    color: white;
+    width: 100%;
+    margin-top: 1.2rem;
+    padding: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+    transition: all ease 0.3s;
+}
+
+.cart-finish-comprar {
+    background-color: var(--color-amt);
+}
+
+.cart-finish-comprar:hover ,.cart-volver-tienda:hover {
+    background-color: #278f38;
+}
+
+.cart-finish-presupuesto {
+    background-color: rgb(134, 134, 134);
+}
+
+.cart-finish-presupuesto:hover {
+    background-color: #505050;
+}
+
+.cart-volver-tienda {
+    color: white;
+    padding: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+    background-color: var(--color-amt);
+    transition: all ease 0.3s;
+}
+
+.cart-empty-msg {
+    text-align: center;
+    justify-content: center;
+    margin:auto;
+    margin-left: 10px;
+}
 
 /* --------Menu-------- */
 .menu-toggle {
@@ -602,6 +837,7 @@ footer {
     width: 100%;
     height: 100%;
 }
+
 /* --------HOVERS-------- */
 
 .hover_pad_weight:hover {
@@ -630,6 +866,12 @@ footer {
     }
     .product-box {
         width: 90%;
+    }
+    .cart-items {
+        width: 70%;
+    }
+    .cart-finish {
+        width: 30%;
     }
 
 }
@@ -672,9 +914,15 @@ footer {
         flex-direction: column;
         margin-top: 0;
     }
+    .cart-box {
+        flex-direction: column;
+    }
+    .cart-items,.cart-finish {
+        width: 100%;
+    }
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 570px) {
     .header {
         max-width: 100vw;
     }
@@ -691,5 +939,19 @@ footer {
     }
     .carrito-total-precio {
         display: none;
+    }
+    .cart-price-sub,.cart-responsive-hide {
+        display: none;
+    }
+    .cart-prod-responsive {
+        display: inline-block;
+    }
+    .cart-prod-delete {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+    .cart-prod-cantidad p {
+        display: block;
     }
 }

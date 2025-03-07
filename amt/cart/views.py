@@ -2,41 +2,46 @@ from django.shortcuts import redirect, get_object_or_404,render,HttpResponse
 from .models import Producto, Carrito, Pedido
 
 # Create your views here.
-def home(request):
-    if not request.user.is_authenticated:
-        pass
+def ver_carrito(request):
+    if request.user.is_authenticated:
+        carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
+        return render(request, 'ver_carrito.html', {'carrito': carrito})
     else:
-        carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
-        return render(request,'ver_carrito.html',{
-            'carrito':carrito
-        })
+        pass
 
 def agregar_al_carrito(request, producto_id):
     if request.method == 'POST':
         producto = get_object_or_404(Producto, id=producto_id)
         cantidad = int(request.POST.get('cantidad', 1))
 
-        if not request.user.is_authenticated:
-            carrito_sesion = request.session.get('carrito', {})
-
-            if str(producto_id) in carrito_sesion:
-                carrito_sesion[str(producto_id)]['cantidad'] += cantidad
-            else:
-                carrito_sesion[str(producto_id)] = {
-                    'producto_id': producto_id,
-                    'cantidad': cantidad,
-                }
-            request.session['carrito'] = carrito_sesion
-            return HttpResponse(f"Usuario: {request.session.get('carrito', {})}")
-
+        if request.user.is_authenticated:
+            carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
+            carrito.agregar_producto(producto, cantidad)
+            return redirect('products:producto', product_name=producto.nombre)
         else:
-            carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
-            try:
-                pedido_existente = carrito.pedidos.get(producto=producto)
-                pedido_existente.cantidad += cantidad
-                pedido_existente.save()
-            except Pedido.DoesNotExist:
-                pedido = Pedido.objects.create(producto=producto, cantidad=cantidad)
-                carrito.pedidos.add(pedido)
+            pass
 
-        return redirect('products:producto', product_name=producto.nombre)
+def eliminar_del_carrito(request,pedido_id):
+    carrito = get_object_or_404(Carrito,usuario=request.user)
+    pedido = get_object_or_404(Pedido,id=pedido_id,carrito=carrito)
+    pedido.delete()
+    return redirect('cart:ver_carrito')
+
+def cart_update(request, pedido_id):
+    carrito = get_object_or_404(Carrito, usuario=request.user)
+    pedido = get_object_or_404(Pedido, id=pedido_id, carrito=carrito)
+
+    action = request.POST.get('action')
+
+    if action == "increment":
+        pedido.cantidad += 1
+        pedido.save()
+    elif action == "decrement":
+        if pedido.cantidad > 1:
+            pedido.cantidad -= 1
+            pedido.save()
+        else:
+            pedido.delete()
+            return redirect('cart:ver_carrito')  # Redirigir directamente si eliminamos el pedido
+
+    return redirect('cart:ver_carrito')
