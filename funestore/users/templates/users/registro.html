@@ -26,15 +26,24 @@
         <div class="users-form-box">
             <h2>Registrarse</h2>
             <div class="users-form-subbox">
-                <form class="user-form-main">
+                <form method="post" class="user-form-main">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
                     <div>
-                        <input type="email" class="user-form-control" id="email" placeholder="Email" required>
-                        <input type="password" class="user-form-control" id="password" placeholder="Contraseña" required>
-                        <input type="password" class="user-form-control" id="password_repeat" placeholder="Repetir contraseña" required>
+                        {{ form.email }}
+                        {{ form.password }}
+                        {{ form.password_repeat }}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div style="color: crimson;font-family: 'Roboto';text-align: center;font-size: 0.8rem;">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
                     </div>
                     <button type="submit" class="users-button">Registrarse</button>
                 </form>
-                <a href="#">Ya estas registrado?</a>
+                <a href="{% url 'users:login' %}">Ya estas registrado?</a>
             </div>
         </div>
     </div>

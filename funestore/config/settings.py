@@ -36,11 +36,11 @@ SECRET_KEY = 'django-insecure-&r$abfh2yec)-#l^r(^^z*0-+cv!(5lr(2@zmfct65f7^m!4jz
 DEBUG = True
 
 # ! Actualizar el HOST con el dominio
-ALLOWED_HOSTS = ['ed59-181-228-88-24.ngrok-free.app','127.0.0.1']
+ALLOWED_HOSTS = ['9baf-181-228-88-24.ngrok-free.app','127.0.0.1']
 
 # ! Verificar las correspondencias
 CSRF_TRUSTED_ORIGINS = [
-    "https://ed59-181-228-88-24.ngrok-free.app"
+    "https://9baf-181-228-88-24.ngrok-free.app"
 ]
 
 # ! Falta verificar que la url recibida por MP sea la correcta, Agregar SECRET KEY A .evn

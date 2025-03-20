@@ -26,7 +26,7 @@
                     {% if user.is_authenticated %}
                         <li><a href="#">Perfil</a></li>
                         <li><a href="#">Mis Pedidos</a></li>
-                        <li><a href="#">Cerrar Sesión</a></li>
+                        <li><a href="{% url 'users:logout' %}">Cerrar Sesión</a></li>
                     {% else %}
                         <li><a href="{% url 'users:login' %}">Iniciar Sesión</a></li>
                         <li><a href="{% url 'users:singup' %}">Registrarse</a></li>

@@ -26,15 +26,23 @@
         <div class="users-form-box">
             <h2>Iniciar sesion</h2>
             <div class="users-form-subbox">
-                <form class="user-form-main">
+                <form method="post" class="user-form-main">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
                     <div>
-                        <input type="email" class="user-form-control" id="email" placeholder="Email" required>
-                        <input type="password" class="user-form-control" id="password" placeholder="Contraseña" required>
-                
+                        {{ form.email }}
+                        {{ form.password }}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div style="color: crimson;font-family: 'Roboto';text-align: center;font-size: 0.8rem;">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
                     </div>
-                    <button type="submit" class="users-button">Iniciar sesion</button>
+                    <button type="submit" class="users-button">Iniciar Sesion</button>
                 </form>
-                <a href="#">No tienes una cuenta?</a>
+                <a href="{% url 'users:singup' %}">No tienes una cuenta?</a>
                 <a href="#">Olvide mi contraseña</a>
             </div>
         </div>
