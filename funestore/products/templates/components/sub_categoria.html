@@ -1,0 +1,14 @@
+{% if 'sub_categoria' not in request.GET %}
+    <div>
+        <span class="filter-title">Subcategorias</span>
+        <ul class="list-none">
+        {% for sub in sub_categorias %}
+            <li>
+                <a class="decoration-none filter-link" href="?sub_categoria={{ sub.nombre }}{% for key, val in request.GET.items %}{% if key != 'sub_categoria' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">
+                    {{ sub.nombre }}
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endif %}

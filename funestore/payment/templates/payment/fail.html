@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contenidomain %}
+<main class="padding-1rem">
+    <div class="users-facturacion-box">
+        <h2 style="text-align: center;">❌ ¡Ups! Algo salió mal. ❌</h2>
+        <p>No pudimos procesar tu pago o el mismo fue rechazado.</p>
+        <div>
+            <p>Te recomendamos:</p>
+            <ul class="users-failpay">
+                <li><i class="bi bi-check"></i> Verificar los datos de tu medio de pago.</li>
+                <li><i class="bi bi-check"></i> Volver a intentarlo en unos minutos.</li>
+                <li><i class="bi bi-check"></i> Si el problema persiste, contáctanos a <span class="users-email-link">help@funestore.com.ar</span>.</li>
+            </ul>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <a href="#" class="users-facturacion-button users-confirm-links">Volver a la tienda</a>
+            <a href="#" class="users-facturacion-button users-confirm-links">Volver al carrito</a>
+        </div>
+    </div>
+</main>
+{% endblock contenidomain %}
