@@ -3,7 +3,7 @@
 /* Variables de CSS para colores y otros estilos */
 :root {
     --primary-color: #ededed;
-    --color-amt: rgb(82, 219, 80);
+    --color-fs: rgb(82, 219, 80);
     --background-color: #fefefe;
     --search-bg-color: #ededed;
     --search-focus-bg-color: #fff;
@@ -94,9 +94,9 @@ header {
 }
 
 .login {
-    color: var(--color-amt);
+    color: var(--color-fs);
     border-radius: 10px;
-    outline: var(--color-amt) solid 2px;
+    outline: var(--color-fs) solid 2px;
 }
 
 /* --------Navbar-------- */
@@ -121,7 +121,7 @@ header {
 }
 
 .nav__item:hover {
-    color: var(--color-amt)
+    color: var(--color-fs)
 }
 
 .navbar {
@@ -152,7 +152,7 @@ header {
 }
 
 .nav-productos-items.categoria-selec {
-    background-color: var(--color-amt);
+    background-color: var(--color-fs);
     color: #fff;
     font-weight: 600;
 }
@@ -185,12 +185,13 @@ header {
 }
 
 .result-productos-titulo:hover {
-    color: var(--color-amt);
-    border-color: var(--color-amt);
+    color: var(--color-fs);
+    border-color: var(--color-fs);
 }
 /* --------Logo-------- */
 .logo, .logo-nav {
     width: 64px;
+    padding: 1rem;
 }
 
 /* --------Busqueda-------- */
@@ -225,7 +226,7 @@ header {
 
 .lupa {
     font-size: 1.1rem;
-    color: var(--color-amt);
+    color: var(--color-fs);
 }
 
 /* --------Menu-------- */
@@ -321,7 +322,7 @@ footer {
 /* --------HOVERS-------- */
 
 .hover_pad_weight:hover {
-    color: var(--color-amt);
+    color: var(--color-fs);
     padding-left: 0.1rem;
     font-weight: 600;
 }

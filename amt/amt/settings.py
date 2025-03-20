@@ -12,6 +12,15 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import environ
+
+# Inicializar environ
+env = environ.Env()
+environ.Env.read_env(os.path.join(os.path.dirname(__file__), ".env"))
+
+# Cargar la variable de entorno del archivo .env
+MERCADOPAGO_ACCESS_TOKEN = env("MERCADOPAGO_ACCESS_TOKEN")
+MP_WEBHOOK_KEY = env("MP_WEBHOOK_KEY")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,12 +35,30 @@ SECRET_KEY = 'django-insecure-&r$abfh2yec)-#l^r(^^z*0-+cv!(5lr(2@zmfct65f7^m!4jz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ! Actualizar el HOST con el dominio
+ALLOWED_HOSTS = ['ed59-181-228-88-24.ngrok-free.app','127.0.0.1']
 
+# ! Verificar las correspondencias
+CSRF_TRUSTED_ORIGINS = [
+    "https://ed59-181-228-88-24.ngrok-free.app"
+]
+
+# ! Falta verificar que la url recibida por MP sea la correcta, Agregar SECRET KEY A .evn
+# ! Verificar la calidad de la integracion de MP
+# ! Pobar la seguridad de la pagina
+
+# * Sessions
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_AGE = 86400
+SESSION_COOKIE_HTTPONLY = True
+
+# ! Poner en TRUE al momento de salir a produccion
+SESSION_COOKIE_SECURE = False
 
 # Application definition
 
 INSTALLED_APPS = [
+    "django_user_agents",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,10 +69,12 @@ INSTALLED_APPS = [
     'products',
     'core',
     'cart',
-    'users'
+    'users',
+    'payment'
 ]
 
 MIDDLEWARE = [
+    "django_user_agents.middleware.UserAgentMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -150,6 +179,3 @@ EMAIL_HOST_PASSWORD = 'aluc xeog iyiq lkur'  # Usa una contraseña de aplicació
 
 # Configurar la URL de login
 LOGIN_URL = "/usuario/login/"
-
-MERCADOPAGO_PUBLIC_KEY = "APP_USR-af870896-2a1f-49b0-8bf4-5e5a0d887878"
-MERCADOPAGO_ACCESS_TOKEN = "APP_USR-1446495638811835-030623-0a55628b2e7fba74a867cb1200b71eb0-722027219"

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<script src="{% static 'js/mobile.js' %}"></script>
+{% endblock head %}
+
+{% block contenidomain %}
+<ul class="filter-ordenar-box">
+    <li class="filter-button"><i class="bi bi-filter"></i>Filtros</li>
+    <li>{{categoria}}</li>
+    <li class="ordenar-button"><i class="bi bi-arrow-down-up"></i>Ordenar</li>
+    <div class="filter-box-mobile">
+        {% if 'sub_categoria' not in request.GET %}
+            <p class="filter-item">Subcategoria<i class="bi bi-chevron-down"></i></p>
+            <div class="filter-expanded">
+                {% for sub in sub_categorias %}
+                <a href="?sub_categoria={{ sub.nombre }}{% for key, val in request.GET.items %}{% if key != 'sub_categoria' %}&{{ key }}={{ val }}{% endif %}{% endfor %}" class="filter-link-mobile">{{sub.nombre}}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% for nombre_atributo, valores in atributos_unicos.items %}
+            {% if nombre_atributo not in request.GET %}
+                <p class="filter-item">{{nombre_atributo}}<i class="bi bi-chevron-down"></i></p>
+                <div class="filter-expanded">
+                    {% for valor in valores %}
+                        <a href="?{{ nombre_atributo }}={{ valor }}{% for key, val in request.GET.items %}{% if key != nombre_atributo %}&{{ key }}={{ val }}{% endif %}{% endfor %}" class="filter-link-mobile">{{valor}}</a>
+                    {% endfor %}
+                </div>
+            {% endif %} 
+        {% endfor %}
+        {% if 'marca' not in request.GET %}
+            <p class="filter-item">Marca<i class="bi bi-chevron-down"></i></p>
+            <div class="filter-expanded">
+                {% for marca in marcas %}
+                    <a href="?marca={{ marca.nombre }}{% for key, val in request.GET.items %}{% if key != 'marca' %}&{{ key }}={{ val }}{% endif %}{% endfor %}" class="filter-link-mobile">{{ marca.nombre }}</a>
+                {% endfor %}
+            </div>
+        {% endif %} 
+    </div>
+    <div class="ordenar-box-mobile">
+        <a href="?ordenby=date{% for key, val in request.GET.items %}{% if key != 'ordenby' %}&{{ key }}={{ val }}{% endif %}{% endfor %}" class="filter-link-mobile">Por los Ultimos</a>
+        <a href="?ordenby=price_higher{% for key, val in request.GET.items %}{% if key != 'ordenby' %}&{{ key }}={{ val }}{% endif %}{% endfor %}" class="filter-link-mobile"">Por precio: Mayor a menor</a>
+        <a href="?ordenby=price_lower{% for key, val in request.GET.items %}{% if key != 'ordenby' %}&{{ key }}={{ val }}{% endif %}{% endfor %}" class="filter-link-mobile"">Por precio: Menor a mayor</a>
+    </div>
+</ul>
+{% if filtros_aplicados %}
+<div class="filter-active-box-mobile">
+    {% for key, value in request.GET.items %}
+        {% if key not in "ordenby" and key not in "q" %}
+            <a class="decoration-none filter-active-link"href="?{% for k, v in request.GET.items %}{% if k != key %}&{{ k }}={{ v }}{% endif %}{% endfor %}">
+                {{ value }}<i class="bi bi-x"></i>
+            </a>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+<main class="product-box main-box">
+    <div class="grid-container">
+        {% for producto, imagen_url in productos_imagen %}
+            <div class="product-card">
+                {% if imagen_url %}
+                    {% include 'components/cards_dinamic.html' with img_url=imagen_url product_name=producto.nombre product_price=producto.precio only %}
+                {% else %}
+                    {% include 'components/cards_static.html' with img_url='img/prod_default.jpg' product_name=producto.nombre product_price=producto.precio only %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</main>
+{% endblock contenidomain %}
+
+{% block contacto %}
+{% endblock contacto %}

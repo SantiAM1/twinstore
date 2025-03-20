@@ -1,12 +1,10 @@
 from django.urls import path
-from .views import inicio_sesion, cerrar_sesion,registro,perfil,verificar_email
+from .views import datos_facturacion,iniciar_sesion,registarse
 
 app_name = "users"
 
 urlpatterns = [
-    path('login/', inicio_sesion, name="login"),
-    path('logout/', cerrar_sesion, name="logout"),
-    path('registro/', registro, name="registro"),
-    path('verificar/<uuid:token>/', verificar_email, name="verificar_email"),
-    path('perfil/',perfil,name="perfil")
+    path('facturacion/',datos_facturacion,name='facturacion'),
+    path('login/',iniciar_sesion,name="login"),
+    path('singup/',registarse,name="singup")
 ]

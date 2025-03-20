@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
 
+{% block head %}
+    <title>Carrito - Funestore</title>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+{% endblock head %}
+
 {% block section %}
 {% endblock section %}
 
 {% block contenidomain %}
 <div class="cart-box flex justify-between gap-1rem">
-    {% if carrito.pedidos.all %}
+    {% if pedidos %}
         <div class="cart-items flex flex-column justify-between gap-1rem">
             <table class="cart-table">
                 <thead>
@@ -20,21 +25,21 @@
                     <tr>
                         <td class="cart-divider-main" colspan="4"></td>
                     </tr>
-                    {% for pedido in carrito.pedidos.all %}
+                    {% for pedido in pedidos %}
                     <tr class="items-center">
                         <td class="cart-prod flex items-center">
                             <div class="cart-prod-responsive flex items-center">
-                                <a href="{% url 'cart:eliminar' pedido_id=pedido.id %}"><i class="bi bi-x-circle cart-prod-delete"></i></a>
-                                <img src="{{ pedido.get_prod_img }}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img">
+                                <a href="{% url 'cart:eliminar_sesion' pedido.id %}"><i class="bi bi-x-circle cart-prod-delete"></i></a>
+                                <img src="{{ pedido.imagen_url }}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img">
                             </div>
                             <div class="cart-prod-cantidad flex flex-column">
                                 <span>{{ pedido.producto.nombre }}</span>
-                                <p class="display_none"><span>{{pedido.get_cantidad}} x </span>${{pedido.producto.precio}}</p>
+                                <p class="display_none"><span>{{pedido.cantidad}} x </span>${{pedido.producto.precio}}</p>
                             </div>
                         </td>
                         <td class="cart-price-sub">${{ pedido.producto.precio }}</td>
                         <td>
-                            <form method="POST" action="{% url 'cart:update' pedido.id %}">
+                            <form method="POST" action="{% url 'cart:update_sesion' pedido.id %}">
                                 {% csrf_token %}
                                 <div class="quantity-container">
                                     <button type="submit" name="action" value="decrement"><i class="bi bi-dash"></i></button>
@@ -43,7 +48,7 @@
                                 </div>
                             </form>
                         </td>
-                        <td class="cart-price-sub">${{ pedido.get_total_precio }}</td>
+                        <td class="cart-price-sub">${{ pedido.total_precio }}</td>
                     </tr>
                     <tr>
                         <td class="cart-divider-prod" colspan="4"></td>
@@ -60,7 +65,7 @@
                 <tbody>
                     <tr class="cart-finish-info">
                         <th>Subtotal</th>
-                        <td>${{ carrito.get_total }}</td>
+                        <td>${{ total_precio }}</td>
                     </tr>
                     <tr>
                         <td class="cart-divider-prod" colspan="2"></td>
@@ -83,21 +88,36 @@
                     </tr>
                     <tr class="cart-finish-info total-row">
                         <th class="cart-finish-th">Total</th>
-                        <td>${{ carrito.get_total }}</td>
+                        <td>${{ total_precio }}</td>
                     </tr>
                     <tr>
                         <td class="cart-divider-main" colspan="2"></td>
                     </tr>
                 </tfoot>
             </table>
-            <a href="#" class="decoration-none cart-finish-button cart-finish-comprar">Finalizar compra</a>
+            <div id="wallet_container"></div>
+                <script>
+                const mp = new MercadoPago('APP_USR-76d326c5-fb71-4ca6-8d44-68353c5d5011', {
+                    locale: 'es-AR'  // Asegura que esté en español y Argentina
+                });
+
+                // Crear el botón de pago con la preference_id generada en Django
+                mp.bricks().create("wallet", "wallet_container", {
+                    initialization: {
+                        preferenceId: "{{ preference_id }}",  // Se inserta la preference_id del backend
+                    },
+                    customization: {
+                        theme: 'default',
+                    }
+                });
+                </script>
+            <!-- <a href="#" class="decoration-none cart-finish-button cart-finish-comprar">Finalizar compra</a> -->
             <a href="#" class="decoration-none cart-finish-button cart-finish-presupuesto">Presupuestar</a>
         </div>
     {% else %}
         <p class="cart-empty-msg">Tu carrito esta vacio</p>
         <a href="{% url 'core:home' %}" class="decoration-none cart-volver-tienda">Volver a la tienda</a>
     {% endif %}
-    
 </div>
 {% endblock contenidomain %}
 

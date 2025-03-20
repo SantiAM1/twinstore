@@ -4,7 +4,7 @@ from django.shortcuts import render
 
 
 def home(request):
-    return render(request,'inicio.html')
+    return render(request,'core/inicio.html')
 
 def local(request):
-    return render(request,'local.html')
+    return render(request,'core/local.html')

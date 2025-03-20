@@ -1,62 +1,151 @@
-from ast import Sub
-from django.shortcuts import render,get_object_or_404
-from django.http import HttpResponse,JsonResponse
-from .models import Producto, SubCategoria,Categoria,Marca
-from django.urls import reverse
+from django.shortcuts import render
+from .models import Producto, SubCategoria,Marca
+from django.db.models import Q
+from django_user_agents.utils import get_user_agent
 
 # Create your views here.
+# ----- Manejo de filtros ----- #
+def get_atributos(productos):
+    atributos_unicos = {}
+    for producto in productos:
+        for atributo in producto.atributos.all():
+            if atributo.nombre not in atributos_unicos:
+                atributos_unicos[atributo.nombre] = set()
+            atributos_unicos[atributo.nombre].add(atributo.valor)
 
+    atributos_unicos = {k: list(v) for k, v in atributos_unicos.items()}
+    return atributos_unicos
+
+def filtrar_atributo(dict, productos, atributos_unicos):
+    filtros = {}
+
+    # Recolectar los filtros seleccionados
+    for nombre_atributo, valores in dict.items():
+        if nombre_atributo in atributos_unicos:  # Asegurar que el filtro es válido
+            filtros[nombre_atributo] = valores
+
+    # Aplicar los filtros solo si existen
+    if filtros:
+        productos = productos.filter(
+            atributos__nombre__in=filtros.keys(),
+            atributos__valor__in=filtros.values()
+        ).distinct()
+    return productos
+
+# ----- Busqueda de productos ----- #
+def buscar_productos(request):
+    query = request.GET.get('q', '')
+
+    #* Si encuentra una busqueda procede a realizar el filtro
+    if query:
+        palabras = query.split()
+        productos = Producto.objects.filter(
+            Q(nombre__icontains=palabras[0])
+        )
+        for palabra in palabras[1:]:
+            productos = productos.filter(Q(nombre__icontains=palabra))
+
+        productos, filtro = ordenby(request, productos)
+        productos_imagen = get_prod_img(productos)
+
+        return render(request, 'products/search_filter.html', {
+            'productos_imagen': productos_imagen,
+            'cantidad_productos': len(productos),
+            'query': query,
+            'filtro': filtro
+        })
+
+    #* En el caso de no encontrar nada se muestran todos los productos
+    productos =Producto.objects.all()
+    productos, filtro = ordenby(request, productos)
+    productos_imagen = get_prod_img(productos)
+    return render(request, 'products/search_filter.html', {
+            'productos_imagen': productos_imagen,
+            'cantidad_productos': len(productos),
+            'query': query,
+            'filtro': filtro
+        })
+
+# ----- Filtracion por categoria ----- #
 def categoria(request, categoria):
     sub_categorias = SubCategoria.objects.filter(categoria__nombre=categoria)
-    productos = Producto.objects.filter(sub_categoria__in=sub_categorias).prefetch_related('imagenes')
+    productos = Producto.objects.filter(sub_categoria__in=sub_categorias).prefetch_related('imagenes', 'atributos')
+    marcas = Marca.objects.filter(producto__in=productos).distinct()
 
-    productos=ordenby(request,productos)
+    #* 🔹 Filtrar por marcas
+    marca_seleccionada = request.GET.get('marca')
+    if marca_seleccionada:
+        productos = productos.filter(marca__nombre=marca_seleccionada)
+
+    #* 🔹 Filtrar por subcategorias
+    sub_categoria_seleccionada = request.GET.get('sub_categoria')
+    if sub_categoria_seleccionada:
+        productos = productos.filter(sub_categoria__nombre=sub_categoria_seleccionada)
+
+    #* 🔹 Obtener los atributos
+    atributos_unicos = get_atributos(productos)
+
+    #* 🔹 Filtrar productos segun los atributos
+    productos = filtrar_atributo(request.GET,productos,atributos_unicos)
+
+    #* 🔹 Ordenar los productos
+    productos, filtro=ordenby(request,productos)
+
+    #* 🔹 Obtener imágenes de los productos
     productos_imagen=get_prod_img(productos)
 
-    return render(request, 'category_filter.html', {
+    filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q"]}
+
+    user_agent = get_user_agent(request)
+    if user_agent.is_mobile:
+        return render(request,'products/mobile.html',{
         'productos_imagen': productos_imagen,
         'categoria': categoria,
         'sub_categorias':sub_categorias,
-        'cantidad_productos':len(productos)
+        'cantidad_productos':len(productos),
+        'filtro' : filtro,
+        'atributos_unicos':atributos_unicos,
+        'marcas':marcas,
+        'filtros_aplicados':filtros_aplicados
     })
 
-def subcategoria(request, categoria, sub_categoria):
-    productos = Producto.objects.filter(
-        sub_categoria__nombre=sub_categoria, 
-        sub_categoria__categoria__nombre=categoria
-    ).prefetch_related('imagenes')
-
-    productos=ordenby(request,productos)
-    productos_imagen=get_prod_img(productos)
-
-    return render(request, 'subcategory_filter.html', {
+    return render(request, 'products/category.html', {
         'productos_imagen': productos_imagen,
         'categoria': categoria,
-        'sub_categoria': sub_categoria,
-        'cantidad_productos':len(productos)
+        'sub_categorias':sub_categorias,
+        'cantidad_productos':len(productos),
+        'filtro' : filtro,
+        'atributos_unicos':atributos_unicos,
+        'marcas':marcas,
+        'filtros_aplicados':filtros_aplicados
     })
 
+# ----- Vista individual del producto ----- #
 def producto_view(request,product_name):
     producto = Producto.objects.get(nombre=product_name)
     imagenes = producto.imagenes.all()
     template_path = f'products-specs/{producto.sku}.html'
-    return render(request,'producto_view.html',{
+    return render(request,'products/producto_view.html',{
         'producto':producto,
         'template_path':template_path,
         'imagenes':imagenes
         })
 
+# ----- Ordenar los productos ----- #
 def ordenby(request, productos):
     orden = request.GET.get('ordenby', 'date')
     if orden == 'price_lower':
         productos = productos.order_by('precio')
+        filtro = 'Ordenar por precio: menor a mayor'
     elif orden == 'price_higher':
         productos = productos.order_by('-precio')
+        filtro = 'Ordenar por precio: mayor a menor'
     else:
         productos = productos.order_by('-id')
-    
-    return productos
+        filtro = 'Ordenar por los últimos'
+    return productos, filtro
 
+# ----- Obetener las imagenes de los productos ----- #
 def get_prod_img(productos):
     productos_imagen = []
     for producto in productos:

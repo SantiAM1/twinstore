@@ -72,3 +72,33 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+    const toggles = document.querySelectorAll(".toggle");
+
+    toggles.forEach(toggle => {
+        toggle.addEventListener("click", function() {
+            toggle.querySelector("i").classList.toggle("rotated");
+            let submenu = this.nextElementSibling;
+            if (submenu) {
+                submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+            }
+        });
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const menu = document.querySelector(".menu");
+    const closeBtn = document.querySelector(".menu-title i");
+    const openBtn = document.getElementById("open-menu");
+
+    // Abrir el menú
+    openBtn.addEventListener("click", function () {
+        menu.classList.add("active");
+    });
+
+    // Cerrar el menú
+    closeBtn.addEventListener("click", function () {
+        menu.classList.remove("active");
+    });
+});
