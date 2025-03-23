@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contenidomain %}
+<main class="padding-1rem">
+    <div class="users-pedidos-box">
+        <h1 style="font-family: 'Roboto';text-align: start;padding-bottom: 1rem;font-weight: 300;border-bottom: 1px solid #d6d6d6;margin: 1rem;">Lista de pedidos</h1>
+        <table class="users-pedidos-table">
+            <thead>
+                <tr>
+                    <th>Pedido</th>
+                    <th class="users-pedidos-hide">ID de pago</th>
+                    <th class="users-pedidos-hide">Fecha</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="cart-divider-main" colspan="4"></td>
+                </tr>
+                {% for pedido in historial %}
+                <tr class="users-pedidos-tr">
+                    <td>
+                        <ul>
+                            {% for producto in pedido.productos %}
+                                <li><span class="users-pedido-count">{{producto.cantidad}} x</span><p class="users-pedido-prod"> {{producto.nombre}}</p></li>
+                            {% endfor %}
+                        </ul>
+                        <p class="users-pedidos-hide-id">ID de pago: <span>#{{pedido.payment_id}}</span></p>
+                    </td>
+                    <td class="users-pedidos-id users-pedidos-hide">#{{pedido.payment_id}}</td>
+                    <td class="users-pedidos-hide">{{pedido.fecha_compra|date:"d/m/y"}}</td>
+                    <td>
+                        {% if pedido.estado == 'confirmado' %}
+                            <div style="background-color: #9dfca1;color: #196b00;" class="users-pedidos-status">
+                                <span>{{pedido.estado|capfirst}}</span>
+                            </div>
+                        {% elif pedido.estado == 'rechazado' %}
+                            <div style="background-color: #f59f9f;color: #8a1919;" class="users-pedidos-status">
+                                <span>{{pedido.estado|capfirst}}</span>
+                            </div>
+                        {% elif pedido.estado == 'pendiente' %}
+                            <div style="background-color: #f5ec9f;color: #7b8315;" class="users-pedidos-status">
+                                <span>{{pedido.estado|capfirst}}</span>
+                            </div>
+                        {% elif pedido.estado == 'preparando pedido' %}
+                            <div style="background-color: #9fcbf5;color: #1d70a0;" class="users-pedidos-status">
+                                <span>{{pedido.estado|capfirst}}</span>
+                            </div>
+                        {% elif pedido.estado == 'enviado' %}
+                            <div style="background-color: #da9ff5;color: #911da0;" class="users-pedidos-status">
+                                <span>{{pedido.estado|capfirst}}</span>
+                            </div>
+                        {% elif pedido.estado == 'finalizado' %}
+                        <div style="background-color: #c2c2c2;color: #494949;" class="users-pedidos-status">
+                            <span>{{pedido.estado|capfirst}}</span>
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="cart-divider-prod" colspan="4"></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+{% endblock contenidomain %}

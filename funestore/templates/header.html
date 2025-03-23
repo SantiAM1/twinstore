@@ -24,8 +24,8 @@
         
                 <ul class="dropdown list-none" id="userDropdown">
                     {% if user.is_authenticated %}
-                        <li><a href="#">Perfil</a></li>
-                        <li><a href="#">Mis Pedidos</a></li>
+                        <li><a href="{% url 'users:perfil' %}">Perfil</a></li>
+                        <li><a href="{% url 'users:pedidos' %}">Mis Pedidos</a></li>
                         <li><a href="{% url 'users:logout' %}">Cerrar Sesión</a></li>
                     {% else %}
                         <li><a href="{% url 'users:login' %}">Iniciar Sesión</a></li>
@@ -82,7 +82,7 @@
                     </button>
                 </li>
                 <li>
-                    <a href="#" class="nav__link nav__item">
+                    <a href="{% url 'users:pedidos' %}" class="nav__link nav__item">
                         <i class="bi bi-box-seam icon_navbar"></i>
                         Pedidos
                     </a>

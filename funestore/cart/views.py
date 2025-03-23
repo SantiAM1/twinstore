@@ -9,7 +9,7 @@ from users.models import PerfilUsuario
 # ----- Preferencias de MP ----- #
 def preference_mp(numero):
     #* Integración con Mercado Pago
-    site_url = '9baf-181-228-88-24.ngrok-free.app'
+    site_url = f'{settings.MY_NGROK_URL}'
 
     preference_data = {
             "items": [

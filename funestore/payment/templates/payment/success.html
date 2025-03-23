@@ -8,11 +8,12 @@
         <p>Hemos recibido tu pedido con exito, puede ver el estado de tu compra en "Mis Pedidos"</p>
         <div>
             <p>📨 En breve recibirás un correo con todos los detalles.</p>
+            <p>🏷️ Este es tu codigo de seguimiento:{{token}}</p>
             <p>👉 Si tenés dudas, podés contactarnos a <span class="users-email-link">help@funestore.com.ar</span>.</p>
         </div>
         <div style="display: flex; justify-content: space-between;">
-            <a href="#" class="users-facturacion-button users-confirm-links">Volver a la tienda</a>
-            <a href="#" class="users-facturacion-button users-confirm-links">Mis pedidos</a>
+            <a href="{% url 'core:home' %}" class="users-facturacion-button users-confirm-links">Volver a la tienda</a>
+            <a href="{% url 'users:pedidos' %}" class="users-facturacion-button users-confirm-links">Mis pedidos</a>
         </div>
     </div>
 </main>

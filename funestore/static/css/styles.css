@@ -1078,6 +1078,63 @@ footer {
     font-weight: 600;
 }
 
+/* -----Pedidos----- */
+.cart-divider-main {
+    border-bottom: 2px solid #bbbbbb;
+}
+.users-pedidos-box {
+    padding: 0.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background-color: white;
+    max-width: 1024px;
+    margin: auto;
+}
+.users-pedidos-table {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem;
+    border-collapse: separate;
+    border-spacing: 10px 10px;
+}
+.users-pedidos-tr td {
+    padding: 10px;
+}
+.users-pedidos-id {
+    font-weight: bold;
+}
+.users-pedidos-status {
+    border-radius: 12px;
+    padding: 10px;
+}
+.users-pedido-count {
+    color: #686868;
+    font-weight: bold;
+}
+.users-responsive-hide{
+    display: none;
+}
+.users-pedidos-tr ul{
+    list-style: none;
+    text-align: start;
+}
+.users-pedidos-tr li{
+    padding-bottom: 0.3rem;
+}
+.users-pedido-prod {
+    display:inline;
+    font-weight: bold;
+}
+.users-pedidos-hide-id {
+    display: none;
+    font-family: 'Roboto';
+    color: #555;
+    font-size: 0.8rem;
+    text-align: start;
+    width: 100%;
+}
+
+/* -----Interfaz de usuario----- */
 .users-box {
     display: flex;
     width: 1024px;
@@ -1447,6 +1504,12 @@ footer {
     }
     .product-slider{
         width: 340px;
+    }
+    .users-pedidos-hide {
+        display: none;
+    }
+    .users-pedidos-hide-id {
+        display: block;
     }
 }
 

@@ -1,11 +1,49 @@
 from django import forms
 from django.contrib.auth.models import User
+import uuid
 
 TIPO_FACTURA_CHOICES = [
     ('A', 'IVA Responsable Inscripto'),
     ('B', 'Consumidor Final'),
     ('C', 'Monotributista'),
 ]
+
+class DatosEnvioForm(forms.Form):
+    direccion_completa = forms.CharField(
+        required=False,
+        label="Dirección",
+        widget=forms.TextInput(attrs={
+            'id': 'autocomplete',
+            'placeholder': 'Calle, Numero, Ciudad...',
+            'class': 'users-facturacion-email',
+            'autocomplete': 'off',
+        })
+    )
+    calle = forms.CharField(required=False, widget=forms.HiddenInput(attrs={'id': 'id_calle'}))
+    altura = forms.CharField(required=False, widget=forms.HiddenInput(attrs={'id': 'id_altura'}))
+    ciudad = forms.CharField(required=False, widget=forms.HiddenInput(attrs={'id': 'id_ciudad'}))
+    provincia = forms.CharField(required=False, widget=forms.HiddenInput(attrs={'id': 'id_provincia'}))
+    codigo_postal = forms.CharField(required=False, widget=forms.HiddenInput(attrs={'id': 'id_codigo_postal'}))
+    latitud = forms.CharField(required=False, widget=forms.HiddenInput(attrs={'id': 'id_latitud'}))
+    longitud = forms.CharField(required=False, widget=forms.HiddenInput(attrs={'id': 'id_longitud'}))
+
+
+class PreferenciasUsuarios(forms.Form):
+    recibir_promociones = forms.BooleanField(required=False,label='Quiero rebicir notificaciones sobre promociones')
+    recibir_estado_pedido = forms.BooleanField(required=False,label='Quiero rebicir mails sobre el estado de mi pedido')
+class DatosPersonales(forms.Form):
+    nombre = forms.CharField(required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'Nombre',
+        'class': 'users-facturacion-email',
+    }))
+    apellido = forms.CharField(required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'Apellido',
+        'class': 'users-facturacion-email',
+    }))
+    email = forms.EmailField(required=False, label="Email", widget=forms.EmailInput(attrs={
+        'placeholder': 'Email',
+        'class': 'users-facturacion-email'
+    }))
 
 class FacturacionForm(forms.Form):
     tipo_factura = forms.ChoiceField(choices=TIPO_FACTURA_CHOICES, label="Tipo de Factura")
@@ -21,6 +59,23 @@ class FacturacionForm(forms.Form):
         'placeholder': 'Email',
         'class': 'users-facturacion-email'
     }))
+
+class BuscarPedidoForm(forms.Form):
+    token = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Código de búsqueda...',
+            'class': 'user-form-control',
+        })
+    )
+
+    def clean_token(self):
+        token = self.cleaned_data['token']
+        try:
+            uuid.UUID(token, version=4)
+        except ValueError:
+            raise forms.ValidationError("El código ingresado no es válido.")
+        return token
 
 class LoginForm(forms.Form):
     email = forms.EmailField(required=True,label="Email",widget=forms.EmailInput(attrs={

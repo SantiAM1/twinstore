@@ -35,17 +35,20 @@ SECRET_KEY = 'django-insecure-&r$abfh2yec)-#l^r(^^z*0-+cv!(5lr(2@zmfct65f7^m!4jz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# * Host
+MY_NGROK_URL="c18b-181-228-88-24.ngrok-free.app"
+
 # ! Actualizar el HOST con el dominio
-ALLOWED_HOSTS = ['9baf-181-228-88-24.ngrok-free.app','127.0.0.1']
+ALLOWED_HOSTS = [f'{MY_NGROK_URL}','127.0.0.1']
 
 # ! Verificar las correspondencias
 CSRF_TRUSTED_ORIGINS = [
-    "https://9baf-181-228-88-24.ngrok-free.app"
+    f"https://{MY_NGROK_URL}"
 ]
 
 # ! Falta verificar que la url recibida por MP sea la correcta, Agregar SECRET KEY A .evn
 # ! Verificar la calidad de la integracion de MP
-# ! Pobar la seguridad de la pagina
+# ! Probar la seguridad de la pagina
 
 # * Sessions
 SESSION_ENGINE = "django.contrib.sessions.backends.db"

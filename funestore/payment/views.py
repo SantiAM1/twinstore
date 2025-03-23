@@ -88,13 +88,7 @@ def notification(request):
                         print(f"⚠️ El pago {payment_id} no está aprobado (estado: {status}).")
                 else:
                     print(f"❌ Error al consultar pago {payment_id}")
-            return HttpResponse(status=200)
-        else:
-            if topic in ["merchant_order", "payment"]:
-                print(f"⚠️ Notificación {topic} sin HMAC válido. Ignorando pero devolviendo 200.")
-                return HttpResponse(status=200)
-            print("❌ HMAC verification failed completamente.")
-            return HttpResponseForbidden("Invalid signature")
+        return HttpResponse(status=200)
 
 def pendings(request):
     return HttpResponse('Pendiente')
@@ -121,7 +115,8 @@ def payment_success(request):
         # * Borrar el carrito
         del request.session['carrito']
         request.session.modified = True
-    return render(request,'payment/success.html')
+    token = historial.token_consulta
+    return render(request,'payment/success.html',{'token':token})
 
 def failure(request):
     return render(request,'payment/fail.html')

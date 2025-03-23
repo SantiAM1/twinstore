@@ -1,9 +1,50 @@
 from django.shortcuts import render, redirect
-from .forms import FacturacionForm,RegistrarForm,LoginForm
+from .forms import FacturacionForm,RegistrarForm,LoginForm,BuscarPedidoForm,DatosPersonales,PreferenciasUsuarios, DatosEnvioForm
 from .models import PerfilUsuario
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
+from payment.models import HistorialCompras
+import uuid
+from django.contrib.auth.decorators import login_required
+
+
+@login_required
+def mi_perfil(request):
+    if request.method == "POST":
+        return redirect('core:home')
+    facturacion_form = FacturacionForm()
+    datos_personales_form = DatosPersonales()
+    preferencias_form = PreferenciasUsuarios()
+    datos_envio_form = DatosEnvioForm()
+    return render(request,'users/perfil.html',{
+        'facturacion_form':facturacion_form,
+        'datos_personales_form':datos_personales_form,
+        'preferencias_form':preferencias_form,
+        'datos_envio_form':datos_envio_form
+    })
+
+def ver_pedidos(request):
+    if request.user.is_authenticated:
+        historial = HistorialCompras.objects.filter(usuario=request.user)
+        return render(request,'users/pedidos.html',{'historial':historial})
+    form = BuscarPedidoForm()
+    if request.method == "POST":
+        form = BuscarPedidoForm(request.POST)
+        if form.is_valid():
+            token = form.cleaned_data['token']
+            historial = HistorialCompras.objects.filter(token_consulta=token)
+            if historial:
+                return render(request, 'users/ver_pedido.html', {'historial': historial})
+            else:
+                messages.error(request, "No existe un pedido con ese código.")
+                return redirect('users:pedidos')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+                    return redirect('users:pedidos')
+    return render(request, 'users/buscar_pedido.html', {'form': form})
 
 def facturacion_view(request):
     form = FacturacionForm()
@@ -69,6 +110,7 @@ def registarse(request):
             return redirect('users:singup')
     return render(request, 'users/registro.html', {'form': form})
 
+@login_required
 def cerrar_sesion(request):
     logout(request)
     return redirect('core:home')
