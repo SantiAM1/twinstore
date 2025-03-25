@@ -14,13 +14,16 @@ from pathlib import Path
 import os
 import environ
 
-# Inicializar environ
+#  * Inicializar environ
 env = environ.Env()
 environ.Env.read_env(os.path.join(os.path.dirname(__file__), ".env"))
 
-# Cargar la variable de entorno del archivo .env
+#  * Cargar la variable de entorno del archivo .env
 MERCADOPAGO_ACCESS_TOKEN = env("MERCADOPAGO_ACCESS_TOKEN")
 MP_WEBHOOK_KEY = env("MP_WEBHOOK_KEY")
+DJANGO_SECRET_KEY = env("DJANGO_SECRET_KEY")
+
+MERCADOPAGO_PUBLIC_KEY = "APP_USR-af870896-2a1f-49b0-8bf4-5e5a0d887878"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,13 +33,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&r$abfh2yec)-#l^r(^^z*0-+cv!(5lr(2@zmfct65f7^m!4jz'
+SECRET_KEY = DJANGO_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # * Host
-MY_NGROK_URL="c18b-181-228-88-24.ngrok-free.app"
+MY_NGROK_URL="3618-181-228-88-24.ngrok-free.app"
 
 # ! Actualizar el HOST con el dominio
 ALLOWED_HOSTS = [f'{MY_NGROK_URL}','127.0.0.1']
@@ -73,7 +76,8 @@ INSTALLED_APPS = [
     'core',
     'cart',
     'users',
-    'payment'
+    'payment',
+    'shipping',
 ]
 
 MIDDLEWARE = [

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from .forms import FacturacionForm,RegistrarForm,LoginForm,BuscarPedidoForm,DatosPersonales,PreferenciasUsuarios, DatosEnvioForm
+from .forms import FacturacionForm,RegistrarForm,LoginForm,BuscarPedidoForm,DatosPersonales,PreferenciasUsuarios
+from shipping.forms import DatosEnvioForm
 from .models import PerfilUsuario
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login,logout
@@ -7,16 +8,79 @@ from django.contrib import messages
 from payment.models import HistorialCompras
 import uuid
 from django.contrib.auth.decorators import login_required
+from shipping.models import DatosEnvio
 
 
 @login_required
 def mi_perfil(request):
     if request.method == "POST":
-        return redirect('core:home')
-    facturacion_form = FacturacionForm()
-    datos_personales_form = DatosPersonales()
-    preferencias_form = PreferenciasUsuarios()
-    datos_envio_form = DatosEnvioForm()
+        perfil, create = PerfilUsuario.objects.get_or_create(user = request.user)
+        datos_envio_form = DatosEnvioForm(request.POST)
+        if datos_envio_form.is_valid():
+            DatosEnvio.objects.update_or_create(
+            usuario=request.user,
+            defaults={
+                'calle': datos_envio_form.cleaned_data['calle'],
+                'altura': datos_envio_form.cleaned_data['altura'],
+                'ciudad': datos_envio_form.cleaned_data['ciudad'],
+                'provincia': datos_envio_form.cleaned_data['provincia'],
+                'codigo_postal': datos_envio_form.cleaned_data['codigo_postal']
+            }
+        )
+        facturacion_form = FacturacionForm(request.POST)
+        if facturacion_form.is_valid():
+            perfil.tipo_factura = facturacion_form.cleaned_data['tipo_factura']
+            perfil.razon_social = facturacion_form.cleaned_data['razon_social']
+            perfil.dni_cuit = facturacion_form.cleaned_data['dni_cuit']
+        datos_personales_form = DatosPersonales(request.POST)
+        if datos_personales_form.is_valid():
+            perfil.nombre = datos_personales_form.cleaned_data['nombre']
+            perfil.apellido = datos_personales_form.cleaned_data['apellido']
+        preferencias_form = PreferenciasUsuarios(request.POST)
+        if preferencias_form.is_valid():
+            perfil.preferencias_promociones = preferencias_form.cleaned_data['recibir_promociones']
+            perfil.preferencias_estado_pedido = preferencias_form.cleaned_data['recibir_estado_pedido']
+        perfil.save()
+
+    usuario = request.user.perfil
+    facturacion_form = FacturacionForm(
+        initial={
+            'tipo_factura':usuario.tipo_factura,
+            'razon_social':usuario.razon_social,
+            'dni_cuit':usuario.dni_cuit,
+            'email':request.user.email
+        }
+    )
+    datos_personales_form = DatosPersonales(
+        initial={
+            'nombre':usuario.nombre,
+            'apellido':usuario.apellido,
+            'email':request.user.email
+        }
+    )
+    preferencias_form = PreferenciasUsuarios(
+        initial={
+            'recibir_promociones':usuario.preferencias_promociones,
+            'recibir_estado_pedido':usuario.preferencias_estado_pedido
+        }
+    )
+    direccion_envio = request.user.direcciones_envio.first()
+    if direccion_envio:
+        direccion_completa = f"{direccion_envio.calle} {direccion_envio.altura}, {direccion_envio.ciudad}, {direccion_envio.provincia or ''}, CP {direccion_envio.codigo_postal}"
+    else:
+        direccion_completa = ''
+
+    datos_envio_form = DatosEnvioForm(
+    initial={
+        'direccion_completa': direccion_completa,
+        'calle': direccion_envio.calle if direccion_envio else '',
+        'altura': direccion_envio.altura if direccion_envio else '',
+        'ciudad': direccion_envio.ciudad if direccion_envio else '',
+        'provincia': direccion_envio.provincia if direccion_envio else '',
+        'codigo_postal': direccion_envio.codigo_postal if direccion_envio else '',
+    }
+)
+
     return render(request,'users/perfil.html',{
         'facturacion_form':facturacion_form,
         'datos_personales_form':datos_personales_form,
@@ -95,6 +159,7 @@ def registarse(request):
             user = authenticate(username=form.cleaned_data['email'], password=form.cleaned_data['password'])
             if user is not None:
                 login(request, user)
+
                 return redirect('core:home')
             else:
                 messages.error(request, "Ocurrió un error inesperado al registrarte. Por favor, intentá ingresar manualmente.")

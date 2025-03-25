@@ -881,7 +881,7 @@ header {
 }
 
 .cart-finish-comprar:hover ,.cart-volver-tienda:hover {
-    background-color: #278f38;
+    background-color: #1e2d6e;
 }
 
 .cart-finish-presupuesto {
@@ -1390,30 +1390,195 @@ footer {
 .users-facturacion-box p {
     color: #5f5f5f;
 }
-@media (max-width: 700px) {
-    .users-form-box {
-        width: 50%;
-    }
-    .users-img-box {
-        width: 50%;
-    }
+
+.users-perfil {
+    padding: 1rem;
+    gap: 0.5rem;
+    display: flex;
+    flex-direction: row;
+    font-family: 'Roboto';
+    width: 100%;
+    margin: auto;
+    max-width: max-content;
+    min-width: 330px;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgb(168, 168, 168);
+    border-radius: 12px;
 }
 
-@media (max-width: 580px) {
-    .users-img-box {
-    display: none;
-    }
-    .users-form-box {
-        width: 100%;
-        border-radius: 12px;
-    }
-    .users-facturacion-form {
-        flex-direction: column;
-    }
-    .users-confirm-links {
-        font-size: 0.8rem;
-        width: 140px;
-    }
+.container-form {
+    width: 100%;
+    height: 2.5rem;
+    position: relative;
+}
+.form__input {
+    font-family: 'Roboto';
+    font-size: 1rem;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: #ededed;
+    border: none;
+    border-left: 4px solid #1b8dd8;
+    outline: none;
+    color: #535353;
+    padding-left: 1em;
+}
+.form__label {
+    position: absolute;
+    background-color: #ededed;
+    color: #535353;
+    left: 1em;
+    top: 0.75em;
+    cursor: text;
+    border-radius: 0.5em;
+    transition: all 0.2s ease-in;
+}
+.form__input:hover {
+    border-left: 4px solid #5faee2;
+}
+.form__input:focus {
+    box-shadow: 0 0 4px rgb(63, 154, 252);
+}
+input[type="text"]:focus ~ .form__label,
+.form__input:not(:placeholder-shown) ~ .form__label {
+    top: -0.5em;
+    font-size: 0.75rem;
+    padding: 0 0.75em;
+    background-color: #fff;
+    color: #838383;
+}
+
+.users-select {
+    width: 100%;
+    padding: 10px;
+    background-color: #f3f3f3;
+    outline: none;
+    border: none;
+    border-left: 4px solid #6e6e6e;
+    font-family: 'Roboto';
+    font-size: 1rem;
+}
+
+.users-perfil h2 {
+    font-family: 'Roboto';
+    color: #292929;
+    padding: 0;
+    margin: 0;
+}
+
+.users-perfil-facturacion {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 50%;
+}
+
+.users-perfil-facturacion span {
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.users-divider {
+    border-bottom: 2px solid #ededed;
+}
+
+.users-perfil-pedido {
+    width: 50%;
+    padding: 1rem;
+    height: max-content;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.users-perfil-pedido h3 {
+    text-align: start;
+    width: 100%;
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+
+.cart-finish-facturacion {
+    font-family: 'Roboto';
+    width: 100%;
+    border-collapse: separate;
+}
+
+.cart-finish-facturacion th {
+    text-align: start;
+}
+
+.cart-finish-facturacion td {
+    text-align: end;
+}
+
+.cart-finish-facturacion thead {
+    font-weight: bold;
+}
+
+.cart-finish-facturacion tbody td, tfoot{
+    font-weight: bold;
+}
+
+.cart-finish-facturacion tbody th{
+    font-weight: normal;
+    color: #575757;
+    font-size: 0.9rem;
+}
+
+.cart-finish-facturacion tbody p {
+    display: inline-block;
+    font-weight: bold;
+    color: #575757;
+}
+
+.cart-finsh-prods th{
+    padding: 0.5rem 0;
+}
+
+.cart-formadepago {
+    list-style: none;
+    max-width: 300px;
+}
+
+.cart-formadepago li {
+    padding: 0.5rem 0;
+    font-weight: bold;
+}
+
+.cart-presupuestar,.cart-finalizarcompra {
+    text-decoration: none;
+    display: block;
+    background-color:#1b8dd8;
+    padding: 0.5rem;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    width: 70%;
+}
+
+.cart-finalizarcompra {
+    font-size: 1.2rem;
+    background-color:#146ba5;
+    width: 100%;
+    margin: 0.5rem 0;
+}
+
+.cart-formadepago-details {
+    font-family: 'Roboto';
+    padding-top: 0.5rem;
+    font-weight: 300;
+    text-align: justify;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+input[type="radio"]:checked + label + .cart-formadepago-details {
+    max-height: 300px;
+    opacity: 1;
 }
 
 /* --------Media Queries-------- */
@@ -1513,6 +1678,22 @@ footer {
     }
 }
 
+@media (max-width: 700px) {
+    .users-form-box {
+        width: 50%;
+    }
+    .users-img-box {
+        width: 50%;
+    }
+    .users-perfil {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .users-perfil-facturacion,.users-perfil-pedido {
+        width: 100%;
+    }
+}
+
 @media screen and (max-width: 570px) {
     .header {
         max-width: 100vw;
@@ -1563,5 +1744,19 @@ footer {
     }
     .product-card {
         width: 160px;
+    }
+    .users-img-box {
+        display: none;
+    }
+    .users-form-box {
+        width: 100%;
+        border-radius: 12px;
+    }
+    .users-facturacion-form {
+        flex-direction: column;
+    }
+    .users-confirm-links {
+        font-size: 0.8rem;
+        width: 140px;
     }
 }

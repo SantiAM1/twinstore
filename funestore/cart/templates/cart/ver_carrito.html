@@ -78,7 +78,7 @@
                         <td class="cart-divider-prod" colspan="2"></td>
                     </tr>
                     <tr class="cart-finish-info">
-                        <th>Recargo Tarjeta</th>
+                        <th>Costo de envio</th>
                         <td>$0.00</td>
                     </tr>
                 </tbody>
@@ -95,23 +95,7 @@
                     </tr>
                 </tfoot>
             </table>
-            <div id="wallet_container"></div>
-                <script>
-                const mp = new MercadoPago('APP_USR-76d326c5-fb71-4ca6-8d44-68353c5d5011', {
-                    locale: 'es-AR'  // Asegura que esté en español y Argentina
-                });
-
-                // Crear el botón de pago con la preference_id generada en Django
-                mp.bricks().create("wallet", "wallet_container", {
-                    initialization: {
-                        preferenceId: "{{ preference_id }}",  // Se inserta la preference_id del backend
-                    },
-                    customization: {
-                        theme: 'default',
-                    }
-                });
-                </script>
-            <!-- <a href="#" class="decoration-none cart-finish-button cart-finish-comprar">Finalizar compra</a> -->
+            <a href="{% url 'cart:realizar_pedido' %}" class="decoration-none cart-finish-button cart-finish-comprar">Finalizar compra</a>
             <a href="#" class="decoration-none cart-finish-button cart-finish-presupuesto">Presupuestar</a>
         </div>
     {% else %}
