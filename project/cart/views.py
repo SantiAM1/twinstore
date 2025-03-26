@@ -131,11 +131,11 @@ def realizar_pedido(request):
             })
     else:
         form = UsuarioForm()
-        carrito = request.session.get('carrito',{})
-        pedidos = []
-        for producto_id,cantidad in carrito.items():
+        carrito_session = request.session.get('carrito',{})
+        carrito = []
+        for producto_id,cantidad in carrito_session.items():
             producto = get_object_or_404(Producto,id=int(producto_id))
-            pedidos.append({
+            carrito.append({
                 'producto':producto,
                 'cantidad':cantidad,
                 'total_precio':producto.precio*cantidad,
@@ -144,7 +144,6 @@ def realizar_pedido(request):
         'carrito': carrito,
         'public_key':public_key,
         'form':form,
-
         })
 
 # ----- Ver el carro -----#

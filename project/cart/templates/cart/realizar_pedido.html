@@ -98,7 +98,7 @@
                         </tr>
                         {% endfor %}
                     {% else %}
-                        {% for pedido in pedidos %}
+                        {% for pedido in carrito %}
                             <tr class="cart-finsh-prods">
                                 <th><p>{{pedido.cantidad}} x</p> {{pedido.producto.nombre}}</th>
                                 <td>${{pedido.total_precio}}</td>
