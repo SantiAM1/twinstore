@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <title>Carrito - Funestore</title>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+{% endblock head %}
+
+{% block section %}
+{% endblock section %}
+
+{% block contenidomain %}
+<main class="padding-1rem">
+    <form class="users-perfil">
+        <div class="users-perfil-facturacion">
+            <h2>Detalles de facturacion</h2>
+            <span>Personales **</span>
+            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select" required>
+                <option value="" selected disabled>Tipo de factura *</option>
+                {% for value, label in form.tipo_factura.field.choices %}
+                    {% if value %}
+                        <option value="{{ value }}" {% if form.tipo_factura.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <div id="dni_cuit_container" class="container-form" style="display: none;">
+                {{form.dni_cuit}}
+                <label for="{{ form.dni_cuit.id_for_label }}" id="dni_cuit_label" class="form__label">{{form.dni_cuit.label}}</label>
+            </div>
+            <div id="razon_social_container" class="container-form" style="display: none;">
+                {{form.razon_social}}
+                <label for="{{ form.razon_social.id_for_label }}" class="form__label">{{form.razon_social.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.nombre}}
+                <label for="{{ form.nombre.id_for_label }}" class="form__label">{{form.nombre.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.apellido}}
+                <label for="{{ form.apellido.id_for_label }}" class="form__label">{{form.apellido.label}}</label>
+            </div>
+            <span>Direccion **</span>
+            <div class="container-form">
+                {{form.calle}}
+                <label for="{{ form.calle.id_for_label }}" class="form__label">{{form.calle.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.calle_detail}}
+                <label for="{{ form.calle_detail.id_for_label }}" class="form__label">{{form.calle_detail.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.cuidad}}
+                <label for="{{ form.cuidad.id_for_label }}" class="form__label">{{form.cuidad.label}}</label>
+            </div>
+            <select name="{{ form.provincia.html_name }}" id="{{ form.provincia.id_for_label }}" class="users-select" required>
+                <option value="" selected disabled>Provincia *</option>
+                {% for value, label in form.provincia.field.choices %}
+                    {% if value %}
+                        <option value="{{ value }}" {% if form.provincia.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <div class="container-form">
+                {{form.codigo_postal}}
+                <label for="{{ form.codigo_postal.id_for_label }}" class="form__label">{{form.codigo_postal.label}}</label>
+            </div>
+            <span>Contacto</span>
+            <div class="container-form">
+                {{form.email}}
+                <label for="{{ form.email.id_for_label }}" class="form__label">{{form.email.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.telefono}}
+                <label for="{{ form.telefono.id_for_label }}" class="form__label">{{form.telefono.label}}</label>
+            </div>
+        </div>
+        <div class="users-perfil-pedido">
+            <h3>Tu pedido</h3>
+            <table class="cart-finish-facturacion">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <td>Subtotal</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th colspan="2" style="border-bottom: 2px solid rgb(185, 185, 185);"></th>
+                    </tr>
+                    {% if carrito.pedidos.all %}
+                        {% for pedido in carrito.pedidos.all %}
+                        <tr class="cart-finsh-prods">
+                            <th><p>{{pedido.get_cantidad}} x</p> {{pedido.producto.nombre}}</th>
+                            <td>${{pedido.get_total_precio}}</td>
+                        </tr>
+                        <tr>
+                            <th colspan="2" style="border-bottom: 1px solid rgb(180, 180, 180);"></th>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        {% for pedido in pedidos %}
+                            <tr class="cart-finsh-prods">
+                                <th><p>{{pedido.cantidad}} x</p> {{pedido.producto.nombre}}</th>
+                                <td>${{pedido.total_precio}}</td>
+                            </tr>
+                            <tr>
+                                <th colspan="2" style="border-bottom: 1px solid rgb(180, 180, 180);"></th>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    
+                </tbody>
+                <tfoot>
+                    <tr class="cart-finsh-prods">
+                        <th>Subtotal</th>
+                        <td>${{total_precio}}</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" style="border-bottom: 1px solid rgb(180, 180, 180);"></th>
+                    </tr>
+                    <tr class="cart-finsh-prods">
+                        <th>Adicionales</th>
+                        <td id="adicionales-value">$0.00</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" style="border-bottom: 1px solid rgb(180, 180, 180);"></th>
+                    </tr>
+                    <tr class="cart-finsh-prods">
+                        <th>Total</th>
+                        <td id="total-value">${{ total_precio }}</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" style="border-bottom: 2px solid rgb(185, 185, 185);"></th>
+                    </tr>
+                </tfoot>
+            </table>
+            <a href="#" class="cart-presupuestar">Descargar Presupuesto</a>
+            <ul  class="cart-formadepago">
+                <li>
+                    <input type="radio" name="opcion" id="opcion1">
+                    <label for="opcion1">Pago en el local: (Contado)</label>
+                    <div class="cart-formadepago-details">IMPORTANTE: Los pedidos abonados en efectivo se realizan al momento de recibir el pedido, el monto puede variar al momento del pago.
+                        <a href="#" class="cart-finalizarcompra">Realizar Pedido</a>
+                    </div>
+                </li>
+                <li>
+                    <input type="radio" name="opcion" id="opcion2">
+                    <label for="opcion2">Transferencia / Depósito bancario (PAGO EN EL DÍA)</label>
+                    <div class="cart-formadepago-details">Hace tu pago en nuestra cuenta bancaria. Usa el identificador de pedido como referencia del pago. La transferencia tiene un plazo de 24hs para ser informada.
+                        <a href="#" class="cart-finalizarcompra">Realizar Pedido</a>
+                    </div>
+                </li>
+                <li>
+                    <input type="radio" name="opcion" id="opcion3">
+                    <label for="opcion3">Pagar con Mercado Pago</label>
+                    <div class="cart-formadepago-details">IMPORTANTE: Los pagos realizados con la plataforma de Mercado Pago cuentan con un recargo del 6,29% más IVA.
+                        <div id="box-checkout-pro"></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </form>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Procesando pedido...</p>
+    </div>
+</main>
+{% include 'cart/module/type_factura.html' %}
+{% include 'cart/module/axios.html' %}
+{% endblock contenidomain %}
+
+{% block contacto %}
+{% endblock contacto %}

@@ -1,0 +1,113 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contenidomain %}
+<main class="padding-1rem">
+    <form class="users-perfil" method="post">
+        {% csrf_token %}
+        <div class="users-perfil-facturacion users-perfil-form">
+            <h2>Datos de Usuario</h2>
+            <span>Personales **</span>
+            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select" required>
+                <option value="" selected disabled>Tipo de factura *</option>
+                {% for value, label in form.tipo_factura.field.choices %}
+                    {% if value %}
+                        <option value="{{ value }}" {% if form.tipo_factura.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <div id="dni_cuit_container" class="container-form" style="display: none;">
+                {{form.dni_cuit}}
+                <label for="{{ form.dni_cuit.id_for_label }}" id="dni_cuit_label" class="form__label">{{form.dni_cuit.label}}</label>
+            </div>
+            <div id="razon_social_container" class="container-form" style="display: none;">
+                {{form.razon_social}}
+                <label for="{{ form.razon_social.id_for_label }}" class="form__label">{{form.razon_social.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.nombre}}
+                <label for="{{ form.nombre.id_for_label }}" class="form__label">{{form.nombre.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.apellido}}
+                <label for="{{ form.apellido.id_for_label }}" class="form__label">{{form.apellido.label}}</label>
+            </div>
+            <span>Direccion **</span>
+            <div class="container-form">
+                {{form.calle}}
+                <label for="{{ form.calle.id_for_label }}" class="form__label">{{form.calle.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.calle_detail}}
+                <label for="{{ form.calle_detail.id_for_label }}" class="form__label">{{form.calle_detail.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.cuidad}}
+                <label for="{{ form.cuidad.id_for_label }}" class="form__label">{{form.cuidad.label}}</label>
+            </div>
+            <select name="{{ form.provincia.html_name }}" id="{{ form.provincia.id_for_label }}" class="users-select" required>
+                <option value="" selected disabled>Provincia *</option>
+                {% for value, label in form.provincia.field.choices %}
+                    {% if value %}
+                        <option value="{{ value }}" {% if form.provincia.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <div class="container-form">
+                {{form.codigo_postal}}
+                <label for="{{ form.codigo_postal.id_for_label }}" class="form__label">{{form.codigo_postal.label}}</label>
+            </div>
+            <span>Contacto</span>
+            <div class="container-form">
+                {{form.email}}
+                <label for="{{ form.email.id_for_label }}" class="form__label">{{form.email.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.telefono}}
+                <label for="{{ form.telefono.id_for_label }}" class="form__label">{{form.telefono.label}}</label>
+            </div>
+            <button type="submit" class="users-facturacion-button">Guardar</button>
+        </div>
+    </form>
+    
+</main>
+<script>
+    const tipoFactura = document.getElementById('id_tipo_factura');
+    const dniCuitContainer = document.getElementById('dni_cuit_container');
+    const razonSocialContainer = document.getElementById('razon_social_container');
+    const dniCuitInput = document.getElementById('id_dni_cuit');
+    const dniCuitLabel = document.getElementById('dni_cuit_label');
+    const razonSocialInput = document.getElementById('id_razon_social');
+    
+    function actualizarCamposFactura() {
+    const value = tipoFactura.value;
+
+    if (value === 'B') {
+        dniCuitLabel.textContent = 'DNI *';
+        dniCuitInput.required = true;
+        dniCuitContainer.style.display = 'block';
+
+        razonSocialContainer.style.display = 'none';
+        razonSocialInput.required = false;
+    } else if (value === 'A' || value === 'C') {
+        dniCuitLabel.textContent = 'CUIT *';
+        dniCuitInput.required = true;
+        dniCuitContainer.style.display = 'block';
+
+        razonSocialContainer.style.display = 'block';
+        razonSocialInput.required = true;
+    } else {
+        dniCuitContainer.style.display = 'none';
+        razonSocialContainer.style.display = 'none';
+        dniCuitInput.required = false;
+        razonSocialInput.required = false;
+    }
+}
+
+tipoFactura.addEventListener('change', actualizarCamposFactura);
+window.addEventListener('DOMContentLoaded', actualizarCamposFactura);
+</script>
+
+{% endblock contenidomain %}
+
