@@ -144,7 +144,7 @@ def realizar_pedido(request):
         'carrito': carrito,
         'public_key':public_key,
         'form':form,
-        'pedidos':pedidos
+
         })
 
 # ----- Ver el carro -----#
