@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 class CalcularPedidoSerializer(serializers.Serializer):
-    total_precio = serializers.DecimalField(max_digits=10, decimal_places=2)
     metodo_pago = serializers.CharField()
     nombre = serializers.CharField()
     apellido = serializers.CharField()
@@ -11,3 +10,14 @@ class CalcularPedidoSerializer(serializers.Serializer):
     calle = serializers.CharField()
     cuidad = serializers.CharField()
     codigo_postal = serializers.CharField()
+
+class AgregarAlCarritoSerializer(serializers.Serializer):
+    producto_id = serializers.IntegerField()
+    cantidad = serializers.IntegerField()
+
+class EliminarPedidoSerializer(serializers.Serializer):
+    pedido_id = serializers.IntegerField()
+
+class ActualizarPedidoSerializer(serializers.Serializer):
+    pedido_id = serializers.IntegerField()
+    action = serializers.ChoiceField(choices=["increment", "decrement"])

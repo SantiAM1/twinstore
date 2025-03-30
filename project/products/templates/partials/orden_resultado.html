@@ -1,15 +1,14 @@
 <div class="flex justify-between gap-1rem items-center product-result">
-    <p>Mostrando {{cantidad_productos}} resultado/s</p>
-    <form method="GET" id="filterForm">
-        <input type="hidden" name="q" value="{{ query }}">
+    <p>Mostrando {{ cantidad_productos }} resultado/s</p>
 
+    <form method="GET" id="filterForm">
         {% for key, value in request.GET.items %}
             {% if key != "ordenby" %}
-                <input type="hidden" name="{{ key }}" value="{{ value }}">
+                <input type="hidden" name="{{ key }}" value="{{ value|urlencode }}">
             {% endif %}
         {% endfor %}
 
-        <select name="ordenby" id="ordenby" onchange="document.getElementById('filterForm').submit();" class="product-ordenby">
+        <select name="ordenby" id="ordenby" class="product-ordenby">
             <option value="" disabled selected class="display_none">{{ filtro }}</option>
             <option value="date">Ordenar por los últimos</option>
             <option value="price_lower">Ordenar por precio: menor a mayor</option>

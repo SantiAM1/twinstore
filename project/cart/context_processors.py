@@ -18,6 +18,6 @@ def carrito_total(request):
                 'cantidad' : cantidad,
                 'total_precio' : producto.precio * cantidad
             })
-        total_precio = sum(pedido['total_precio'] for pedido in pedidos) if pedidos else '0.00'
+        total_precio = sum(pedido['total_precio'] for pedido in pedidos) if pedidos else "0.00"
         total_productos = sum(pedido['cantidad'] for pedido in pedidos)
     return {'total_precio': total_precio,'total_productos':total_productos}

@@ -1,0 +1,28 @@
+{% if 'sub_categoria' not in request.GET %}
+    <p class="filter-item">Subcategoria<i class="bi bi-chevron-down"></i></p>
+    <div class="filter-expanded">
+        {% for sub in sub_categorias %}
+            <a href="?sub_categoria={{ sub.nombre }}{% for key, val in request.GET.items %}{% if key != 'sub_categoria' %}&{{ key }}={{ val }}{% endif %}{% endfor %}" class="filter-link-mobile">{{sub.nombre}}</a>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% for nombre_atributo, valores in atributos_unicos.items %}
+    {% if nombre_atributo not in request.GET %}
+        <p class="filter-item">{{nombre_atributo}}<i class="bi bi-chevron-down"></i></p>
+        <div class="filter-expanded">
+            {% for valor in valores %}
+                <a href="?{{ nombre_atributo }}={{ valor }}{% for key, val in request.GET.items %}{% if key != nombre_atributo %}&{{ key }}={{ val }}{% endif %}{% endfor %}" class="filter-link-mobile">{{valor}}</a>
+            {% endfor %}
+        </div>
+    {% endif %} 
+{% endfor %}
+
+{% if 'marca' not in request.GET %}
+    <p class="filter-item">Marca<i class="bi bi-chevron-down"></i></p>
+    <div class="filter-expanded">
+        {% for marca in marcas %}
+            <a href="?marca={{ marca.nombre }}{% for key, val in request.GET.items %}{% if key != 'marca' %}&{{ key }}={{ val }}{% endif %}{% endfor %}" class="filter-link-mobile">{{ marca.nombre }}</a>
+        {% endfor %}
+    </div>
+{% endif %} 

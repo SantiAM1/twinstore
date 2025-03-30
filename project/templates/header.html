@@ -12,11 +12,12 @@
                     Carrito / ${{total_precio}}
                 </div>
                 <i class="bi bi-cart-fill"></i>
-                <div class="carrito-cantidad">
+                <div class="carrito-cantidad" id="carrito-cantidad">
                     {{total_productos}}
                 </div>
             </a>
-            <div class="user-menu cursor_pointer" onclick="toggleMenu()">
+            <div id="carrito-feedback" class="carrito-feedback oculto"></div>
+            <div class="user-menu cursor_pointer" >
                 <div class="user-icon flex items-center">
                     <i class="bi bi-person"></i>  <!-- Icono de usuario -->
                     <i class="bi bi-chevron-down"></i> <!-- Flecha hacia abajo -->
@@ -24,6 +25,9 @@
         
                 <ul class="dropdown list-none" id="userDropdown">
                     {% if user.is_authenticated %}
+                        {% if user.is_superuser %}
+                            <li><a href="{% url 'core:cargar_excel' %}">🗂️ Cargar productos desde Excel</a></li>
+                        {% endif %}
                         <li><a href="{% url 'users:perfil' %}">Perfil</a></li>
                         <li><a href="{% url 'users:pedidos' %}">Mis Pedidos</a></li>
                         <li><a href="{% url 'users:logout' %}">Cerrar Sesión</a></li>

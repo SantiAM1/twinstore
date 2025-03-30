@@ -23,6 +23,15 @@ class SubCategoria(models.Model):
     def __str__(self):
         return self.nombre
 
+class EstimacionEmpaque(models.Model):
+    categoria = models.CharField(max_length=100, unique=True)
+    largo_cm = models.DecimalField(max_digits=6, decimal_places=2)
+    ancho_cm = models.DecimalField(max_digits=6, decimal_places=2)
+    alto_cm = models.DecimalField(max_digits=6, decimal_places=2)
+    peso_kg = models.DecimalField(max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return f"Empaque estimado para {self.categoria}"
 class Producto(models.Model):
     nombre = models.CharField(max_length=50,unique=True)
     marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
@@ -30,7 +39,7 @@ class Producto(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     descuento = models.IntegerField()
     sku = models.CharField(max_length=20, unique=True, blank=True, null=True)
-    specs = models.BooleanField(default=False)
+    categoria_envio = models.ForeignKey(EstimacionEmpaque, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.nombre
@@ -46,3 +55,18 @@ class Atributo(models.Model):
 
     def __str__(self):
         return f"{self.nombre}: {self.valor}"
+    
+class CategoriaEspecificacion(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+class EspecificacionTecnica(models.Model):
+    producto = models.ForeignKey(Producto, related_name='especificaciones', on_delete=models.CASCADE)
+    categoria = models.ForeignKey(CategoriaEspecificacion, on_delete=models.SET_NULL, null=True, blank=True)
+    datos = models.JSONField(default=dict)
+
+    def __str__(self):
+        return f"{self.categoria.nombre} ({self.producto.nombre})"
+    

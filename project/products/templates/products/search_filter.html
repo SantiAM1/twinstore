@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block section %}
-{% endblock section %}
 
 {% block contenidomain %}
 <div class="product-box main-box">
@@ -10,9 +8,9 @@
         <div>
             <a href="{% url 'core:home' %}" class="decoration-none product-outside-link">Inicio</a>
             <i class="bi bi-chevron-right product-outside-link"></i>
-            <span>Busqueda:"{{query}}"</span>
+            <span>Resultados de busqueda para: "{{query}}"</span>
         </div>
-        {% include 'components/filter.html' %}
+        {% include 'partials/orden_resultado.html' %}
     </nav>
     <div class="flex gap-1rem product-box-grid">
         <main class="flex justify-center flex-grow">
@@ -32,6 +30,3 @@
 </div>
 
 {% endblock contenidomain %}
-
-{% block contacto %}
-{% endblock contacto %}

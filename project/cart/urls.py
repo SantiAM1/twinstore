@@ -1,15 +1,14 @@
 from django.urls import path
-from .views import agregar_al_carrito,ver_carrito,eliminar_del_carrito,cart_update,cart_update_session,cart_delete_session,realizar_pedido,CalcularPedidoView
+from .views import ver_carrito,realizar_pedido,CalcularPedidoView,AgregarAlCarritoView,EliminarPedidoView,ActualizarPedidoView,generar_presupuesto
 
 app_name = 'cart'
 
 urlpatterns = [
-    path('agregar/<int:producto_id>/', agregar_al_carrito, name='agregar'),
     path('ver/', ver_carrito, name='ver_carrito'),
-    path('eliminar/<int:pedido_id>/', eliminar_del_carrito, name='eliminar'),
-    path('update/<int:pedido_id>',cart_update,name="update"),
-    path('update_session/<int:id>',cart_update_session,name="update_sesion"),
-    path('eliminar_session/<int:id>',cart_delete_session,name="eliminar_sesion"),
     path('realizar-pedido/',realizar_pedido,name="realizar_pedido"),
     path('api/calcular-pedido/', CalcularPedidoView.as_view(), name='api_calcular_pedido'),
+    path('api/agregar_al_carrito/',AgregarAlCarritoView.as_view(),name='api_agregar_carrito'),
+    path('api/eliminar_pedido/',EliminarPedidoView.as_view(),name="api_eliminar_pedido"),
+    path('api/actualizar_pedido/',ActualizarPedidoView.as_view(),name="api_actualizar_pedido"),
+    path('presupuestar/',generar_presupuesto,name="presupuestar")
 ]

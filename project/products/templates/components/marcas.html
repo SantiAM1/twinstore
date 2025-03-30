@@ -2,13 +2,14 @@
 <div>
     <span class="filter-title">Marcas</span>
     <ul class="list-none">
-    {% for marca in marcas %}
-        <li>
-            <a class="decoration-none filter-link" href="?marca={{ marca.nombre }}{% for key, val in request.GET.items %}{% if key != 'marca' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">
-                {{ marca.nombre }}
-            </a>
-        </li>
-    {% endfor %}
+        {% for marca in marcas %}
+            <li>
+                <a class="decoration-none filter-link"
+                    href="?{% for key, val in request.GET.items %}{% if key != 'marca' %}{{ key }}={{ val|urlencode }}&{% endif %}{% endfor %}marca={{ marca.nombre|urlencode }}">
+                    {{ marca.nombre }}
+                </a>
+            </li>
+        {% endfor %}
     </ul>
 </div>
 {% endif %}

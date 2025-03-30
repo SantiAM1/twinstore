@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+    <style>
+        .cargar-excel-admin {
+            padding: 1rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+        }
+    </style>
+{% endblock head %}
+{% block contenidomain %}
+<main class="padding-1rem">
+<div class="cargar-excel-admin">
+<h2>Cargar productos desde Excel</h2>
+
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="alert 
+            {% if message.tags == 'success' %}alert-success
+            {% elif message.tags == 'error' %}alert-danger
+            {% elif message.tags == 'info' %}alert-info
+            {% else %}alert-secondary
+            {% endif %}">
+            {{ message|safe }}
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Cargar archivo</button>
+</form>
+</div>
+</main>
+{% endblock contenidomain %}

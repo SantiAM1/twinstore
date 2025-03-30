@@ -4,54 +4,30 @@
 {% block contenidomain %}
 <div class="product-box main-box">
     <nav class="flex justify-between items-center products-nav">
-        <div>
-            <a href="{% url 'core:home' %}" class="decoration-none product-outside-link">Inicio</a>
-            <i class="bi bi-chevron-right product-outside-link"></i>
-            {% if 'sub_categoria' in request.GET %}
-                <a href="{% url 'products:categoria' categoria=categoria %}" class="decoration-none product-outside-link">{{categoria}}</a>
-                <i class="bi bi-chevron-right product-outside-link"></i>
-                <span>{{ request.GET.sub_categoria }}</span>
-            {% else %}
-                <span>{{categoria}}</span>
-            {% endif %}
+        {% include 'partials/header_links.html' %}
+        <div id="orden-result">
+            {% include 'partials/orden_resultado.html' %}
         </div>
-        {% include 'components/filter.html' %}
     </nav>
     <div class="flex gap-1rem product-box-grid">
         <div class="flex flex-column filter-box">
-            {% if filtros_aplicados %}
-                <div class="flex flex-column filter-active-box">
-                {% for key, value in request.GET.items %}
-                    {% if key not in "ordenby" and key not in "q" %}
-                        <a class="decoration-none filter-active-link"href="?{% for k, v in request.GET.items %}{% if k != key %}&{{ k }}={{ v }}{% endif %}{% endfor %}">
-                            {{ value }}<i class="bi bi-x"></i>
-                        </a>
-                    {% endif %}
-                {% endfor %}
-                </div>
-            {% endif %}
-            {% include 'components/sub_categoria.html' %}
-            {% include 'components/atribute.html'%}
-            {% include 'components/marcas.html' %}
+            {% include 'partials/filtros_dinamicos.html' %}
         </div>
         <div style="border-right: 2px solid #bbbbbb;"></div>
-        <main class="flex justify-center flex-grow">
+        <main class="flex justify-center">
             <div class="grid-container">
-                {% for producto, imagen_url in productos_imagen %}
-                    <div class="product-card">
-                        {% if imagen_url %}
-                            {% include 'components/cards_dinamic.html' with img_url=imagen_url product_name=producto.nombre product_price=producto.precio only %}
-                        {% else %}
-                            {% include 'components/cards_static.html' with img_url='img/prod_default.jpg' product_name=producto.nombre product_price=producto.precio only %}
-                        {% endif %}
-                    </div>
-                {% endfor %}
+            {% include 'partials/product_grid.html' %}
             </div>
         </main>
     </div>
 </div>
-
 {% endblock contenidomain %}
 
-{% block contacto %}
-{% endblock contacto %}
+{% block myscripts %}
+<script>
+    window.filters = {
+        categoria : "{{categoria}}",
+        apiUrl :"{% url 'products:categoria_ajax' categoria=categoria %}"
+    };
+</script>
+{% endblock myscripts %}

@@ -6,16 +6,14 @@
     <script src="https://sdk.mercadopago.com/js/v2"></script>
 {% endblock head %}
 
-{% block section %}
-{% endblock section %}
-
 {% block contenidomain %}
 <main class="padding-1rem">
-    <form class="users-perfil">
+    <form class="users-perfil" method="post" action="{% url 'payment:realizar_pedido' %}">
+        {% csrf_token %}
         <div class="users-perfil-facturacion">
             <h2>Detalles de facturacion</h2>
             <span>Personales **</span>
-            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select" required>
+            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select bloqueable" required>
                 <option value="" selected disabled>Tipo de factura *</option>
                 {% for value, label in form.tipo_factura.field.choices %}
                     {% if value %}
@@ -52,7 +50,7 @@
                 {{form.cuidad}}
                 <label for="{{ form.cuidad.id_for_label }}" class="form__label">{{form.cuidad.label}}</label>
             </div>
-            <select name="{{ form.provincia.html_name }}" id="{{ form.provincia.id_for_label }}" class="users-select" required>
+            <select name="{{ form.provincia.html_name }}" id="{{ form.provincia.id_for_label }}" class="users-select bloqueable" required>
                 <option value="" selected disabled>Provincia *</option>
                 {% for value, label in form.provincia.field.choices %}
                     {% if value %}
@@ -134,27 +132,27 @@
                     </tr>
                 </tfoot>
             </table>
-            <a href="#" class="cart-presupuestar">Descargar Presupuesto</a>
+            <a href="#" class="cart-presupuestar bloqueable">Descargar Presupuesto</a>
             <ul  class="cart-formadepago">
                 <li>
-                    <input type="radio" name="opcion" id="opcion1">
-                    <label for="opcion1">Pago en el local: (Contado)</label>
+                    <input type="radio" name="forma_pago" id="efectivo" value="efectivo">
+                    <label for="efectivo">Pago en el local: (Contado)</label>
                     <div class="cart-formadepago-details">IMPORTANTE: Los pedidos abonados en efectivo se realizan al momento de recibir el pedido, el monto puede variar al momento del pago.
-                        <a href="#" class="cart-finalizarcompra">Realizar Pedido</a>
+                        <button type="submit" class="cart-finalizarcompra bloqueable cursor_pointer">Realizar Pedido</button>
                     </div>
                 </li>
                 <li>
-                    <input type="radio" name="opcion" id="opcion2">
-                    <label for="opcion2">Transferencia / Depósito bancario (PAGO EN EL DÍA)</label>
+                    <input type="radio" name="forma_pago" id="transferencia" value="transferencia">
+                    <label for="transferencia">Transferencia / Depósito bancario (PAGO EN EL DÍA)</label>
                     <div class="cart-formadepago-details">Hace tu pago en nuestra cuenta bancaria. Usa el identificador de pedido como referencia del pago. La transferencia tiene un plazo de 24hs para ser informada.
-                        <a href="#" class="cart-finalizarcompra">Realizar Pedido</a>
+                        <button type="submit" class="cart-finalizarcompra bloqueable cursor_pointer">Realizar Pedido</button>
                     </div>
                 </li>
                 <li>
-                    <input type="radio" name="opcion" id="opcion3">
-                    <label for="opcion3">Pagar con Mercado Pago</label>
+                    <input type="radio" name="forma_pago" id="mercadopago">
+                    <label for="mercadopago">Pagar con Mercado Pago</label>
                     <div class="cart-formadepago-details">IMPORTANTE: Los pagos realizados con la plataforma de Mercado Pago cuentan con un recargo del 6,29% más IVA.
-                        <div id="box-checkout-pro"></div>
+                        <div id="box-checkout-pro" class="bloqueable"></div>
                     </div>
                 </li>
             </ul>
@@ -165,9 +163,7 @@
         <p>Procesando pedido...</p>
     </div>
 </main>
-{% include 'cart/module/type_factura.html' %}
-{% include 'cart/module/axios.html' %}
 {% endblock contenidomain %}
 
-{% block contacto %}
-{% endblock contacto %}
+{% block myscripts %}
+{% endblock myscripts %}

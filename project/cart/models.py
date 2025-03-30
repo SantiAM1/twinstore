@@ -34,6 +34,8 @@ class Carrito(models.Model):
         )
         if not creado:
             pedido.cantidad += cantidad
+            if pedido.cantidad > 5:
+                pedido.cantidad = 5
             pedido.save()
         return pedido
 

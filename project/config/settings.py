@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+# ! GTK3 WEASYPRINT
+
 from pathlib import Path
 import os
 import environ
@@ -39,7 +41,7 @@ SECRET_KEY = DJANGO_SECRET_KEY
 DEBUG = True
 
 # * Host
-MY_NGROK_URL="7bc5-181-228-88-24.ngrok-free.app"
+MY_NGROK_URL="bf07-186-137-123-71.ngrok-free.app"
 
 # ! Actualizar el HOST con el dominio
 ALLOWED_HOSTS = [f'{MY_NGROK_URL}','127.0.0.1']
@@ -72,6 +74,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'django_json_widget',
     'rest_framework',
     'products',
     'core',
@@ -118,10 +121,20 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'project',
+        'USER': 'santi',
+        'PASSWORD': 'santi_db_project',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -186,3 +199,10 @@ EMAIL_HOST_PASSWORD = 'aluc xeog iyiq lkur'  # Usa una contraseña de aplicació
 
 # Configurar la URL de login
 LOGIN_URL = "/usuario/login/"
+
+# * Argentina !
+LANGUAGE_CODE = 'es-ar'
+TIME_ZONE = 'America/Argentina/Buenos_Aires'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True

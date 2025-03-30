@@ -36,55 +36,58 @@ class UsuarioForm(forms.Form):
         ('W', 'Tierra del Fuego'),
         ('X', 'Tucumán'),
     ]
+    SELECT_ATTRS = forms.Select(attrs={'class': 'users-select bloqueable'})
+    INPUT_ATTRS = forms.TextInput(attrs={'class': 'form__input bloqueable','autocomplete':'off','placeholder':' '})
 
     tipo_factura = forms.ChoiceField(
         choices=TIPO_FACTURA_CHOICES,
         required=True,
-        widget=forms.Select(attrs={'class': 'users-select'})
+        widget=SELECT_ATTRS
     )
     dni_cuit = forms.CharField(
         max_length=255,
         required=True,
         label='DNI *',
-        widget=forms.TextInput(attrs={'class': 'form__input','autocomplete':'off','placeholder':' '})
+        widget=INPUT_ATTRS
         )
     razon_social = forms.CharField(
         max_length=255,
         required=False,
         label='Razon Social *',
-        widget=forms.TextInput(attrs={'class': 'form__input','autocomplete':'off','placeholder':' '})
+        widget=INPUT_ATTRS
         )
     nombre = forms.CharField(
         max_length=255,
         required=True,
         label='Nombre *',
-        widget=forms.TextInput(attrs={'class': 'form__input','autocomplete':'off','placeholder':' '})
+        widget=INPUT_ATTRS
         )
     apellido = forms.CharField(
         max_length=255,
         required=True,
         label='Apellidos *',
-        widget=forms.TextInput(attrs={'class': 'form__input','autocomplete':'off','placeholder':' '})
+        widget=INPUT_ATTRS
         )
     calle = forms.CharField(max_length=255, required=True, label="Dirección de la calle *",
-        widget=forms.TextInput(attrs={'class': 'form__input','autocomplete':'off','placeholder':' '})
+        widget=INPUT_ATTRS
         )
     calle_detail = forms.CharField(max_length=255, required=False, label="Apartamento / Piso / Detalle",
-        widget=forms.TextInput(attrs={'class': 'form__input','autocomplete':'off','placeholder':' '})
+        widget=INPUT_ATTRS
         )
     cuidad = forms.CharField(max_length=255, required=True, label="Localidad / Ciudad *",
-        widget=forms.TextInput(attrs={'class': 'form__input','autocomplete':'off','placeholder':' '})
+        widget=INPUT_ATTRS
         )
     provincia = forms.ChoiceField(choices=PROVINCIAS_CHOICES, required=True,
-        widget=forms.Select(attrs={'class': 'users-select'}))
+        widget=SELECT_ATTRS
+        )
     codigo_postal = forms.CharField(max_length=10, required=True, label="Codigo Postal *",
-        widget=forms.TextInput(attrs={'class': 'form__input','autocomplete':'off','placeholder':' '})
+        widget=INPUT_ATTRS
         )
     email = forms.EmailField(required=True, label="Email *",
         widget=forms.EmailInput(attrs={'class': 'form__input','autocomplete':'off','placeholder':' '})
         )
     telefono = forms.CharField(max_length=20, required=False, label="Telefono",
-        widget=forms.TextInput(attrs={'class': 'form__input','autocomplete':'off','placeholder':' '})
+        widget=INPUT_ATTRS
         )
 
 class PreferenciasUsuarios(forms.Form):

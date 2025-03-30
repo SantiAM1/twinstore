@@ -28,6 +28,7 @@ def mi_perfil(request):
             perfil.codigo_postal = data['codigo_postal']
             perfil.telefono = data['telefono']
             perfil.save()
+            messages.success(request,'Usuario actualizado con exito!')
     form = UsuarioForm(initial={
             'tipo_factura': perfil.tipo_factura,
             'dni_cuit': perfil.dni_cuit,

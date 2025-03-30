@@ -13,22 +13,32 @@
     {% endblock head %}
 </head>
 <body>
-    <header>
+    <header class="header-tag">
         {% include 'header.html' %}
     </header>
     <div class="divider-content"></div>
-    {% block section %}
-    {% endblock section %}
 
     {% block contenidomain %}
     {% endblock contenidomain %}
 
-    {% block contacto %}
-    {% endblock contacto %}
-    
     <footer class="flex flex-column">
         {% include 'footer.html' %}
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        window.api = {
+            agregarAlCarrito: "{% url 'cart:api_agregar_carrito' %}",
+            eliminarPedido: "{% url 'cart:api_eliminar_pedido' %}",
+            verCarrito : "{% url 'cart:ver_carrito' %}",
+            calcularPedido:"{% url 'cart:api_calcular_pedido' %}",
+            actualizarPedido:"{% url 'cart:api_actualizar_pedido' %}",
+            imgMP: "{% static 'img/mercado_pago.png' %}",
+            finalizarCompra: "{% url 'cart:realizar_pedido' %}"
+        };
+    </script>
+    {% block myscripts %}
+    {% endblock myscripts %}
     {% include 'menu_mobile.html' %}
     {% include 'scr_template.html' %}
 </body>
