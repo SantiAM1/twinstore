@@ -1,5 +1,5 @@
 """
-WSGI config for funestore project.
+WSGI config for twinstore project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block head %}
-    <title>{{producto.nombre}} - Funestore</title>
+    <title>{{producto.nombre}} - Twinstore</title>
 {% endblock head %}
 
 {% block contenidomain %}
@@ -17,13 +17,13 @@
         <span> {{producto.nombre}} </span>
     </nav>
     <div class="flex gap-1rem product-view">
-        <div class="thumbnails">
+        <div class="flex flex-column thumbnails">
             {% for imagen in imagenes %}
             <img src="{{ imagen.imagen.url }}" class="thumbnail" alt="Miniatura" onclick="scrollToImage('{{ forloop.counter0 }}')">
             {% endfor %}
         </div>
-        <div class="product-slider">
-            <div class="slider-track" id="sliderTrack">
+        <div class="flex items-center product-slider">
+            <div class="flex items-center slider-track" id="sliderTrack">
                 {% for imagen in imagenes %}
                 <img src="{{ imagen.imagen.url }}" id="slide-{{ forloop.counter0 }}" alt="Imagen principal de {{ producto.nombre }}">
                 {% endfor %}
@@ -37,7 +37,7 @@
             <div class="flex flex-column gap-1rem">
                 <p class="product-title-precio">${{producto.precio}}</p>
                 <form id="add-to-cart-form" class="flex items-center gap-1rem" style="height: 40px;">
-                    <div class="quantity-container">
+                    <div class="flex items-center justify-center quantity-container">
                         <button type="button" class="decrement" onclick="decreaseQuantity()"><i class="bi bi-dash"></i></button>
                         <input type="text" id="quantity" name="cantidad" value="1" readonly>
                         <button type="button" class="increment" onclick="increaseQuantity()"><i class="bi bi-plus"></i></button>

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import iniciar_sesion,registarse,cerrar_sesion,ver_pedidos,mi_perfil
+from .views import iniciar_sesion,registarse,cerrar_sesion,buscar_pedidos,mi_perfil,verificar_email,email_enviado,reenviar_verificacion,users_pedidos,ver_pedido
 
 app_name = "users"
 
@@ -7,6 +7,11 @@ urlpatterns = [
     path('login/',iniciar_sesion,name="login"),
     path('singup/',registarse,name="singup"),
     path('logout/',cerrar_sesion,name="logout"),
-    path('pedidos/',ver_pedidos,name="pedidos"),
-    path('miperfil/',mi_perfil,name="perfil")
+    path('buscar_pedidos/',buscar_pedidos,name="buscar_pedidos"),
+    path('ver_pedido/<str:token>',ver_pedido,name="ver_pedidos"),
+    path('mispedidos/',users_pedidos,name="mispedidos"),
+    path('miperfil/',mi_perfil,name="perfil"),
+    path('verificar/<str:token>',verificar_email,name="verificar"),
+    path('email_enviado/<str:token>',email_enviado,name="email_enviado"),
+    path('reenviar_mail/<str:token>',reenviar_verificacion,name="reenviar_mail")
 ]

@@ -3,17 +3,45 @@
 
 {% block contenidomain %}
 <main class="padding-1rem">
-    <div class="users-facturacion-box">
-        <h2 style="text-align: center;">✅ ¡Gracias por tu compra! ✅</h2>
-        <p>Hemos recibido tu pedido con exito, puede ver el estado de tu compra en "Mis Pedidos"</p>
+    <div class="flex font-roboto flex-column users-facturacion-box">
+        <h2 class="text-center">✅ ¡Gracias por tu compra! ✅</h2>
+        <p>Hemos recibido tu pedido con exito</p>
+        {% if historial.forma_de_pago == 'transferencia' %}
+            <div class="users-facturacion-transferencia">
+                <h3>Pago por transferencia bancaria</h3><br>
+                <p><i class="bi bi-clock-history"></i> El pago debe realizarse dentro de las <strong>próximas 24 horas</strong>.</p>
+                <p><i class="bi bi-paperclip"></i> Usá el ID de pago como **referencia en tu transferencia**.</p>
+                <p><i class="bi bi-check2"></i><strong> ID de pago:</strong> <code>{{ historial.payment_id }}</code></p>
+
+                {% if user.is_authenticated %}
+                    <p><i class="bi bi-check2"></i> Podés subir el comprobante más tarde desde la sección <strong>"Mis pedidos"</strong>.</p>
+                {% else %}
+                    <p><i class="bi bi-check2"></i> Podés subir tu comprobante más tarde ingresando tu <strong>código de seguimiento</strong></p>
+                {% endif %}
+                <p><i class="bi bi-check2-all"></i> Una vez validado el pago, te notificaremos por correo electrónico.</p><br>
+                <div class="link-comprobante-box">
+                    <a href="{% url 'payment:comprobante' historial.token_consulta %}" class="users-facturacion-button link-comprobante-button">
+                        Subir comprobante ahora
+                    </a>
+                </div>
+            </div>
+        {% endif %}
         <div>
+            {% if user.is_authenticated %}
+                <p>🏷️ Puedes ver el estado de tu compra en "Mis Pedidos"</p>
+            {% else %}
+                <p>🏷️ Este es tu codigo de seguimiento:<code>{{ historial.token_consulta }}</code></p>
+            {% endif %}
             <p>📨 En breve recibirás un correo con todos los detalles.</p>
-            <p>🏷️ Este es tu codigo de seguimiento:{{token}}</p>
-            <p>👉 Si tenés dudas, podés contactarnos a <span class="users-email-link">help@funestore.com.ar</span>.</p>
+            <p>👉 Si tenés dudas, podés contactarnos a <span class="users-email-link">help@twinstore.com.ar</span>.</p>
         </div>
         <div class="flex justify-between">
             <a href="{% url 'core:home' %}" class="users-facturacion-button users-confirm-links">Volver a la tienda</a>
-            <a href="{% url 'users:pedidos' %}" class="users-facturacion-button users-confirm-links">Mis pedidos</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'users:mispedidos' %}" class="users-facturacion-button users-confirm-links">Mis pedidos</a>
+            {% else %}
+            <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="users-facturacion-button users-confirm-links">Ver Pedido</a>
+            {% endif %}
         </div>
     </div>
 </main>

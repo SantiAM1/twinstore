@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block contenidomain %}
-<ul class="filter-ordenar-box">
-    <li class="filter-button"><i class="bi bi-filter"></i>Filtros</li>
+<ul class="flex items-center justify-between filter-ordenar-box">
+    <li class="flex items-center filter-button"><i class="bi bi-sliders"></i>Filtros</li>
     <li>{{categoria}}</li>
-    <li class="ordenar-button"><i class="bi bi-arrow-down-up"></i>Ordenar</li>
+    <li class="flex items-center ordenar-button"><i class="bi bi-arrow-down-up"></i>Ordenar</li>
     <div class="filter-box-mobile" id="filters-box-mobile">
         {% include 'partials/filtros_dinamicos_mobile.html' %}
     </div>

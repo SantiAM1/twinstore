@@ -1,6 +1,6 @@
 
     {% for producto, imagen_url in productos_imagen %}
-        <div class="product-card">
+        <div class="flex flex-column items-center justify-center product-card">
             {% if imagen_url %}
                 {% include 'components/cards_dinamic.html' with img_url=imagen_url product_name=producto.nombre product_price=producto.precio only %}
             {% else %}

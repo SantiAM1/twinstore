@@ -5,4 +5,4 @@ class PaymentConfig(AppConfig):
     name = 'payment'
 
     def ready(self):
-        import payment.signals  # 👈 Importamos el archivo de señales
+        import payment.signals

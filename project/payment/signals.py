@@ -1,6 +1,12 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import PagoRecibidoMP, HistorialCompras
+from .models import PagoRecibidoMP, HistorialCompras,ComprobanteTransferencia
+
+@receiver(post_save, sender=ComprobanteTransferencia)
+def aprobar_historial_transferencia(sender, instance, created, **kwargs):
+    if instance.aprobado and instance.historial.estado != 'confirmado':
+        instance.historial.estado = 'confirmado'
+        instance.historial.save()
 
 @receiver(post_save, sender=PagoRecibidoMP)
 def asociar_pago_y_actualizar_estado(sender, instance, created, **kwargs):

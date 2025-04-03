@@ -1,5 +1,5 @@
 <a href="{% url 'products:producto' product_name=product_name %}" class="decoration-none">
-    <div class="product-card-img"><img src="{{img_url}}" alt="{{ product_name }}"></div>
+    <div class="flex items-center justify-center product-card-img"><img src="{{img_url}}" alt="{{ product_name }}" loading="lazy"></div>
     <span>{{ product_name }}</span>
     <p>${{product_price}}</p>
     <strong>Ver mas</strong>

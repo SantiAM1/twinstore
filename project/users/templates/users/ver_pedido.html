@@ -4,6 +4,11 @@
 {% block contenidomain %}
 <main class="padding-1rem">
     <div class="users-pedidos-box">
+        {% if messages %}
+            {% for mensaje in messages %}
+                <p class="django-msg-{{mensaje.tags}}">{{mensaje}}</p>
+            {% endfor %}
+        {% endif %}
         <h1 style="font-family: 'Roboto';text-align: start;padding-bottom: 1rem;font-weight: 300;border-bottom: 1px solid #d6d6d6;margin: 1rem;">Pedido</h1>
         <table class="users-pedidos-table">
             <thead>
@@ -25,6 +30,13 @@
                             {% for producto in pedido.productos %}
                                 <li><span class="users-pedido-count">{{producto.cantidad}} x</span><p class="users-pedido-prod"> {{producto.nombre}}</p></li>
                             {% endfor %}
+                            {% if pedido.forma_de_pago == 'transferencia' %}
+                                {% if pedido.comprobante %}
+                                    <p class="link-subir-comprobante subido"><i class="bi bi-paperclip"></i> Comprobante adjunto</p>
+                                {% else %}
+                                    <a href="{% url 'payment:comprobante' pedido.token_consulta %}" class="link-subir-comprobante"><i class="bi bi-paperclip"></i> Subir comprobante</a>
+                                {% endif %}
+                            {% endif %}
                         </ul>
                         <p class="users-pedidos-hide-id">ID de pago: <span>#{{pedido.payment_id}}</span></p>
                     </td>

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contenidomain %}
+<main class="padding-1rem">
+    <div class="flex font-roboto flex-column users-facturacion-box">
+        <h2 style="text-align: center;">¡Correo de verificacion enviado!</h2>
+        <div>
+            <p>Te enviamos un mail con un enlace para activar tu cuenta.</p>
+            <p>Revisá tu bandeja de entrada o spam. El enlace expirará en breve</p>
+        </div>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="django-msg-{{message.tags}}">
+                    {{message}}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <a href="{% url 'users:reenviar_mail' token %} ">¿No recibiste el correo? Reenviar verificación</a>
+        <div class="flex justify-center">
+            <a href="{% url 'core:home' %}" class="users-facturacion-button users-confirm-links">Volver a la tienda</a>
+        </div>
+    </div>
+</main>
+{% endblock contenidomain %}

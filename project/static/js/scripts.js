@@ -401,21 +401,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 calle: document.getElementById('id_calle').value,
                 cuidad: document.getElementById('id_cuidad').value,
                 codigo_postal: document.getElementById('id_codigo_postal').value,
+                recibir_mail: document.getElementById('id_recibir_estado_pedido').value,
             };
 
             try {
                 const response = await axios.post(window.api.calcularPedido, datos);
                 const { total, adicional, init_point,metodoPagoSeleccionado } = response.data;
 
-                document.getElementById('adicionales-value').innerText = `$${adicional}`;
-                document.getElementById('total-value').innerText = `$${total}`;
+                document.getElementById('adicionales-value').innerText = `$${parseFloat(adicional).toLocaleString("es-AR", { minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2, 
+                    useGrouping: false})}`
+                document.getElementById('total-value').innerText = `$${parseFloat(total).toLocaleString("es-AR", { minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2, 
+                    useGrouping: false})}`
 
                 const boxCheckout = document.getElementById('box-checkout-pro');
 
                 if (init_point && metodoPagoSeleccionado === 'mercado_pago') {
                     boxCheckout.innerHTML = `
                         <a href="${init_point}" rel="noopener noreferrer" class="boton-checkout-pro">
-                            <img src="${window.api.imgMP}" alt="Pagar con Mercado Pago" />  Pagar con Mercado Pago
+                            <img src="${window.api.imgMP}" alt="Pagar con Mercado Pago" loading="lazy" />  Pagar con Mercado Pago
                         </a>
                     `;
                 } else {
@@ -441,18 +446,18 @@ function mostrarFeedbackCarrito(productoNombre, totalPrecio, imagenUrl,cantidadP
     const precioFormateado = parseFloat(totalPrecio).toFixed(2);
     const subTotalFormateado = parseFloat(subTotal).toFixed(2);
     feedback.innerHTML = `
-        <div class="carrito-feedback-imgbox">
-            <img src="${imagenUrl}" alt="${productoNombre}">
-            <div class="carrito-feedback-info">
+        <div class="flex items-center gap-1rem carrito-feedback-imgbox">
+            <img src="${imagenUrl}" alt="${productoNombre} loading="lazy"">
+            <div class="flex flex-column carrito-feedback-info">
                 <p>${productoNombre}</p>
                 <p>${cantidadPedido} x $${subTotalFormateado}</p>
             </div>
         </div>
-        <div class="carrito-feedback-divider">
+        <div class="flex justify-between carrito-feedback-divider">
             <p>Subtotal</p>
             <p>$${precioFormateado}</p>
         </div>
-        <div class="carrito-feedback-links">
+        <div class="flex flex-column carrito-feedback-links">
             <a href="${window.api.verCarrito}">VER CARRITO</a>
             <a href="${window.api.finalizarCompra}">FINALIZAR COMPRA</a>
         </div>

@@ -145,52 +145,63 @@ class AgregarAlCarritoView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class CalcularPedidoView(APIView):
-    print("xd")
     permission_classes = [TieneCarrito]
     
     def post(self, request):
-        print("hola")
+
         serializer = CalcularPedidoSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
-
             total_processor = float(carrito_total(request).get('total_precio'))
 
             if data['metodo_pago'] == 'mercado_pago':
+
                 total_compra = round(total_processor/0.923891,2)
                 adicional = round(total_compra - total_processor,2)
+
+                if request.user.is_authenticated:
+                    carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
+                    carrito_id = carrito.id
+                else:
+                    carrito = request.session['carrito']
+                    carrito_id = request.session['anon_cart_id']
+
+                direccion = data['calle']
+                match = re.match(r'^(.*?)(?:\s+(\d+))?$', direccion.strip())
+                if match:
+                    calle_nombre = match.group(1).strip()
+                    calle_altura = match.group(2) if match.group(2) else ''
+
+                dni_cuit = data['dni_cuit']
+                ident_type = "DNI" if data['tipo_factura'] == 'B' else 'CUIT'
+                email = data['email']
+                nombre = data['nombre']
+                apellido = data['apellido']
+                codigo_postal = data['codigo_postal']
+                razon_social = data.get('razon_social','')
+                tipo_factura = data.get('tipo_factura','')
+                telefono = data.get('telefono', '')
+                cuidad = data.get('cuidad', ''),
+                recibir_mail = data.get('recibir_mail')
+
+                try:
+                    preference = preference_mp(total_compra,carrito_id,dni_cuit,ident_type,email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,cuidad,recibir_mail)
+                    init_point = preference.get("init_point", "")
+                except ValueError as e:
+                    return Response({'error': str(e)}, status=500)
+
             else:
                 total_compra = total_processor
                 adicional = 0
+                init_point = ''
 
             if total_processor <= 0:
                 return Response({'error': 'El carrito está vacío'}, status=400)
-
-            if request.user.is_authenticated:
-                carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
-                carrito_id = carrito.id
-            else:
-                carrito_id = request.session['anon_cart_id']
-            dni_cuit = data['dni_cuit']
-            ident_type = "DNI" if data['tipo_factura'] == 'B' else 'CUIT'
-            email = data['email']
-            nombre = data['nombre']
-            apellido = data['apellido']
-            codigo_postal = data['codigo_postal']
-            direccion = data['calle']
-            match = re.match(r'^(.*?)(?:\s+(\d+))?$', direccion.strip())
-            if match:
-                calle_nombre = match.group(1).strip()
-                calle_altura = match.group(2) if match.group(2) else ''
-            try:
-                preference = preference_mp(total_compra,carrito_id,dni_cuit,ident_type,email,nombre,apellido,codigo_postal,calle_nombre,calle_altura)
-            except ValueError as e:
-                return Response({'error': str(e)}, status=500)
-
+            
             return Response({
                 'total': total_compra,
                 'adicional': adicional,
-                'init_point': preference.get("init_point", ""),
+                'init_point': init_point,
                 'metodoPagoSeleccionado':data['metodo_pago'],
             })
         else:
@@ -199,7 +210,7 @@ class CalcularPedidoView(APIView):
 # Create your views here.
 # ----- Preferencias de MP ----- #
 
-def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura):
+def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,cuidad,recibir_mail):
     site_url = f'{settings.MY_NGROK_URL}'
 
     argentina_tz = timezone.get_fixed_timezone(-180)
@@ -211,8 +222,8 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
         "items": [
             {
                 "id": f"carrito-{carrito_id}",
-                "title": "Compra en Funestore",
-                "description": "Productos electrónicos - Funestore.com.ar",
+                "title": "Compra en Twinstore",
+                "description": "Productos electrónicos - Twinstore.com.ar",
                 "quantity": 1,
                 "currency_id": "ARS",
                 "unit_price": float(numero),
@@ -234,18 +245,35 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
             }
         },
         "back_urls": {
-            "success": f"https://{site_url}/payment/success",
-            "failure": f"https://{site_url}/payment/failure",
-            "pending": f"https://{site_url}/payment/pendings"
+            "success": f"https://{site_url}/payment/success/",
+            "failure": f"https://{site_url}/payment/failure/",
+            "pending": f"https://{site_url}/payment/pendings/"
         },
         "auto_return": "approved",
         "notification_url": f"https://{site_url}/payment/webhook/",
-        "statement_descriptor": "FUNESTORE",
+        "statement_descriptor": "TWINSTORE",
         "external_reference": str(carrito_id),
         "expires": True,
         "expiration_date_from": expiration_from,
         "expiration_date_to": expiration_to,
+        "metadata": {
+            "carrito_id": carrito_id,
+            "dni_cuit": dni_cuit,
+            "ident_type": ident_type,
+            "email": email,
+            "nombre": nombre,
+            "apellido": apellido,
+            "codigo_postal": codigo_postal,
+            "calle_nombre": calle_nombre,
+            "calle_altura": calle_altura,
+            "razon_social":razon_social,
+            "tipo_factura":tipo_factura,
+            "telefono":telefono,
+            "cuidad":cuidad,
+            "recibir_mail":recibir_mail
+        },
     }
+
     sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
     try:
@@ -276,6 +304,7 @@ def realizar_pedido(request):
                 'codigo_postal': perfil.codigo_postal,
                 'email': request.user.email,
                 'telefono': perfil.telefono,
+                'guardar_datos': perfil.guardar_datos
             })
     else:
         form = UsuarioForm()
@@ -347,8 +376,6 @@ def generar_presupuesto(request):
     with open(logo_path, "rb") as f:
         logo_base64 = base64.b64encode(f.read()).decode("utf-8")
 
-    print("Logo path:", logo_path)
-    print("Logo file exists:", os.path.exists(logo_path))
 
     context = {'carrito':carrito,'fecha':datetime.date.today(),'logo_base64': logo_base64}
     html_string = render_to_string("presupuesto.html", context)

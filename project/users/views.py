@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from .forms import RegistrarForm,LoginForm,BuscarPedidoForm,PreferenciasUsuarios,UsuarioForm
+from django.shortcuts import get_object_or_404, render, redirect
+from .forms import RegistrarForm,LoginForm,BuscarPedidoForm,UsuarioForm
 from .models import PerfilUsuario
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login,logout
@@ -7,7 +7,9 @@ from django.contrib import messages
 from payment.models import HistorialCompras
 import uuid
 from django.contrib.auth.decorators import login_required
-
+from .emails import enviar_mail_async
+from django.utils import timezone
+from datetime import timedelta
 
 @login_required
 def mi_perfil(request):
@@ -47,27 +49,37 @@ def mi_perfil(request):
         'form':form
     })
 
-def ver_pedidos(request):
-    if request.user.is_authenticated:
-        historial = HistorialCompras.objects.filter(usuario=request.user)
-        return render(request,'users/pedidos.html',{'historial':historial})
+@login_required
+def users_pedidos(request):
+    historial = HistorialCompras.objects.filter(usuario=request.user)
+    return render(request,'users/pedidos.html',{'historial':historial})
+
+def buscar_pedidos(request):
     form = BuscarPedidoForm()
     if request.method == "POST":
         form = BuscarPedidoForm(request.POST)
         if form.is_valid():
             token = form.cleaned_data['token']
-            historial = HistorialCompras.objects.filter(token_consulta=token)
-            if historial:
-                return render(request, 'users/ver_pedido.html', {'historial': historial})
-            else:
-                messages.error(request, "No existe un pedido con ese código.")
-                return redirect('users:pedidos')
+            return redirect('users:ver_pedidos',token=token)
         else:
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, error)
-                    return redirect('users:pedidos')
+                    return redirect('users:buscar_pedidos')
     return render(request, 'users/buscar_pedido.html', {'form': form})
+
+def ver_pedido(request,token):
+    historial = HistorialCompras.objects.filter(token_consulta=token)
+    if historial:
+        return render(request, 'users/ver_pedido.html', {'historial': historial})
+    else:
+        messages.error(request, "No existe un pedido con ese código.")
+        return redirect('users:buscar_pedidos')
+
+@login_required
+def cerrar_sesion(request):
+    logout(request)
+    return redirect('core:home')
 
 def iniciar_sesion(request):
     form = LoginForm()
@@ -76,6 +88,10 @@ def iniciar_sesion(request):
         if form.is_valid():
             user = authenticate(username=form.cleaned_data['email'], password=form.cleaned_data['password'])
             if user is not None:
+                perfil = user.perfil
+                if not perfil.email_verificado:
+                    messages.warning(request, "Primero tenes que verificar tu correo para ingresar")
+                    return redirect('users:login')
                 login(request, user)
                 return redirect('core:home')
             else:
@@ -93,14 +109,13 @@ def registarse(request):
                 email=form.cleaned_data['email'],
                 password=form.cleaned_data['password']
             )
-            user = authenticate(username=form.cleaned_data['email'], password=form.cleaned_data['password'])
-            if user is not None:
-                login(request, user)
+            # * Forzamos acceso al perfil (por si aún no se generó en el signal)
+            _ = user.perfil
 
-                return redirect('core:home')
-            else:
-                messages.error(request, "Ocurrió un error inesperado al registrarte. Por favor, intentá ingresar manualmente.")
-                return redirect('users:singup')
+            # * Enviamos el mail de verificación (modo rápido actual)
+            enviar_mail_async(user)
+
+            return redirect('users:email_enviado',token = user.perfil.token_verificacion)
         else:
             if form.errors.get('email'):
                 for error in form.errors.get('email'):
@@ -112,7 +127,43 @@ def registarse(request):
             return redirect('users:singup')
     return render(request, 'users/registro.html', {'form': form})
 
-@login_required
-def cerrar_sesion(request):
-    logout(request)
-    return redirect('core:home')
+def email_enviado(request,token):
+    return render(request,'users/confirmar_mail.html',{'token':token})
+
+def verificar_email(request, token):
+    try:
+        perfil = get_object_or_404(PerfilUsuario, token_verificacion=token)
+        perfil.email_verificado = True
+        perfil.token_verificacion = None
+        perfil.save()
+        messages.success(request,'Usuario confirmado con exito!')
+        return redirect('users:login')
+    except:
+        return render(request,'users/error_mail.html')
+
+def reenviar_verificacion(request, token):
+    token = token
+    perfil = PerfilUsuario.objects.filter(token_verificacion=token).first()
+    
+    if perfil.email_verificado:
+        return redirect('core:home')
+
+    # ⏱️ Verificamos si ya envió uno recientemente (último intento guardado en sesión)
+    ultimo_envio = request.session.get('ultimo_envio_verificacion')
+    ahora = timezone.now()
+
+    if ultimo_envio:
+        hace_cuanto = ahora - timezone.datetime.fromisoformat(ultimo_envio)
+        if hace_cuanto < timedelta(minutes=2):  # Espera mínima entre reintentos
+            messages.warning(request, "⏳ Por favor, esperá unos minutos antes de volver a reenviar el mail.")
+            return redirect('users:email_enviado',token=token)
+
+    user = perfil.user
+
+    enviar_mail_async(user)
+
+    request.session['ultimo_envio_verificacion'] = ahora.isoformat()
+
+    messages.success(request, "📧 Te reenviamos el correo de verificación.")
+
+    return redirect('users:email_enviado',token=token)

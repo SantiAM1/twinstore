@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
-    <title>Carrito - Funestore</title>
+    <title>Carrito - Twinstore</title>
 {% endblock head %}
 
 {% block contenidomain %}
@@ -28,7 +28,7 @@
                                 <td class="cart-prod flex items-center">
                                     <div class="cart-prod-responsive flex items-center">
                                         <a href="#" class="cart-prod-delete bloqueable" data-pedido-id="{{ pedido.id }}"><i class="bi bi-x-circle"></i></a>
-                                        <img src="{{ pedido.get_prod_img }}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img">
+                                        <img src="{{ pedido.get_prod_img }}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img" loading="lazy">
                                     </div>
                                     <div class="cart-prod-cantidad flex flex-column">
                                         <span>{{ pedido.producto.nombre }}</span>
@@ -37,7 +37,7 @@
                                 </td>
                                 <td class="cart-price-sub">${{ pedido.producto.precio }}</td>
                                 <td>
-                                    <div class="quantity-container bloqueable" data-pedido-id="{{ pedido.id }}" data-precio="{{ pedido.producto.precio }}">
+                                    <div class="flex items-center justify-center quantity-container bloqueable" data-pedido-id="{{ pedido.id }}" data-precio="{{ pedido.producto.precio }}">
                                         <button type="button" name="action" data-action="decrement" class="btn-cantidad"><i class="bi bi-dash"></i></button>
                                         <input type="text" class="input-value-cart" name="cantidad" value="{{ pedido.cantidad }}" readonly>
                                         <button type="button" name="action" data-action="increment" class="btn-cantidad"><i class="bi bi-plus"></i></button>
@@ -55,7 +55,7 @@
                                 <td class="cart-prod flex items-center">
                                     <div class="cart-prod-responsive flex items-center">
                                         <a href="#" class="cart-prod-delete bloqueable" data-pedido-id="{{ pedido.id }}"><i class="bi bi-x-circle"></i></a>
-                                        <img src="{{ pedido.imagen_url }}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img">
+                                        <img src="{{ pedido.imagen_url }}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img" loading="lazy">
                                     </div>
                                     <div class="cart-prod-cantidad flex flex-column">
                                         <span>{{ pedido.producto.nombre }}</span>
@@ -64,7 +64,7 @@
                                 </td>
                                 <td class="cart-price-sub">${{ pedido.producto.precio }}</td>
                                 <td>
-                                    <div class="quantity-container bloqueable" data-pedido-id="{{ pedido.id }}" data-precio="{{ pedido.producto.precio }}">
+                                    <div class="flex items-center justify-center quantity-container bloqueable" data-pedido-id="{{ pedido.id }}" data-precio="{{ pedido.producto.precio }}">
                                         <button type="button" name="action" data-action="decrement" class="btn-cantidad"><i class="bi bi-dash"></i></button>
                                         <input type="text" class="input-value-cart" name="cantidad" value="{{ pedido.cantidad }}" readonly>
                                         <button type="button" name="action" data-action="increment" class="btn-cantidad"><i class="bi bi-plus"></i></button>

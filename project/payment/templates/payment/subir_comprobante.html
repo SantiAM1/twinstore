@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contenidomain %}
+<main class="padding-1rem">
+    <div class="flex font-roboto flex-column users-facturacion-box">
+        <h2 class="text-center">Cargar comprobante</h2>
+        <div>
+            <p><i class="bi bi-paperclip"></i> Usá el ID de pago como **referencia en tu transferencia**.</p>
+            <p><i class="bi bi-check2"></i><strong> ID de pago:</strong> <code>{{ historial.payment_id }}</code></p>
+            <p><i class="bi bi-info-lg"></i> Subí el comprobante en formato <strong>JPG, JPEG, PNG</strong> o <strong>PDF</strong>.</p>
+            <p><i class="bi bi-file-earmark-excel"></i> El archivo seleccionado no puede superar los <strong>5MB</strong>.</p>
+        </div>
+        <form method="post" action="{% url 'payment:comprobante' historial.token_consulta %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.file }}
+            <label for="{{ form.file.id_for_label }}" class="label-subir-comprobante" id="label-file"><i class="bi bi-file-earmark-arrow-down"></i>Archivo</label>
+            <button class="button-subir-comprobante" type="submit" id="button-subir">Subir Comprobante</button>
+        </form>
+        <div class="flex justify-between">
+            <a href="{% url 'core:home' %}" class="users-facturacion-button users-confirm-links">Volver a la tienda</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'users:mispedidos' %}" class="users-facturacion-button users-confirm-links">Mis pedidos</a>
+            {% else %}
+            <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="users-facturacion-button users-confirm-links">Ver Pedido</a>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+<script>
+    document.getElementById("id_file").addEventListener("change", function () {
+        const archivo = this.files[0];
+        const maxSizeMB = 5;
+        const label = document.getElementById("label-file");
+        const buttonSubir = document.getElementById('button-subir');
+    
+        if (archivo && archivo.size > maxSizeMB * 1024 * 1024) {
+            alert(`❌ El archivo supera el límite de ${maxSizeMB} MB.`);
+            this.value = ""; // resetea el input
+        }
+        if (archivo) {
+        label.textContent = `${archivo.name} (${(archivo.size / 1024).toFixed(1)} KB)`;
+        buttonSubir.classList.add('ready');
+        }
+    });
+</script>
+{% endblock myscripts %}

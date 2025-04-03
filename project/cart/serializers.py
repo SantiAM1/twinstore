@@ -10,6 +10,7 @@ class CalcularPedidoSerializer(serializers.Serializer):
     calle = serializers.CharField()
     cuidad = serializers.CharField()
     codigo_postal = serializers.CharField()
+    recibir_mail = serializers.BooleanField()
 
 class AgregarAlCarritoSerializer(serializers.Serializer):
     producto_id = serializers.IntegerField()

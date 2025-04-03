@@ -14,7 +14,7 @@
         <div class="users-img-box">
             <div class="users-img-overlay">
                 <div class="users-title">
-                    <h1>Funestore</h1>
+                    <h1>Twinstore</h1>
                     <span>A new Hardware Experience</span>
                 </div>
                 <div class="users-msg">
@@ -23,10 +23,10 @@
                 </div>
             </div>
         </div>
-        <div class="users-form-box">
+        <div class="flex flex-column items-center justify-center users-form-box">
             <h2>Registrarse</h2>
-            <div class="users-form-subbox">
-                <form method="post" class="user-form-main">
+            <div class="flex flex-column items-center gap-1rem users-form-subbox">
+                <form method="post" class="flex flex-column items-center gap-1rem">
                     {% csrf_token %}
                     {{ form.non_field_errors }}
                     <div>
@@ -35,7 +35,7 @@
                         {{ form.password_repeat }}
                         {% if messages %}
                             {% for message in messages %}
-                                <div style="color: crimson;font-family: 'Roboto';text-align: center;font-size: 0.8rem;">
+                                <div class="django-msg-{{message.tags}}">
                                     {{ message }}
                                 </div>
                             {% endfor %}

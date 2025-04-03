@@ -2,8 +2,9 @@
 {% load static %}
 
 {% block head %}
-    <title>Carrito - Funestore</title>
+    <title>Carrito - Twinstore</title>
     <script src="https://sdk.mercadopago.com/js/v2"></script>
+
 {% endblock head %}
 
 {% block contenidomain %}
@@ -21,11 +22,11 @@
                     {% endif %}
                 {% endfor %}
             </select>
-            <div id="dni_cuit_container" class="container-form" style="display: none;">
+            <div id="dni_cuit_container" class="container-form display_none">
                 {{form.dni_cuit}}
                 <label for="{{ form.dni_cuit.id_for_label }}" id="dni_cuit_label" class="form__label">{{form.dni_cuit.label}}</label>
             </div>
-            <div id="razon_social_container" class="container-form" style="display: none;">
+            <div id="razon_social_container" class="container-form display_none">
                 {{form.razon_social}}
                 <label for="{{ form.razon_social.id_for_label }}" class="form__label">{{form.razon_social.label}}</label>
             </div>
@@ -71,6 +72,20 @@
                 {{form.telefono}}
                 <label for="{{ form.telefono.id_for_label }}" class="form__label">{{form.telefono.label}}</label>
             </div>
+            {% if user.is_authenticated %}
+                <div class="container-checkbox">
+                    {{ form.guardar_datos }}
+                    <label class="form-check-label" for="{{ form.guardar_datos.id_for_label }}">
+                        {{ form.guardar_datos.label }}
+                    </label>
+                </div>
+            {% endif %}
+            <div class="container-checkbox">
+                {{ form.recibir_estado_pedido }}
+                <label class="form-check-label" for="{{ form.recibir_estado_pedido.id_for_label }}">
+                    {{ form.recibir_estado_pedido.label }}
+                </label>
+            </div>
         </div>
         <div class="users-perfil-pedido">
             <h3>Tu pedido</h3>
@@ -83,7 +98,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <th colspan="2" style="border-bottom: 2px solid rgb(185, 185, 185);"></th>
+                        <th colspan="2" class="border-2px"></th>
                     </tr>
                     {% if carrito.pedidos.all %}
                         {% for pedido in carrito.pedidos.all %}
@@ -92,7 +107,7 @@
                             <td>${{pedido.get_total_precio}}</td>
                         </tr>
                         <tr>
-                            <th colspan="2" style="border-bottom: 1px solid rgb(180, 180, 180);"></th>
+                            <th colspan="2" class="border-1px"></th>
                         </tr>
                         {% endfor %}
                     {% else %}
@@ -102,7 +117,7 @@
                                 <td>${{pedido.total_precio}}</td>
                             </tr>
                             <tr>
-                                <th colspan="2" style="border-bottom: 1px solid rgb(180, 180, 180);"></th>
+                                <th colspan="2" class="border-1px"></th>
                             </tr>
                         {% endfor %}
                     {% endif %}
@@ -114,21 +129,21 @@
                         <td>${{total_precio}}</td>
                     </tr>
                     <tr>
-                        <th colspan="2" style="border-bottom: 1px solid rgb(180, 180, 180);"></th>
+                        <th colspan="2" class="border-1px"></th>
                     </tr>
                     <tr class="cart-finsh-prods">
                         <th>Adicionales</th>
-                        <td id="adicionales-value">$0.00</td>
+                        <td id="adicionales-value">$0,00</td>
                     </tr>
                     <tr>
-                        <th colspan="2" style="border-bottom: 1px solid rgb(180, 180, 180);"></th>
+                        <th colspan="2" class="border-1px"></th>
                     </tr>
                     <tr class="cart-finsh-prods">
                         <th>Total</th>
                         <td id="total-value">${{ total_precio }}</td>
                     </tr>
                     <tr>
-                        <th colspan="2" style="border-bottom: 2px solid rgb(185, 185, 185);"></th>
+                        <th colspan="2" class="border-2px"></th>
                     </tr>
                 </tfoot>
             </table>

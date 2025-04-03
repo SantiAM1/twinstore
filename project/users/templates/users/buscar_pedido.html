@@ -19,7 +19,7 @@
         <h1 style="font-family: 'Roboto';text-align: start;padding-bottom: 1rem;font-weight: 300;border-bottom: 1px solid #d6d6d6;margin: 1rem;">Buscar un pedido:</h1>
         {% if messages %}
             {% for message in messages %}
-                <div style="color: crimson;font-family: 'Roboto';text-align: center;font-size: 0.8rem;">
+                <div class="django-msg-{{message.tags}}">
                     {{ message }}
                 </div>
             {% endfor %}

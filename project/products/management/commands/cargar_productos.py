@@ -3,6 +3,7 @@ import pandas as pd
 import uuid
 from products.models import Producto, Marca, Categoria, SubCategoria, Atributo
 
+# ! Funcion no mas usada!
 class Command(BaseCommand):
     help = 'Carga productos desde un archivo Excel, incluyendo atributos dinámicos'
 

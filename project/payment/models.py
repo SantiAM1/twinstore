@@ -28,10 +28,18 @@ class HistorialCompras(models.Model):
     pagos = models.ManyToManyField("PagoRecibidoMP", blank=True,editable=False)
     merchant_order_id = models.CharField(max_length=100, blank=True, null=True)
     token_consulta = models.UUIDField(default=uuid.uuid4, unique=True)
+    recibir_mail = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Compra {self.id} - {self.estado} - {self.usuario if self.usuario else 'Anónimo'}"
-    
+        if self.usuario:
+            nombre = self.usuario
+        elif hasattr(self, "facturacion"):
+            nombre = f"{self.facturacion.nombre} {self.facturacion.apellido} ({self.facturacion.dni_cuit})"
+        else:
+            nombre = "Anónimo"
+
+        return f"Compra {self.id} - {self.estado} - {nombre}"
+
     def pagos_completos(self):
         return all(p.status == "approved" for p in self.pagos.all())
 
@@ -47,3 +55,15 @@ class PagoRecibidoMP(models.Model):
 
     def __str__(self):
         return f"Pago {self.payment_id} - {self.status}"
+    
+from django.db import models
+
+class ComprobanteTransferencia(models.Model):
+    historial = models.OneToOneField("HistorialCompras", on_delete=models.CASCADE, related_name="comprobante")
+    file = models.FileField(upload_to="comprobantes/")
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+    aprobado = models.BooleanField(default=False)
+    observaciones = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Comprobante de {self.historial.payment_id}"

@@ -1,18 +1,18 @@
 {% load static %}
 <div class="header flex flex-column">
     <div class="header-item flex top-header-item">
-        <a href="{% url 'core:home' %}"><img src="{% static 'img/logo.png' %}" alt="LOGO" class="logo"></a>
+        <a href="{% url 'core:home' %}"><img src="{% static 'img/logo.png' %}" alt="LOGO" class="logo" loading="lazy"></a>
         <form method="GET" action="{% url 'products:search' %}" class="busqueda b-arriba">
-            <input name="q" type="text" placeholder="Buscar Productos..." value="{{ query }}" class="busqueda-input border_none bg-transparent">
+            <input name="q" type="text" placeholder="Buscar Productos..." value="{{ query }}" class="busqueda-input border_none bg-transparent font-roboto" autocomplete="off">
             <button type="submit" class="busqueda-boton border_none bg-transparent cursor_pointer"><i class="bi bi-search lupa"></i></button>
         </form>
         <div class="box-carrito_login flex items-center">
             <a href="{% url 'cart:ver_carrito' %}" class="carrito flex items-center">
-                <div class="carrito-total-precio" style="font-family: 'Roboto';">
+                <div class="carrito-total-precio font-roboto">
                     Carrito / ${{total_precio}}
                 </div>
                 <i class="bi bi-cart-fill"></i>
-                <div class="carrito-cantidad" id="carrito-cantidad">
+                <div class="flex justify-center items-center position-absolute carrito-cantidad" id="carrito-cantidad">
                     {{total_productos}}
                 </div>
             </a>
@@ -26,10 +26,11 @@
                 <ul class="dropdown list-none" id="userDropdown">
                     {% if user.is_authenticated %}
                         {% if user.is_superuser %}
+                            <li><a href="{% url 'admin:index' %}">🔐 Panel de administración</a></li>
                             <li><a href="{% url 'core:cargar_excel' %}">🗂️ Cargar productos desde Excel</a></li>
                         {% endif %}
                         <li><a href="{% url 'users:perfil' %}">Perfil</a></li>
-                        <li><a href="{% url 'users:pedidos' %}">Mis Pedidos</a></li>
+                        <li><a href="{% url 'users:mispedidos' %}">Mis Pedidos</a></li>
                         <li><a href="{% url 'users:logout' %}">Cerrar Sesión</a></li>
                     {% else %}
                         <li><a href="{% url 'users:login' %}">Iniciar Sesión</a></li>
@@ -86,7 +87,7 @@
                     </button>
                 </li>
                 <li>
-                    <a href="{% url 'users:pedidos' %}" class="nav__link nav__item">
+                    <a href="{% url 'users:buscar_pedidos' %}" class="nav__link nav__item">
                         <i class="bi bi-box-seam icon_navbar"></i>
                         Pedidos
                     </a>

@@ -89,10 +89,16 @@ class UsuarioForm(forms.Form):
     telefono = forms.CharField(max_length=20, required=False, label="Telefono",
         widget=INPUT_ATTRS
         )
-
-class PreferenciasUsuarios(forms.Form):
-    recibir_promociones = forms.BooleanField(required=False,label='Quiero rebicir notificaciones sobre promociones')
-    recibir_estado_pedido = forms.BooleanField(required=False,label='Quiero rebicir mails sobre el estado de mi pedido')
+    guardar_datos = forms.BooleanField(
+        required=False,
+        label="Recordar mis datos para futuras compras",
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    recibir_estado_pedido = forms.BooleanField(
+        required=False,
+        label='Recibir mails sobre el estado del pedido',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
 
 class BuscarPedidoForm(forms.Form):
     token = forms.CharField(

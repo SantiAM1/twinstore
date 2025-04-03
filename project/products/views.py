@@ -4,6 +4,10 @@ from .models import Producto, SubCategoria,Marca
 from django.db.models import Q
 from django_user_agents.utils import get_user_agent
 from django.template.loader import render_to_string
+from django.db import connection
+import time
+
+
 
 # Create your views here.
 # ----- Manejo de filtros ----- #
@@ -21,18 +25,18 @@ def get_atributos(productos):
 def filtrar_atributo(dict, productos, atributos_unicos):
     filtros = {}
 
-    # Recolectar los filtros seleccionados
-    for nombre_atributo, valores in dict.items():
-        if nombre_atributo in atributos_unicos:  # Asegurar que el filtro es válido
+    for nombre_atributo, valores in dict.lists():  # permite múltiples valores por clave
+        if nombre_atributo in atributos_unicos:
             filtros[nombre_atributo] = valores
 
-    # Aplicar los filtros solo si existen
-    if filtros:
+    # Aplicamos los filtros individualmente (AND lógico)
+    for atributo, valores in filtros.items():
         productos = productos.filter(
-            atributos__nombre__in=filtros.keys(),
-            atributos__valor__in=filtros.values()
-        ).distinct()
-    return productos
+            atributos__nombre=atributo,
+            atributos__valor__in=valores
+        )
+    
+    return productos.distinct()
 
 # ----- Busqueda de productos ----- #
 def buscar_productos(request):
@@ -71,8 +75,8 @@ def buscar_productos(request):
 # ----- Categoria AJAX ----- #
 def categoria_ajax(request, categoria):
     sub_categorias = SubCategoria.objects.filter(categoria__nombre=categoria)
-    productos = Producto.objects.filter(sub_categoria__in=sub_categorias).prefetch_related('imagenes', 'atributos')
-    marcas = Marca.objects.filter(producto__in=productos).distinct()
+
+    productos = Producto.objects.filter(sub_categoria__in=sub_categorias).select_related('marca', 'sub_categoria').prefetch_related('imagenes', 'atributos')
 
     #* 🔹 Filtrar por marcas
     marca_seleccionada = request.GET.get('marca')
@@ -84,11 +88,18 @@ def categoria_ajax(request, categoria):
     if sub_categoria_seleccionada:
         productos = productos.filter(sub_categoria__nombre=sub_categoria_seleccionada)
 
-    #* 🔹 Obtener los atributos
+    #* 🔹 Obtener atributos antes del filtro
+    atributos_previos = get_atributos(productos)
+
+    #* 🔹 Aplicar filtros
+    productos = filtrar_atributo(request.GET, productos, atributos_previos)
+
+    #* 🔹 Obtener solo los atributos válidos después del filtro
     atributos_unicos = get_atributos(productos)
 
-    #* 🔹 Filtrar productos segun los atributos
-    productos = filtrar_atributo(request.GET,productos,atributos_unicos)
+    marcas = Marca.objects.filter(producto__in=productos).distinct()
+
+    sub_categorias = SubCategoria.objects.filter(productos__in=productos).distinct()
 
     #* 🔹 Ordenar los productos
     productos, filtro=ordenby(request,productos)
@@ -154,9 +165,9 @@ def categoria_ajax(request, categoria):
 
 # ----- Filtracion por categoria ----- #
 def categoria(request, categoria):
+
     sub_categorias = SubCategoria.objects.filter(categoria__nombre=categoria)
-    productos = Producto.objects.filter(sub_categoria__in=sub_categorias).prefetch_related('imagenes', 'atributos')
-    marcas = Marca.objects.filter(producto__in=productos).distinct()
+    productos = Producto.objects.filter(sub_categoria__in=sub_categorias).select_related('marca', 'sub_categoria').prefetch_related('imagenes', 'atributos')
 
     #* 🔹 Filtrar por marcas
     marca_seleccionada = request.GET.get('marca')
@@ -168,11 +179,17 @@ def categoria(request, categoria):
     if sub_categoria_seleccionada:
         productos = productos.filter(sub_categoria__nombre=sub_categoria_seleccionada)
 
-    #* 🔹 Obtener los atributos
+    #* 🔹 Obtener atributos antes del filtro
+    atributos_previos = get_atributos(productos)
+
+    #* 🔹 Aplicar filtros
+    productos = filtrar_atributo(request.GET, productos, atributos_previos)
+
+    #* 🔹 Obtener solo los atributos válidos después del filtro
     atributos_unicos = get_atributos(productos)
 
-    #* 🔹 Filtrar productos segun los atributos
-    productos = filtrar_atributo(request.GET,productos,atributos_unicos)
+    marcas = Marca.objects.filter(producto__in=productos).distinct()
+    sub_categorias = SubCategoria.objects.filter(productos__in=productos).distinct()
 
     #* 🔹 Ordenar los productos
     productos, filtro=ordenby(request,productos)
@@ -206,15 +223,6 @@ def categoria(request, categoria):
         'filtros_aplicados':filtros_aplicados
     })
 
-# ----- Vista individual del producto ----- #
-def producto_view(request,product_name):
-    producto = Producto.objects.get(nombre=product_name)
-    imagenes = producto.imagenes.all()
-    return render(request,'products/producto_view.html',{
-        'producto':producto,
-        'imagenes':imagenes
-        })
-
 # ----- Ordenar los productos ----- #
 def ordenby(request, productos):
     orden = request.GET.get('ordenby', 'date')
@@ -231,12 +239,18 @@ def ordenby(request, productos):
 
 # ----- Obetener las imagenes de los productos ----- #
 def get_prod_img(productos):
-    productos_imagen = []
-    for producto in productos:
-        imagen_principal = producto.imagenes.first()
-        if imagen_principal:
-            imagen_url = imagen_principal.imagen.url
-        else:
-            imagen_url = None
-        productos_imagen.append((producto, imagen_url))
-    return productos_imagen
+    return [
+        (p, (img.imagen.url if img else None))
+        for p in productos
+        for img in [next(iter(p.imagenes.all()), None)]
+    ]
+
+
+# ----- Vista individual del producto ----- #
+def producto_view(request,product_name):
+    producto = Producto.objects.get(nombre=product_name)
+    imagenes = producto.imagenes.all()
+    return render(request,'products/producto_view.html',{
+        'producto':producto,
+        'imagenes':imagenes
+        })

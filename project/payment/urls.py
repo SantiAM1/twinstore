@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import notification,payment_success,pendings,failure,pedidos_efectivo_transferencia
+from .views import notification,payment_success,pendings,failure,pedidos_efectivo_transferencia,subir_comprobante
 
 app_name = "payment"
 
@@ -8,5 +8,6 @@ urlpatterns = [
     path("success/",payment_success,name="success"),
     path("failure/",failure,name="failure"),
     path("pendings/",pendings,name="pendings"),
-    path("realizar_pedido/",pedidos_efectivo_transferencia,name="realizar_pedido")
+    path("realizar_pedido/",pedidos_efectivo_transferencia,name="realizar_pedido"),
+    path("comprobante/<str:token>/",subir_comprobante,name="comprobante")
 ]
