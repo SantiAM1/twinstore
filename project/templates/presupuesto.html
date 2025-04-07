@@ -126,14 +126,14 @@
         <div class="bloque1">
             <div class="logo-informacion">
                 <img src="data:image/png;base64,{{ logo_base64 }}" alt="Logo Twinstore">
-                <p>Razon social: Aguirre Moretto Santiago</p>
+                <p>Razon social: Gustavo Alejandro Aguirre</p>
                 <p>Juan Elorza 2906 (2132) Funes</p>
-                <p>Monotribustista</p>
+                <p>Iva responsable inscripto</p>
             </div>
             <div class="fecha-cuit">
                 <strong>Presupuesto</strong>
                 <span>{{fecha}}</span>
-                <p>CUIT: 20429262985</p>
+                <p>CUIT: 20-22817323-2</p>
             </div>
         </div>
         <div class="divider"></div>
@@ -179,19 +179,15 @@
                 <tfoot>
                     <tr>
                         <td colspan="3">Subtotal</td>
-                        <td>$48000.00</td>
+                        <td>${{total_compra}}</td>
                     </tr>
                     <tr>
-                        <td colspan="3">Costo de envio</td>
-                        <td>$0.00</td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">Recargo</td>
-                        <td>$0.00</td>
+                        <td colspan="3">Adicional</td>
+                        <td>${{adicional}}</td>
                     </tr>
                     <tr>
                         <td colspan="3">Total</td>
-                        <td>$48000.00</td>
+                        <td>${{total_compra}}</td>
                     </tr>
                 </tfoot>
             </table>

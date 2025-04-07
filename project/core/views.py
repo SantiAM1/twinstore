@@ -7,9 +7,50 @@ import pandas as pd
 import uuid
 from .forms import ExcelUploadForm
 from products.models import Producto, Marca, Categoria, SubCategoria, Atributo
-
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+from django.core.cache import cache
+import hashlib
+from django.core.paginator import Paginator
 # Create your views here.
 
+def productos_con_descuento_ajax(request):
+    page = request.GET.get('page', 1)
+    productos_descuento = Producto.objects.filter(descuento__gt=0)
+    paginator = Paginator(productos_descuento, 10)  # 10 productos por "scroll"
+
+    productos_pagina = paginator.get_page(page)
+    data = []
+    for producto in productos_pagina:
+        data.append({
+            'nombre': producto.nombre,
+            'precio': producto.precio,
+            'descuento': producto.descuento,
+            'imagen': producto.get_imagen_url(),  # método que devuelve URL
+            'slug': producto.slug,
+        })
+
+    return JsonResponse({
+        'productos': data,
+        'has_next': productos_pagina.has_next(),
+    })
+@require_GET
+def buscar_productos(request):
+    q = request.GET.get('q', '').strip().lower()
+    if not q or len(q) < 2:
+        return JsonResponse([], safe=False)
+
+    hash_q = hashlib.md5(q.encode()).hexdigest()
+    cache_key = f"autocomplete:{hash_q}"
+
+    resultados = cache.get(cache_key)
+
+    if not resultados:
+        productos = Producto.objects.filter(nombre__icontains=q).values_list('nombre', flat=True)[:10]
+        resultados = list(productos)
+        cache.set(cache_key, resultados, 60 * 5)
+
+    return JsonResponse(resultados, safe=False)
 
 def home(request):
     return render(request,'core/inicio.html')

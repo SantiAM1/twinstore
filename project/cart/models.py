@@ -14,7 +14,7 @@ class Pedido(models.Model):
         return self.producto.precio * self.cantidad
 
     def get_prod_img(self):
-        return self.producto.imagenes.first().imagen.url if self.producto.imagenes.first() else 'img/prod_default.jpg'
+        return self.producto.imagenes.first().imagen.url if self.producto.imagenes.first() else 'img/prod_default.webp'
     
     def get_cantidad(self):
         return self.cantidad

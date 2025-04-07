@@ -3,18 +3,16 @@
 
 {% block head %}
     <title>Carrito - Twinstore</title>
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
-
 {% endblock head %}
 
 {% block contenidomain %}
 <main class="padding-1rem">
-    <form class="users-perfil" method="post" action="{% url 'payment:realizar_pedido' %}">
+    <form class="users-perfil flex font-roboto width-100" method="post" action="{% url 'payment:realizar_pedido' %}">
         {% csrf_token %}
-        <div class="users-perfil-facturacion">
-            <h2>Detalles de facturacion</h2>
+        <div class="users-perfil-facturacion flex flex-column gap-1rem">
+            <h2 class="font-roboto">Detalles de facturacion</h2>
             <span>Personales **</span>
-            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select bloqueable" required>
+            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select bloqueable border-none font-roboto" required>
                 <option value="" selected disabled>Tipo de factura *</option>
                 {% for value, label in form.tipo_factura.field.choices %}
                     {% if value %}
@@ -22,36 +20,36 @@
                     {% endif %}
                 {% endfor %}
             </select>
-            <div id="dni_cuit_container" class="container-form display_none">
+            <div id="dni_cuit_container" class="container-form display-none">
                 {{form.dni_cuit}}
-                <label for="{{ form.dni_cuit.id_for_label }}" id="dni_cuit_label" class="form__label">{{form.dni_cuit.label}}</label>
+                <label for="{{ form.dni_cuit.id_for_label }}" id="dni_cuit_label" class="form-label">{{form.dni_cuit.label}}</label>
             </div>
-            <div id="razon_social_container" class="container-form display_none">
+            <div id="razon_social_container" class="container-form display-none">
                 {{form.razon_social}}
-                <label for="{{ form.razon_social.id_for_label }}" class="form__label">{{form.razon_social.label}}</label>
+                <label for="{{ form.razon_social.id_for_label }}" class="form-label">{{form.razon_social.label}}</label>
             </div>
             <div class="container-form">
                 {{form.nombre}}
-                <label for="{{ form.nombre.id_for_label }}" class="form__label">{{form.nombre.label}}</label>
+                <label for="{{ form.nombre.id_for_label }}" class="form-label">{{form.nombre.label}}</label>
             </div>
             <div class="container-form">
                 {{form.apellido}}
-                <label for="{{ form.apellido.id_for_label }}" class="form__label">{{form.apellido.label}}</label>
+                <label for="{{ form.apellido.id_for_label }}" class="form-label">{{form.apellido.label}}</label>
             </div>
             <span>Direccion **</span>
             <div class="container-form">
                 {{form.calle}}
-                <label for="{{ form.calle.id_for_label }}" class="form__label">{{form.calle.label}}</label>
+                <label for="{{ form.calle.id_for_label }}" class="form-label">{{form.calle.label}}</label>
             </div>
             <div class="container-form">
                 {{form.calle_detail}}
-                <label for="{{ form.calle_detail.id_for_label }}" class="form__label">{{form.calle_detail.label}}</label>
+                <label for="{{ form.calle_detail.id_for_label }}" class="form-label">{{form.calle_detail.label}}</label>
             </div>
             <div class="container-form">
                 {{form.cuidad}}
-                <label for="{{ form.cuidad.id_for_label }}" class="form__label">{{form.cuidad.label}}</label>
+                <label for="{{ form.cuidad.id_for_label }}" class="form-label">{{form.cuidad.label}}</label>
             </div>
-            <select name="{{ form.provincia.html_name }}" id="{{ form.provincia.id_for_label }}" class="users-select bloqueable" required>
+            <select name="{{ form.provincia.html_name }}" id="{{ form.provincia.id_for_label }}" class="users-select bloqueable border-none font-roboto" required>
                 <option value="" selected disabled>Provincia *</option>
                 {% for value, label in form.provincia.field.choices %}
                     {% if value %}
@@ -61,26 +59,26 @@
             </select>
             <div class="container-form">
                 {{form.codigo_postal}}
-                <label for="{{ form.codigo_postal.id_for_label }}" class="form__label">{{form.codigo_postal.label}}</label>
+                <label for="{{ form.codigo_postal.id_for_label }}" class="form-label">{{form.codigo_postal.label}}</label>
             </div>
             <span>Contacto</span>
             <div class="container-form">
                 {{form.email}}
-                <label for="{{ form.email.id_for_label }}" class="form__label">{{form.email.label}}</label>
+                <label for="{{ form.email.id_for_label }}" class="form-label">{{form.email.label}}</label>
             </div>
             <div class="container-form">
                 {{form.telefono}}
-                <label for="{{ form.telefono.id_for_label }}" class="form__label">{{form.telefono.label}}</label>
+                <label for="{{ form.telefono.id_for_label }}" class="form-label">{{form.telefono.label}}</label>
             </div>
             {% if user.is_authenticated %}
-                <div class="container-checkbox">
+                <div class="container-checkbox font-roboto">
                     {{ form.guardar_datos }}
                     <label class="form-check-label" for="{{ form.guardar_datos.id_for_label }}">
                         {{ form.guardar_datos.label }}
                     </label>
                 </div>
             {% endif %}
-            <div class="container-checkbox">
+            <div class="container-checkbox font-roboto">
                 {{ form.recibir_estado_pedido }}
                 <label class="form-check-label" for="{{ form.recibir_estado_pedido.id_for_label }}">
                     {{ form.recibir_estado_pedido.label }}
@@ -89,7 +87,7 @@
         </div>
         <div class="users-perfil-pedido">
             <h3>Tu pedido</h3>
-            <table class="cart-finish-facturacion">
+            <table class="cart-finish-facturacion font-roboto width-100">
                 <thead>
                     <tr>
                         <th>Producto</th>
@@ -147,33 +145,33 @@
                     </tr>
                 </tfoot>
             </table>
-            <a href="#" class="cart-presupuestar bloqueable">Descargar Presupuesto</a>
+            <a href="{% url 'cart:presupuestar' %}" target="_blank" class="cart-presupuestar bloqueable decoration-none display-block text-center font-bold">Descargar Presupuesto</a>
             <ul  class="cart-formadepago">
                 <li>
                     <input type="radio" name="forma_pago" id="efectivo" value="efectivo">
                     <label for="efectivo">Pago en el local: (Contado)</label>
-                    <div class="cart-formadepago-details">IMPORTANTE: Los pedidos abonados en efectivo se realizan al momento de recibir el pedido, el monto puede variar al momento del pago.
-                        <button type="submit" class="cart-finalizarcompra bloqueable cursor_pointer">Realizar Pedido</button>
+                    <div class="cart-formadepago-details font-roboto">IMPORTANTE: Los pedidos abonados en efectivo se realizan al momento de recibir el pedido, el monto puede variar al momento del pago.
+                        <button type="submit" class="cart-finalizarcompra bloqueable cursor-pointer decoration-none display-block text-center font-bold">Realizar Pedido</button>
                     </div>
                 </li>
                 <li>
                     <input type="radio" name="forma_pago" id="transferencia" value="transferencia">
                     <label for="transferencia">Transferencia / Depósito bancario (PAGO EN EL DÍA)</label>
-                    <div class="cart-formadepago-details">Hace tu pago en nuestra cuenta bancaria. Usa el identificador de pedido como referencia del pago. La transferencia tiene un plazo de 24hs para ser informada.
-                        <button type="submit" class="cart-finalizarcompra bloqueable cursor_pointer">Realizar Pedido</button>
+                    <div class="cart-formadepago-details font-roboto">Hace tu pago en nuestra cuenta bancaria. Usa el identificador de pedido como referencia del pago. La transferencia tiene un plazo de 24hs para ser informada.
+                        <button type="submit" class="cart-finalizarcompra bloqueable cursor-pointer  decoration-none display-block text-center font-bold">Realizar Pedido</button>
                     </div>
                 </li>
                 <li>
                     <input type="radio" name="forma_pago" id="mercadopago">
                     <label for="mercadopago">Pagar con Mercado Pago</label>
-                    <div class="cart-formadepago-details">IMPORTANTE: Los pagos realizados con la plataforma de Mercado Pago cuentan con un recargo del 6,29% más IVA.
-                        <div id="box-checkout-pro" class="bloqueable"></div>
+                    <div class="cart-formadepago-details font-roboto">IMPORTANTE: Los pagos realizados con la plataforma de Mercado Pago cuentan con un recargo del 6,29% más IVA.
+                        <div id="box-checkout-pro" class="bloqueable width-100"></div>
                     </div>
                 </li>
             </ul>
         </div>
     </form>
-    <div id="loading-overlay">
+    <div id="loading-overlay" class="loading-overlay position-fixed display-none flex-column items-center justify-center">
         <div class="spinner"></div>
         <p>Procesando pedido...</p>
     </div>
@@ -181,4 +179,6 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
+    <script src="{% static 'js/tipo_factura.js' %}"></script>
+    <script src="{% static 'js/realizar-pedido.js' %}"></script>
 {% endblock myscripts %}

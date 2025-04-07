@@ -1,10 +1,9 @@
-
-    {% for producto, imagen_url in productos_imagen %}
-        <div class="flex flex-column items-center justify-center product-card">
-            {% if imagen_url %}
-                {% include 'components/cards_dinamic.html' with img_url=imagen_url product_name=producto.nombre product_price=producto.precio only %}
-            {% else %}
-                {% include 'components/cards_static.html' with img_url='img/prod_default.jpg' product_name=producto.nombre product_price=producto.precio only %}
-            {% endif %}
-        </div>
-    {% endfor %}
+{% for producto, imagen_url in productos_imagen %}
+    <div class="flex flex-column items-center justify-center product-card bg-white position-relative bloqueable">
+        {% if imagen_url %}
+            {% include 'components/cards_dinamic.html' %}
+        {% else %}
+            {% include 'components/cards_static.html' %}
+        {% endif %}
+    </div>
+{% endfor %}

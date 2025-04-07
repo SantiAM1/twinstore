@@ -1,71 +1,71 @@
 {% load static %}
-<script src="{% static 'js/scripts.js' %}"></script>
-<script>
+<script src="{% static 'js/base.js' %}"></script>
+<script nonce="{{ nonce }}">
     const categorias = {
         'prod_item-componentes': `
             <div class="result-productos-column flex">
                 <a href="#" class="result-productos-titulo">Hardware</a>
-                <a href="#" class="hover_pad_weight">Gabinetes</a>
-                <a href="#" class="hover_pad_weight">Placas de video</a>
-                <a href="#" class="hover_pad_weight">Motherboards</a>
-                <a href="#" class="hover_pad_weight">Procesadores</a>
-                <a href="#" class="hover_pad_weight">Fuentes</a>
-                <a href="#" class="hover_pad_weight">Coolers</a>
+                <a href="#" class="hover-pad-weight">Gabinetes</a>
+                <a href="#" class="hover-pad-weight">Placas de video</a>
+                <a href="#" class="hover-pad-weight">Motherboards</a>
+                <a href="#" class="hover-pad-weight">Procesadores</a>
+                <a href="#" class="hover-pad-weight">Fuentes</a>
+                <a href="#" class="hover-pad-weight">Coolers</a>
             </div>
             <div class="result-productos-column flex">
                 <a href="{% url 'products:categoria' categoria='Almacenamiento' %}" class="result-productos-titulo">Almacenamiento</a>
-                <a href="{% url 'products:categoria' categoria='Almacenamiento' %}?sub_categoria=Discos Internos" class="hover_pad_weight">Discos Internos</a>
-                <a href="#" class="hover_pad_weight">Discos Internos SSD</a>
-                <a href="#" class="hover_pad_weight">Discos Externos</a>
-                <a href="#" class="hover_pad_weight">Discos Externos SSD</a>
-                <a href="#" class="hover_pad_weight">Pen Drive</a>
-                <a href="#" class="hover_pad_weight">Memorias Flash</a>
+                <a href="{% url 'products:categoria' categoria='Almacenamiento' %}?sub_categoria=Discos Internos" class="hover-pad-weight">Discos Internos</a>
+                <a href="#" class="hover-pad-weight">Discos Internos SSD</a>
+                <a href="#" class="hover-pad-weight">Discos Externos</a>
+                <a href="#" class="hover-pad-weight">Discos Externos SSD</a>
+                <a href="#" class="hover-pad-weight">Pen Drive</a>
+                <a href="#" class="hover-pad-weight">Memorias Flash</a>
             </div>
             <div class="result-productos-column flex">
                 <a href="#" class="result-productos-titulo">Memoria Ram</a>
-                <a href="#" class="hover_pad_weight">Memorias Notebook</a>
-                <a href="#" class="hover_pad_weight">Memorias PC</a>
+                <a href="#" class="hover-pad-weight">Memorias Notebook</a>
+                <a href="#" class="hover-pad-weight">Memorias PC</a>
             </div>
         `,
         'prod_item-computos': `
             <div class="result-productos-column flex">
                 <a href="#" class="result-productos-titulo">Computadoras</a>
-                <a href="#" class="hover_pad_weight">PC de Escritorio</a>
-                <a href="#" class="hover_pad_weight">All in one</a>
-                <a href="#" class="hover_pad_weight">Notebooks</a>
+                <a href="#" class="hover-pad-weight">PC de Escritorio</a>
+                <a href="#" class="hover-pad-weight">All in one</a>
+                <a href="#" class="hover-pad-weight">Notebooks</a>
             </div>
             <div class="result-productos-column flex">
                 <a href="#" class="result-productos-titulo">Imagen</a>
-                <a href="#" class="hover_pad_weight">Monitores</a>
-                <a href="#" class="hover_pad_weight">Proyectores</a>
-                <a href="#" class="hover_pad_weight">Escaner</a>
+                <a href="#" class="hover-pad-weight">Monitores</a>
+                <a href="#" class="hover-pad-weight">Proyectores</a>
+                <a href="#" class="hover-pad-weight">Escaner</a>
             </div>
         `,
         'prod_item-accesorios': `
             <div class="result-productos-column flex">
                 <a href="{% url 'products:categoria' categoria='Perifericos' %}" class="result-productos-titulo">Periféricos</a>
-                <a href="#" class="hover_pad_weight">Teclados</a>
-                <a href="#" class="hover_pad_weight">Mouse</a>
-                <a href="#" class="hover_pad_weight">Auriculares</a>
-                <a href="#" class="hover_pad_weight">Webcams</a>
-                <a href="#" class="hover_pad_weight">Micrófonos</a>
+                <a href="#" class="hover-pad-weight">Teclados</a>
+                <a href="#" class="hover-pad-weight">Mouse</a>
+                <a href="#" class="hover-pad-weight">Auriculares</a>
+                <a href="#" class="hover-pad-weight">Webcams</a>
+                <a href="#" class="hover-pad-weight">Micrófonos</a>
             </div>
         `,
-        'prod_item-impresion': `
+        'prod_item-celulares': `
             <div class="result-productos-column flex">
                 <a href="#" class="result-productos-titulo">Impresión 1</a>
-                <a href="#" class="hover_pad_weight">Impresoras</a>
-                <a href="#" class="hover_pad_weight">Escáneres</a>
-                <a href="#" class="hover_pad_weight">Cartuchos</a>
-                <a href="#" class="hover_pad_weight">Papel</a>
+                <a href="#" class="hover-pad-weight">Impresoras</a>
+                <a href="#" class="hover-pad-weight">Escáneres</a>
+                <a href="#" class="hover-pad-weight">Cartuchos</a>
+                <a href="#" class="hover-pad-weight">Papel</a>
             </div>
         `,
         'prod_item-gaming': `
             <div class="result-productos-column flex">
                 <a href="#" class="result-productos-titulo">Gaming 1</a>
-                <a href="#" class="hover_pad_weight">Consolas</a>
-                <a href="#" class="hover_pad_weight">Videojuegos</a>
-                <a href="#" class="hover_pad_weight">Accesorios de Gaming</a>
+                <a href="#" class="hover-pad-weight">Consolas</a>
+                <a href="#" class="hover-pad-weight">Videojuegos</a>
+                <a href="#" class="hover-pad-weight">Accesorios de Gaming</a>
             </div>
         `
     };

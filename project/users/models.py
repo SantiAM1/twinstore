@@ -84,7 +84,7 @@ class DatosFacturacion(models.Model):
     codigo_postal = models.CharField(max_length=10)
     provincia = models.CharField(max_length=1, choices=PROVINCIA_CHOICES)
     calle = models.CharField(max_length=255)
-    cuidad = models.CharField(max_length=255)
+    cuidad = models.CharField(max_length=255,null=True, blank=True)
     calle_detail = models.CharField(max_length=255, blank=True)
 
     def __str__(self):

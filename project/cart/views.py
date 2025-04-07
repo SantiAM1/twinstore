@@ -24,6 +24,36 @@ import os
 import base64
 
 # ----- APIS ----- #
+class EnviarWtapView(APIView):
+    def get(self,request):
+        productos = []
+
+        if request.user.is_authenticated:
+            carrito = get_object_or_404(Carrito, usuario=request.user)
+            pedidos = carrito.pedidos.select_related('producto')
+            direccion = request.user.perfil.calle
+            codigo_postal = request.user.perfil.codigo_postal
+            for pedido in pedidos:
+                productos.append({
+                    "nombre": pedido.producto.nombre,
+                    "cantidad": pedido.cantidad
+                })
+        else:
+            direccion = ""
+            codigo_postal = ""
+            carrito_sesion = request.session.get('carrito', {})
+            for pedido_id, cantidad in carrito_sesion.items():
+                try:
+                    producto = Producto.objects.get(id=pedido_id)
+                    productos.append({
+                        "nombre": producto.nombre,
+                        "cantidad": cantidad
+                    })
+                except Producto.DoesNotExist:
+                    continue
+
+        return Response({"productos": productos,'direccion':direccion,'codigo_postal':codigo_postal})
+
 class ActualizarPedidoView(APIView):
     permission_classes = [TieneCarrito]
     def post(self,request):
@@ -131,7 +161,7 @@ class AgregarAlCarritoView(APIView):
             imagen_url = (
                 producto.imagenes.first().imagen.url
                 if producto.imagenes.first()
-                else static('img/prod_default.jpg')
+                else static('img/prod_default.webp')
             )
             return Response({
                 'total_precio':total_processor['total_precio'],
@@ -159,12 +189,22 @@ class CalcularPedidoView(APIView):
                 total_compra = round(total_processor/0.923891,2)
                 adicional = round(total_compra - total_processor,2)
 
+                request.session['adicional_mp'] = adicional
+                request.session.modified = True
+
+                productos = {}
+                
                 if request.user.is_authenticated:
                     carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
                     carrito_id = carrito.id
+                    for pedido in carrito.pedidos.all():
+                        productos[str(pedido.producto.id)] = pedido.get_cantidad()
+                    usuario = {'user':request.user.email}
                 else:
                     carrito = request.session['carrito']
+                    productos = carrito
                     carrito_id = request.session['anon_cart_id']
+                    usuario = {'session':request.session.session_key}
 
                 direccion = data['calle']
                 match = re.match(r'^(.*?)(?:\s+(\d+))?$', direccion.strip())
@@ -181,11 +221,10 @@ class CalcularPedidoView(APIView):
                 razon_social = data.get('razon_social','')
                 tipo_factura = data.get('tipo_factura','')
                 telefono = data.get('telefono', '')
-                cuidad = data.get('cuidad', ''),
                 recibir_mail = data.get('recibir_mail')
 
                 try:
-                    preference = preference_mp(total_compra,carrito_id,dni_cuit,ident_type,email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,cuidad,recibir_mail)
+                    preference = preference_mp(total_compra,carrito_id,dni_cuit,ident_type,email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,recibir_mail,productos,usuario)
                     init_point = preference.get("init_point", "")
                 except ValueError as e:
                     return Response({'error': str(e)}, status=500)
@@ -194,6 +233,9 @@ class CalcularPedidoView(APIView):
                 total_compra = total_processor
                 adicional = 0
                 init_point = ''
+                if request.session.get('adicional_mp',{}):
+                    del request.session['adicional_mp']
+                    request.session.modified = True
 
             if total_processor <= 0:
                 return Response({'error': 'El carrito está vacío'}, status=400)
@@ -210,7 +252,7 @@ class CalcularPedidoView(APIView):
 # Create your views here.
 # ----- Preferencias de MP ----- #
 
-def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,cuidad,recibir_mail):
+def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,recibir_mail,productos,usuario):
     site_url = f'{settings.MY_NGROK_URL}'
 
     argentina_tz = timezone.get_fixed_timezone(-180)
@@ -257,20 +299,19 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
         "expiration_date_from": expiration_from,
         "expiration_date_to": expiration_to,
         "metadata": {
-            "carrito_id": carrito_id,
             "dni_cuit": dni_cuit,
-            "ident_type": ident_type,
             "email": email,
             "nombre": nombre,
             "apellido": apellido,
             "codigo_postal": codigo_postal,
-            "calle_nombre": calle_nombre,
-            "calle_altura": calle_altura,
+            "calle": f"{calle_nombre} {calle_altura}",
             "razon_social":razon_social,
             "tipo_factura":tipo_factura,
             "telefono":telefono,
-            "cuidad":cuidad,
-            "recibir_mail":recibir_mail
+            "recibir_mail":recibir_mail,
+            "productos":productos,
+            "usuario":usuario,
+            "carrito_id":carrito_id
         },
     }
 
@@ -341,7 +382,7 @@ def ver_carrito(request):
     carrito = []
     for producto_id,cantidad in carrito_session.items():
         producto = get_object_or_404(Producto,id=int(producto_id))
-        imagen_url = producto.imagenes.first().imagen.url if producto.imagenes.first() else 'img/prod_default.jpg'
+        imagen_url = producto.imagenes.first().imagen.url if producto.imagenes.first() else 'img/prod_default.webp'
         carrito.append({
             'id':producto.id,
             'producto':producto,
@@ -360,6 +401,7 @@ def generar_presupuesto(request):
 
     if request.user.is_authenticated:
         carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
+        total_compra = float(carrito.get_total())
     else:
         carrito_session = request.session.get('carrito',{})
         carrito = []
@@ -370,14 +412,20 @@ def generar_presupuesto(request):
                 'cantidad':cantidad,
                 'total_precio':producto.precio*cantidad,
             })
+        total_compra = float(sum(item['total_precio'] for item in carrito))
 
-    logo_path = os.path.join(settings.BASE_DIR, 'static/img/logo.png')
+    adicional = "0,00"
+    if request.session.get('adicional_mp',{}):
+        adicional = request.session['adicional_mp']
+        total_compra += float(adicional)
+
+    logo_path = os.path.join(settings.BASE_DIR, 'static/img/mail.webp')
 
     with open(logo_path, "rb") as f:
         logo_base64 = base64.b64encode(f.read()).decode("utf-8")
 
 
-    context = {'carrito':carrito,'fecha':datetime.date.today(),'logo_base64': logo_base64}
+    context = {'carrito':carrito,'fecha':datetime.date.today(),'logo_base64': logo_base64,'total_compra':total_compra,'adicional':adicional}
     html_string = render_to_string("presupuesto.html", context)
     pdf_file = HTML(string=html_string).write_pdf()
 

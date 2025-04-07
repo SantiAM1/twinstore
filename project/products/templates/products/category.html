@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block head %}
+    <title>{{categoria}} - Twistore</title>
+{% endblock head %}
+
 {% block contenidomain %}
 <div class="product-box main-box">
     <nav class="flex justify-between items-center products-nav">
@@ -20,14 +24,22 @@
             </div>
         </main>
     </div>
+    <div class="paginacion flex width-100 justify-center">
+        {% include 'partials/paginacion.html' %}
+    </div>
+    <div id="loading-overlay" class="loading-overlay position-fixed display-none flex-column items-center justify-center">
+        <div class="spinner"></div>
+        <p>Procesando...</p>
+    </div>
 </div>
 {% endblock contenidomain %}
 
 {% block myscripts %}
-<script>
+<script nonce="{{ nonce }}">
     window.filters = {
         categoria : "{{categoria}}",
         apiUrl :"{% url 'products:categoria_ajax' categoria=categoria %}"
     };
 </script>
+<script src="{% static 'js/dinamic-filter.js' %}"></script>
 {% endblock myscripts %}

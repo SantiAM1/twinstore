@@ -8,8 +8,8 @@
             {% endif %}
         {% endfor %}
 
-        <select name="ordenby" id="ordenby" class="product-ordenby">
-            <option value="" disabled selected class="display_none">{{ filtro }}</option>
+        <select name="ordenby" id="ordenby" class="product-ordenby bloqueable">
+            <option value="" disabled selected class="display-none">{{ filtro }}</option>
             <option value="date">Ordenar por los últimos</option>
             <option value="price_lower">Ordenar por precio: menor a mayor</option>
             <option value="price_higher">Ordenar por precio: mayor a menor</option>

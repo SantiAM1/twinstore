@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import iniciar_sesion,registarse,cerrar_sesion,buscar_pedidos,mi_perfil,verificar_email,email_enviado,reenviar_verificacion,users_pedidos,ver_pedido
+from .views import iniciar_sesion,registarse,cerrar_sesion,buscar_pedidos,mi_perfil,verificar_email,email_enviado,reenviar_verificacion,users_pedidos,ver_pedido,RecibirMailView,asociar_pedido
 
 app_name = "users"
 
@@ -13,5 +13,7 @@ urlpatterns = [
     path('miperfil/',mi_perfil,name="perfil"),
     path('verificar/<str:token>',verificar_email,name="verificar"),
     path('email_enviado/<str:token>',email_enviado,name="email_enviado"),
-    path('reenviar_mail/<str:token>',reenviar_verificacion,name="reenviar_mail")
+    path('reenviar_mail/<str:token>',reenviar_verificacion,name="reenviar_mail"),
+    path('api/recibir_mail/',RecibirMailView.as_view(),name="recibir_mail"),
+    path('asociar_pedido/',asociar_pedido,name="asociar_pedido")
 ]

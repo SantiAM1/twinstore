@@ -4,19 +4,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="description" content="Twinstore ofrece productos electrónicos de calidad al mejor precio. Envíos a todo el país.">
+    <meta name="keywords" content="teclado, mouse, auriculares, electrónica, Rosario, Twinstore">
+    <meta name="author" content="Twinstore">
+    <meta name="robots" content="index, follow">
+
+
+
+    <!-- Evita inferencias incorrectas de tipo -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+    <!-- Prevención básica de XSS en navegadores antiguos -->
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+    <!-- Política básica CSP (ajustable según tu JS) -->
+    <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    style-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com;
+    script-src 'self' cdn.jsdelivr.net 'nonce-{{ nonce }}';
+    font-src 'self' cdn.jsdelivr.net fonts.gstatic.com;
+    img-src 'self' data:;
+    ">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     {% block head %}
     {% endblock head %}
 </head>
 <body>
-    <header class="header-tag">
+    <header class="header-tag position-fixed">
         {% include 'header.html' %}
     </header>
+
+    <!-- * Carousel -->
     <div class="divider-content"></div>
+    <div class="carousel position-relative overflow-hidden">
+        <div class="carousel-track flex height-100">
+            <picture>
+                <source media="(max-width: 768px)" srcset="{% static 'img/banner_1_mobile.webp' %}">
+                <img src="{% static 'img/banner_1.webp' %}" alt="Banner 1" fetchpriority="high" class="height-100">
+            </picture>
+            <picture>
+                <source media="(max-width: 768px)" srcset="{% static 'img/banner_2_mobile.webp' %}">
+                <img src="{% static 'img/banner_2.webp' %}" alt="Banner 2" loading="lazy" class="height-100">
+            </picture>
+            <picture>
+                <source media="(max-width: 768px)" srcset="{% static 'img/banner_3_mobile.webp' %}">
+                <img src="{% static 'img/banner_3.webp' %}" alt="Banner 3" loading="lazy" class="height-100">
+            </picture>
+        </div>
+        
+    </div>
+    <div class="carousel-timer">
+        <div class="carousel-timer-fill"></div>
+    </div>
+    <!-- * -------- -->
 
     {% block contenidomain %}
     {% endblock contenidomain %}
@@ -25,20 +73,20 @@
         {% include 'footer.html' %}
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        window.api = {
-            agregarAlCarrito: "{% url 'cart:api_agregar_carrito' %}",
-            eliminarPedido: "{% url 'cart:api_eliminar_pedido' %}",
-            verCarrito : "{% url 'cart:ver_carrito' %}",
-            calcularPedido:"{% url 'cart:api_calcular_pedido' %}",
-            actualizarPedido:"{% url 'cart:api_actualizar_pedido' %}",
-            imgMP: "{% static 'img/mercado_pago.png' %}",
-            finalizarCompra: "{% url 'cart:realizar_pedido' %}"
-        };
-    </script>
+    <!-- * Wtap -->
+    <a href="https://wa.me/5493416544144" target="_blank" class="wtap-link position-fixed">
+        <img src="{% static 'img/wtap.webp' %}" alt="WhatsApp">
+    </a>
+    
+    <!-- * Import AXIOS -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
+    <script src="{% static 'js/generic-axios.js' %}"></script>
+    
+    {% include 'api_config.html' %}
+
     {% block myscripts %}
     {% endblock myscripts %}
+
     {% include 'menu_mobile.html' %}
     {% include 'scr_template.html' %}
 </body>

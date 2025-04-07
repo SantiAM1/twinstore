@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django_json_widget.widgets import JSONEditorWidget
 
-from .models import Marca, Categoria, SubCategoria, Producto, ImagenProducto, Atributo, EspecificacionTecnica, CategoriaEspecificacion,EstimacionEmpaque
+from .models import Marca, Categoria, SubCategoria, Producto, ImagenProducto, Atributo, EspecificacionTecnica, CategoriaEspecificacion
 
 # ----- Inline para especificaciones técnicas -----
 class EspecificacionTecnicaInline(admin.StackedInline):
@@ -25,4 +25,3 @@ admin.site.register(Producto, ProductoAdmin)
 admin.site.register(ImagenProducto)
 admin.site.register(Atributo)
 admin.site.register(CategoriaEspecificacion)
-admin.site.register(EstimacionEmpaque)

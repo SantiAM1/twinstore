@@ -5,7 +5,7 @@
             <ul class="list-none">
                 {% for valor in valores %}
                     <li>
-                        <a class="decoration-none filter-link"
+                        <a class="decoration-none filter-link bloqueable"
                             href="?{% for key, val in request.GET.items %}{% if key != nombre_atributo %}{{ key }}={{ val|urlencode }}&{% endif %}{% endfor %}{{ nombre_atributo }}={{ valor|urlencode }}">
                             {{ valor }}
                         </a>

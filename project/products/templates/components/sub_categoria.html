@@ -4,7 +4,7 @@
         <ul class="list-none">
         {% for sub in sub_categorias %}
             <li>
-                <a class="decoration-none filter-link"
+                <a class="decoration-none filter-link bloqueable"
                     href="?{% for key, val in request.GET.items %}{% if key != 'sub_categoria' %}{{ key }}={{ val|urlencode }}&{% endif %}{% endfor %}sub_categoria={{ sub.nombre|urlencode }}">
                     {{ sub.nombre }}
                 </a>

@@ -24,9 +24,8 @@ class HistorialCompras(models.Model):
     fecha_compra = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20, choices=ESTADOS, default='pendiente')
     forma_de_pago = models.CharField(max_length=20,choices=FORMA_DE_PAGO,default='efectivo')
-    payment_id = models.CharField(max_length=100, blank=True, null=True)
     pagos = models.ManyToManyField("PagoRecibidoMP", blank=True,editable=False)
-    merchant_order_id = models.CharField(max_length=100, blank=True, null=True)
+    merchant_order_id = models.CharField(max_length=100, blank=True, null=True,unique=True)
     token_consulta = models.UUIDField(default=uuid.uuid4, unique=True)
     recibir_mail = models.BooleanField(default=False)
 

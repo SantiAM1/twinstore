@@ -3,14 +3,14 @@
 
 {% block contenidomain %}
 <main class="padding-1rem">
-    <div class="users-pedidos-box">
+    <div class="users-pedidos-box bg-white">
         {% if messages %}
             {% for mensaje in messages %}
-                <p class="django-msg-{{mensaje.tags}}">{{mensaje}}</p>
+                <p class="django-msg-{{mensaje.tags}} font-roboto text-center">{{mensaje}}</p>
             {% endfor %}
         {% endif %}
         <h1 style="font-family: 'Roboto';text-align: start;padding-bottom: 1rem;font-weight: 300;border-bottom: 1px solid #d6d6d6;margin: 1rem;">Lista de pedidos</h1>
-        <table class="users-pedidos-table">
+        <table class="users-pedidos-table width-100 text-center">
             <thead>
                 <tr>
                     <th>Pedido</th>
@@ -27,20 +27,29 @@
                 <tr class="users-pedidos-tr">
                     <td>
                         <ul>
-                            {% for producto in pedido.productos %}
-                                <li><span class="users-pedido-count">{{producto.cantidad}} x</span><p class="users-pedido-prod"> {{producto.nombre}}</p></li>
-                            {% endfor %}
+                            <div class="flex items-center gap-05rem">
+                            <div class="notification-box">
+                                {% include 'partials/notificacion.html' %}
+                            </div>
+                                <div>
+                                    {% for producto in pedido.productos %}
+                                        <li class="flex flex-column">
+                                                <span class="users-pedido-count font-bold">{{producto.cantidad}} x<p class="users-pedido-prod font-roboto font-bold"> {{producto.nombre}}</p></span>
+                                        </li>
+                                    {% endfor %}
+                                </div>
+                            </div>
                             {% if pedido.forma_de_pago == 'transferencia' %}
                                 {% if pedido.comprobante %}
-                                    <p class="link-subir-comprobante subido"><i class="bi bi-paperclip"></i> Comprobante adjunto</p>
+                                    <p class="link-subir-comprobante decoration-none font-roboto subido"><i class="bi bi-paperclip"></i> Comprobante adjunto</p>
                                 {% else %}
-                                    <a href="{% url 'payment:comprobante' pedido.token_consulta %}" class="link-subir-comprobante"><i class="bi bi-paperclip"></i> Subir comprobante</a>
+                                    <a href="{% url 'payment:comprobante' pedido.token_consulta %}" class="link-subir-comprobante decoration-none font-roboto"><i class="bi bi-paperclip"></i> Subir comprobante</a>
                                 {% endif %}
                             {% endif %}
                         </ul>
-                        <p class="users-pedidos-hide-id">ID de pago: <span>#{{pedido.payment_id}}</span></p>
+                        <p class="users-pedidos-hide-id display-none width-100 font-roboto">ID de pago: <span>#{{pedido.merchant_order_id}}</span></p>
                     </td>
-                    <td class="users-pedidos-id users-pedidos-hide">#{{pedido.payment_id}}</td>
+                    <td class="users-pedidos-id users-pedidos-hide font-bold">#{{pedido.merchant_order_id}}</td>
                     <td class="users-pedidos-hide">{{pedido.fecha_compra|date:"d/m/y"}}</td>
                     <td>
                         {% if pedido.estado == 'confirmado' %}
@@ -76,6 +85,23 @@
                 {% endfor %}
             </tbody>
         </table>
+        <div>
+            <input type="checkbox" id="asociar-prod" class="asociar-prod display-none">
+            <label for="asociar-prod" class="flex justify-between items-center font-roboto users-asociar-pedido">Asociar un pedido a mi cuenta<i class="bi bi-chevron-down"></i></label>
+            <form method="post" style="padding: 1rem" class="users-pedido-asociar flex items-center flex-column gap-1rem" action="{% url 'users:asociar_pedido' %}">
+                {% csrf_token %}
+                {{form.token}}
+                <button type="submit" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-pedido-button">Asociar pedido</button>
+            </form>
+        </div>
+    </div>
+    <div id="loading-overlay" class="loading-overlay position-fixed display-none flex-column items-center justify-center">
+        <div class="spinner"></div>
+        <p>Procesando...</p>
     </div>
 </main>
 {% endblock contenidomain %}
+
+{% block myscripts %}
+    <script src="{% static 'js/pedido.js' %}"></script>
+{% endblock myscripts %}

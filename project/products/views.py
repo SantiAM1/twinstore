@@ -6,8 +6,8 @@ from django_user_agents.utils import get_user_agent
 from django.template.loader import render_to_string
 from django.db import connection
 import time
-
-
+from django.db.models import F, FloatField, ExpressionWrapper
+from django.core.paginator import Paginator
 
 # Create your views here.
 # ----- Manejo de filtros ----- #
@@ -104,8 +104,14 @@ def categoria_ajax(request, categoria):
     #* 🔹 Ordenar los productos
     productos, filtro=ordenby(request,productos)
 
-    #* 🔹 Obtener imágenes de los productos
-    productos_imagen=get_prod_img(productos)
+    pagina_actual = request.GET.get('pagina', 1)
+    paginator = Paginator(productos, 4)
+    pagina = paginator.get_page(pagina_actual)
+
+    productos_con_img = get_prod_img(pagina.object_list)
+
+    # #* 🔹 Obtener imágenes de los productos
+    # productos_imagen=get_prod_img(productos)
 
     filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q"]}
 
@@ -122,7 +128,8 @@ def categoria_ajax(request, categoria):
             )
 
         html = render_to_string('partials/product_grid.html', {
-            'productos_imagen': productos_imagen
+            'productos_imagen': productos_con_img,
+            'pagina':pagina
         }, request=request)
 
         html_activos = render_to_string(
@@ -152,20 +159,25 @@ def categoria_ajax(request, categoria):
     },request=request)
 
     html_orden = render_to_string('partials/orden_resultado.html',{
-        'cantidad_productos':len(productos),
+        'cantidad_productos':len(productos_con_img),
         'filtro':filtro,
         'request':request
     },request=request)
 
     html = render_to_string('partials/product_grid.html', {
-        'productos_imagen': productos_imagen
+        'productos_imagen': productos_con_img
     }, request=request)
 
-    return JsonResponse({'html': html,'filtros':html_filtros,'navlinks':html_navlinks,'orden':html_orden})
+    html_paginacion = render_to_string('partials/paginacion.html', {
+        'pagina':pagina},
+        request=request
+        )
+
+    return JsonResponse({'html': html,'filtros':html_filtros,'navlinks':html_navlinks,'orden':html_orden,'paginacion':html_paginacion})
 
 # ----- Filtracion por categoria ----- #
 def categoria(request, categoria):
-
+    print('categoria_sin_ajax')
     sub_categorias = SubCategoria.objects.filter(categoria__nombre=categoria)
     productos = Producto.objects.filter(sub_categoria__in=sub_categorias).select_related('marca', 'sub_categoria').prefetch_related('imagenes', 'atributos')
 
@@ -193,19 +205,23 @@ def categoria(request, categoria):
 
     #* 🔹 Ordenar los productos
     productos, filtro=ordenby(request,productos)
+    
+    pagina_actual = request.GET.get('pagina', 1)
+    paginator = Paginator(productos, 4)
+    pagina = paginator.get_page(pagina_actual)
 
     #* 🔹 Obtener imágenes de los productos
-    productos_imagen=get_prod_img(productos)
+    productos_con_img = get_prod_img(pagina.object_list)
 
     filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q"]}
 
     user_agent = get_user_agent(request)
     if user_agent.is_mobile:
         return render(request,'products/mobile.html',{
-        'productos_imagen': productos_imagen,
+        'productos_imagen': productos_con_img,
         'categoria': categoria,
         'sub_categorias':sub_categorias,
-        'cantidad_productos':len(productos),
+        'cantidad_productos':len(productos_con_img),
         'filtro' : filtro,
         'atributos_unicos':atributos_unicos,
         'marcas':marcas,
@@ -213,28 +229,45 @@ def categoria(request, categoria):
     })
 
     return render(request, 'products/category.html', {
-        'productos_imagen': productos_imagen,
+        'productos_imagen': productos_con_img,
         'categoria': categoria,
         'sub_categorias':sub_categorias,
-        'cantidad_productos':len(productos),
+        'cantidad_productos':len(productos_con_img),
         'filtro' : filtro,
         'atributos_unicos':atributos_unicos,
         'marcas':marcas,
-        'filtros_aplicados':filtros_aplicados
+        'filtros_aplicados':filtros_aplicados,
+        'pagina':pagina
     })
 
 # ----- Ordenar los productos ----- #
 def ordenby(request, productos):
     orden = request.GET.get('ordenby', 'date')
+
+    # Agregamos el campo 'precio_final'
+    # Creamos una expresión segura que Django puede evaluar
+    descuento_decimal = ExpressionWrapper(
+        F('descuento') / 100.0,
+        output_field=FloatField()
+    )
+
+    precio_final_expr = ExpressionWrapper(
+        F('precio') * (1 - descuento_decimal),
+        output_field=FloatField()
+    )
+
+    productos = productos.annotate(precio_final=precio_final_expr)
+
     if orden == 'price_lower':
-        productos = productos.order_by('precio')
+        productos = productos.order_by('precio_final')
         filtro = 'Ordenar por precio: menor a mayor'
     elif orden == 'price_higher':
-        productos = productos.order_by('-precio')
+        productos = productos.order_by('-precio_final')
         filtro = 'Ordenar por precio: mayor a menor'
     else:
         productos = productos.order_by('-id')
         filtro = 'Ordenar por los últimos'
+
     return productos, filtro
 
 # ----- Obetener las imagenes de los productos ----- #

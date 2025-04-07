@@ -1,6 +1,24 @@
-<a href="{% url 'products:producto' product_name=product_name %}" class="decoration-none">
-    <div class="flex items-center justify-center product-card-img"><img src="{{img_url}}" alt="{{ product_name }}" loading="lazy"></div>
-    <span>{{ product_name }}</span>
-    <p>${{product_price}}</p>
+{% if producto.descuento > 0 %}
+    <div class="descuento-box font-roboto position-absolute">
+        <i class="bi bi-tag-fill icon-descuento position-absolute"></i>
+        <span class="texto-descuento position-absolute">-{{ producto.descuento }}%</span>
+    </div>
+{% endif %}
+<a href="{% url 'products:producto' product_name=producto.nombre %}" class="decoration-none">
+    <div class="flex items-center justify-center product-card-img">
+        <img src="{{imagen_url}}" alt="{{ producto.nombre }}" loading="lazy">
+        
+    </div>
+    <span>{{ producto.nombre }}</span>
+    {% if producto.descuento > 0 %}
+        <div class="product-descount-box">
+            <p class="precio-anterior">${{ producto.precio_anterior }}</p>
+            <p class="precio-descuento font-roboto">
+                ${{ producto.precio }}
+            </p>
+        </div>
+    {% else %}
+        <p>${{producto.precio}}</p>
+    {% endif %}
     <strong>Ver mas</strong>
 </a>

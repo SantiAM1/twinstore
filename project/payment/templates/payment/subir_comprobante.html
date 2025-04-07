@@ -11,18 +11,18 @@
             <p><i class="bi bi-info-lg"></i> Subí el comprobante en formato <strong>JPG, JPEG, PNG</strong> o <strong>PDF</strong>.</p>
             <p><i class="bi bi-file-earmark-excel"></i> El archivo seleccionado no puede superar los <strong>5MB</strong>.</p>
         </div>
-        <form method="post" action="{% url 'payment:comprobante' historial.token_consulta %}" enctype="multipart/form-data">
+        <form method="post" action="{% url 'payment:comprobante' historial.token_consulta %}" enctype="multipart/form-data" class="flex flex-column gap-1rem items-center">
             {% csrf_token %}
             {{ form.file }}
-            <label for="{{ form.file.id_for_label }}" class="label-subir-comprobante" id="label-file"><i class="bi bi-file-earmark-arrow-down"></i>Archivo</label>
-            <button class="button-subir-comprobante" type="submit" id="button-subir">Subir Comprobante</button>
+            <label for="{{ form.file.id_for_label }}" class="label-subir-comprobante flex items-center justify-center font-roboto" id="label-file"><i class="bi bi-file-earmark-arrow-down"></i>Archivo</label>
+            <button class="button-subir-comprobante border-none font-roboto" type="submit" id="button-subir">Subir Comprobante</button>
         </form>
         <div class="flex justify-between">
-            <a href="{% url 'core:home' %}" class="users-facturacion-button users-confirm-links">Volver a la tienda</a>
+            <a href="{% url 'core:home' %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
             {% if user.is_authenticated %}
-            <a href="{% url 'users:mispedidos' %}" class="users-facturacion-button users-confirm-links">Mis pedidos</a>
+            <a href="{% url 'users:mispedidos' %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Mis pedidos</a>
             {% else %}
-            <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="users-facturacion-button users-confirm-links">Ver Pedido</a>
+            <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Ver Pedido</a>
             {% endif %}
         </div>
     </div>
@@ -30,7 +30,7 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
-<script>
+<script nonce="{{ nonce }}">
     document.getElementById("id_file").addEventListener("change", function () {
         const archivo = this.files[0];
         const maxSizeMB = 5;

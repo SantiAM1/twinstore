@@ -1,14 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block head %}
+    <title>{{categoria}} - Twistore</title>
+{% endblock head %}
+
 {% block contenidomain %}
-<ul class="flex items-center justify-between filter-ordenar-box">
+<ul class="flex items-center justify-between filter-ordenar-box position-relative list-none width-100">
     <li class="flex items-center filter-button"><i class="bi bi-sliders"></i>Filtros</li>
     <li>{{categoria}}</li>
     <li class="flex items-center ordenar-button"><i class="bi bi-arrow-down-up"></i>Ordenar</li>
-    <div class="filter-box-mobile" id="filters-box-mobile">
+    <div class="filter-box-mobile display-none position-absolute width-100" id="filters-box-mobile">
         {% include 'partials/filtros_dinamicos_mobile.html' %}
     </div>
-    <div class="ordenar-box-mobile">
+    <div class="ordenar-box-mobile display-none position-absolute width-100">
         <a href="#" data-orden="date" class="ordenar-opcion">Por los Últimos</a>
         <a href="#" data-orden="price_higher" class="ordenar-opcion">Por precio: Mayor a menor</a>
         <a href="#" data-orden="price_lower" class="ordenar-opcion">Por precio: Menor a mayor</a>
@@ -25,10 +30,12 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
-<script>
+<script nonce="{{ nonce }}">
     window.filters = {
         categoria : "{{categoria}}",
         apiUrl :"{% url 'products:categoria_ajax' categoria=categoria %}"
     };
 </script>
+<script src="{% static 'js/dinamic-filter.js' %}"></script>
+<script src="{% static 'js/mobile-filters.js' %}"></script>
 {% endblock myscripts %}

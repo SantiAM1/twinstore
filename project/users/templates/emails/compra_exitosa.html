@@ -3,28 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        p {
-            text-align: center;
-        }
-    </style>
 </head>
 <body style="font-family: 'Poppins', Arial, sans-serif;; background: #f4f4f4; padding: 20px;">
     <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; position: relative;">
         <img src="{{img}}" alt="Logo Twinstore" style="height: 100px; position: absolute; right: 10px; top: 10px;">
-    <h2 style="color: #007BFF;">¡Gracias por tu compra!</h2>
+    <h2 style="color: #007BFF; width: 200px;">¡Gracias por tu compra!</h2>
     <br>
-    <p>Gracias por registrarte en <strong>Twinstore</strong>. Estamos felices de tenerte 🎉</p>
-    <p>Para activar tu cuenta, hacé clic en el siguiente botón:</p>
+    <p style="text-align: center;font-size: 1.2rem">🎉 ¡Hemos recibido tu pedido con exito! 🎉</p>
+    <p style="font-size: 0.9rem;color: #686868;margin: 0;">Este es tu codigo de consulta:</p>
+    <p style="margin: 0;font-size: 0.9rem"><strong>{{token}}</strong></p>
     <br>
-    <p>
+    <p style="text-align: center;">
         <a href="{{url}}" 
-        style="padding: 12px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px;">
-        Activar cuenta →
+        style="font-weight: bold; padding: 12px 20px; background-color: #286aa7; color: white; text-decoration: none; border-radius: 5px;">
+        Ver pedido →
         </a>
     </p>
-    <br>
-    <p style="color: #888;">Si no fuiste vos, podés ignorar este mensaje.</p>
     </div>
 </body>
 </html>

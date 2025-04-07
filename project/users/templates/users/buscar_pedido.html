@@ -1,33 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block head %}
-    <style>
-        .users-pedido-button {
-            width: 200px;
-        }
-        .users-pedido-buscar {
-            display: flex;
-            gap: 1rem;
-        }
-    </style>
-{% endblock head %}
-
 {% block contenidomain %}
 <main class="padding-1rem">
-    <div class="users-pedidos-box">
+    <div class="users-pedidos-box bg-white">
         <h1 style="font-family: 'Roboto';text-align: start;padding-bottom: 1rem;font-weight: 300;border-bottom: 1px solid #d6d6d6;margin: 1rem;">Buscar un pedido:</h1>
         {% if messages %}
             {% for message in messages %}
-                <div class="django-msg-{{message.tags}}">
+                <div class="django-msg-{{message.tags}} font-roboto text-center">
                     {{ message }}
                 </div>
             {% endfor %}
         {% endif %}
-        <form method="post" style="padding: 1rem" class="users-pedido-buscar">
+        <form method="post" style="padding: 1rem" class="flex gap-1rem items-center flex-column">
             {% csrf_token %}
             {{form.token}}
-            <button type="submit" class="users-facturacion-button users-pedido-button">Buscar pedido</button>
+            <button type="submit" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-pedido-button">Buscar pedido</button>
         </form>
     </div>
 </main>

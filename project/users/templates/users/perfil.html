@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% load static %}
 
@@ -6,15 +5,15 @@
 <main class="padding-1rem">
     <form class="users-perfil" method="post">
         {% csrf_token %}
-        <div class="users-perfil-facturacion users-perfil-form">
+        <div class="flex flex-column gap-1rem font-roboto width-100">
             {% if messages %}
                 {% for mensaje in messages %}
-                    <p class="django-msg-{{mensaje.tags}}">{{mensaje}}</p>
+                    <p class="django-msg-{{mensaje.tags}} font-roboto text-center">{{mensaje}}</p>
                 {% endfor %}
             {% endif %}
-            <h2>Datos de Usuario</h2>
+            <h2 class="font-roboto">Datos de Usuario</h2>
             <span>Personales **</span>
-            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select" required>
+            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select border-none font-roboto" required>
                 <option value="" selected disabled>Tipo de factura *</option>
                 {% for value, label in form.tipo_factura.field.choices %}
                     {% if value %}
@@ -24,34 +23,34 @@
             </select>
             <div id="dni_cuit_container" class="container-form" style="display: none;">
                 {{form.dni_cuit}}
-                <label for="{{ form.dni_cuit.id_for_label }}" id="dni_cuit_label" class="form__label">{{form.dni_cuit.label}}</label>
+                <label for="{{ form.dni_cuit.id_for_label }}" id="dni_cuit_label" class="form-label">{{form.dni_cuit.label}}</label>
             </div>
             <div id="razon_social_container" class="container-form" style="display: none;">
                 {{form.razon_social}}
-                <label for="{{ form.razon_social.id_for_label }}" class="form__label">{{form.razon_social.label}}</label>
+                <label for="{{ form.razon_social.id_for_label }}" class="form-label">{{form.razon_social.label}}</label>
             </div>
             <div class="container-form">
                 {{form.nombre}}
-                <label for="{{ form.nombre.id_for_label }}" class="form__label">{{form.nombre.label}}</label>
+                <label for="{{ form.nombre.id_for_label }}" class="form-label">{{form.nombre.label}}</label>
             </div>
             <div class="container-form">
                 {{form.apellido}}
-                <label for="{{ form.apellido.id_for_label }}" class="form__label">{{form.apellido.label}}</label>
+                <label for="{{ form.apellido.id_for_label }}" class="form-label">{{form.apellido.label}}</label>
             </div>
             <span>Direccion **</span>
             <div class="container-form">
                 {{form.calle}}
-                <label for="{{ form.calle.id_for_label }}" class="form__label">{{form.calle.label}}</label>
+                <label for="{{ form.calle.id_for_label }}" class="form-label">{{form.calle.label}}</label>
             </div>
             <div class="container-form">
                 {{form.calle_detail}}
-                <label for="{{ form.calle_detail.id_for_label }}" class="form__label">{{form.calle_detail.label}}</label>
+                <label for="{{ form.calle_detail.id_for_label }}" class="form-label">{{form.calle_detail.label}}</label>
             </div>
             <div class="container-form">
                 {{form.cuidad}}
-                <label for="{{ form.cuidad.id_for_label }}" class="form__label">{{form.cuidad.label}}</label>
+                <label for="{{ form.cuidad.id_for_label }}" class="form-label">{{form.cuidad.label}}</label>
             </div>
-            <select name="{{ form.provincia.html_name }}" id="{{ form.provincia.id_for_label }}" class="users-select" required>
+            <select name="{{ form.provincia.html_name }}" id="{{ form.provincia.id_for_label }}" class="users-select border-none font-roboto" required>
                 <option value="" selected disabled>Provincia *</option>
                 {% for value, label in form.provincia.field.choices %}
                     {% if value %}
@@ -61,26 +60,29 @@
             </select>
             <div class="container-form">
                 {{form.codigo_postal}}
-                <label for="{{ form.codigo_postal.id_for_label }}" class="form__label">{{form.codigo_postal.label}}</label>
+                <label for="{{ form.codigo_postal.id_for_label }}" class="form-label">{{form.codigo_postal.label}}</label>
             </div>
             <span>Contacto</span>
             <div class="container-form">
                 {{form.email}}
-                <label for="{{ form.email.id_for_label }}" class="form__label">{{form.email.label}}</label>
+                <label for="{{ form.email.id_for_label }}" class="form-label">{{form.email.label}}</label>
             </div>
             <div class="container-form">
                 {{form.telefono}}
-                <label for="{{ form.telefono.id_for_label }}" class="form__label">{{form.telefono.label}}</label>
+                <label for="{{ form.telefono.id_for_label }}" class="form-label">{{form.telefono.label}}</label>
             </div>
-            <div class="container-checkbox">
+            <div class="container-checkbox  font-roboto">
                 {{ form.recibir_estado_pedido }}
                 <label class="form-check-label" for="{{ form.recibir_estado_pedido.id_for_label }}">
                     {{ form.recibir_estado_pedido.label }}
                 </label>
             </div>
-            <button type="submit" class="users-facturacion-button">Guardar</button>
+            <button type="submit" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer">Guardar</button>
         </div>
     </form>
 </main>
 {% endblock contenidomain %}
 
+{% block myscripts %}
+    <script src="{% static 'js/tipo_factura.js' %}"></script>
+{% endblock myscripts %}

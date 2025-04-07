@@ -11,14 +11,14 @@
         </div>
         {% if messages %}
             {% for message in messages %}
-                <div class="django-msg-{{message.tags}}">
+                <div class="django-msg-{{message.tags}} font-roboto text-center">
                     {{message}}
                 </div>
             {% endfor %}
         {% endif %}
         <a href="{% url 'users:reenviar_mail' token %} ">¿No recibiste el correo? Reenviar verificación</a>
         <div class="flex justify-center">
-            <a href="{% url 'core:home' %}" class="users-facturacion-button users-confirm-links">Volver a la tienda</a>
+            <a href="{% url 'core:home' %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
         </div>
     </div>
 </main>

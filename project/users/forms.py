@@ -37,7 +37,7 @@ class UsuarioForm(forms.Form):
         ('X', 'Tucumán'),
     ]
     SELECT_ATTRS = forms.Select(attrs={'class': 'users-select bloqueable'})
-    INPUT_ATTRS = forms.TextInput(attrs={'class': 'form__input bloqueable','autocomplete':'off','placeholder':' '})
+    INPUT_ATTRS = forms.TextInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none','autocomplete':'off','placeholder':' '})
 
     tipo_factura = forms.ChoiceField(
         choices=TIPO_FACTURA_CHOICES,
@@ -84,7 +84,7 @@ class UsuarioForm(forms.Form):
         widget=INPUT_ATTRS
         )
     email = forms.EmailField(required=True, label="Email *",
-        widget=forms.EmailInput(attrs={'class': 'form__input','autocomplete':'off','placeholder':' '})
+        widget=forms.EmailInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none','autocomplete':'off','placeholder':' '})
         )
     telefono = forms.CharField(max_length=20, required=False, label="Telefono",
         widget=INPUT_ATTRS

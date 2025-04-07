@@ -7,9 +7,56 @@ from django.contrib import messages
 from payment.models import HistorialCompras
 import uuid
 from django.contrib.auth.decorators import login_required
-from .emails import enviar_mail_async
+from .emails import mail_confirm_user_async
 from django.utils import timezone
 from datetime import timedelta
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import RecibirMailSerializer
+
+from django.template.loader import render_to_string
+class RecibirMailView(APIView):
+    def post(self,request):
+        serializer = RecibirMailSerializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.validated_data
+            token = data['token']
+            historial = HistorialCompras.objects.filter(token_consulta = token).first()
+            historial.recibir_mail = not historial.recibir_mail
+            historial.save()
+            html = render_to_string('partials/notificacion.html',{
+                'pedido':historial
+            })
+
+            return Response({'html':html})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@login_required
+def asociar_pedido(request):
+    if request.method == "POST":
+        form = BuscarPedidoForm(request.POST)
+        if form.is_valid():
+            token = form.cleaned_data['token']
+            historial = HistorialCompras.objects.filter(token_consulta=token).first()
+            if historial:
+                if historial.usuario == request.user:
+                    messages.error(request,'Ya tienes este pedido asociado')
+                else:
+                    historial.usuario = request.user
+                    historial.save()
+                    messages.success(request,'Pedido asociado con exito!')
+                return redirect('users:mispedidos')
+            else:
+                messages.error(request, "No existe un pedido con ese código.")
+                return redirect('users:mispedidos')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+                    return redirect('users:mispedidos')
 
 @login_required
 def mi_perfil(request):
@@ -51,8 +98,9 @@ def mi_perfil(request):
 
 @login_required
 def users_pedidos(request):
+    form = BuscarPedidoForm()
     historial = HistorialCompras.objects.filter(usuario=request.user)
-    return render(request,'users/pedidos.html',{'historial':historial})
+    return render(request,'users/pedidos.html',{'historial':historial,'form':form})
 
 def buscar_pedidos(request):
     form = BuscarPedidoForm()
@@ -79,6 +127,7 @@ def ver_pedido(request,token):
 @login_required
 def cerrar_sesion(request):
     logout(request)
+    messages.info(request,'Sesion cerrada con exito!')
     return redirect('core:home')
 
 def iniciar_sesion(request):
@@ -93,6 +142,7 @@ def iniciar_sesion(request):
                     messages.warning(request, "Primero tenes que verificar tu correo para ingresar")
                     return redirect('users:login')
                 login(request, user)
+                messages.info(request,'Bienvenido a Twistore!')
                 return redirect('core:home')
             else:
                 messages.error(request, "El email o la contraseña ingresados no son correctos.")
@@ -113,7 +163,7 @@ def registarse(request):
             _ = user.perfil
 
             # * Enviamos el mail de verificación (modo rápido actual)
-            enviar_mail_async(user)
+            mail_confirm_user_async(user)
 
             return redirect('users:email_enviado',token = user.perfil.token_verificacion)
         else:
@@ -160,7 +210,7 @@ def reenviar_verificacion(request, token):
 
     user = perfil.user
 
-    enviar_mail_async(user)
+    mail_confirm_user_async(user)
 
     request.session['ultimo_envio_verificacion'] = ahora.isoformat()
 

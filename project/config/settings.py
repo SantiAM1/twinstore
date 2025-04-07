@@ -41,7 +41,7 @@ SECRET_KEY = DJANGO_SECRET_KEY
 DEBUG = True
 
 # * Host
-MY_NGROK_URL="89d7-186-137-123-71.ngrok-free.app"
+MY_NGROK_URL="f651-186-137-123-71.ngrok-free.app"
 
 # ! Actualizar el HOST con el dominio
 ALLOWED_HOSTS = [f'{MY_NGROK_URL}','127.0.0.1']
@@ -93,6 +93,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = "DENY"
 
 ROOT_URLCONF = 'config.urls'
 
@@ -207,3 +210,46 @@ TIME_ZONE = 'America/Argentina/Buenos_Aires'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+MIDDLEWARE += ['core.middleware.performance_middleware.PerformanceMiddleware']
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'performance_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/performance.log',
+            'formatter': 'simple',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'logs/mi_proyecto.log',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'payment': {  # nombre que usarías con logging.getLogger('payment')
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'performance': {
+            'handlers': ['performance_file', 'console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    }
+}

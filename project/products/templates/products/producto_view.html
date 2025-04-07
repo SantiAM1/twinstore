@@ -19,10 +19,10 @@
     <div class="flex gap-1rem product-view">
         <div class="flex flex-column thumbnails">
             {% for imagen in imagenes %}
-            <img src="{{ imagen.imagen.url }}" class="thumbnail" alt="Miniatura" onclick="scrollToImage('{{ forloop.counter0 }}')">
+            <img src="{{ imagen.imagen.url }}" class="thumbnail cursor-pointer scroll-image" alt="Miniatura" data-index="{{ forloop.counter0 }}">
             {% endfor %}
         </div>
-        <div class="flex items-center product-slider">
+        <div class="flex items-center product-slider position-relative">
             <div class="flex items-center slider-track" id="sliderTrack">
                 {% for imagen in imagenes %}
                 <img src="{{ imagen.imagen.url }}" id="slide-{{ forloop.counter0 }}" alt="Imagen principal de {{ producto.nombre }}">
@@ -38,9 +38,9 @@
                 <p class="product-title-precio">${{producto.precio}}</p>
                 <form id="add-to-cart-form" class="flex items-center gap-1rem" style="height: 40px;">
                     <div class="flex items-center justify-center quantity-container">
-                        <button type="button" class="decrement" onclick="decreaseQuantity()"><i class="bi bi-dash"></i></button>
+                        <button type="button" class="btn-cantidad-view" data-action="decrement"><i class="bi bi-dash"></i></button>
                         <input type="text" id="quantity" name="cantidad" value="1" readonly>
-                        <button type="button" class="increment" onclick="increaseQuantity()"><i class="bi bi-plus"></i></button>
+                        <button type="button" class="btn-cantidad-view" data-action="increment"><i class="bi bi-plus"></i></button>
                     </div>
                     <input type="hidden" name="producto_id" value="{{ producto.id }}" id="producto-id">
                     <button type="submit" class="decoration-none flex items-center product-cart">
@@ -54,7 +54,7 @@
     </div>
     <div class="product-specs">
         {% if producto.especificaciones.all %}
-            <h2>Catacteristicas del producto</h2>
+            <h2 class="font-roboto">Catacteristicas del producto</h2>
             <div class="product-specs-divider"></div>
             <table class="ficha-especificaciones">
                 {% for especificacion in producto.especificaciones.all %}
@@ -86,4 +86,5 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
+<script src="{% static 'js/producto-view.js' %}"></script>
 {% endblock myscripts %}
