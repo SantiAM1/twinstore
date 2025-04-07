@@ -6,3 +6,8 @@ __pycache__/
 media/
 .env
 /staticfiles/
+package-lock.json
+package.json
+.stylelintrc.json
+node_modules/
+logs/
