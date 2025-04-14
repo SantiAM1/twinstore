@@ -121,8 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
         setInterval(move, 8000); // cada 8 segundos
     }
     
-        
-
     // ----- Prediccion de busqueda ------ //
     function autocompletar(inputId, sugerenciasId) {
         const input = document.getElementById(inputId);

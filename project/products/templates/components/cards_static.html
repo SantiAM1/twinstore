@@ -1,7 +1,24 @@
 {% load static %}
+{% if producto.descuento > 0 %}
+    <div class="descuento-box font-roboto position-absolute">
+        <i class="bi bi-tag-fill icon-descuento position-absolute"></i>
+        <span class="texto-descuento position-absolute">-{{ producto.descuento }}%</span>
+    </div>
+{% endif %}
 <a href="{% url 'products:producto' product_name=producto.nombre %}" class="decoration-none flex flex-column items-center">
-    <div class="flex items-center justify-center product product-card-img"><img src="{% static 'img/prod_default.webp' %}" alt="{{ producto.nombre }}" loading="lazy"></div>
+    <div class="flex items-center justify-center product-card-img">
+        <img src="{% static 'img/prod_default.webp' %}" alt="{{ producto.nombre }}" loading="lazy">
+    </div>
     <span>{{ producto.nombre }}</span>
-    <p>${{producto.precio}}</p>
+    {% if producto.descuento > 0 %}
+        <div class="product-descount-box">
+            <p class="precio-anterior">${{ producto.precio_anterior }}</p>
+            <p class="precio-descuento font-roboto">
+                ${{ producto.precio }}
+            </p>
+        </div>
+    {% else %}
+        <p>${{producto.precio}}</p>
+    {% endif %}
     <strong>Ver mas</strong>
 </a>

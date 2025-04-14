@@ -52,24 +52,37 @@ def buscar_productos(request):
             productos = productos.filter(Q(nombre__icontains=palabra))
 
         productos, filtro = ordenby(request, productos)
-        productos_imagen = get_prod_img(productos)
+
+        pagina_actual = request.GET.get('pagina', 1)
+        paginator = Paginator(productos, 12)
+        pagina = paginator.get_page(pagina_actual)
+
+        productos_con_img = get_prod_img(pagina.object_list)
 
         return render(request, 'products/search_filter.html', {
-            'productos_imagen': productos_imagen,
-            'cantidad_productos': len(productos),
+            'productos_imagen': productos_con_img,
+            'cantidad_productos': len(productos_con_img),
             'query': query,
-            'filtro': filtro
+            'filtro': filtro,
+            'pagina':pagina
         })
 
     #* En el caso de no encontrar nada se muestran todos los productos
     productos =Producto.objects.all()
     productos, filtro = ordenby(request, productos)
-    productos_imagen = get_prod_img(productos)
+
+    pagina_actual = request.GET.get('pagina', 1)
+    paginator = Paginator(productos, 12)
+    pagina = paginator.get_page(pagina_actual)
+
+    productos_con_img = get_prod_img(pagina.object_list)
+
     return render(request, 'products/search_filter.html', {
-            'productos_imagen': productos_imagen,
-            'cantidad_productos': len(productos),
+            'productos_imagen': productos_con_img,
+            'cantidad_productos': len(productos_con_img),
             'query': query,
-            'filtro': filtro
+            'filtro': filtro,
+            'pagina':pagina
         })
 
 # ----- Categoria AJAX ----- #
@@ -105,7 +118,7 @@ def categoria_ajax(request, categoria):
     productos, filtro=ordenby(request,productos)
 
     pagina_actual = request.GET.get('pagina', 1)
-    paginator = Paginator(productos, 4)
+    paginator = Paginator(productos, 12)
     pagina = paginator.get_page(pagina_actual)
 
     productos_con_img = get_prod_img(pagina.object_list)
@@ -207,7 +220,7 @@ def categoria(request, categoria):
     productos, filtro=ordenby(request,productos)
     
     pagina_actual = request.GET.get('pagina', 1)
-    paginator = Paginator(productos, 4)
+    paginator = Paginator(productos, 12)
     pagina = paginator.get_page(pagina_actual)
 
     #* 🔹 Obtener imágenes de los productos

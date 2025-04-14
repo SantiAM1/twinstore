@@ -14,6 +14,20 @@ document.addEventListener("DOMContentLoaded", () => {
             aplicarFiltrosDinamicos(filtrosActualizados);
         }
     });
+
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("pagina-btn")) {
+            e.preventDefault();
+    
+            const pagina = e.target.dataset.pagina;
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('pagina', pagina);
+    
+            const filtrosActualizados = Object.fromEntries(urlParams.entries());
+            aplicarFiltrosDinamicos(filtrosActualizados);
+        }
+    });
+    
     
     document.addEventListener('click', async function (e) {
         const link = e.target.closest('.filter-link ,.filter-active-link, .filter-link-mobile');

@@ -3,7 +3,7 @@
 
 {% block contenidomain %}
 <main class="padding-1rem">
-    <div class="flex font-roboto flex-column users-facturacion-box">
+    <div class="flex font-roboto flex-column users-feedback-box">
         <h2 style="text-align: center;">¡Correo de verificacion enviado!</h2>
         <div>
             <p>Te enviamos un mail con un enlace para activar tu cuenta.</p>
@@ -18,7 +18,7 @@
         {% endif %}
         <a href="{% url 'users:reenviar_mail' token %} ">¿No recibiste el correo? Reenviar verificación</a>
         <div class="flex justify-center">
-            <a href="{% url 'core:home' %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
+            <a href="{% url 'core:home' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
         </div>
     </div>
 </main>

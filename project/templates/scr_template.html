@@ -1,6 +1,6 @@
 {% load static %}
 <script src="{% static 'js/base.js' %}"></script>
-<script nonce="{{ nonce }}">
+<script nonce="{{ request.csp_nonce }}">
     const categorias = {
         'prod_item-componentes': `
             <div class="result-productos-column flex">

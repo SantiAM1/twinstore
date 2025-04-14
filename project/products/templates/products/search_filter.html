@@ -18,14 +18,17 @@
                 {% for producto, imagen_url in productos_imagen %}
                     <div class="flex flex-column items-center justify-center product-card bg-white position-relative">
                         {% if imagen_url %}
-                            {% include 'components/cards_dinamic.html' with img_url=imagen_url product_name=producto.nombre product_price=producto.precio only %}
+                            {% include 'components/cards_dinamic.html' %}
                         {% else %}
-                            {% include 'components/cards_static.html' with img_url='img/prod_default.webp' product_name=producto.nombre product_price=producto.precio only %}
+                            {% include 'components/cards_static.html' %}
                         {% endif %}
                     </div>
                 {% endfor %}
             </div>
         </main>
+    </div>
+    <div class="paginacion margin-1rem flex width-100 justify-center gap-05rem font-roboto">
+        {% include 'partials/paginacion.html' %}
     </div>
 </div>
 

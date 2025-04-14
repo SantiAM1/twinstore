@@ -1,0 +1,85 @@
+/* stylelint-disable font-family-no-missing-generic-family-keyword */
+/* stylelint-disable font-family-name-quotes */
+
+/* --------Menu-------- */
+.menu {
+    z-index: 2000;
+    margin: 0;
+    top: 0;
+    left: -100%;
+    width: 100vw;
+    height: 100vh;
+    background: #222;
+    overflow-y: auto;
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.menu-toggle {
+    background-color: var(--color-ts);
+    color: white;
+    padding: 0.3rem;
+    border-radius: 10px;
+}
+
+.menu.active {
+    opacity: 1;
+    left: 0;
+}
+
+.menu-title {
+    font-family: "Big Shoulders";
+    font-weight: bold;
+    font-size: 35px;
+    padding: 1rem;
+}
+
+.menu-subtitle {
+    display:flex;
+    gap: 0.2rem;
+}
+
+.menu span{
+    text-decoration: none;
+    font-family: "Roboto";
+    padding: 10px;
+    display:flex;
+    justify-content: space-between;
+    font-size: 20px;
+}
+
+.menu a {
+    text-decoration: none;
+    display: block;
+    width: 100%;
+}
+
+.menu li {
+    color: white;
+    cursor: pointer;
+}
+.submenu {display: none}
+
+.submenu li {background: #353535;}
+
+.submenu li span, .submenu li span a {
+    font-family: "Montserrat";
+    font-size:15px;
+    color: white;
+}
+
+.dropdown-mobile .submenu .dropdown-mobile .submenu li {background: #444;}
+
+.dropdown-mobile .submenu .dropdown-mobile .submenu span {border-bottom: 1px solid #555;}
+
+.dropdown-mobile .submenu .dropdown-mobile .submenu .submenu span {background: #696969;}
+
+.bi-chevron-down.rotated {
+    transform: rotate(-90deg);
+    transition: transform 0.3s ease;
+}
+
+.bars-menu {
+    color: #111;
+    font-size: 1.1rem;
+}

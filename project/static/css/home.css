@@ -1,0 +1,106 @@
+/* ----- Notificacion main ----- */
+.notification-mainpage {
+    display: grid;
+    place-items: center;
+    width: 100vw;
+    background-color: transparent;
+}
+
+.notification-item {
+    width: 300px;
+    height: 180px;
+    opacity: 0;
+    padding: 1rem;
+    border-radius: 0 0 12px 12px;
+    justify-content: end;
+    animation: showblock 7s ease;
+    transform: translateY(-180px);
+}
+
+@keyframes showblock {
+    20% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translateY(0);
+        background-color: #fff;
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-180px);
+        background-color: #fff;
+        opacity: 0;
+    }
+}
+
+/* stylelint-disable-next-line selector-class-pattern */
+.ofertaProds {
+    max-width: 900px;
+    height: 350px;
+
+    --swiper-navigation-size: 40px;
+    --swiper-navigation-color: #fff;
+}
+
+.swiper-wraper {
+    margin: 0 0.8rem;
+}
+
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+background-color: rgb(0 0 0 / 50%);
+border-radius: 50%;
+width: 48px;
+height: 48px;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: all 0.3s ease;
+backdrop-filter: blur(4px);
+z-index: 10;
+}
+
+.swiper-button-prev {
+left: 10px;
+}
+
+.swiper-button-next {
+right: 10px;
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+background-color: rgb(0 0 0 / 80%);
+transform: scale(1.1);
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+font-size: 20px;
+}
+
+h2 {
+font-size: 2rem;
+font-weight: 700;
+color: #222;
+margin-bottom: 1rem;
+}
+
+h2::after {
+content: '';
+display: block;
+width: 150px;
+height: 4px;
+background-color: #ff5722;
+margin: 0.5rem auto 0;
+border-radius: 10px;
+}

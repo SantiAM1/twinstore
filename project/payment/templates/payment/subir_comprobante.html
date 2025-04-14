@@ -3,7 +3,7 @@
 
 {% block contenidomain %}
 <main class="padding-1rem">
-    <div class="flex font-roboto flex-column users-facturacion-box">
+    <div class="flex font-roboto flex-column users-feedback-box">
         <h2 class="text-center">Cargar comprobante</h2>
         <div>
             <p><i class="bi bi-paperclip"></i> Usá el ID de pago como **referencia en tu transferencia**.</p>
@@ -18,11 +18,11 @@
             <button class="button-subir-comprobante border-none font-roboto" type="submit" id="button-subir">Subir Comprobante</button>
         </form>
         <div class="flex justify-between">
-            <a href="{% url 'core:home' %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
+            <a href="{% url 'core:home' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
             {% if user.is_authenticated %}
-            <a href="{% url 'users:mispedidos' %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Mis pedidos</a>
+            <a href="{% url 'users:mispedidos' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Mis pedidos</a>
             {% else %}
-            <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Ver Pedido</a>
+            <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Ver Pedido</a>
             {% endif %}
         </div>
     </div>
@@ -30,7 +30,7 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
-<script nonce="{{ nonce }}">
+<script nonce="{{ request.csp_nonce }}">
     document.getElementById("id_file").addEventListener("change", function () {
         const archivo = this.files[0];
         const maxSizeMB = 5;

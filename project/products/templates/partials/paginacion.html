@@ -1,37 +1,35 @@
 
-    {% if pagina.has_previous %}
-      <button class="pagina-btn" data-pagina="{{ pagina.previous_page_number }}">«</button>
-    {% endif %}
-  
-    {# Primera página siempre visible #}
-    {% if pagina.number > 3 %}
-      <button class="pagina-btn" data-pagina="1">1</button>
-      {% if pagina.number > 4 %}
-        <span>...</span>
-      {% endif %}
-    {% endif %}
-  
-    {# Rango de páginas centrado alrededor de la actual #}
-    {% for num in pagina.paginator.page_range %}
-      {% if num >= pagina.number|add:-2 and num <= pagina.number|add:2 %}
-        {% if num == pagina.number %}
-          <span class="pagina-actual">{{ num }}</span>
-        {% else %}
-          <button class="pagina-btn" data-pagina="{{ num }}">{{ num }}</button>
-        {% endif %}
-      {% endif %}
-    {% endfor %}
-  
-    {# Última página siempre visible #}
-    {% if pagina.number < pagina.paginator.num_pages|add:-2 %}
-      {% if pagina.number < pagina.paginator.num_pages|add:-3 %}
-        <span>...</span>
-      {% endif %}
-      <button class="pagina-btn" data-pagina="{{ pagina.paginator.num_pages }}">{{ pagina.paginator.num_pages }}</button>
-    {% endif %}
-  
-    {% if pagina.has_next %}
-      <button class="pagina-btn" data-pagina="{{ pagina.next_page_number }}">»</button>
-    {% endif %}
+{% if pagina.has_previous %}
+    <button class="tw-hover-button pagina-btn flex items-center justify-center font-roboto cursor-pointer" data-pagina="{{ pagina.previous_page_number }}">«</button>
+{% endif %}
 
-  
+{# Primera página siempre visible #}
+{% if pagina.number > 3 %}
+    <button class="tw-hover-button pagina-btn flex items-center justify-center font-roboto cursor-pointer" data-pagina="1">1</button>
+    {% if pagina.number > 4 %}
+        <span class="tw-hover-button pagina-btn font-roboto">...</span>
+    {% endif %}
+{% endif %}
+
+{# Rango de páginas centrado alrededor de la actual #}
+{% for num in pagina.paginator.page_range %}
+    {% if num >= pagina.number|add:-2 and num <= pagina.number|add:2 %}
+        {% if num == pagina.number %}
+            <span class="pagina-btn border-blue bg-white flex items-center justify-center font-roboto">{{ num }}</span>
+        {% else %}
+            <button class="tw-hover-button pagina-btn flex items-center justify-center font-roboto cursor-pointer" data-pagina="{{ num }}">{{ num }}</button>
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{# Última página siempre visible #}
+{% if pagina.number < pagina.paginator.num_pages|add:-2 %}
+    {% if pagina.number < pagina.paginator.num_pages|add:-3 %}
+        <span class="tw-hover-button pagina-btn font-roboto" style="padding: 10px 14px;">...</span>
+    {% endif %}
+    <button class="tw-hover-button pagina-btn flex items-center justify-center font-roboto cursor-pointer" data-pagina="{{ pagina.paginator.num_pages }}">{{ pagina.paginator.num_pages }}</button>
+{% endif %}
+
+{% if pagina.has_next %}
+    <button class="tw-hover-button pagina-btn flex items-center justify-center font-roboto cursor-pointer" data-pagina="{{ pagina.next_page_number }}">»</button>
+{% endif %}

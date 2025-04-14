@@ -1,6 +1,6 @@
 <!-- * My URLS -->
 {% load static %}
-<script nonce="{{ nonce }}">
+<script nonce="{{ request.csp_nonce }}">
     window.api = {
         agregarAlCarrito: "{% url 'cart:api_agregar_carrito' %}",
         eliminarPedido: "{% url 'cart:api_eliminar_pedido' %}",

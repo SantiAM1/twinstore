@@ -29,15 +29,15 @@
                 <ul class="dropdown list-none position-absolute" id="userDropdown">
                     {% if user.is_authenticated %}
                         {% if user.is_superuser %}
-                            <li><a href="{% url 'admin:index' %}">🔐 Panel de administración</a></li>
-                            <li><a href="{% url 'core:cargar_excel' %}">🗂️ Cargar productos desde Excel</a></li>
+                            <li><a href="{% url 'admin:index' %}" class="dropdown-buttons display-block decoration-none font-roboto">🔐 Panel de administración</a></li>
+                            <li><a href="{% url 'core:cargar_excel' %}" class="dropdown-buttons display-block decoration-none font-roboto">🗂️ Cargar productos desde Excel</a></li>
                         {% endif %}
-                        <li><a href="{% url 'users:perfil' %}">Perfil</a></li>
-                        <li><a href="{% url 'users:mispedidos' %}">Mis Pedidos</a></li>
-                        <li><a href="{% url 'users:logout' %}">Cerrar Sesión</a></li>
+                        <li><a href="{% url 'users:perfil' %}" class="dropdown-buttons display-block decoration-none font-roboto">Perfil</a></li>
+                        <li><a href="{% url 'users:mispedidos' %}" class="dropdown-buttons display-block decoration-none font-roboto">Mis Pedidos</a></li>
+                        <li><a href="{% url 'users:logout' %}" class="dropdown-buttons display-block decoration-none font-roboto">Cerrar Sesión</a></li>
                     {% else %}
-                        <li><a href="{% url 'users:login' %}">Iniciar Sesión</a></li>
-                        <li><a href="{% url 'users:singup' %}">Registrarse</a></li>
+                        <li><a href="{% url 'users:login' %}" class="dropdown-buttons display-block decoration-none font-roboto">Iniciar Sesión</a></li>
+                        <li><a href="{% url 'users:singup' %}" class="dropdown-buttons display-block decoration-none font-roboto">Registrarse</a></li>
                     {% endif %}
                 </ul>
             </div>

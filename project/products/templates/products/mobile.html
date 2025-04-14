@@ -30,7 +30,7 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
-<script nonce="{{ nonce }}">
+<script nonce="{{ request.csp_nonce }}">
     window.filters = {
         categoria : "{{categoria}}",
         apiUrl :"{% url 'products:categoria_ajax' categoria=categoria %}"

@@ -3,7 +3,7 @@
 
 {% block contenidomain %}
 <main class="padding-1rem">
-    <div class="flex font-roboto flex-column users-facturacion-box">
+    <div class="flex font-roboto flex-column users-feedback-box">
         <h2 class="text-center">❌ ¡Ups! Algo salió mal. ❌</h2>
         <p>No pudimos procesar tu pago o el mismo fue rechazado.</p>
         <div>
@@ -15,8 +15,8 @@
             </ul>
         </div>
         <div class="flex justify-center">
-            <a href="{% url 'core:home' %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
-            <a href="{% url 'cart:ver_carrito' %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver al carrito</a>
+            <a href="{% url 'core:home' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
+            <a href="{% url 'cart:ver_carrito' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver al carrito</a>
         </div>
     </div>
 </main>

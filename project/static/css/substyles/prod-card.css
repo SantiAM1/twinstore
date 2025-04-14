@@ -1,0 +1,98 @@
+.product-card {
+    border: 1px solid #ddd;
+    padding: 16px;
+    box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+    width: 193px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card span {
+    color: #111;
+    width: 100%;
+    height: 57px;
+    display: inline-block;
+    text-align: center;
+    font-family: var(--font-type);
+}
+
+.product-card p {
+    margin-top: 0.5rem;
+    text-align: center;
+    color: #474747;
+    font-weight: bold;
+}
+
+.product-card strong {
+    margin: 0.5rem 1rem 0;
+    width: 80%;
+    background-color: var(--color-ts);
+    padding: 0.3rem;
+    display: inline-block;
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    font-family: var(--font-type);
+}
+
+.product-card-img {
+    width: 147.5px;
+    height: 147.5px;
+    overflow: hidden;
+}
+
+.descuento-box {
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 3rem;
+    height: 3rem;
+}
+
+.icon-descuento {
+    font-size: 4.5rem;
+    color: #007bff;
+    top: -10px;
+    left: -10px;
+    z-index: 1;
+}
+
+.texto-descuento.texto-descuento {
+    z-index: 2;
+    top: 18px;
+    left: 2px;
+    color: rgb(255 255 255);
+    font-weight: bold;
+    font-size: 1.2rem;
+    pointer-events: none;
+}
+
+.product-descount-box {
+    width: 100%;
+    text-align: center;
+}
+
+.precio-anterior.precio-anterior {
+    text-decoration: line-through;
+    color: #6d6d6d;
+    font-weight: lighter;
+    display: inline-block;
+    font-size: 0.7rem;
+}
+
+.precio-descuento.precio-descuento {
+    display: inline-block;
+    color: #005dc0;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.product-card-img img {
+    width: 147.5px;
+    height: 147.5px;
+    object-fit: contain;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgb(0 0 0 / 20%);
+}

@@ -12,28 +12,9 @@ from django.views.decorators.http import require_GET
 from django.core.cache import cache
 import hashlib
 from django.core.paginator import Paginator
+from products.views import get_prod_img
 # Create your views here.
 
-def productos_con_descuento_ajax(request):
-    page = request.GET.get('page', 1)
-    productos_descuento = Producto.objects.filter(descuento__gt=0)
-    paginator = Paginator(productos_descuento, 10)  # 10 productos por "scroll"
-
-    productos_pagina = paginator.get_page(page)
-    data = []
-    for producto in productos_pagina:
-        data.append({
-            'nombre': producto.nombre,
-            'precio': producto.precio,
-            'descuento': producto.descuento,
-            'imagen': producto.get_imagen_url(),  # método que devuelve URL
-            'slug': producto.slug,
-        })
-
-    return JsonResponse({
-        'productos': data,
-        'has_next': productos_pagina.has_next(),
-    })
 @require_GET
 def buscar_productos(request):
     q = request.GET.get('q', '').strip().lower()
@@ -53,7 +34,11 @@ def buscar_productos(request):
     return JsonResponse(resultados, safe=False)
 
 def home(request):
-    return render(request,'core/inicio.html')
+    productos_descuento = Producto.objects.filter(precio_anterior__isnull=False).prefetch_related('imagenes')[:20]
+    productos_desc = get_prod_img(productos_descuento)
+    return render(request,'core/inicio.html',{
+        'productos_desc': productos_desc,
+    })
 
 def local(request):
     return render(request,'core/local.html')

@@ -3,7 +3,7 @@
 
 {% block contenidomain %}
 <main class="padding-1rem">
-    <div class="flex font-roboto flex-column users-facturacion-box">
+    <div class="flex font-roboto flex-column users-feedback-box">
         <h2 class="text-center">✅ ¡Gracias por tu compra! ✅</h2>
         <p>Hemos recibido tu pedido con exito</p>
         {% if historial.forma_de_pago == 'transferencia' %}
@@ -20,7 +20,7 @@
                 {% endif %}
                 <p><i class="bi bi-check2-all"></i> Una vez validado el pago, te notificaremos por correo electrónico.</p><br>
                 <div class="link-comprobante-box">
-                    <a href="{% url 'payment:comprobante' historial.token_consulta %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer link-comprobante-button">
+                    <a href="{% url 'payment:comprobante' historial.token_consulta %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer link-comprobante-button">
                         Subir comprobante ahora
                     </a>
                 </div>
@@ -36,11 +36,11 @@
             <p>👉 Si tenés dudas, podés contactarnos a <span class="users-email-link">help@twinstore.com.ar</span>.</p>
         </div>
         <div class="flex justify-between">
-            <a href="{% url 'core:home' %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
+            <a href="{% url 'core:home' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
             {% if user.is_authenticated %}
-            <a href="{% url 'users:mispedidos' %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Mis pedidos</a>
+            <a href="{% url 'users:mispedidos' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Mis pedidos</a>
             {% else %}
-            <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="users-facturacion-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Ver Pedido</a>
+            <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Ver Pedido</a>
             {% endif %}
         </div>
     </div>

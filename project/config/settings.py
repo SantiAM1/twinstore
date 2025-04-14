@@ -15,6 +15,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 import environ
+from csp.constants import NONCE
 
 #  * Inicializar environ
 env = environ.Env()
@@ -76,6 +77,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'django_json_widget',
     'rest_framework',
+    'csp',
     'products',
     'core',
     'cart',
@@ -92,7 +94,32 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": ["'self'"],
+        "style-src": [
+            "'self'",
+            "'unsafe-inline'",
+            "https://cdn.jsdelivr.net",
+            "https://fonts.googleapis.com"
+        ],
+        "script-src": [
+            "'self'",
+            "https://cdn.jsdelivr.net",
+            NONCE  # ← esto hace que se inyecte automáticamente el nonce
+        ],
+        "font-src": [
+            "'self'",
+            "https://cdn.jsdelivr.net",
+            "https://fonts.gstatic.com",
+            "data:"
+        ],
+        "img-src": ["'self'", "data:"],
+    }
+}
 
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"

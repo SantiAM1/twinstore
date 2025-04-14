@@ -24,7 +24,7 @@
             </div>
         </main>
     </div>
-    <div class="paginacion flex width-100 justify-center">
+    <div class="paginacion margin-1rem flex width-100 justify-center gap-05rem font-roboto">
         {% include 'partials/paginacion.html' %}
     </div>
     <div id="loading-overlay" class="loading-overlay position-fixed display-none flex-column items-center justify-center">
@@ -35,7 +35,7 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
-<script nonce="{{ nonce }}">
+<script nonce="{{ request.csp_nonce }}">
     window.filters = {
         categoria : "{{categoria}}",
         apiUrl :"{% url 'products:categoria_ajax' categoria=categoria %}"
