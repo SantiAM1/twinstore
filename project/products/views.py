@@ -257,25 +257,11 @@ def categoria(request, categoria):
 def ordenby(request, productos):
     orden = request.GET.get('ordenby', 'date')
 
-    # Agregamos el campo 'precio_final'
-    # Creamos una expresión segura que Django puede evaluar
-    descuento_decimal = ExpressionWrapper(
-        F('descuento') / 100.0,
-        output_field=FloatField()
-    )
-
-    precio_final_expr = ExpressionWrapper(
-        F('precio') * (1 - descuento_decimal),
-        output_field=FloatField()
-    )
-
-    productos = productos.annotate(precio_final=precio_final_expr)
-
     if orden == 'price_lower':
-        productos = productos.order_by('precio_final')
+        productos = productos.order_by('precio')
         filtro = 'Ordenar por precio: menor a mayor'
     elif orden == 'price_higher':
-        productos = productos.order_by('-precio_final')
+        productos = productos.order_by('-precio')
         filtro = 'Ordenar por precio: mayor a menor'
     else:
         productos = productos.order_by('-id')
