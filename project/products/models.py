@@ -1,7 +1,5 @@
 from re import T
-from urllib.request import ProxyDigestAuthHandler
 from django.db import models
-from django.forms import ImageField
 
 class Marca(models.Model):
     nombre = models.CharField(max_length=30)
@@ -31,6 +29,8 @@ class Producto(models.Model):
     precio_anterior = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     descuento = models.IntegerField(default=0)
     sku = models.CharField(max_length=20, unique=True, blank=True, null=True)
+    portada = models.ImageField(upload_to='productos/',null=True, blank=True)
+    portada_100 = models.ImageField(upload_to='productos/100/', null=True, blank=True)
 
     def __str__(self):
         return self.nombre
@@ -60,4 +60,3 @@ class EspecificacionTecnica(models.Model):
 
     def __str__(self):
         return f"{self.categoria.nombre} ({self.producto.nombre})"
-    
