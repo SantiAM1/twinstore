@@ -1,79 +1,71 @@
-{% extends 'base.html' %}
-{% load static %}
-
+{% extends 'base.html' %} {% load static %}
 {% block head %}
-    <title>Twinstore</title>
-    <link
+<title>Twinstore</title>
+<link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-    />
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-    <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}">
-    <link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}">
+/>
+<link rel="stylesheet" href="{% static 'css/home.css' %}" />
+<link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}"/>
 {% endblock head %}
-
 {% block contenidomain %}
-    <main class="padding-1rem">
-        <section>
-            <h2 class="text-center width-100 font-roboto position-relative">Nuestras ofertas 🔥</h2>
-            <div class="swiper ofertaProds">
-                <div class="swiper-wrapper">
-                    {% for producto, imagen_url in productos_desc %}
-                    <div class="swiper-slide">
-                        <div class="flex flex-column items-center justify-center product-card bg-white position-relative bloqueable">
-                            {% if imagen_url %}
-                                {% include 'components/cards_dinamic.html' %}
-                            {% else %}
-                                {% include 'components/cards_static.html' %}
-                            {% endif %}
-                        </div>
+<main class="padding-1rem">
+    <section>
+        <h2 class="text-center width-100 font-roboto position-relative">
+            Nuestras ofertas 🔥
+        </h2>
+        <div class="swiper ofertaProds">
+            <div class="swiper-wrapper">
+                {% for producto in productos_descuento %}
+                <div class="swiper-slide">
+                    <div class="flex flex-column items-center justify-center product-card bg-white position-relative">
+                        {% if producto.portada %}
+                            {% include 'components/cards_dinamic.html' %} 
+                        {% else %} 
+                            {% include 'components/cards_static.html' %}
+                        {% endif %}
                     </div>
-                    {% endfor %}
                 </div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-pagination"></div>
+                {% endfor %}
             </div>
-        </section>
-    </main>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="notification-mainpage position-fixed">
-                <div class="flex flex-column text-center notification-item django-msg-{{message.tags}} font-roboto">
-                    {{ message }}
-                </div>
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endblock contenidomain %}
-
-{% block myscripts %}
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </section>
+</main>
+{% if messages %} {% for message in messages %}
+<div class="notification-mainpage position-fixed">
+    <div class="flex flex-column text-center notification-item django-msg-{{message.tags}} font-roboto">
+        {{ message }}
+    </div>
+</div>
+{% endfor %} {% endif %} {% endblock contenidomain %} {% block myscripts %}
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script nonce="{{ request.csp_nonce }}">
-const swiper = new Swiper('.ofertaProds',{
-    slidesPerView:2,
-    spaceBetween:10,
-    pagination: {
-        el: ".swiper-pagination",
-        clickable: true,
-        dynamicBullets:true, 
-    },
-    navigation: {
-        nextEl: ".swiper-button-next",
-        prevEl: ".swiper-button-prev",
-    },
-    breakpoints: {
-        768: {
-            slidesPerView: 3,
-            spaceBetween: 10,
+    const swiper = new Swiper(".ofertaProds", {
+        slidesPerView: 2,
+        spaceBetween: 10,
+        pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+            dynamicBullets: true,
         },
-        900: {
-            slidesPerView: 4,
-            spaceBetween: 15,
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
         },
-    },
-}
-
-)
+        breakpoints: {
+            768: {
+                slidesPerView: 3,
+                spaceBetween: 10,
+            },
+            900: {
+                slidesPerView: 4,
+                spaceBetween: 15,
+            },
+        },
+    });
 </script>
 {% endblock myscripts %}

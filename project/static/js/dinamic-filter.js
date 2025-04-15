@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
             // 🔁 Tomamos los filtros actuales de la URL
             const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('pagina', 1);
             urlParams.set('ordenby', orden); // actualizamos el ordenamiento
     
             // 🔄 Convertimos a objeto y enviamos a la función
@@ -38,6 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const newParams = new URL(link.href).searchParams;
             const parametros = {};
             newParams.forEach((value, key) => parametros[key] = value);
+
+            parametros['pagina'] = 1;
     
             aplicarFiltrosDinamicos(parametros).finally(() => toggleDisableItems(false));
         }

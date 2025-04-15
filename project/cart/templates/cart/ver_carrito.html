@@ -3,6 +3,8 @@
 
 {% block head %}
     <title>Carrito - Twinstore</title>
+    <link rel="stylesheet" href="{% static 'css/carrito.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/substyles/quantity.css' %}" />
 {% endblock head %}
 
 {% block contenidomain %}
@@ -29,7 +31,7 @@
                                 <td class="cart-prod flex items-center">
                                     <div class="cart-prod-responsive flex items-center position-relative gap-05rem">
                                         <a href="#" class="cart-prod-delete bloqueable" data-pedido-id="{{ pedido.id }}"><i class="bi bi-x-circle"></i></a>
-                                        <img src="{{ pedido.get_prod_img }}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img" loading="lazy">
+                                        <img src="{{ pedido.producto.portada.url }}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img" loading="lazy">
                                     </div>
                                     <div class="cart-prod-cantidad flex flex-column">
                                         <span>{{ pedido.producto.nombre }}</span>

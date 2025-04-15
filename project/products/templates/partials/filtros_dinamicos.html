@@ -1,7 +1,7 @@
 {% if filtros_aplicados %}
     <div class="flex flex-column filter-active-box">
     {% for key, value in request.GET.items %}
-        {% if key not in "ordenby" and key not in "q" %}
+        {% if key not in "ordenby" and key not in "q" and key not in "pagina" %}
             <a class="decoration-none filter-active-link bloqueable"href="?{% for k, v in request.GET.items %}{% if k != key %}&{{ k }}={{ v }}{% endif %}{% endfor %}">
                 {{ value }}<i class="bi bi-x"></i>
             </a>

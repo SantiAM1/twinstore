@@ -1,25 +1,35 @@
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save,post_save
 from django.dispatch import receiver
-from .models import Producto
+from .models import Producto, ImagenProducto
 from decimal import Decimal
 
 from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
 
-def resize_to_200x200(image_field):
-    img = Image.open(image_field)
-    img = img.convert('RGB')
-    img = img.resize((200, 200), Image.ANTIALIAS)
-    buffer = BytesIO()
-    img.save(fp=buffer, format='JPEG', quality=85)
-    return ContentFile(buffer.getvalue())
+try:
+    RESAMPLE = Image.Resampling.LANCZOS
+except AttributeError:
+    RESAMPLE = Image.ANTIALIAS
 
+def resize_to_size(image_field, size=(200, 200)):
+    if not image_field:
+        return None
+    try:
+        img = Image.open(image_field)
+        img = img.convert('RGB')
+        img.thumbnail(size, RESAMPLE)
+        buffer = BytesIO()
+        img.save(fp=buffer, format='WEBP', quality=85)
+        return ContentFile(buffer.getvalue())
+    except Exception as e:
+        print(f"[ERROR al redimensionar portada]: {e}")
+        return None
 
 
 @receiver(pre_save, sender=Producto)
 def applys_producto(sender, instance, **kwargs):
-    # * Verifica si el producto tiene un descuento
+    # * Aplica descuento si hay
     if instance.descuento > 0:
         if not instance.precio_anterior:
             instance.precio_anterior = instance.precio
@@ -29,7 +39,32 @@ def applys_producto(sender, instance, **kwargs):
         if instance.precio_anterior:
             instance.precio = instance.precio_anterior
             instance.precio_anterior = None
-    # * Verifica si tiene portada
+
+    # * Redimensionar portada si no fue procesada aún
     if instance.portada and not instance.portada.name.startswith("portadas_200"):
-        nueva_imagen = resize_to_200x200(instance.portada)
-        instance.portada.save(f"portadas_200_{instance.pk or 'temp'}.jpg", nueva_imagen, save=False)
+        nueva_imagen = resize_to_size(instance.portada,size=(200, 200))
+        if nueva_imagen:
+            instance.portada.save(f"portadas_200_{instance.pk or 'temp'}.webp", nueva_imagen, save=False)
+
+@receiver(post_save, sender=ImagenProducto)
+def generar_thumbnail(sender, instance, created, **kwargs):
+    if created and instance.imagen:
+        # * Redimensionar imagen a 600x600
+        nueva_imagen = resize_to_size(instance.imagen, (600, 600))
+        if nueva_imagen:
+            instance.imagen.save(f"img600_{instance.pk}.webp", nueva_imagen, save=False)
+
+        # * Redimensionar imagen a 100x100
+        mini = resize_to_size(instance.imagen, size=(100, 100))
+        if mini:
+            filename = f"thumb100_{instance.pk}.webp"
+            instance.imagen_100.save(filename, mini, save=False)
+            instance.save()
+
+        # # * Creamos una portada provisoria
+        # if instance.producto.portada is None:
+        #     nueva_imagen = resize_to_size(instance.imagen,size=(200, 200))
+        #     if nueva_imagen:
+        #         filename = f"portadas_200_{instance.pk or 'temp'}.webp"
+        #         instance.producto.portada.save(filename, nueva_imagen, save=False)
+        #         instance.producto.save()

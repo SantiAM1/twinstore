@@ -1,6 +1,5 @@
 from django.contrib import admin
-from django.db import models
-from django_json_widget.widgets import JSONEditorWidget
+from .forms import EspecificacionTecnicaForm
 
 from .models import Marca, Categoria, SubCategoria, Producto, ImagenProducto, Atributo, EspecificacionTecnica, CategoriaEspecificacion
 
@@ -8,9 +7,7 @@ from .models import Marca, Categoria, SubCategoria, Producto, ImagenProducto, At
 class EspecificacionTecnicaInline(admin.StackedInline):
     model = EspecificacionTecnica
     extra = 1
-    formfield_overrides = {
-        models.JSONField: {'widget': JSONEditorWidget}
-    }
+    form = EspecificacionTecnicaForm
 
 # ----- Admin de Producto -----
 class ProductoAdmin(admin.ModelAdmin):

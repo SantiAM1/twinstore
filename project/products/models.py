@@ -29,15 +29,15 @@ class Producto(models.Model):
     precio_anterior = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     descuento = models.IntegerField(default=0)
     sku = models.CharField(max_length=20, unique=True, blank=True, null=True)
-    portada = models.ImageField(upload_to='productos/',null=True, blank=True)
-    portada_100 = models.ImageField(upload_to='productos/100/', null=True, blank=True)
+    portada = models.ImageField(upload_to='productos/portadas/',null=True, blank=True)
 
     def __str__(self):
         return self.nombre
 
 class ImagenProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='imagenes',  blank=True)
-    imagen = models.ImageField(upload_to='productos_imagenes/')
+    imagen = models.ImageField(upload_to='productos/imagenes/')
+    imagen_100 = models.ImageField(upload_to='productos/imagenes/', null=True, blank=True)
 
 class Atributo(models.Model):
     producto = models.ForeignKey(Producto, related_name="atributos", on_delete=models.CASCADE)

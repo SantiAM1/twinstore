@@ -205,3 +205,11 @@ table.ficha-especificaciones {
     border-radius: 10px;
     object-fit: contain;
 }
+
+.prod-editar-btn {
+    background-color: var(--color-ts);
+    color: #fff;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+}

@@ -1,11 +1,8 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block head %}
-    <title>{{categoria}} - Twistore</title>
-{% endblock head %}
-
-{% block contenidomain %}
+{% extends 'base.html' %} {% load static %} {% block head %}
+<title>{{categoria}} - Twistore</title>
+<link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
+<link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
+{% endblock head %} {% block contenidomain %}
 <div class="product-box main-box">
     <nav class="flex justify-between items-center products-nav">
         {% include 'partials/header_links.html' %}
@@ -17,28 +14,31 @@
         <div class="flex flex-column filter-box">
             {% include 'partials/filtros_dinamicos.html' %}
         </div>
-        <div style="border-right: 2px solid #bbbbbb;"></div>
+        <div style="border-right: 2px solid #bbbbbb"></div>
         <main class="flex justify-center">
             <div class="grid-container">
-            {% include 'partials/product_grid.html' %}
+                {% include 'partials/product_grid.html' %}
             </div>
         </main>
     </div>
-    <div class="paginacion margin-1rem flex width-100 justify-center gap-05rem font-roboto">
+    <div
+        class="paginacion margin-1rem flex width-100 justify-center gap-05rem font-roboto"
+    >
         {% include 'partials/paginacion.html' %}
     </div>
-    <div id="loading-overlay" class="loading-overlay position-fixed display-none flex-column items-center justify-center">
+    <div
+        id="loading-overlay"
+        class="loading-overlay position-fixed display-none flex-column items-center justify-center"
+    >
         <div class="spinner"></div>
         <p>Procesando...</p>
     </div>
 </div>
-{% endblock contenidomain %}
-
-{% block myscripts %}
+{% endblock contenidomain %} {% block myscripts %}
 <script nonce="{{ request.csp_nonce }}">
     window.filters = {
-        categoria : "{{categoria}}",
-        apiUrl :"{% url 'products:categoria_ajax' categoria=categoria %}"
+        categoria: "{{categoria}}",
+        apiUrl: "{% url 'products:categoria_ajax' categoria=categoria %}",
     };
 </script>
 <script src="{% static 'js/dinamic-filter.js' %}"></script>

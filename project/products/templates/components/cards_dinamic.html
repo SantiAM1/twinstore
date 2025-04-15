@@ -7,7 +7,7 @@
 {% endif %}
 <a href="{% url 'products:producto' product_name=producto.nombre %}" class="decoration-none">
     <div class="flex items-center justify-center product-card-img">
-        <img src="{{imagen_url}}" alt="{{ producto.nombre }}" loading="lazy">
+        <img src="{{producto.portada.url}}" alt="{{ producto.nombre }}" loading="lazy">
     </div>
     <span>{{ producto.nombre }}</span>
     {% if producto.descuento > 0 %}

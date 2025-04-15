@@ -4,10 +4,12 @@ from .models import Producto, SubCategoria,Marca
 from django.db.models import Q
 from django_user_agents.utils import get_user_agent
 from django.template.loader import render_to_string
-from django.db import connection
 import time
 from django.db.models import F, FloatField, ExpressionWrapper
 from django.core.paginator import Paginator
+from .forms import EditarProducto,ImagenProductoFormSet
+from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import render, get_object_or_404, redirect
 
 # Create your views here.
 # ----- Manejo de filtros ----- #
@@ -57,11 +59,11 @@ def buscar_productos(request):
         paginator = Paginator(productos, 12)
         pagina = paginator.get_page(pagina_actual)
 
-        productos_con_img = get_prod_img(pagina.object_list)
+        productos = pagina.object_list
 
         return render(request, 'products/search_filter.html', {
-            'productos_imagen': productos_con_img,
-            'cantidad_productos': len(productos_con_img),
+            'productos_imagen': productos,
+            'cantidad_productos': len(productos),
             'query': query,
             'filtro': filtro,
             'pagina':pagina
@@ -75,11 +77,11 @@ def buscar_productos(request):
     paginator = Paginator(productos, 12)
     pagina = paginator.get_page(pagina_actual)
 
-    productos_con_img = get_prod_img(pagina.object_list)
+    productos = pagina.object_list
 
     return render(request, 'products/search_filter.html', {
-            'productos_imagen': productos_con_img,
-            'cantidad_productos': len(productos_con_img),
+            'productos': productos,
+            'cantidad_productos': len(productos),
             'query': query,
             'filtro': filtro,
             'pagina':pagina
@@ -120,14 +122,10 @@ def categoria_ajax(request, categoria):
     pagina_actual = request.GET.get('pagina', 1)
     paginator = Paginator(productos, 12)
     pagina = paginator.get_page(pagina_actual)
+    productos = pagina.object_list
 
-    productos_con_img = get_prod_img(pagina.object_list)
-
-    # #* 🔹 Obtener imágenes de los productos
-    # productos_imagen=get_prod_img(productos)
-
-    filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q"]}
-
+    filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q","pagina"]}
+    print(filtros_aplicados)
     user_agent = get_user_agent(request)
     if user_agent.is_mobile:
 
@@ -141,7 +139,7 @@ def categoria_ajax(request, categoria):
             )
 
         html = render_to_string('partials/product_grid.html', {
-            'productos_imagen': productos_con_img,
+            'productos': productos,
             'pagina':pagina
         }, request=request)
 
@@ -172,13 +170,13 @@ def categoria_ajax(request, categoria):
     },request=request)
 
     html_orden = render_to_string('partials/orden_resultado.html',{
-        'cantidad_productos':len(productos_con_img),
+        'cantidad_productos':len(productos),
         'filtro':filtro,
         'request':request
     },request=request)
 
     html = render_to_string('partials/product_grid.html', {
-        'productos_imagen': productos_con_img
+        'productos': productos
     }, request=request)
 
     html_paginacion = render_to_string('partials/paginacion.html', {
@@ -222,19 +220,17 @@ def categoria(request, categoria):
     pagina_actual = request.GET.get('pagina', 1)
     paginator = Paginator(productos, 12)
     pagina = paginator.get_page(pagina_actual)
+    productos = pagina.object_list
 
-    #* 🔹 Obtener imágenes de los productos
-    productos_con_img = get_prod_img(pagina.object_list)
-
-    filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q"]}
+    filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q","pagina"]}
 
     user_agent = get_user_agent(request)
     if user_agent.is_mobile:
         return render(request,'products/mobile.html',{
-        'productos_imagen': productos_con_img,
+        'productos': productos,
         'categoria': categoria,
         'sub_categorias':sub_categorias,
-        'cantidad_productos':len(productos_con_img),
+        'cantidad_productos':len(productos),
         'filtro' : filtro,
         'atributos_unicos':atributos_unicos,
         'marcas':marcas,
@@ -242,10 +238,10 @@ def categoria(request, categoria):
     })
 
     return render(request, 'products/category.html', {
-        'productos_imagen': productos_con_img,
+        'productos': productos,
         'categoria': categoria,
         'sub_categorias':sub_categorias,
-        'cantidad_productos':len(productos_con_img),
+        'cantidad_productos':len(productos),
         'filtro' : filtro,
         'atributos_unicos':atributos_unicos,
         'marcas':marcas,
@@ -256,7 +252,6 @@ def categoria(request, categoria):
 # ----- Ordenar los productos ----- #
 def ordenby(request, productos):
     orden = request.GET.get('ordenby', 'date')
-
     if orden == 'price_lower':
         productos = productos.order_by('precio')
         filtro = 'Ordenar por precio: menor a mayor'
@@ -269,15 +264,6 @@ def ordenby(request, productos):
 
     return productos, filtro
 
-# ----- Obetener las imagenes de los productos ----- #
-def get_prod_img(productos):
-    return [
-        (p, (img.imagen.url if img else None))
-        for p in productos
-        for img in [next(iter(p.imagenes.all()), None)]
-    ]
-
-
 # ----- Vista individual del producto ----- #
 def producto_view(request,product_name):
     producto = Producto.objects.get(nombre=product_name)
@@ -285,4 +271,35 @@ def producto_view(request,product_name):
     return render(request,'products/producto_view.html',{
         'producto':producto,
         'imagenes':imagenes
+        })
+
+# * Solo admin o staff
+@user_passes_test(lambda u: u.is_staff)
+def editar_producto_view(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+
+    if request.method == 'POST':
+        form = EditarProducto(request.POST, request.FILES, instance=producto)
+        formset = ImagenProductoFormSet(request.POST, request.FILES, queryset=producto.imagenes.all())
+
+        if form.is_valid() and formset.is_valid():
+            form.save()
+
+            # Guardar imágenes asociadas
+            imagenes = formset.save(commit=False)
+            for img in imagenes:
+                img.producto = producto  # importante
+                img.save()
+            for obj in formset.deleted_objects:
+                obj.delete()
+        
+            return redirect('products:editar_producto', pk=producto.pk)
+    else:
+        form = EditarProducto(instance=producto)
+        formset = ImagenProductoFormSet(queryset=producto.imagenes.all())
+
+    return render(request, 'products/editar_producto.html',{
+        'form': form,
+        'producto': producto,
+        'formset': formset,
         })
