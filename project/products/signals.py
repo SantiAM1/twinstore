@@ -12,7 +12,6 @@ try:
 except AttributeError:
     RESAMPLE = Image.ANTIALIAS
 
-import os
 
 def resize_to_size(image_field, size=(200, 200)):
     if not image_field:
@@ -28,10 +27,9 @@ def resize_to_size(image_field, size=(200, 200)):
         print(f"[ERROR al redimensionar portada]: {e}")
         return None
 
-
 @receiver(pre_save, sender=Producto)
 def applys_producto(sender, instance, **kwargs):
-    # * Aplica descuento si hay
+    # * Aplicar descuento al precio si existe
     if instance.descuento > 0:
         if not instance.precio_anterior:
             instance.precio_anterior = instance.precio
@@ -42,30 +40,30 @@ def applys_producto(sender, instance, **kwargs):
             instance.precio = instance.precio_anterior
             instance.precio_anterior = None
 
-    # * Redimensionar portada si no fue procesada aún
-    if instance.portada and not instance.portada.name.startswith("portadas_200"):
-        nueva_imagen = resize_to_size(instance.portada,size=(200, 200))
+    # * Redimensionar portada si fue modificada
+    if instance.pk:
+        try:
+            old = Producto.objects.get(pk=instance.pk)
+            portada_cambiada = instance.portada != old.portada
+        except Producto.DoesNotExist:
+            portada_cambiada = True
+    else:
+        portada_cambiada = True
+
+    if instance.portada and portada_cambiada:
+        nueva_imagen = resize_to_size(instance.portada, size=(200, 200))
         if nueva_imagen:
             instance.portada.save(f"portadas_200_{instance.pk or 'temp'}.webp", nueva_imagen, save=False)
 
 @receiver(post_save, sender=ImagenProducto)
 def generar_thumbnail(sender, instance, created, **kwargs):
     if created and instance.imagen:
-        original_path = instance.imagen.path
-        # * Redimensionar imagen a 600x600
+        # Redimensionar imagen principal a 600x600
         nueva_imagen = resize_to_size(instance.imagen, (600, 600))
         if nueva_imagen:
             instance.imagen.save(f"img600_{instance.pk}.webp", nueva_imagen, save=False)
 
-        # * Borrar archivo original si aún existe
-        if os.path.exists(original_path):
-            os.remove(original_path)
-
-        # * 👉 Si ya había miniatura, eliminarla
-        if instance.imagen_100 and os.path.isfile(instance.imagen_100.path):
-            os.remove(instance.imagen_100.path)
-
-        # * Redimensionar imagen a 100x100
+        # Redimensionar miniatura a 100x100
         mini = resize_to_size(instance.imagen, size=(100, 100))
         if mini:
             filename = f"thumb100_{instance.pk}.webp"

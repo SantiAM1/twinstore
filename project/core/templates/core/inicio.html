@@ -1,4 +1,5 @@
-{% extends 'base.html' %} {% load static %}
+{% extends 'base.html' %}
+{% load static %}
 {% block head %}
 <title>Twinstore</title>
 <link
@@ -9,6 +10,11 @@
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}"/>
 <link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}"/>
 {% endblock head %}
+
+{% block carousel %}
+{% include 'carousel.html' %}
+{% endblock carousel %}
+
 {% block contenidomain %}
 <main class="padding-1rem">
     <section>

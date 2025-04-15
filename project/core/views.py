@@ -14,6 +14,9 @@ import hashlib
 from django.core.paginator import Paginator
 # Create your views here.
 
+def pagina_mantenimiento(request):
+    return render(request, 'core/mantenimiento.html')
+
 @require_GET
 def buscar_productos(request):
     q = request.GET.get('q', '').strip().lower()

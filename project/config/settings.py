@@ -17,6 +17,8 @@ import os
 import environ
 from csp.constants import NONCE
 
+PAGINA_EN_MANTENIMIENTO = True
+
 #  * Inicializar environ
 env = environ.Env()
 environ.Env.read_env(os.path.join(os.path.dirname(__file__), ".env"))
@@ -30,7 +32,6 @@ MERCADOPAGO_PUBLIC_KEY = "APP_USR-af870896-2a1f-49b0-8bf4-5e5a0d887878"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -76,6 +77,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'django_json_widget',
+    'django_cleanup.apps.CleanupConfig',
     'rest_framework',
     'csp',
     'products',
@@ -95,6 +97,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
+    'core.middleware.mantenimiento.MantenimientoGlobalMiddleware',
 ]
 
 CONTENT_SECURITY_POLICY = {
@@ -187,19 +190,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.0/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
@@ -237,8 +227,6 @@ TIME_ZONE = 'America/Argentina/Buenos_Aires'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
-MIDDLEWARE += ['core.middleware.performance_middleware.PerformanceMiddleware']
 
 LOGGING = {
     'version': 1,

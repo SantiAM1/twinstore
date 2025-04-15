@@ -26,9 +26,9 @@ class Producto(models.Model):
     marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
     sub_categoria = models.ForeignKey(SubCategoria, on_delete=models.CASCADE, related_name='productos')
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_anterior = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    precio_anterior = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,editable=False)
     descuento = models.IntegerField(default=0)
-    sku = models.CharField(max_length=20, unique=True, blank=True, null=True)
+    sku = models.CharField(max_length=20, unique=True, blank=True, null=True,editable=False)
     portada = models.ImageField(upload_to='productos/portadas/',null=True, blank=True)
 
     def __str__(self):
@@ -56,7 +56,8 @@ class CategoriaEspecificacion(models.Model):
 class EspecificacionTecnica(models.Model):
     producto = models.ForeignKey(Producto, related_name='especificaciones', on_delete=models.CASCADE)
     categoria = models.ForeignKey(CategoriaEspecificacion, on_delete=models.SET_NULL, null=True, blank=True)
-    datos = models.JSONField(default=dict)
+    datos = models.JSONField(default=dict, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.categoria.nombre} ({self.producto.nombre})"
+        categoria_nombre = self.categoria.nombre if self.categoria else 'Sin categoría'
+        return f"{categoria_nombre} ({self.producto.nombre})"

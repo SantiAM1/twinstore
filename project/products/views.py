@@ -4,13 +4,12 @@ from .models import Producto, SubCategoria,Marca,ImagenProducto
 from django.db.models import Q
 from django_user_agents.utils import get_user_agent
 from django.template.loader import render_to_string
-import time
-from django.db.models import F, FloatField, ExpressionWrapper
 from django.core.paginator import Paginator
 from .forms import EditarProducto,ImagenProductoForm
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, get_object_or_404, redirect
 import os
+from django.contrib import messages
 # Create your views here.
 # ----- Manejo de filtros ----- #
 def get_atributos(productos):
@@ -283,13 +282,13 @@ def editar_producto_view(request, pk):
 
         if form.is_valid():
             form.save()
-
+            messages.success(request, 'Producto editado correctamente.')
             return redirect('products:editar_producto', pk=producto.pk)
     else:
         form = EditarProducto(instance=producto)
         imagenes = producto.imagenes.all()
         cantidad_actual = imagenes.count()
-        cantidad_maxima = 5
+        cantidad_maxima = 4
         cantidad_restante = cantidad_maxima - cantidad_actual
 
         formularios_nuevos = [ImagenProductoForm() for _ in range(cantidad_restante)]
@@ -306,13 +305,13 @@ def editar_producto_view(request, pk):
 def agregar_imagenes(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     if request.method == 'POST':
-        for key in request.FILES:
-            archivo = request.FILES[key]
+        for archivo in request.FILES.getlist('imagen'):
             if archivo:
                 ImagenProducto.objects.create(
                     producto=producto,
                     imagen=archivo
                 )
+        messages.success(request, 'Imagen/es cargada/s correctamente.')
         return redirect('products:editar_producto', pk=producto.pk)
 
 # * Solo admin o staff
@@ -325,4 +324,5 @@ def eliminar_imagen(request, img_id):
         os.remove(imagen.imagen.path)
 
     imagen.delete()
+    messages.success(request, 'Imagen eliminada correctamente.')
     return redirect('products:editar_producto', pk=producto_id)

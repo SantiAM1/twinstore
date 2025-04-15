@@ -10,20 +10,6 @@ class EspecificacionTecnicaForm(forms.ModelForm):
             'datos': forms.Textarea(attrs={'rows': 4, 'cols': 80, 'style': 'font-family: monospace;'})
         }
 
-    def clean_datos(self):
-        datos = self.cleaned_data.get('datos')
-
-        if datos in [None, ""]:
-            return {}
-
-        if isinstance(datos, str):
-            try:
-                return json.loads(datos)
-            except json.JSONDecodeError:
-                raise forms.ValidationError("El contenido no es un JSON válido. Usá formato correcto como: {\"clave\": \"valor\"}")
-
-        return datos
-
 class EditarProducto(forms.ModelForm):
     class Meta:
         INPUT_ATTRS = {'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none','autocomplete':'off','placeholder':' '}
