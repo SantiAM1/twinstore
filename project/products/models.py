@@ -37,7 +37,7 @@ class Producto(models.Model):
 class ImagenProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='imagenes',  blank=True)
     imagen = models.ImageField(upload_to='productos/imagenes/')
-    imagen_100 = models.ImageField(upload_to='productos/imagenes/', null=True, blank=True)
+    imagen_100 = models.ImageField(upload_to='productos/imagenes/', null=True, blank=True,editable=False)
 
 class Atributo(models.Model):
     producto = models.ForeignKey(Producto, related_name="atributos", on_delete=models.CASCADE)

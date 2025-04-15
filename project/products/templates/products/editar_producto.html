@@ -1,59 +1,93 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block head %}
 <title>{{producto.nombre}} - Twinstore</title>
-<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
-<link rel="stylesheet" href="{% static 'css/forms.css' %}">
 {% endblock head %}
+
+{% block headend %}
+<link rel="stylesheet" href="{% static 'css/forms-ts.css' %}">
+<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
+<link rel="stylesheet" href="{% static 'css/prod-view.css' %}" />
+{% endblock headend %}
+
 {% block contenidomain %}
 <main class="padding-1rem">
-    <form method="POST" enctype="multipart/form-data" class="users-perfil flex font-roboto width-100">
-        {% csrf_token %}
+    <div class="users-perfil flex font-roboto width-100">
         <div class="flex flex-column gap-1rem width-100">
-            <h1>Editar producto: {{ producto.nombre }}</h1>
-            <div class="container-form">
-                {{form.nombre}}
-                <label for="{{ form.nombre.id_for_label }}" class="form-label">{{form.nombre.label}}</label>
-            </div>
-            <div class="container-form">
-                {{form.marca}}
-            </div>
-            <div class="container-form">
-                {{form.sub_categoria}}
-            </div>
-            {% if producto.precio_anterior %}
-            <div class="container-form">
-                <input type="text" name="precio_anterior" value="{{producto.precio_anterior}}" class="form-input bloqueable font-roboto position-absolute width-100 height-100 border-none" readonly id="id_precio_anterior" placeholder=" ">
-                <label for="{{ form.precio_anterior.id_for_label }}" class="form-label">Precio anterior</label>
-            </div>
-            {% endif %}
-            <div class="container-form">
-                {{form.precio}}
-                <label for="{{ form.precio.id_for_label }}" class="form-label">{{form.precio.label}}</label>
-            </div>
-            <div class="container-form">
-                {{form.descuento}}
-                <label for="{{ form.descuento.id_for_label }}" class="form-label">{{form.descuento.label}}</label>
-            </div>
-            <div class="container-form">
-                {{form.portada}}
-                <label for="{{ form.portada.id_for_label }}" class="form-label">{{form.portada.label}}</label>
-            </div>
-
-            <h3>Imágenes</h3>
-            {{ formset.management_form }}
-            {% for imagen_form in formset %}
-                <div class="mb-3">
-                    {{ imagen_form.imagen.label_tag }}
-                    {{ imagen_form.imagen }}
-                    {% if imagen_form.instance.imagen %}
-                        <img src="{{ imagen_form.instance.imagen.url }}" width="100">
-                    {% endif %}
-                    {{ imagen_form.DELETE }} Eliminar
+            <form method="POST" enctype="multipart/form-data" action="{% url 'products:editar_producto' producto.id %}" class="flex flex-column gap-1rem width-100">
+                {% csrf_token %}
+                <h1>Editar producto: {{ producto.nombre }}</h1>
+                <div class="container-form">
+                    {{form.nombre}}
+                    <label for="{{ form.nombre.id_for_label }}" class="form-label">{{form.nombre.label}}</label>
                 </div>
-            {% endfor %}
-            <button type="submit" class="tw-hover-button">Guardar cambios</button>
+                <div class="container-form">
+                    {{form.marca}}
+                </div>
+                <div class="container-form">
+                    {{form.sub_categoria}}
+                </div>
+                {% if producto.precio_anterior %}
+                <div class="container-form">
+                    <input type="text" name="precio_anterior" value="{{producto.precio_anterior}}" class="form-input bloqueable font-roboto position-absolute width-100 height-100 border-none" readonly id="id_precio_anterior" placeholder=" ">
+                    <label for="{{ form.precio_anterior.id_for_label }}" class="form-label">Precio anterior</label>
+                </div>
+                {% endif %}
+                <div class="container-form">
+                    {{form.precio}}
+                    <label for="{{ form.precio.id_for_label }}" class="form-label">{{form.precio.label}}</label>
+                </div>
+                <div class="container-form">
+                    {{form.descuento}}
+                    <label for="{{ form.descuento.id_for_label }}" class="form-label">{{form.descuento.label}}</label>
+                </div>
+                <div>
+                    {{form.portada}}
+                    <span class="display-none"></span>
+                    <div class="flex height-100 gap-1rem">
+                        {% if producto.portada %}
+                        <img src="{{producto.portada.url}}" alt="No hay una portada" class="thumbnail">
+                        {% endif %}
+                        <label for="{{ form.portada.id_for_label }}" class="form-label-img width-100 height-100 flex items-center justify-center">Portada</label>
+                    </div>
+                </div>
+                <button type="submit" class="tw-hover-button">Guardar cambios</button>
+            </form>
+            {% if imagenes %}
+                <div class="flex gap-1rem flex-column">
+                    <h3>Imágenes existentes</h3>
+                    {% for img in imagenes %}
+                        <div class="flex height-100 width-100 gap-1rem items-center">
+                            <img src="{{img.imagen.url}}" alt="{{img.imagen}}" class="thumbnail">
+                            <a href="{% url 'products:eliminar_imagen' img.id %}" class="tw-hover-button decoration-none">Eliminar Imagen</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if formularios_nuevos %}
+                <h3>Agregar nuevas imágenes</h3>
+                <form method="post" enctype="multipart/form-data" class="width-100 flex flex-column gap-1rem" action="{% url 'products:agregar_imagenes' producto.id %}">
+                {% csrf_token %}
+                {% for form in formularios_nuevos %}
+                    {% with forloop.counter as i %}
+                        <div class="flex flex-column gap-1rem width-100">
+                            <input type="file" name="{{ form.imagen.name }}" id="id_imagen_{{ i }}" class="form-admin-control">
+                            <span class="archivo-info display-none"></span>
+                            <label for="id_imagen_{{ i }}" class="form-label-img width-100 height-100 flex items-center justify-center">
+                                Imagen {{ i }}
+                            </label>
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+                <button type="submit" class="tw-hover-button">Subir imagen</button>
+                </form>
+            {% endif %}
         </div>
-    </form>
+    </div>
 </main>
 {% endblock contenidomain %}
+
+{% block myscripts %}
+    <script src="{% static 'js/subir-archivo.js' %}"></script>
+{% endblock myscripts %}

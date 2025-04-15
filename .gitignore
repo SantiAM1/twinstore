@@ -11,3 +11,4 @@ package.json
 .stylelintrc.json
 node_modules/
 logs/
+.prettierrc

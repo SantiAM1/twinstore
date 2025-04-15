@@ -1,16 +1,16 @@
 from django.http import JsonResponse
 from django.shortcuts import render
-from .models import Producto, SubCategoria,Marca
+from .models import Producto, SubCategoria,Marca,ImagenProducto
 from django.db.models import Q
 from django_user_agents.utils import get_user_agent
 from django.template.loader import render_to_string
 import time
 from django.db.models import F, FloatField, ExpressionWrapper
 from django.core.paginator import Paginator
-from .forms import EditarProducto,ImagenProductoFormSet
+from .forms import EditarProducto,ImagenProductoForm
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, get_object_or_404, redirect
-
+import os
 # Create your views here.
 # ----- Manejo de filtros ----- #
 def get_atributos(productos):
@@ -280,26 +280,49 @@ def editar_producto_view(request, pk):
 
     if request.method == 'POST':
         form = EditarProducto(request.POST, request.FILES, instance=producto)
-        formset = ImagenProductoFormSet(request.POST, request.FILES, queryset=producto.imagenes.all())
 
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid():
             form.save()
 
-            # Guardar imágenes asociadas
-            imagenes = formset.save(commit=False)
-            for img in imagenes:
-                img.producto = producto  # importante
-                img.save()
-            for obj in formset.deleted_objects:
-                obj.delete()
-        
             return redirect('products:editar_producto', pk=producto.pk)
     else:
         form = EditarProducto(instance=producto)
-        formset = ImagenProductoFormSet(queryset=producto.imagenes.all())
+        imagenes = producto.imagenes.all()
+        cantidad_actual = imagenes.count()
+        cantidad_maxima = 5
+        cantidad_restante = cantidad_maxima - cantidad_actual
+
+        formularios_nuevos = [ImagenProductoForm() for _ in range(cantidad_restante)]
 
     return render(request, 'products/editar_producto.html',{
         'form': form,
         'producto': producto,
-        'formset': formset,
+        'formularios_nuevos': formularios_nuevos,
+        'imagenes': imagenes,
         })
+
+# * Solo admin o staff
+@user_passes_test(lambda u: u.is_staff)
+def agregar_imagenes(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id)
+    if request.method == 'POST':
+        for key in request.FILES:
+            archivo = request.FILES[key]
+            if archivo:
+                ImagenProducto.objects.create(
+                    producto=producto,
+                    imagen=archivo
+                )
+        return redirect('products:editar_producto', pk=producto.pk)
+
+# * Solo admin o staff
+@user_passes_test(lambda u: u.is_staff)
+def eliminar_imagen(request, img_id):
+    imagen = get_object_or_404(ImagenProducto, id=img_id)
+    producto_id = imagen.producto.id
+
+    if imagen.imagen and os.path.isfile(imagen.imagen.path):
+        os.remove(imagen.imagen.path)
+
+    imagen.delete()
+    return redirect('products:editar_producto', pk=producto_id)

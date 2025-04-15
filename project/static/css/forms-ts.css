@@ -76,3 +76,18 @@ input[type="email"]:focus ~ .form-label,
     border-left: 4px solid #6e6e6e;
     font-size: 1rem;
 }
+
+.form-label-img {
+    background-color: #fff;
+    color: #8d8d8d;
+    cursor: text;
+    border: 1px dashed #8d8d8d;
+}
+
+span.active {
+    display: block;
+    font-weight: bold;
+    padding: 0.1rem;
+    background-color: #1f1a64;
+    color: #fff;
+}

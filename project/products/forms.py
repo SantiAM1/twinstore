@@ -1,7 +1,6 @@
 from django import forms
 from .models import EspecificacionTecnica,Producto,ImagenProducto
 import json
-from django.forms import modelformset_factory
 
 class EspecificacionTecnicaForm(forms.ModelForm):
     class Meta:
@@ -36,7 +35,7 @@ class EditarProducto(forms.ModelForm):
             'precio': forms.NumberInput(attrs=INPUT_ATTRS),
             'descuento': forms.NumberInput(attrs=INPUT_ATTRS),
             'nombre': forms.TextInput(attrs=INPUT_ATTRS),
-            'portada': forms.FileInput(attrs=INPUT_ATTRS),
+            'portada': forms.FileInput(attrs={'class': 'form-admin-control display-none'}),
         }
 
 class ImagenProductoForm(forms.ModelForm):
@@ -44,12 +43,5 @@ class ImagenProductoForm(forms.ModelForm):
         model = ImagenProducto
         fields = ['imagen']
         widgets = {
-            'imagen': forms.FileInput(attrs={'class': 'form-control'}),
+            'imagen': forms.FileInput(attrs={'class': 'form-admin-control display-none'}),
         }
-
-ImagenProductoFormSet = modelformset_factory(
-    ImagenProducto,
-    form=ImagenProductoForm,
-    extra=3,
-    can_delete=True
-)

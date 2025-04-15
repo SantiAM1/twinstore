@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block head %}
+    <title>Mi perfil</title>
+{% endblock head %}
+{% block headend %}
+<link rel="stylesheet" href="{% static 'css/forms-ts.css' %}">
+<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
+{% endblock headend %}
+
 {% block contenidomain %}
 <main class="padding-1rem">
     <form class="users-perfil" method="post">
