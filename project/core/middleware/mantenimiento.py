@@ -1,27 +1,35 @@
-from django.conf import settings
 from django.shortcuts import redirect
+from django.urls import resolve, reverse
+from django.core.cache import cache
+from core.models import ModoMantenimiento  # ajustá según tu app
 
 class MantenimientoGlobalMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        esta_en_mantenimiento = getattr(settings, 'PAGINA_EN_MANTENIMIENTO', False)
-        es_admin = request.path.startswith('/admin')
         es_mantenimiento = request.path.startswith('/mantenimiento')
+        es_admin = request.path.startswith('/admin')
 
         usuario = request.user
-
-        # Permitir navegación a staff o superusuarios incluso durante el mantenimiento
         es_staff = usuario.is_authenticated and (usuario.is_staff or usuario.is_superuser)
 
-        # Si el sitio está en mantenimiento y el usuario no es staff
-        if esta_en_mantenimiento and not es_staff:
-            if not es_mantenimiento and not es_admin:
-                return redirect('pagina_mantenimiento')
+        # Obtener estado en caché (más rápido que consultar DB siempre)
+        modo_mantenimiento = cache.get('modo_mantenimiento')
+        if modo_mantenimiento is None:
+            try:
+                modo_mantenimiento = ModoMantenimiento.objects.first().activo
+                cache.set('modo_mantenimiento', modo_mantenimiento, 10)  # dura 10 seg
+            except:
+                modo_mantenimiento = False  # por defecto activo
 
-        # Si el sitio NO está en mantenimiento y alguien entra manualmente a /mantenimiento/
-        if not esta_en_mantenimiento and es_mantenimiento:
-            return redirect('inicio')
+        # Si está activo y no es staff ni admin, redirige
+        if modo_mantenimiento and not es_staff:
+            if not es_mantenimiento and not es_admin:
+                return redirect(reverse('pagina_mantenimiento'))
+
+        # Si no está activo y entra a /mantenimiento, lo echamos
+        if not modo_mantenimiento and es_mantenimiento:
+            return redirect(reverse('inicio'))
 
         return self.get_response(request)

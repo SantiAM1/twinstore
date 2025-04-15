@@ -16,8 +16,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import RecibirMailSerializer
 
+from core.permissions import BloquearSiMantenimiento
+
 from django.template.loader import render_to_string
 class RecibirMailView(APIView):
+    permission_classes = [BloquearSiMantenimiento]
     def post(self,request):
         serializer = RecibirMailSerializer(data=request.data)
         if serializer.is_valid():

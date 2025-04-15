@@ -1,5 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render
+
+from core.decorators import bloquear_si_mantenimiento
 from .models import Producto, SubCategoria,Marca,ImagenProducto
 from django.db.models import Q
 from django_user_agents.utils import get_user_agent
@@ -87,6 +89,7 @@ def buscar_productos(request):
         })
 
 # ----- Categoria AJAX ----- #
+@bloquear_si_mantenimiento
 def categoria_ajax(request, categoria):
     sub_categorias = SubCategoria.objects.filter(categoria__nombre=categoria)
 

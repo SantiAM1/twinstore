@@ -15,6 +15,7 @@ from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,Eli
 import re
 from .context_processors import carrito_total
 from .permissions import TieneCarrito
+from core.permissions import BloquearSiMantenimiento
 from .decorators import requiere_carrito
 from django.templatetags.static import static
 from django.template.loader import render_to_string
@@ -25,6 +26,7 @@ import base64
 
 # ----- APIS ----- #
 class EnviarWtapView(APIView):
+    permission_classes = [BloquearSiMantenimiento]
     def get(self,request):
         productos = []
 
@@ -55,7 +57,7 @@ class EnviarWtapView(APIView):
         return Response({"productos": productos,'direccion':direccion,'codigo_postal':codigo_postal})
 
 class ActualizarPedidoView(APIView):
-    permission_classes = [TieneCarrito]
+    permission_classes = [TieneCarrito,BloquearSiMantenimiento]
     def post(self,request):
         serializer = ActualizarPedidoSerializer(data=request.data)
         if serializer.is_valid():
@@ -105,7 +107,7 @@ class ActualizarPedidoView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EliminarPedidoView(APIView):
-    permission_classes = [TieneCarrito]
+    permission_classes = [TieneCarrito,BloquearSiMantenimiento]
     def post(self,request):
         serializer = EliminarPedidoSerializer(data=request.data)
         if serializer.is_valid():
@@ -132,6 +134,7 @@ class EliminarPedidoView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AgregarAlCarritoView(APIView):
+    permission_classes = [BloquearSiMantenimiento]
     def post(self,request):
         serializer = AgregarAlCarritoSerializer(data=request.data)
         if serializer.is_valid():
@@ -175,7 +178,7 @@ class AgregarAlCarritoView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class CalcularPedidoView(APIView):
-    permission_classes = [TieneCarrito]
+    permission_classes = [TieneCarrito,BloquearSiMantenimiento]
     
     def post(self, request):
 

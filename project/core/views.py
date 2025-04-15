@@ -12,12 +12,14 @@ from django.views.decorators.http import require_GET
 from django.core.cache import cache
 import hashlib
 from django.core.paginator import Paginator
+from .decorators import bloquear_si_mantenimiento
 # Create your views here.
 
 def pagina_mantenimiento(request):
     return render(request, 'core/mantenimiento.html')
 
 @require_GET
+@bloquear_si_mantenimiento
 def buscar_productos(request):
     q = request.GET.get('q', '').strip().lower()
     if not q or len(q) < 2:

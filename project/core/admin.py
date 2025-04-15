@@ -2,6 +2,7 @@ import json
 from django.contrib.sessions.models import Session
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from .models import ModoMantenimiento
 
 @admin.register(Session)
 class SessionAdmin(admin.ModelAdmin):
@@ -14,3 +15,17 @@ class SessionAdmin(admin.ModelAdmin):
         return mark_safe(f'<pre>{pretty_data}</pre>')
 
     get_decoded.short_description = "Session Data (decoded)"
+
+@admin.register(ModoMantenimiento)
+class ModoMantenimientoAdmin(admin.ModelAdmin):
+    list_display = ['activo']
+
+    def has_add_permission(self, request):
+        return not ModoMantenimiento.objects.exists()
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        from django.core.cache import cache
+        cache.set('modo_mantenimiento', self.activo)
+
+
