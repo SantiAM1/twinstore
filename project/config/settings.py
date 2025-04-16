@@ -150,6 +150,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+    'anon': '10/minute',
+    'user': '100/minute',
+
+    'carrito': '30/minute',
+    'calcular_pedido': '10/minute',
+    'toggle_notificaciones': '10/hour',
+    'enviar_wtap': '10/day',
+    'filtros_dinamicos': '30/minute',
+    'prediccion_busqueda': '60/minute',
+    }
+}
+
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

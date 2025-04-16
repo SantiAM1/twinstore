@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block head %}
+    <title>Compra denegada - Twinstore</title>
+{% endblock head %}
+{% block headend %}
+    <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
+{% endblock headend %}
+
 {% block contenidomain %}
 <main class="padding-1rem">
     <div class="flex font-roboto flex-column users-feedback-box">

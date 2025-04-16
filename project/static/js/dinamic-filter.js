@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.addEventListener("click", function (e) {
-        if (e.target.classList.contains("pagina-btn")) {
+        if (e.target.classList.contains("pagina-btn") && e.target.dataset.pagina) {
             e.preventDefault();
     
             const pagina = e.target.dataset.pagina;

@@ -67,7 +67,7 @@
                     class="dropdown list-none position-absolute"
                     id="userDropdown"
                 >
-                    {% if user.is_authenticated %} {% if user.is_superuser %}
+                    {% if user.is_authenticated %} {% if user.is_staff %}
                     <li>
                         <a
                             href="{% url 'admin:index' %}"

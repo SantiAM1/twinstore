@@ -24,9 +24,12 @@ import datetime
 import os
 import base64
 
+from core.throttling import EnviarWtapThrottle,CarritoThrottle,CalcularPedidoThrottle
+
 # ----- APIS ----- #
 class EnviarWtapView(APIView):
     permission_classes = [BloquearSiMantenimiento]
+    throttle_classes = [EnviarWtapThrottle]
     def get(self,request):
         productos = []
 
@@ -55,9 +58,9 @@ class EnviarWtapView(APIView):
                     continue
 
         return Response({"productos": productos,'direccion':direccion,'codigo_postal':codigo_postal})
-
 class ActualizarPedidoView(APIView):
     permission_classes = [TieneCarrito,BloquearSiMantenimiento]
+    throttle_classes = [CarritoThrottle]
     def post(self,request):
         serializer = ActualizarPedidoSerializer(data=request.data)
         if serializer.is_valid():
@@ -108,6 +111,7 @@ class ActualizarPedidoView(APIView):
 
 class EliminarPedidoView(APIView):
     permission_classes = [TieneCarrito,BloquearSiMantenimiento]
+    throttle_classes = [CarritoThrottle]
     def post(self,request):
         serializer = EliminarPedidoSerializer(data=request.data)
         if serializer.is_valid():
@@ -135,6 +139,7 @@ class EliminarPedidoView(APIView):
 
 class AgregarAlCarritoView(APIView):
     permission_classes = [BloquearSiMantenimiento]
+    throttle_classes = [CarritoThrottle]
     def post(self,request):
         serializer = AgregarAlCarritoSerializer(data=request.data)
         if serializer.is_valid():
@@ -179,7 +184,7 @@ class AgregarAlCarritoView(APIView):
         
 class CalcularPedidoView(APIView):
     permission_classes = [TieneCarrito,BloquearSiMantenimiento]
-    
+    throttle_classes = [CalcularPedidoThrottle]
     def post(self, request):
 
         serializer = CalcularPedidoSerializer(data=request.data)

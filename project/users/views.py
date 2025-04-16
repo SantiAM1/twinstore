@@ -19,8 +19,11 @@ from .serializers import RecibirMailSerializer
 from core.permissions import BloquearSiMantenimiento
 
 from django.template.loader import render_to_string
+from core.throttling import ToggleNotificacionesThrottle
+
 class RecibirMailView(APIView):
     permission_classes = [BloquearSiMantenimiento]
+    throttle_classes = [ToggleNotificacionesThrottle]
     def post(self,request):
         serializer = RecibirMailSerializer(data=request.data)
         if serializer.is_valid():

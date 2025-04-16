@@ -24,23 +24,30 @@ class ImagenProductoInline(admin.StackedInline):
 
     miniatura.short_description = "Preview"
 
-# 👉 Inline para Especificaciones Técnicas
 class EspecificacionTecnicaInline(admin.StackedInline):
     model = EspecificacionTecnica
-    extra = 1
+    extra = 0
     form = EspecificacionTecnicaForm
 
-# 👉 Admin principal de Producto
 class ProductoAdmin(admin.ModelAdmin):
     inlines = [AtributoInline, ImagenProductoInline, EspecificacionTecnicaInline]
     list_display = ['nombre', 'sku', 'precio', 'marca', 'sub_categoria']
     search_fields = ['nombre', 'sku']
     list_filter = ['marca', 'sub_categoria']
 
-# ----- Registro de modelos -----
-admin.site.register(Marca)
-admin.site.register(Categoria)
-admin.site.register(SubCategoria)
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+    def has_module_permission(self, request):
+        return False
+    
+@admin.register(Marca)
+class MarcaAdmin(admin.ModelAdmin):
+    def has_module_permission(self, request):
+        return False  # Oculta de la barra lateral
+
+@admin.register(SubCategoria)
+class SubcategoriaAdmin(admin.ModelAdmin):
+    def has_module_permission(self, request):
+        return False
+
 admin.site.register(Producto, ProductoAdmin)
-admin.site.register(Atributo)
-admin.site.register(CategoriaEspecificacion)

@@ -6,6 +6,7 @@ admin.site.register(PagoRecibidoMP)
 
 @admin.register(ComprobanteTransferencia)
 class ComprobanteAdmin(admin.ModelAdmin):
-    list_display = ['historial', 'fecha_subida', 'aprobado']
+    readonly_fields = ['historial']
+    list_display = ['historial','fecha_subida', 'aprobado']
     list_filter = ['aprobado']
-    search_fields = ['historial__payment_id']
+    search_fields = ['historial__merchant_order_id']

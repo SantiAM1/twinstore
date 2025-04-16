@@ -1,6 +1,17 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block head %}
+<title>Buscar pedido - Twinstore</title>
+{% endblock head %}
+
+{% block headend %}
+<link rel="stylesheet" href="{% static 'css/pedidos.css' %}">
+<link rel="stylesheet" href="{% static 'css/substyles/login-register.css' %}">
+<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
+<link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}">
+{% endblock headend %}
+
 {% block contenidomain %}
 <main class="padding-1rem">
     <div class="users-pedidos-box bg-white">

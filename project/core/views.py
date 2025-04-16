@@ -13,13 +13,38 @@ from django.core.cache import cache
 import hashlib
 from django.core.paginator import Paginator
 from .decorators import bloquear_si_mantenimiento
+from .throttling import PrediccionBusquedaThrottle
+from rest_framework.decorators import throttle_classes
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.timezone import now
 # Create your views here.
+
+@staff_member_required
+def verificar_throttle(request):
+    # Simulamos usuarios o IPs de prueba (esto es solo demostrativo)
+    ejemplos = [
+        'throttle_user_1',  # Clave ejemplo para usuarios autenticados
+        'throttle_anon_192.168.0.100',  # Clave ejemplo para IP
+    ]
+
+    data = []
+    for clave in ejemplos:
+        valor = cache.get(clave)
+        if valor:
+            data.append({'clave': clave, 'valor': valor})
+
+    return render(request, 'core/throttle_panel.html', {
+        'fecha': now(),
+        'throttles': data,
+    })
 
 def pagina_mantenimiento(request):
     return render(request, 'core/mantenimiento.html')
 
 @require_GET
 @bloquear_si_mantenimiento
+@throttle_classes([PrediccionBusquedaThrottle])
 def buscar_productos(request):
     q = request.GET.get('q', '').strip().lower()
     if not q or len(q) < 2:
@@ -47,7 +72,7 @@ def local(request):
     return render(request,'core/local.html')
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser)
+@staff_member_required
 def cargar_productos_excel(request):
     if request.method == 'POST':
         form = ExcelUploadForm(request.POST, request.FILES)

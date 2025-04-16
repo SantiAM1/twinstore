@@ -8,10 +8,13 @@ from django_user_agents.utils import get_user_agent
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from .forms import EditarProducto,ImagenProductoForm
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, get_object_or_404, redirect
 import os
 from django.contrib import messages
+from rest_framework.decorators import throttle_classes
+from core.throttling import FiltrosDinamicosThrottle
+
 # Create your views here.
 # ----- Manejo de filtros ----- #
 def get_atributos(productos):
@@ -90,6 +93,7 @@ def buscar_productos(request):
 
 # ----- Categoria AJAX ----- #
 @bloquear_si_mantenimiento
+@throttle_classes([FiltrosDinamicosThrottle])
 def categoria_ajax(request, categoria):
     sub_categorias = SubCategoria.objects.filter(categoria__nombre=categoria)
 
@@ -276,7 +280,7 @@ def producto_view(request,product_name):
         })
 
 # * Solo admin o staff
-@user_passes_test(lambda u: u.is_staff)
+@staff_member_required
 def editar_producto_view(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
 
@@ -304,7 +308,7 @@ def editar_producto_view(request, pk):
         })
 
 # * Solo admin o staff
-@user_passes_test(lambda u: u.is_staff)
+@staff_member_required
 def agregar_imagenes(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
     if request.method == 'POST':
@@ -318,13 +322,10 @@ def agregar_imagenes(request, producto_id):
         return redirect('products:editar_producto', pk=producto.pk)
 
 # * Solo admin o staff
-@user_passes_test(lambda u: u.is_staff)
+@staff_member_required
 def eliminar_imagen(request, img_id):
     imagen = get_object_or_404(ImagenProducto, id=img_id)
     producto_id = imagen.producto.id
-
-    if imagen.imagen and os.path.isfile(imagen.imagen.path):
-        os.remove(imagen.imagen.path)
 
     imagen.delete()
     messages.success(request, 'Imagen eliminada correctamente.')

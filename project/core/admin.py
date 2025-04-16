@@ -18,10 +18,11 @@ class SessionAdmin(admin.ModelAdmin):
 
 @admin.register(ModoMantenimiento)
 class ModoMantenimientoAdmin(admin.ModelAdmin):
-    list_display = ['activo']
+    list_display = ['estado_mantenimiento']
 
-    def has_add_permission(self, request):
-        return not ModoMantenimiento.objects.exists()
+    def estado_mantenimiento(self, obj):
+        return "🟥 SITIO EN MANTENIMIENTO" if obj.activo else "🟩 SITIO FUNCIONADO CORRECTAMENTE"
+    estado_mantenimiento.short_description = "Estado del sitio"
     
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

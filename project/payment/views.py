@@ -12,6 +12,10 @@ from django.contrib.auth import get_user_model
 
 import requests
 
+from django.urls import reverse
+
+from core.decorators import bloquear_si_mantenimiento
+
 from .models import HistorialCompras, PagoRecibidoMP
 from cart.models import Carrito
 from products.models import Producto
@@ -202,6 +206,7 @@ def payment_success(request):
     historial = HistorialCompras.objects.filter(merchant_order_id=merchant_order_id).first()
     return render(request, 'payment/success.html',{'historial':historial})
 
+@bloquear_si_mantenimiento
 @requiere_carrito
 def pedidos_efectivo_transferencia(request):
     if request.method == "POST":
@@ -309,7 +314,7 @@ def pedidos_efectivo_transferencia(request):
             calle_detail=data['calle_detail'],
         )
 
-        return render(request, 'payment/success.html',{'historial':historial})
+        return redirect(f"{reverse('payment:success')}?merchant_order_id={merchant_order_id}")
 
 def subir_comprobante(request, token):
     historial = get_object_or_404(HistorialCompras, token_consulta=token)

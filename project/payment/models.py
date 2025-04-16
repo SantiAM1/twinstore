@@ -37,7 +37,7 @@ class HistorialCompras(models.Model):
         else:
             nombre = "Anónimo"
 
-        return f"Compra {self.id} - {self.estado} - {nombre}"
+        return f"{self.merchant_order_id} - {self.estado} - {nombre}"
 
     def pagos_completos(self):
         return all(p.status == "approved" for p in self.pagos.all())
@@ -65,4 +65,4 @@ class ComprobanteTransferencia(models.Model):
     observaciones = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Comprobante de {self.historial.payment_id}"
+        return f"Comprobante de {self.historial.merchant_order_id}"

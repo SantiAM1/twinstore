@@ -30,6 +30,6 @@ class MantenimientoGlobalMiddleware:
 
         # Si no está activo y entra a /mantenimiento, lo echamos
         if not modo_mantenimiento and es_mantenimiento:
-            return redirect(reverse('inicio'))
+            return redirect(reverse('core:home'))
 
         return self.get_response(request)

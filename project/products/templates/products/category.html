@@ -1,8 +1,12 @@
-{% extends 'base.html' %} {% load static %} {% block head %}
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
 <title>{{categoria}} - Twistore</title>
+<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
 <link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
-{% endblock head %} {% block contenidomain %}
+{% endblock head %}
+{% block contenidomain %}
 <div class="product-box main-box">
     <nav class="flex justify-between items-center products-nav">
         {% include 'partials/header_links.html' %}
@@ -34,7 +38,8 @@
         <p>Procesando...</p>
     </div>
 </div>
-{% endblock contenidomain %} {% block myscripts %}
+{% endblock contenidomain %}
+{% block myscripts %}
 <script nonce="{{ request.csp_nonce }}">
     window.filters = {
         categoria: "{{categoria}}",
