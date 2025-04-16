@@ -21,6 +21,8 @@ from core.permissions import BloquearSiMantenimiento
 from django.template.loader import render_to_string
 from core.throttling import ToggleNotificacionesThrottle
 
+from axes.handlers.proxy import AxesProxyHandler
+
 class RecibirMailView(APIView):
     permission_classes = [BloquearSiMantenimiento]
     throttle_classes = [ToggleNotificacionesThrottle]
@@ -141,7 +143,16 @@ def iniciar_sesion(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
-            user = authenticate(username=form.cleaned_data['email'], password=form.cleaned_data['password'])
+            # 🔒 Verificar si el intento está bloqueado por Axes
+            if AxesProxyHandler.is_locked(request, credentials={'username': form.cleaned_data['email']}):
+                messages.error(request, "Demasiados intentos fallidos. Esperá 1 hora para volver a intentar.")
+                return redirect('users:login')
+            
+            user = authenticate(
+                request=request,
+                username=form.cleaned_data['email'],
+                password=form.cleaned_data['password']
+                )
             if user is not None:
                 perfil = user.perfil
                 if not perfil.email_verificado:

@@ -56,8 +56,10 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 86400
 SESSION_COOKIE_HTTPONLY = True
 
-# ! Poner en TRUE al momento de salir a produccion
-SESSION_COOKIE_SECURE = False
+# ! Descomentar antes de producción
+# SESSION_COOKIE_SECURE = True        # * Solo se envían por HTTPS
+# CSRF_COOKIE_SECURE = True           # * Igual para CSRF
+# CSRF_COOKIE_HTTPONLY = True         # * Protege aún más
 
 # Application definition
 
@@ -70,7 +72,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'django_json_widget',
+    'axes',
     'django_cleanup.apps.CleanupConfig',
     'rest_framework',
     'csp',
@@ -82,6 +84,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'axes.middleware.AxesMiddleware',
     "django_user_agents.middleware.UserAgentMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -93,6 +96,21 @@ MIDDLEWARE = [
     'csp.middleware.CSPMiddleware',
     'core.middleware.mantenimiento.MantenimientoGlobalMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_LOCKOUT_PARAMETERS = ['username', 'ip_address']
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1
+AXES_RESET_ON_SUCCESS = True
+
+# ! Descomentar antes de producción
+# SECURE_HSTS_SECONDS = 31536000
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
 
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
