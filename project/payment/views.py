@@ -204,8 +204,6 @@ def notification(request):
 def payment_success(request):
     merchant_order_id = request.GET.get('merchant_order_id','')
     historial = HistorialCompras.objects.filter(merchant_order_id=merchant_order_id).first()
-    if not historial:
-        return redirect('core:home')
     return render(request, 'payment/success.html',{'historial':historial})
 
 @bloquear_si_mantenimiento

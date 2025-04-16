@@ -1,7 +1,6 @@
 from django.shortcuts import get_object_or_404
 from products.models import Producto
 from .models import Carrito
-import secrets
 
 def carrito_total(request):
     if request.user.is_authenticated:
@@ -26,4 +25,4 @@ def carrito_total(request):
         del request.session['adicional_mp']
         request.session.modified = True
 
-    return {'total_precio': total_precio,'total_productos':total_productos,'nonce': secrets.token_urlsafe(16)}
+    return {'total_precio': total_precio,'total_productos':total_productos}

@@ -35,15 +35,23 @@ document.addEventListener("DOMContentLoaded", () => {
                     useGrouping: false})}`
 
                 const boxCheckout = document.getElementById('box-checkout-pro');
-
+                boxCheckout.innerHTML = "";
+                    
                 if (init_point && metodoPagoSeleccionado === 'mercado_pago') {
-                    boxCheckout.innerHTML = `
-                        <a href="${init_point}" rel="noopener noreferrer" class="boton-checkout-pro flex font-roboto items-center decoration-none font-bold gap-05rem">
-                            <img src="${window.api.imgMP}" alt="Pagar con Mercado Pago" loading="lazy" />  Pagar con Mercado Pago
-                        </a>
-                    `;
-                } else {
-                    boxCheckout.innerHTML = "";
+                    const a = document.createElement("a");
+                    a.href = init_point;
+                    a.rel = "noopener noreferrer";
+                    a.className = "boton-checkout-pro flex font-roboto items-center decoration-none font-bold gap-05rem";
+                    
+                    const img = document.createElement("img");
+                    img.src = window.api.imgMP;
+                    img.alt = "Pagar con Mercado Pago";
+                    img.loading = "lazy";
+                    
+                    a.appendChild(img);
+                    a.appendChild(document.createTextNode(" Pagar con Mercado Pago"));
+                    
+                    boxCheckout.appendChild(a);
                 }
 
             } catch (error) {

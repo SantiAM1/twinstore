@@ -53,10 +53,6 @@ CSRF_TRUSTED_ORIGINS = [
     f"https://{MY_NGROK_URL}"
 ]
 
-# ! Falta verificar que la url recibida por MP sea la correcta, Agregar SECRET KEY A .evn
-# ! Verificar la calidad de la integracion de MP
-# ! Probar la seguridad de la pagina
-
 # * Sessions
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 86400
@@ -112,7 +108,7 @@ CONTENT_SECURITY_POLICY = {
         "script-src": [
             "'self'",
             "https://cdn.jsdelivr.net",
-            NONCE  # ← esto hace que se inyecte automáticamente el nonce
+            NONCE
         ],
         "font-src": [
             "'self'",
@@ -126,6 +122,7 @@ CONTENT_SECURITY_POLICY = {
 
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 ROOT_URLCONF = 'config.urls'
 

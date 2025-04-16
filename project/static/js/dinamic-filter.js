@@ -78,34 +78,34 @@ document.addEventListener("DOMContentLoaded", () => {
             // * GRID COMPARTIDO
             const gridBox = document.querySelector('.grid-container');
             if (gridBox) {
-                gridBox.innerHTML = response.data.html
+                gridBox.innerHTML = DOMPurify.sanitize(response.data.html)
             }
             // * COMPUTADORA
             const filterBox = document.querySelector('.filter-box');
             if (filterBox) {
-                filterBox.innerHTML = response.data.filtros;
+                filterBox.innerHTML = DOMPurify.sanitize(response.data.filtros);
             }
             const linksProds = document.querySelector('.product-links-box');
             if (linksProds) {
-                linksProds.innerHTML = response.data.navlinks;
+                linksProds.innerHTML = DOMPurify.sanitize(response.data.navlinks);
             }
             const orderResult = document.getElementById('orden-result')
             if (orderResult) {
-                orderResult.innerHTML = response.data.orden;
+                orderResult.innerHTML =  DOMPurify.sanitize(response.data.orden);
             }
             const paginacion = document.querySelector('.paginacion');
             if (paginacion) {
-                paginacion.innerHTML = response.data.paginacion;
+                paginacion.innerHTML = DOMPurify.sanitize(response.data.paginacion);
             }
             // * MOBILE
             const filterActiveBox = document.getElementById('filter-active-mobile');
             if (filterActiveBox) {
-                filterActiveBox.innerHTML = response.data.activos
+                filterActiveBox.innerHTML = DOMPurify.sanitize(response.data.activos);
             }
 
             const filterMobileBox = document.getElementById('filters-box-mobile');
             if (filterMobileBox) {
-                filterMobileBox.innerHTML = response.data.filtros;
+                filterMobileBox.innerHTML = DOMPurify.sanitize(response.data.filtros);
             
                 if (!filterMobileBox.dataset.listenerSet) {
                     filterMobileBox.addEventListener("click", function (event) {

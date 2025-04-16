@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         item.addEventListener("mouseenter", () => {
             navItems.forEach(navItem => navItem.classList.remove("categoria-selec"));
             item.classList.add("categoria-selec");
-            resultProdDisplay.innerHTML = categorias[item.id] || '<div class="result-productos-column flex">No hay contenido disponible</div>';
+            resultProdDisplay.innerHTML = DOMPurify.sanitize(categorias[item.id] || '<div class="result-productos-column flex">No hay contenido disponible</div>');
         });
     });
 

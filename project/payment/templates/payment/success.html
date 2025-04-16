@@ -37,7 +37,11 @@
             {% if user.is_authenticated %}
                 <p>🏷️ Puedes ver el estado de tu compra en "Mis Pedidos"</p>
             {% else %}
-                <p>🏷️ Este es tu codigo de seguimiento:<code>{{ historial.token_consulta }}</code></p>
+                {% if historial %}
+                    <p>🏷️ Este es tu codigo de seguimiento:<code>{{ historial.token_consulta }}</code></p>
+                {% else %}
+                    <p>🏷️ Tu codigo de seguimiento se esta generando...</code></p>
+                {% endif %}
             {% endif %}
             <p>📨 En breve recibirás un correo con todos los detalles.</p>
             <p>👉 Si tenés dudas, podés contactarnos a <span class="users-email-link">help@twinstore.com.ar</span>.</p>
@@ -45,9 +49,11 @@
         <div class="flex justify-between">
             <a href="{% url 'core:home' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
             {% if user.is_authenticated %}
-            <a href="{% url 'users:mispedidos' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Mis pedidos</a>
+                <a href="{% url 'users:mispedidos' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Mis pedidos</a>
             {% else %}
-            <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Ver Pedido</a>
+                {% if historial %}
+                    <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Ver Pedido</a>
+                {% endif %}
             {% endif %}
         </div>
     </div>

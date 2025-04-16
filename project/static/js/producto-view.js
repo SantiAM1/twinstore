@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
         const precioFormateado = parseFloat(totalPrecio).toFixed(2);
         const subTotalFormateado = parseFloat(subTotal).toFixed(2);
-        feedback.innerHTML = `
+        const htmlNoPurificado = `
             <div class="flex items-center gap-1rem carrito-feedback-imgbox">
                 <img src="${imagenUrl}" alt="${productoNombre} loading="lazy"">
                 <div class="flex flex-column carrito-feedback-info">
@@ -67,7 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 <a href="${window.api.verCarrito}" class="font-roboto decoration-none font-bold">VER CARRITO</a>
                 <a href="${window.api.finalizarCompra}" class="font-roboto decoration-none font-bold">FINALIZAR COMPRA</a>
             </div>
-        `;
+            `
+        feedback.innerHTML = DOMPurify.sanitize(htmlNoPurificado)
         feedback.classList.remove('oculto');
     
         setTimeout(() => {

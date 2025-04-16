@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const { html } = response.data;
         
                     const notificationBox = btn.closest('.notification-box');
-                    notificationBox.innerHTML = html;
+                    notificationBox.innerHTML = DOMPurify.sanitize(html);
         
                 } catch (error) {
                     console.error("No se pudo actualizar el pedido:", error);

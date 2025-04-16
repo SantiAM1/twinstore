@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const precio = parseFloat(container.dataset.precio);
 
                 if (precioSubtotal && !isNaN(precio)) {
-                    precioSubtotal.innerHTML = `$${(precio * cantidad).toFixed(2)}`;
+                    precioSubtotal.textContent = `$${(precio * cantidad).toFixed(2)}`;
 
                     // Animación suave
                     precioSubtotal.classList.remove('animate-flash'); // reset
@@ -57,8 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const subTotal = document.getElementById('cart-subtotal');
         const total = document.getElementById('cart-total');
         if (subTotal && total) {
-            subTotal.innerHTML = `$${totalFormateado}`;
-            total.innerHTML = `$${totalFormateado}`
+            subTotal.textContent = `$${totalFormateado}`;
+            total.textContent = `$${totalFormateado}`
         }
     }
 
