@@ -2,7 +2,11 @@
 {% load static %}
 
 {% block head %}
-    <title>{{categoria}} - Twistore</title>
+<title>{{categoria}} - Twistore</title>
+<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
+<link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
+<link rel="stylesheet" href="{% static 'css/mobile-filters.css' %}" />
+<link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
 {% endblock head %}
 
 {% block contenidomain %}
@@ -27,6 +31,9 @@
         {% include 'partials/product_grid.html' %}
     </div>
 </main>
+<div class="paginacion margin-1rem flex justify-center gap-05rem font-roboto">
+    {% include 'partials/paginacion.html' %}
+</div>
 {% endblock contenidomain %}
 
 {% block myscripts %}

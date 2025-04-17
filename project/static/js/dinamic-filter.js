@@ -26,6 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
     
             const filtrosActualizados = Object.fromEntries(urlParams.entries());
             aplicarFiltrosDinamicos(filtrosActualizados);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
         }
     });
     

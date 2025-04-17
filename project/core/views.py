@@ -83,7 +83,7 @@ def cargar_productos_excel(request):
 
                 if df.empty:
                     messages.error(request, "El archivo Excel está vacío.")
-                    return redirect('cargar_excel')
+                    return redirect('core:cargar_excel')
 
                 nombres_en_excel = df['Producto'].tolist()
                 productos_existentes = Producto.objects.all()
@@ -120,25 +120,46 @@ def cargar_productos_excel(request):
                     if creado:
                             messages.success(request, mark_safe(f'✅ Producto <strong>{producto.nombre}</strong> agregado'))
                     else:
-                        if producto.precio != fila['Precio'] or producto.descuento != fila['Descuento']:
-                            messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong> actualizado'))
-
+                        if producto.descuento != fila['Descuento']:
+                            messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Descuento aplicado --> %{fila['Descuento']}'))
+                        elif producto.descuento != 0 and producto.precio_anterior != fila['Precio']:
+                            messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Precio actualizado --> ${fila['Precio']}'))
+                        elif producto.descuento == 0 and producto.precio != fila['Precio']:
+                            messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Precio actualizado --> ${fila['Precio']}'))
 
                     if not creado:
-                        producto.precio = fila['Precio']
-                        producto.descuento = fila['Descuento']
+                        nuevo_descuento = fila['Descuento']
+                        nuevo_precio_base = fila['Precio']
+                        producto.descuento = nuevo_descuento
+
+                        if nuevo_descuento == 0:
+                            # Si se eliminó el descuento, restauramos el precio base
+                            producto.precio = nuevo_precio_base
+                            producto.precio_anterior = None
+                        else:
+                            # Si hay descuento, se ajusta precio_anterior
+                            if not producto.precio_anterior or producto.precio_anterior != nuevo_precio_base:
+                                producto.precio_anterior = nuevo_precio_base
+                            # El precio final será recalculado por el signal
+
                         if not producto.sku:
                             producto.sku = sku
+
                         producto.save()
-                    
+
+                    # Eliminar atributos anteriores para no duplicar
+                    producto.atributos.all().delete()
+
+                    # Cargar nuevos atributos separados por ';'
                     if 'Atributos' in fila and isinstance(fila['Atributos'], str):
-                        atributos = fila['Atributos'].split('|')
+                        atributos = fila['Atributos'].split(';')
                         for atributo in atributos:
-                            nombre_valor = atributo.split(':')
-                            if len(nombre_valor) == 2:
-                                nombre = nombre_valor[0].strip()
-                                valor = nombre_valor[1].strip()
-                                Atributo.objects.get_or_create(producto=producto, nombre=nombre, valor=valor)
+                            if ':' in atributo:
+                                nombre, valor = atributo.split(':', 1)
+                                nombre = nombre.strip()
+                                valor = valor.strip()
+                                if nombre and valor:
+                                    Atributo.objects.get_or_create(producto=producto, nombre=nombre, valor=valor)
 
                 messages.success(request, f"Productos cargados correctamente. Se eliminaron {eliminados} productos.")
                 return redirect('core:cargar_excel')
@@ -150,4 +171,3 @@ def cargar_productos_excel(request):
         form = ExcelUploadForm()
 
     return render(request, 'core/cargar_excel.html', {'form': form})
-

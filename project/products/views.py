@@ -17,6 +17,19 @@ from core.throttling import FiltrosDinamicosThrottle
 
 # Create your views here.
 # ----- Manejo de filtros ----- #
+def ordenby(request, productos):
+    orden = request.GET.get('ordenby', 'date')
+    if orden == 'price_lower':
+        productos = productos.order_by('precio')
+        filtro = 'Ordenar por precio: menor a mayor'
+    elif orden == 'price_higher':
+        productos = productos.order_by('-precio')
+        filtro = 'Ordenar por precio: mayor a menor'
+    else:
+        productos = productos.order_by('-id')
+        filtro = 'Ordenar por los últimos'
+    return productos, filtro
+
 def get_atributos(productos):
     atributos_unicos = {}
     for producto in productos:
@@ -43,6 +56,137 @@ def filtrar_atributo(dict, productos, atributos_unicos):
         )
     
     return productos.distinct()
+
+def return_filtros_dinamicos(request, categoria):
+    sub_categorias = SubCategoria.objects.filter(categoria__nombre=categoria)
+    productos = Producto.objects.filter(sub_categoria__in=sub_categorias).select_related('marca', 'sub_categoria').prefetch_related('imagenes', 'atributos')
+
+    #* 🔹 Filtrar por marcas
+    marca_seleccionada = request.GET.get('marca')
+    if marca_seleccionada:
+        productos = productos.filter(marca__nombre=marca_seleccionada)
+
+    #* 🔹 Filtrar por subcategorias
+    sub_categoria_seleccionada = request.GET.get('sub_categoria')
+    if sub_categoria_seleccionada:
+        productos = productos.filter(sub_categoria__nombre=sub_categoria_seleccionada)
+
+    #* 🔹 Obtener atributos antes del filtro
+    atributos_previos = get_atributos(productos)
+
+    #* 🔹 Aplicar filtros
+    productos = filtrar_atributo(request.GET, productos, atributos_previos)
+
+    #* 🔹 Obtener solo los atributos válidos después del filtro
+    atributos_unicos = get_atributos(productos)
+
+    marcas = Marca.objects.filter(producto__in=productos).distinct()
+    sub_categorias = SubCategoria.objects.filter(productos__in=productos).distinct()
+
+    #* 🔹 Ordenar los productos
+    productos, filtro=ordenby(request,productos)
+    
+    pagina_actual = request.GET.get('pagina', 1)
+    paginator = Paginator(productos, 12)
+    pagina = paginator.get_page(pagina_actual)
+    productos = pagina.object_list
+
+    filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q","pagina"]}
+
+    return productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro
+
+# ----- Categoria AJAX ----- #
+@bloquear_si_mantenimiento
+@throttle_classes([FiltrosDinamicosThrottle])
+def categoria_ajax(request, categoria):
+    productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro = return_filtros_dinamicos(request, categoria)
+
+    user_agent = get_user_agent(request)
+    if user_agent.is_mobile:
+        html_filtros = render_to_string(
+            'partials/filtros_dinamicos_mobile.html',{
+                'atributos_unicos': atributos_unicos,
+                'request':request,
+                'sub_categorias':sub_categorias,
+                'marcas':marcas
+            }, request=request
+            )
+
+        html = render_to_string('partials/product_grid.html', {
+            'productos': productos,
+            'pagina':pagina
+        }, request=request)
+
+        html_activos = render_to_string(
+        'partials/filtros_activos_mobile.html', {
+            'filtros_aplicados':filtros_aplicados,
+            'request': request,
+        },
+        request=request
+        )
+        html_paginacion = render_to_string('partials/paginacion.html', {
+        'pagina':pagina},
+        request=request
+        )
+        return JsonResponse({'activos':html_activos,'html':html,'filtros':html_filtros,'paginacion':html_paginacion})
+
+    html_filtros = render_to_string(
+        'partials/filtros_dinamicos.html', {
+            'filtros_aplicados':filtros_aplicados,
+            'request': request,
+            'sub_categorias': sub_categorias,
+            'atributos_unicos': atributos_unicos,
+            'marcas': marcas,
+        },
+        request=request
+    )
+    html_navlinks = render_to_string('partials/header_links.html',{
+        'categoria':categoria,
+        'sub_categorias':sub_categorias
+    },request=request)
+    html_orden = render_to_string('partials/orden_resultado.html',{
+        'cantidad_productos':len(productos),
+        'filtro':filtro,
+        'request':request
+    },request=request)
+    html = render_to_string('partials/product_grid.html', {
+        'productos': productos
+    }, request=request)
+    html_paginacion = render_to_string('partials/paginacion.html', {
+        'pagina':pagina},
+        request=request
+        )
+    return JsonResponse({'html': html,'filtros':html_filtros,'navlinks':html_navlinks,'orden':html_orden,'paginacion':html_paginacion})
+
+# ----- Filtracion por categoria ----- #
+def categoria(request, categoria):
+    productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro = return_filtros_dinamicos(request, categoria)
+
+    user_agent = get_user_agent(request)
+    if user_agent.is_mobile:
+        return render(request,'products/mobile.html',{
+        'productos': productos,
+        'categoria': categoria,
+        'sub_categorias':sub_categorias,
+        'cantidad_productos':len(productos),
+        'filtro' : filtro,
+        'atributos_unicos':atributos_unicos,
+        'marcas':marcas,
+        'filtros_aplicados':filtros_aplicados,
+        'pagina':pagina
+    })
+
+    return render(request, 'products/category.html', {
+        'productos': productos,
+        'categoria': categoria,
+        'sub_categorias':sub_categorias,
+        'cantidad_productos':len(productos),
+        'filtro' : filtro,
+        'atributos_unicos':atributos_unicos,
+        'marcas':marcas,
+        'filtros_aplicados':filtros_aplicados,
+        'pagina':pagina
+    })
 
 # ----- Busqueda de productos ----- #
 def buscar_productos(request):
@@ -90,185 +234,6 @@ def buscar_productos(request):
             'filtro': filtro,
             'pagina':pagina
         })
-
-# ----- Categoria AJAX ----- #
-@bloquear_si_mantenimiento
-@throttle_classes([FiltrosDinamicosThrottle])
-def categoria_ajax(request, categoria):
-    sub_categorias = SubCategoria.objects.filter(categoria__nombre=categoria)
-
-    productos = Producto.objects.filter(sub_categoria__in=sub_categorias).select_related('marca', 'sub_categoria').prefetch_related('imagenes', 'atributos')
-
-    #* 🔹 Filtrar por marcas
-    marca_seleccionada = request.GET.get('marca')
-    if marca_seleccionada:
-        productos = productos.filter(marca__nombre=marca_seleccionada)
-
-    #* 🔹 Filtrar por subcategorias
-    sub_categoria_seleccionada = request.GET.get('sub_categoria')
-    if sub_categoria_seleccionada:
-        productos = productos.filter(sub_categoria__nombre=sub_categoria_seleccionada)
-
-    #* 🔹 Obtener atributos antes del filtro
-    atributos_previos = get_atributos(productos)
-
-    #* 🔹 Aplicar filtros
-    productos = filtrar_atributo(request.GET, productos, atributos_previos)
-
-    #* 🔹 Obtener solo los atributos válidos después del filtro
-    atributos_unicos = get_atributos(productos)
-
-    marcas = Marca.objects.filter(producto__in=productos).distinct()
-
-    sub_categorias = SubCategoria.objects.filter(productos__in=productos).distinct()
-
-    #* 🔹 Ordenar los productos
-    productos, filtro=ordenby(request,productos)
-
-    pagina_actual = request.GET.get('pagina', 1)
-    paginator = Paginator(productos, 12)
-    pagina = paginator.get_page(pagina_actual)
-    productos = pagina.object_list
-
-    filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q","pagina"]}
-    print(filtros_aplicados)
-    user_agent = get_user_agent(request)
-    if user_agent.is_mobile:
-
-        html_filtros = render_to_string(
-            'partials/filtros_dinamicos_mobile.html',{
-                'atributos_unicos': atributos_unicos,
-                'request':request,
-                'sub_categorias':sub_categorias,
-                'marcas':marcas
-            }, request=request
-            )
-
-        html = render_to_string('partials/product_grid.html', {
-            'productos': productos,
-            'pagina':pagina
-        }, request=request)
-
-        html_activos = render_to_string(
-        'partials/filtros_activos_mobile.html', {
-            'filtros_aplicados':filtros_aplicados,
-            'request': request,
-        },
-        request=request
-        )
-
-        return JsonResponse({'activos':html_activos,'html':html,'filtros':html_filtros})
-
-    html_filtros = render_to_string(
-        'partials/filtros_dinamicos.html', {
-            'filtros_aplicados':filtros_aplicados,
-            'request': request,
-            'sub_categorias': sub_categorias,
-            'atributos_unicos': atributos_unicos,
-            'marcas': marcas,
-        },
-        request=request
-    )
-
-    html_navlinks = render_to_string('partials/header_links.html',{
-        'categoria':categoria,
-        'sub_categorias':sub_categorias
-    },request=request)
-
-    html_orden = render_to_string('partials/orden_resultado.html',{
-        'cantidad_productos':len(productos),
-        'filtro':filtro,
-        'request':request
-    },request=request)
-
-    html = render_to_string('partials/product_grid.html', {
-        'productos': productos
-    }, request=request)
-
-    html_paginacion = render_to_string('partials/paginacion.html', {
-        'pagina':pagina},
-        request=request
-        )
-
-    return JsonResponse({'html': html,'filtros':html_filtros,'navlinks':html_navlinks,'orden':html_orden,'paginacion':html_paginacion})
-
-# ----- Filtracion por categoria ----- #
-def categoria(request, categoria):
-    print('categoria_sin_ajax')
-    sub_categorias = SubCategoria.objects.filter(categoria__nombre=categoria)
-    productos = Producto.objects.filter(sub_categoria__in=sub_categorias).select_related('marca', 'sub_categoria').prefetch_related('imagenes', 'atributos')
-
-    #* 🔹 Filtrar por marcas
-    marca_seleccionada = request.GET.get('marca')
-    if marca_seleccionada:
-        productos = productos.filter(marca__nombre=marca_seleccionada)
-
-    #* 🔹 Filtrar por subcategorias
-    sub_categoria_seleccionada = request.GET.get('sub_categoria')
-    if sub_categoria_seleccionada:
-        productos = productos.filter(sub_categoria__nombre=sub_categoria_seleccionada)
-
-    #* 🔹 Obtener atributos antes del filtro
-    atributos_previos = get_atributos(productos)
-
-    #* 🔹 Aplicar filtros
-    productos = filtrar_atributo(request.GET, productos, atributos_previos)
-
-    #* 🔹 Obtener solo los atributos válidos después del filtro
-    atributos_unicos = get_atributos(productos)
-
-    marcas = Marca.objects.filter(producto__in=productos).distinct()
-    sub_categorias = SubCategoria.objects.filter(productos__in=productos).distinct()
-
-    #* 🔹 Ordenar los productos
-    productos, filtro=ordenby(request,productos)
-    
-    pagina_actual = request.GET.get('pagina', 1)
-    paginator = Paginator(productos, 12)
-    pagina = paginator.get_page(pagina_actual)
-    productos = pagina.object_list
-
-    filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q","pagina"]}
-
-    user_agent = get_user_agent(request)
-    if user_agent.is_mobile:
-        return render(request,'products/mobile.html',{
-        'productos': productos,
-        'categoria': categoria,
-        'sub_categorias':sub_categorias,
-        'cantidad_productos':len(productos),
-        'filtro' : filtro,
-        'atributos_unicos':atributos_unicos,
-        'marcas':marcas,
-        'filtros_aplicados':filtros_aplicados
-    })
-
-    return render(request, 'products/category.html', {
-        'productos': productos,
-        'categoria': categoria,
-        'sub_categorias':sub_categorias,
-        'cantidad_productos':len(productos),
-        'filtro' : filtro,
-        'atributos_unicos':atributos_unicos,
-        'marcas':marcas,
-        'filtros_aplicados':filtros_aplicados,
-        'pagina':pagina
-    })
-
-# ----- Ordenar los productos ----- #
-def ordenby(request, productos):
-    orden = request.GET.get('ordenby', 'date')
-    if orden == 'price_lower':
-        productos = productos.order_by('precio')
-        filtro = 'Ordenar por precio: menor a mayor'
-    elif orden == 'price_higher':
-        productos = productos.order_by('-precio')
-        filtro = 'Ordenar por precio: mayor a menor'
-    else:
-        productos = productos.order_by('-id')
-        filtro = 'Ordenar por los últimos'
-
-    return productos, filtro
 
 # ----- Vista individual del producto ----- #
 def producto_view(request,product_name):

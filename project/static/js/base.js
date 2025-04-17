@@ -151,9 +151,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             div.textContent = nombre;
                             div.className = "sugerencia-item";
                             div.addEventListener("click", () => {
-                                input.value = nombre;
-                                sugerenciasBox.style.display = "none";
-                                input.closest("form").submit();
+                                const nombreFormateado = encodeURIComponent(nombre);
+                                window.location.href = `/productos/producto/${nombreFormateado}`;
                             });
                             sugerenciasBox.appendChild(div);
                         });

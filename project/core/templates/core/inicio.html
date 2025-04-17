@@ -9,6 +9,35 @@
 <link rel="stylesheet" href="{% static 'css/home.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}"/>
 <link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}"/>
+<style>
+    .landing-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 150px);
+  gap: 2rem;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+/* Estilo de los cuadros */
+.landing-box {
+  width: 150px;
+  height: 150px;
+  border: 2px solid rgb(138, 138, 138);
+  border-radius: 15px;
+}
+
+.langing-icons {
+    font-size: 4rem; color: #414141;
+}
+
+/* Responsive para celulares */
+@media (max-width: 768px) {
+  .landing-grid {
+    grid-template-columns: repeat(2, 150px);
+    gap: 1rem;
+  }
+}
+</style>
 {% endblock head %}
 
 {% block carousel %}
@@ -17,6 +46,12 @@
 
 {% block contenidomain %}
 <main class="padding-1rem">
+    <div class="landing-grid">
+        <div class="landing-box font-roboto flex flex-column gap-1rem items-center justify-center"><i class="bi bi-tv langing-icons"></i>PC Armadas</div>
+        <div class="landing-box font-roboto flex flex-column gap-1rem items-center justify-center"><i class="bi bi-box langing-icons"></i>Componentes</div>
+        <div class="landing-box font-roboto flex flex-column gap-1rem items-center justify-center"><i class="bi bi-wrench langing-icons"></i>Servicios</div>
+        <div class="landing-box font-roboto flex flex-column gap-1rem items-center justify-center"><i class="bi bi-phone langing-icons"></i>Celulares</div>
+    </div>
     <section>
         <h2 class="text-center width-100 font-roboto position-relative">
             Nuestras ofertas 🔥
@@ -41,13 +76,18 @@
         </div>
     </section>
 </main>
-{% if messages %} {% for message in messages %}
-<div class="notification-mainpage position-fixed">
-    <div class="flex flex-column text-center notification-item django-msg-{{message.tags}} font-roboto">
-        {{ message }}
+{% if messages %}
+    {% for message in messages %}
+    <div class="notification-mainpage position-fixed">
+        <div class="flex flex-column text-center notification-item django-msg-{{message.tags}} font-roboto">
+            {{ message }}
+        </div>
     </div>
-</div>
-{% endfor %} {% endif %} {% endblock contenidomain %} {% block myscripts %}
+    {% endfor %}
+{% endif %}
+{% endblock contenidomain %}
+
+{% block myscripts %}
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script nonce="{{ request.csp_nonce }}">
     const swiper = new Swiper(".ofertaProds", {

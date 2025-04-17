@@ -31,12 +31,12 @@ def resize_to_size(image_field, size=(200, 200)):
 def applys_producto(sender, instance, **kwargs):
     # * Aplicar descuento al precio si existe
     if instance.descuento > 0:
-        if not instance.precio_anterior:
+        if instance.precio_anterior is None:
             instance.precio_anterior = instance.precio
         descuento_decimal = Decimal(instance.descuento) / Decimal('100')
         instance.precio = instance.precio_anterior * (1 - descuento_decimal)
     else:
-        if instance.precio_anterior:
+        if instance.precio_anterior is not None:
             instance.precio = instance.precio_anterior
             instance.precio_anterior = None
 
