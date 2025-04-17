@@ -103,6 +103,11 @@
         gap: 1rem;}
 
     .users-perfil-facturacion,.users-perfil-pedido {width: 100%;}
+
+    .landing-grid {
+        grid-template-columns: repeat(2, 150px);
+        gap: 1rem;
+    }
 }
 
 @media screen and (width <= 570px) {
