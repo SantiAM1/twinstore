@@ -41,7 +41,7 @@ SECRET_KEY = DJANGO_SECRET_KEY
 DEBUG = True
 
 # * Host
-MY_NGROK_URL="f651-186-137-123-71.ngrok-free.app"
+MY_NGROK_URL='127.0.0.1:8000'
 
 # ! Actualizar el HOST con el dominio
 ALLOWED_HOSTS = [f'{MY_NGROK_URL}','127.0.0.1']
@@ -227,6 +227,12 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SITE_URL = "http://127.0.0.1:8000"
+
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 # Configuración de SMTP para enviar emails con Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

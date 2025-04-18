@@ -7,7 +7,7 @@ from django.contrib import messages
 from payment.models import HistorialCompras
 import uuid
 from django.contrib.auth.decorators import login_required
-from .emails import mail_confirm_user_async
+from .emails import mail_confirm_user_html
 from django.utils import timezone
 from datetime import timedelta
 
@@ -179,8 +179,7 @@ def registarse(request):
             # * Forzamos acceso al perfil (por si aún no se generó en el signal)
             _ = user.perfil
 
-            # * Enviamos el mail de verificación (modo rápido actual)
-            mail_confirm_user_async(user)
+            mail_confirm_user_html(user)
 
             return redirect('users:email_enviado',token = user.perfil.token_verificacion)
         else:
@@ -227,7 +226,7 @@ def reenviar_verificacion(request, token):
 
     user = perfil.user
 
-    mail_confirm_user_async(user)
+    mail_confirm_user_html(user)
 
     request.session['ultimo_envio_verificacion'] = ahora.isoformat()
 
