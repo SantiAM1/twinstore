@@ -18,7 +18,7 @@ def mail_confirm_user_html(usuario):
     msg = EmailMultiAlternatives(
         subject='Confirmá tu cuenta en Twinstore',
         body=text,
-        from_email='Twinstore <notificaciones@twinstore.com>',
+        from_email=settings.DEFAULT_FROM_EMAIL,
         to=[usuario.email]
     )
     msg.attach_alternative(html, "text/html")
@@ -43,7 +43,7 @@ def mail_buy_send_html(historial,user_email):
     msg = EmailMultiAlternatives(
         subject='Compra recibida - Twistore',
         body=text,
-        from_email='Twinstore <notificaciones@twinstore.com>',
+        from_email=settings.DEFAULT_FROM_EMAIL,
         to=[user_email]
     )
     msg.attach_alternative(html, "text/html")
