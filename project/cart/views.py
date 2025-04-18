@@ -23,6 +23,7 @@ from weasyprint import HTML
 import datetime
 import os
 import base64
+import pytz
 
 from core.throttling import EnviarWtapThrottle,CarritoThrottle,CalcularPedidoThrottle
 
@@ -263,10 +264,10 @@ class CalcularPedidoView(APIView):
 def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,recibir_mail,productos,usuario):
     site_url = f'{settings.MY_NGROK_URL}'
 
-    argentina_tz = timezone.get_fixed_timezone(-180)
+    argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
 
-    expiration_from = timezone.localtime(timezone.now(), argentina_tz).isoformat()
-    expiration_to = timezone.localtime(timezone.now() + timedelta(days=1), argentina_tz).isoformat()
+    expiration_from = timezone.now().astimezone(argentina_tz).isoformat()
+    expiration_to = (timezone.now() + timedelta(minutes=30)).astimezone(argentina_tz).isoformat()
 
     preference_data = {
         "items": [

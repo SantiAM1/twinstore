@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 import pandas as pd
 import uuid
-from .forms import ExcelUploadForm
+from .forms import ExcelUploadForm,DolarActualizar
 from products.models import Producto, Marca, Categoria, SubCategoria, Atributo
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
@@ -15,9 +15,11 @@ from django.core.paginator import Paginator
 from .decorators import bloquear_si_mantenimiento
 from .throttling import PrediccionBusquedaThrottle
 from rest_framework.decorators import throttle_classes
+from .models import DolarConfiguracion
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.timezone import now
+from core.utils import obtener_valor_dolar
 # Create your views here.
 
 @staff_member_required
@@ -63,7 +65,7 @@ def buscar_productos(request):
     return JsonResponse(resultados, safe=False)
 
 def home(request):
-    productos_descuento = Producto.objects.filter(precio_anterior__isnull=False)[:20]
+    productos_descuento = Producto.objects.filter(descuento__gt=0).order_by('-descuento')[:20]
     return render(request,'core/inicio.html',{
         'productos_descuento': productos_descuento,
     })
@@ -75,99 +77,107 @@ def local(request):
 @staff_member_required
 def cargar_productos_excel(request):
     if request.method == 'POST':
-        form = ExcelUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            archivo = form.cleaned_data['archivo']
-            try:
-                df = pd.read_excel(archivo)
+        excel = ExcelUploadForm(request.POST, request.FILES)
+        if excel.is_valid():
+            archivo = excel.cleaned_data['archivo']
+            if archivo is not None:
+                try:
+                    df = pd.read_excel(archivo)
 
-                if df.empty:
-                    messages.error(request, "El archivo Excel está vacío.")
+                    if df.empty:
+                        messages.error(request, "El archivo Excel está vacío.")
+                        return redirect('core:cargar_excel')
+
+                    nombres_en_excel = df['Producto'].tolist()
+                    productos_existentes = Producto.objects.all()
+                    productos_a_eliminar = productos_existentes.exclude(nombre__in=nombres_en_excel)
+                    eliminados = productos_a_eliminar.count()
+
+                    for eliminado in productos_a_eliminar:
+                        messages.error(request, mark_safe(f'❌ Producto <strong>{eliminado.nombre}</strong> eliminado'))
+
+                    productos_a_eliminar.delete()
+
+                    for _, fila in df.iterrows():
+                        marca, _ = Marca.objects.get_or_create(nombre=fila['Marca'])
+
+                        try:
+                            sub_categoria = SubCategoria.objects.get(nombre=fila['Sub-categoria'])
+                            categoria = sub_categoria.categoria
+                        except SubCategoria.DoesNotExist:
+                            messages.warning(request, f'Subcategoría no encontrada: {fila["Sub-categoria"]}')
+                            continue
+
+                        sku = f"{marca.nombre[:3].upper()}-{sub_categoria.nombre[:3].upper()}-{uuid.uuid4().hex[:6].upper()}"
+
+                        valor_dolar = obtener_valor_dolar()
+                        print(valor_dolar)
+
+                        producto, creado = Producto.objects.get_or_create(
+                            nombre=fila['Producto'],
+                            defaults={
+                                'marca': marca,
+                                'sub_categoria': sub_categoria,
+                                'precio_dolar': fila['Precio USD'],
+                                'descuento': fila['Descuento'],
+                                'sku': sku
+                            }
+                        )
+
+                        if creado:
+                            messages.success(request, mark_safe(f'✅ Producto <strong>{producto.nombre}</strong> agregado'))
+
+                        else:
+                            precio_dolar_excel = fila['Precio USD']
+                            descuento_excel = fila['Descuento']
+
+                            hubo_cambio = False
+
+                            if producto.precio_dolar != precio_dolar_excel:
+                                hubo_cambio = True
+                                messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Precio en USD actualizado → ${precio_dolar_excel}'))
+
+                            if producto.descuento != descuento_excel:
+                                hubo_cambio = True
+                                messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Descuento actualizado → %{descuento_excel}'))
+
+                            if hubo_cambio:
+                                producto.precio_dolar = precio_dolar_excel
+                                producto.descuento = descuento_excel
+                                if not producto.sku:
+                                    producto.sku = sku
+                                producto.save()
+
+                        # Eliminar atributos anteriores para no duplicar
+                        producto.atributos.all().delete()
+
+                        # Cargar nuevos atributos separados por ';'
+                        if 'Atributos' in fila and isinstance(fila['Atributos'], str):
+                            atributos = fila['Atributos'].split(';')
+                            for atributo in atributos:
+                                if ':' in atributo:
+                                    nombre, valor = atributo.split(':', 1)
+                                    nombre = nombre.strip()
+                                    valor = valor.strip()
+                                    if nombre and valor:
+                                        Atributo.objects.get_or_create(producto=producto, nombre=nombre, valor=valor)
+
+                    messages.success(request, f"Productos cargados correctamente. Se eliminaron {eliminados} productos.")
                     return redirect('core:cargar_excel')
 
-                nombres_en_excel = df['Producto'].tolist()
-                productos_existentes = Producto.objects.all()
-                productos_a_eliminar = productos_existentes.exclude(nombre__in=nombres_en_excel)
-                eliminados = productos_a_eliminar.count()
-
-                for eliminado in productos_a_eliminar:
-                    messages.error(request, mark_safe(f'❌ Producto <strong>{eliminado.nombre}</strong> eliminado'))
-
-                productos_a_eliminar.delete()
-
-                for _, fila in df.iterrows():
-                    marca, _ = Marca.objects.get_or_create(nombre=fila['Marca'])
-
-                    try:
-                        sub_categoria = SubCategoria.objects.get(nombre=fila['Sub-categoria'])
-                        categoria = sub_categoria.categoria
-                    except SubCategoria.DoesNotExist:
-                        messages.warning(request, f'Subcategoría no encontrada: {fila["Sub-categoria"]}')
-                        continue
-
-                    sku = f"{marca.nombre[:3].upper()}-{sub_categoria.nombre[:3].upper()}-{uuid.uuid4().hex[:6].upper()}"
-
-                    producto, creado = Producto.objects.get_or_create(
-                        nombre=fila['Producto'],
-                        defaults={
-                            'marca': marca,
-                            'sub_categoria': sub_categoria,
-                            'precio': fila['Precio'],
-                            'descuento': fila['Descuento'],
-                            'sku': sku
-                        }
-                    )
-                    if creado:
-                            messages.success(request, mark_safe(f'✅ Producto <strong>{producto.nombre}</strong> agregado'))
-                    else:
-                        if producto.descuento != fila['Descuento']:
-                            messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Descuento aplicado --> %{fila['Descuento']}'))
-                        elif producto.descuento != 0 and producto.precio_anterior != fila['Precio']:
-                            messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Precio actualizado --> ${fila['Precio']}'))
-                        elif producto.descuento == 0 and producto.precio != fila['Precio']:
-                            messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Precio actualizado --> ${fila['Precio']}'))
-
-                    if not creado:
-                        nuevo_descuento = fila['Descuento']
-                        nuevo_precio_base = fila['Precio']
-                        producto.descuento = nuevo_descuento
-
-                        if nuevo_descuento == 0:
-                            # Si se eliminó el descuento, restauramos el precio base
-                            producto.precio = nuevo_precio_base
-                            producto.precio_anterior = None
-                        else:
-                            # Si hay descuento, se ajusta precio_anterior
-                            if not producto.precio_anterior or producto.precio_anterior != nuevo_precio_base:
-                                producto.precio_anterior = nuevo_precio_base
-                            # El precio final será recalculado por el signal
-
-                        if not producto.sku:
-                            producto.sku = sku
-
-                        producto.save()
-
-                    # Eliminar atributos anteriores para no duplicar
-                    producto.atributos.all().delete()
-
-                    # Cargar nuevos atributos separados por ';'
-                    if 'Atributos' in fila and isinstance(fila['Atributos'], str):
-                        atributos = fila['Atributos'].split(';')
-                        for atributo in atributos:
-                            if ':' in atributo:
-                                nombre, valor = atributo.split(':', 1)
-                                nombre = nombre.strip()
-                                valor = valor.strip()
-                                if nombre and valor:
-                                    Atributo.objects.get_or_create(producto=producto, nombre=nombre, valor=valor)
-
-                messages.success(request, f"Productos cargados correctamente. Se eliminaron {eliminados} productos.")
-                return redirect('core:cargar_excel')
-
-            except Exception as e:
-                messages.error(request, f"Ocurrió un error al procesar el archivo: {e}")
-                return redirect('core:cargar_excel')
+                except Exception as e:
+                    messages.error(request, f"Ocurrió un error al procesar el archivo: {e}")
+                    return redirect('core:cargar_excel')
+    
+        dolar = DolarActualizar(request.POST)
+        if dolar.is_valid():
+            valor_dolar = dolar.cleaned_data['dolar']
+            dolar_model = DolarConfiguracion.objects.first()
+            dolar_model.valor = valor_dolar
+            dolar_model.save()
+            messages.success(request, f"Valor del Dolar actualizado a ${valor_dolar}")
     else:
-        form = ExcelUploadForm()
+        excel = ExcelUploadForm()
+        dolar = DolarActualizar(initial={'dolar': obtener_valor_dolar()})
 
-    return render(request, 'core/cargar_excel.html', {'form': form})
+    return render(request, 'core/cargar_excel.html', {'excel': excel,'dolar': dolar})

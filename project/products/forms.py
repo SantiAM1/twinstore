@@ -14,14 +14,15 @@ class EditarProducto(forms.ModelForm):
     class Meta:
         INPUT_ATTRS = {'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none','autocomplete':'off','placeholder':' '}
         model = Producto
-        fields = ['nombre', 'marca', 'sub_categoria', 'precio', 'descuento', 'portada']
+        fields = ['nombre', 'marca', 'sub_categoria', 'precio_dolar', 'descuento', 'portada','precio']
         widgets = {
             'marca': forms.Select(attrs={'class': 'users-select bloqueable'}),
             'sub_categoria': forms.Select(attrs={'class': 'users-select bloqueable'}),
-            'precio': forms.NumberInput(attrs=INPUT_ATTRS),
+            'precio_dolar': forms.NumberInput(attrs=INPUT_ATTRS),
             'descuento': forms.NumberInput(attrs=INPUT_ATTRS),
             'nombre': forms.TextInput(attrs=INPUT_ATTRS),
             'portada': forms.FileInput(attrs={'class': 'form-admin-control display-none'}),
+            'precio': forms.NumberInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none', 'readonly': 'readonly'})
         }
 
 class ImagenProductoForm(forms.ModelForm):

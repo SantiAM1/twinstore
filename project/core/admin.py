@@ -2,7 +2,7 @@ import json
 from django.contrib.sessions.models import Session
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from .models import ModoMantenimiento
+from .models import ModoMantenimiento,DolarConfiguracion
 
 @admin.register(Session)
 class SessionAdmin(admin.ModelAdmin):
@@ -29,4 +29,4 @@ class ModoMantenimientoAdmin(admin.ModelAdmin):
         from django.core.cache import cache
         cache.set('modo_mantenimiento', self.activo)
 
-
+admin.site.register(DolarConfiguracion)

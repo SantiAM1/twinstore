@@ -2,6 +2,7 @@ from django.db.models.signals import pre_save,post_save
 from django.dispatch import receiver
 from .models import Producto, ImagenProducto
 from decimal import Decimal
+from core.utils import obtener_valor_dolar,actualizar_precio_final
 
 from PIL import Image
 from io import BytesIO
@@ -28,18 +29,15 @@ def resize_to_size(image_field, size=(200, 200)):
         return None
 
 @receiver(pre_save, sender=Producto)
-def applys_producto(sender, instance, **kwargs):
-    # * Aplicar descuento al precio si existe
-    if instance.descuento > 0:
-        if instance.precio_anterior is None:
-            instance.precio_anterior = instance.precio
-        descuento_decimal = Decimal(instance.descuento) / Decimal('100')
-        instance.precio = instance.precio_anterior * (1 - descuento_decimal)
-    else:
-        if instance.precio_anterior is not None:
-            instance.precio = instance.precio_anterior
-            instance.precio_anterior = None
+def calcular_precio_final(sender, instance, **kwargs):
+    """
+    Antes de guardar un producto, calcular el precio final en ARS a partir de precio_dolar y descuento.
+    """
+    valor_dolar = obtener_valor_dolar()
+    actualizar_precio_final(instance, valor_dolar)
 
+@receiver(pre_save, sender=Producto)
+def applys_portada(sender, instance, **kwargs):
     # * Redimensionar portada si fue modificada
     if instance.pk:
         try:
@@ -49,7 +47,6 @@ def applys_producto(sender, instance, **kwargs):
             portada_cambiada = True
     else:
         portada_cambiada = True
-
     if instance.portada and portada_cambiada:
         nueva_imagen = resize_to_size(instance.portada, size=(200, 200))
         if nueva_imagen:

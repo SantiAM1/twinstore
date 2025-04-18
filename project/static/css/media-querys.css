@@ -14,6 +14,9 @@
     .cart-items {width: 70%;}
     
     .cart-finish {width: 30%;}
+
+    .landing-box {width: 150px; 
+        height: 150px;}
 }
 
 @media screen and (width <= 800px) {

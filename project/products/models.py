@@ -1,5 +1,6 @@
 from re import T
 from django.db import models
+from core.utils import obtener_valor_dolar
 
 class Marca(models.Model):
     nombre = models.CharField(max_length=30)
@@ -26,10 +27,19 @@ class Producto(models.Model):
     marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
     sub_categoria = models.ForeignKey(SubCategoria, on_delete=models.CASCADE, related_name='productos')
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_anterior = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,editable=False)
+    precio_dolar = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     descuento = models.IntegerField(default=0)
     sku = models.CharField(max_length=20, unique=True, blank=True, null=True,editable=False)
     portada = models.ImageField(upload_to='productos/portadas/',null=True, blank=True)
+
+    @property
+    def precio_anterior(self):
+        if self.precio_dolar:
+            try:
+                return round(self.precio_dolar * obtener_valor_dolar(), 2)
+            except:
+                return None
+        return None
 
     def __str__(self):
         return self.nombre
