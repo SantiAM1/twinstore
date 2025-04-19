@@ -41,3 +41,25 @@ def enviar_mail_confirm_user(mail_data,user_email):
     )
     msg.attach_alternative(html, "text/html")
     msg.send()
+
+@shared_task
+def enviar_mail_estado_pedido(mail_data,user_email):
+    context = {
+        'url' : mail_data['url'],
+        'img' : mail_data['img'],
+        'pedido_id': mail_data['pedido_id'],
+        'estado': mail_data['estado'],
+        'mensaje': mail_data['mensaje'],
+    }
+
+    html = render_to_string('emails/estado_pedido.html', context)
+    text = f'Hola {user_email}, esto es el estado de tu pedido ID:#{mail_data['pedido_id']}: {mail_data['estado']}'
+
+    msg = EmailMultiAlternatives(
+        subject='Estado de tu pedido - Twinstore',
+        body=text,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[user_email]
+    )
+    msg.attach_alternative(html, "text/html")
+    msg.send()

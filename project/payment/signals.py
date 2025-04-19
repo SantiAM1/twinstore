@@ -1,6 +1,15 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import PagoRecibidoMP, HistorialCompras,ComprobanteTransferencia
+from users.emails import mail_estado_pedido_html
+
+@receiver(post_save, sender=HistorialCompras)
+def enviar_actualizacion_compra(sender, instance, created, **kwargs):
+    """
+    Se envia un mail al actualizar el historial de compras.
+    """
+    if (instance.forma_de_pago == "transferencia" and instance.estado != "pendiente") or (instance.forma_de_pago == "efectivo" and instance.estado != "confirmado") or (instance.forma_de_pago == "mercado pago" and instance.estado != "pendiente"):
+        mail_estado_pedido_html(instance, instance.facturacion.email)
 
 @receiver(post_save, sender=ComprobanteTransferencia)
 def aprobar_historial_transferencia(sender, instance, created, **kwargs):
