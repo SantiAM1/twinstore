@@ -17,11 +17,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 razonSocialContainer.style.display = 'none';
                 razonSocialInput.required = false;
-            } else if (value === 'A' || value === 'C') {
+            } else if (value === 'A') {
                 dniCuitLabel.textContent = 'CUIT *';
                 dniCuitInput.required = true;
                 dniCuitContainer.style.display = 'block';
-
                 razonSocialContainer.style.display = 'block';
                 razonSocialInput.required = true;
             } else {

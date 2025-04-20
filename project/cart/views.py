@@ -1,31 +1,44 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404,render
+from django.conf import settings
+from django.utils import timezone
+from django.templatetags.static import static
+from django.template.loader import render_to_string
+from django.urls import reverse
+
 from users.forms import UsuarioForm
+from users.models import PerfilUsuario,DatosFacturacion
+
+from core.permissions import BloquearSiMantenimiento
+from core.decorators import bloquear_si_mantenimiento
+from core.throttling import EnviarWtapThrottle,CarritoThrottle,CalcularPedidoThrottle
+
+from payment.models import HistorialCompras
+
 from .models import Producto, Carrito, Pedido
 import mercadopago
-from django.conf import settings
-from users.models import PerfilUsuario
-from django.utils import timezone
-import uuid
-from datetime import timedelta
+
+from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,EliminarPedidoSerializer,ActualizarPedidoSerializer
+from .context_processors import carrito_total
+from .permissions import TieneCarrito
+from .decorators import requiere_carrito
+
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,EliminarPedidoSerializer,ActualizarPedidoSerializer
+
 import re
-from .context_processors import carrito_total
-from .permissions import TieneCarrito
-from core.permissions import BloquearSiMantenimiento
-from .decorators import requiere_carrito
-from django.templatetags.static import static
-from django.template.loader import render_to_string
 from weasyprint import HTML
 import datetime
 import os
 import base64
 import pytz
-
-from core.throttling import EnviarWtapThrottle,CarritoThrottle,CalcularPedidoThrottle
+import uuid
+from datetime import timedelta
+import random
+import string
+from datetime import datetime
 
 # ----- APIS ----- #
 class EnviarWtapView(APIView):
@@ -323,83 +336,199 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
             "carrito_id":carrito_id
         },
     }
+    print("Preferencia de Mercado Pago:", preference_data)
 
     sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
     try:
         preference_response = sdk.preference().create(preference_data)
-        preference = preference_response["response"]
+        preference = preference_response.get("response", {})
+        init_point = preference.get("init_point")
+
+        if not init_point or not init_point.startswith("https://www.mercadopago.com"):
+            raise ValueError("Init point inválido o no generado")
+        
+        return preference
+
     except Exception as e:
         raise ValueError(f"Error al generar preferencia de pago: {str(e)}")
-    if not preference["init_point"].startswith("https://www.mercadopago.com"):
-        raise ValueError("Init point inválido")
-    return preference
 
 # ----- Realizar pedido -----#
+@bloquear_si_mantenimiento
 @requiere_carrito
 def realizar_pedido(request):
+    if request.method == "POST":
+        form = UsuarioForm(request.POST)
+        if not form.is_valid():
+            return render(request, 'cart/realizar_pedido.html', {
+                'form': form,
+                'carrito': _obtener_carrito(request),
+            })
+        else:
+            data = form.cleaned_data
+            forma_pago = request.POST.get('forma_pago')
+
+            if forma_pago not in ['efectivo', 'transferencia']:
+                return redirect("core:home")
+            elif forma_pago == 'transferencia':
+                merchant_order_id = _generar_identificador_unico('T')
+                status = 'pendiente'
+            else:
+                merchant_order_id = _generar_identificador_unico('E')
+                status = 'confirmado'
+
+            if request.user.is_authenticated:
+                carrito = Carrito.objects.filter(usuario=request.user).first()
+                total_carrito = carrito.get_total()
+
+                # * Armamos el detalle de productos
+                productos = []
+                for pedido in carrito.pedidos.all():
+                    productos.append({
+                        'producto_id': pedido.producto.id,
+                        'nombre': pedido.producto.nombre,
+                        'precio_unitario': float(pedido.producto.precio),
+                        'cantidad': pedido.cantidad,
+                        'subtotal': float(pedido.get_total_precio()),
+                    })
+
+                # * Borramos el carrito y pedidos
+                carrito.pedidos.all().delete()
+                carrito.delete()
+
+                # * Guardamos los datos si el usuario lo desea
+                if form.cleaned_data['guardar_datos']:
+                    perfil, create = PerfilUsuario.objects.get_or_create(user=request.user)
+                    perfil.tipo_factura = data['tipo_factura']
+                    perfil.dni_cuit = data['dni_cuit']
+                    perfil.razon_social = data['razon_social']
+                    perfil.nombre = data['nombre']
+                    perfil.apellido = data['apellido']
+                    perfil.calle = data['calle']
+                    perfil.calle_detail = data['calle_detail']
+                    perfil.ciudad = data['ciudad']
+                    perfil.provincia = data['provincia']
+                    perfil.codigo_postal = data['codigo_postal']
+                    perfil.telefono = data['telefono']
+                    perfil.guardar_datos = True
+                    perfil.save()
+                else:
+                    perfil, create = PerfilUsuario.objects.get_or_create(user=request.user)
+                    perfil.guardar_datos = False
+                    perfil.save()
+
+            else:
+                carrito = request.session['carrito']
+                if not carrito:
+                    return redirect('core:home')
+                
+                productos = []
+                for producto_id,cantidad in carrito.items():
+                    producto = get_object_or_404(Producto,id=int(producto_id))
+                    productos.append({
+                        'producto_id': producto.id,
+                        'nombre':producto.nombre,
+                        'precio_unitario':float(producto.precio),
+                        'cantidad':cantidad,
+                        'subtotal':float(producto.precio)*cantidad
+                    })
+                
+                total_carrito = sum(producto['subtotal'] for producto in productos)
+
+                # * Borrar el carrito
+                del request.session['carrito']
+                request.session.modified = True
+                
+            historial = HistorialCompras.objects.create(
+            usuario=carrito.usuario if request.user.is_authenticated else None,
+            productos=productos,
+            total_compra=total_carrito,
+            estado=status,
+            forma_de_pago=forma_pago,
+            merchant_order_id=merchant_order_id,
+            recibir_mail=data['recibir_estado_pedido']
+            )
+
+            DatosFacturacion.objects.create(
+                historial=historial,
+                nombre=data['nombre'],
+                apellido=data['apellido'],
+                razon_social=data['razon_social'],
+                dni_cuit=data['dni_cuit'],
+                tipo_factura=data['tipo_factura'],
+                telefono=data['telefono'],
+                email=data['email'],
+                codigo_postal=data['codigo_postal'],
+                provincia=data['provincia'],
+                calle=data['calle'],
+                ciudad=data['ciudad'],
+                calle_detail=data['calle_detail'],
+            )
+
+            return redirect(f"{reverse('payment:success')}?merchant_order_id={merchant_order_id}")
+    else:
+        if request.user.is_authenticated:
+            perfil, create = PerfilUsuario.objects.get_or_create(user = request.user)
+            form = UsuarioForm(initial={
+                    'tipo_factura': perfil.tipo_factura,
+                    'dni_cuit': perfil.dni_cuit,
+                    'razon_social': perfil.razon_social,
+                    'nombre': perfil.nombre,
+                    'apellido': perfil.apellido,
+                    'calle': perfil.calle,
+                    'calle_detail': perfil.calle_detail,
+                    'ciudad': perfil.ciudad,
+                    'provincia': perfil.provincia,
+                    'codigo_postal': perfil.codigo_postal,
+                    'email': request.user.email,
+                    'telefono': perfil.telefono,
+                    'guardar_datos': perfil.guardar_datos
+                })
+        else:
+            form = UsuarioForm()
+        return render(request, 'cart/realizar_pedido.html', {
+            'carrito': _obtener_carrito(request),
+            'form':form,
+            })
+
+def _generar_identificador_pago(letra):
+    fecha = datetime.now().strftime('%d%m%y')
+    sufijo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+    return f"{letra}-{fecha}-{sufijo}"
+
+def _generar_identificador_unico(letra):
+    while True:
+        nuevo_id = _generar_identificador_pago(letra)
+        if not HistorialCompras.objects.filter(merchant_order_id=nuevo_id).exists():
+            return nuevo_id
+
+def _obtener_carrito(request):
     if request.user.is_authenticated:
         carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
-        perfil, create = PerfilUsuario.objects.get_or_create(user = request.user)
-        form = UsuarioForm(initial={
-                'tipo_factura': perfil.tipo_factura,
-                'dni_cuit': perfil.dni_cuit,
-                'razon_social': perfil.razon_social,
-                'nombre': perfil.nombre,
-                'apellido': perfil.apellido,
-                'calle': perfil.calle,
-                'calle_detail': perfil.calle_detail,
-                'cuidad': perfil.cuidad,
-                'provincia': perfil.provincia,
-                'codigo_postal': perfil.codigo_postal,
-                'email': request.user.email,
-                'telefono': perfil.telefono,
-                'guardar_datos': perfil.guardar_datos
-            })
+        return carrito
     else:
-        form = UsuarioForm()
-        carrito_session = request.session.get('carrito',{})
-        carrito = []
         if 'anon_cart_id' not in request.session:
             request.session['anon_cart_id'] = f"anon-{uuid.uuid4()}"
+        carrito_session = request.session.get('carrito',{})
+        carrito = []
         for producto_id,cantidad in carrito_session.items():
             producto = get_object_or_404(Producto,id=int(producto_id))
             carrito.append({
+                'id':producto.id,
                 'producto':producto,
                 'cantidad':cantidad,
                 'total_precio':producto.precio*cantidad,
                 })
-    return render(request, 'cart/realizar_pedido.html', {
-        'carrito': carrito,
-        'form':form,
-        })
+        return carrito
 
 # ----- Ver el carro -----#
 def ver_carrito(request):
     #step Si esta autenticado
-    if request.user.is_authenticated:
-        carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
+    carrito = _obtener_carrito(request)
+    try:
         empty = False if carrito.pedidos.all() else True
-        return render(request, 'cart/ver_carrito.html', {
-            'carrito': carrito,
-            'empty':empty
-        })
-    #step Si NO! esta autenticado
-    if 'anon_cart_id' not in request.session:
-        request.session['anon_cart_id'] = f"anon-{uuid.uuid4()}"
-    carrito_session = request.session.get('carrito',{})
-    carrito = []
-    for producto_id,cantidad in carrito_session.items():
-        producto = get_object_or_404(Producto,id=int(producto_id))
-        imagen_url = producto.imagenes.first().imagen.url if producto.imagenes.first() else 'img/prod_default.webp'
-        carrito.append({
-            'id':producto.id,
-            'producto':producto,
-            'cantidad':cantidad,
-            'total_precio':producto.precio*cantidad,
-            'imagen_url': imagen_url,
-            })
-    empty = False if carrito else True
+    except:
+        empty = False if carrito else True
     return render(request,'cart/ver_carrito.html',{
         'carrito':carrito,
         'empty':empty
@@ -407,7 +536,6 @@ def ver_carrito(request):
 
 @requiere_carrito
 def generar_presupuesto(request):
-
     if request.user.is_authenticated:
         carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
         total_compra = float(carrito.get_total())

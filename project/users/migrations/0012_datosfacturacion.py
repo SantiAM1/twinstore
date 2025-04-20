@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('codigo_postal', models.CharField(max_length=10)),
                 ('provincia', models.CharField(choices=[('A', 'Ciudad Autónoma de Buenos Aires'), ('B', 'Buenos Aires'), ('C', 'Catamarca'), ('D', 'Chaco'), ('E', 'Chubut'), ('F', 'Córdoba'), ('G', 'Corrientes'), ('H', 'Entre Ríos'), ('I', 'Formosa'), ('J', 'Jujuy'), ('K', 'La Pampa'), ('L', 'La Rioja'), ('M', 'Mendoza'), ('N', 'Misiones'), ('O', 'Neuquén'), ('P', 'Río Negro'), ('Q', 'Salta'), ('R', 'San Juan'), ('S', 'San Luis'), ('T', 'Santa Cruz'), ('U', 'Santa Fe'), ('V', 'Santiago del Estero'), ('W', 'Tierra del Fuego'), ('X', 'Tucumán')], max_length=1)),
                 ('calle', models.CharField(max_length=255)),
-                ('cuidad', models.CharField(max_length=255)),
+                ('ciudad', models.CharField(max_length=255)),
                 ('calle_detail', models.CharField(blank=True, max_length=255)),
                 ('historial', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='facturacion', to='payment.historialcompras')),
             ],

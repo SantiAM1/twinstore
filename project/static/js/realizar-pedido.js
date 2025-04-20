@@ -18,10 +18,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 dni_cuit: document.getElementById('id_dni_cuit').value || '00000000',
                 tipo_factura: document.getElementById('id_tipo_factura').value || 'B',
                 calle: document.getElementById('id_calle').value,
-                cuidad: document.getElementById('id_cuidad').value,
+                ciudad: document.getElementById('id_ciudad').value,
                 codigo_postal: document.getElementById('id_codigo_postal').value,
                 recibir_mail: document.getElementById('id_recibir_estado_pedido').checked,
             };
+            document.querySelectorAll('.error').forEach(div => div.innerText = '');
 
             try {
                 const response = await axios.post(window.api.calcularPedido, datos);
@@ -55,8 +56,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
             } catch (error) {
-                console.error('Error al calcular el pedido', error);
-                alert('Ocurrió un error al calcular el pedido.');
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                document.querySelectorAll('input[name="forma_pago"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                const errors = error.response?.data;
+                if (errors) {
+                    Object.keys(errors).forEach(key => {
+                        const errorDiv = document.getElementById(`${key}_error`);
+                        if (errorDiv) {
+                            errorDiv.innerText = errors[key][0];
+                            errorDiv.classList.remove('display-none');
+                        }
+                    });
+                } else {
+                    alert('Ocurrió un error al calcular el pedido.');
+                }
             } finally {
                 
                 toggleDisableItems(false);

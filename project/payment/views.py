@@ -12,10 +12,6 @@ from django.contrib.auth import get_user_model
 
 import requests
 
-from django.urls import reverse
-
-from core.decorators import bloquear_si_mantenimiento
-
 from .models import HistorialCompras, PagoRecibidoMP
 from cart.models import Carrito
 from products.models import Producto
@@ -24,10 +20,6 @@ from users.models import PerfilUsuario,DatosFacturacion
 from payment.forms import ComprobanteForm
 from django.db import IntegrityError, transaction
 from cart.decorators import requiere_carrito
-
-import random
-import string
-from datetime import datetime
 
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.db import SessionStore
@@ -131,7 +123,7 @@ def notification(request):
                                     carrito.delete()
                         else:
                             usuario = None
-                            if not status == 'rejected':
+                            if status in ['approved', 'in_process', 'pending']:
                                 session_key = metadata['usuario'].get('session')
                                 store = SessionStore(session_key=session_key)
                                 if 'carrito' in store:
@@ -206,116 +198,6 @@ def payment_success(request):
     historial = HistorialCompras.objects.filter(merchant_order_id=merchant_order_id).first()
     return render(request, 'payment/success.html',{'historial':historial})
 
-@bloquear_si_mantenimiento
-@requiere_carrito
-def pedidos_efectivo_transferencia(request):
-    if request.method == "POST":
-        form = UsuarioForm(request.POST)
-        if not form.is_valid():
-            return redirect('core:home')
-        
-        data = form.cleaned_data
-        forma_pago = request.POST.get('forma_pago')
-
-        if forma_pago not in ['efectivo', 'transferencia']:
-            return redirect("core:home")
-        elif forma_pago == 'transferencia':
-            merchant_order_id = generar_identificador_unico('T')
-            status = 'pendiente'
-        else:
-            merchant_order_id = generar_identificador_unico('E')
-            status = 'confirmado'
-
-        if request.user.is_authenticated:
-            carrito = Carrito.objects.filter(usuario=request.user).first()
-            total_carrito = carrito.get_total()
-
-            # * Armamos el detalle de productos
-            productos = []
-            for pedido in carrito.pedidos.all():
-                productos.append({
-                    'producto_id': pedido.producto.id,
-                    'nombre': pedido.producto.nombre,
-                    'precio_unitario': float(pedido.producto.precio),
-                    'cantidad': pedido.cantidad,
-                    'subtotal': float(pedido.get_total_precio()),
-                })
-
-            # * Borramos el carrito y pedidos
-            carrito.pedidos.all().delete()
-            carrito.delete()
-
-            # * Guardamos los datos si el usuario lo desea
-            if form.cleaned_data['guardar_datos']:
-                perfil, create = PerfilUsuario.objects.get_or_create(user=request.user)
-                perfil.tipo_factura = data['tipo_factura']
-                perfil.dni_cuit = data['dni_cuit']
-                perfil.razon_social = data['razon_social']
-                perfil.nombre = data['nombre']
-                perfil.apellido = data['apellido']
-                perfil.calle = data['calle']
-                perfil.calle_detail = data['calle_detail']
-                perfil.cuidad = data['cuidad']
-                perfil.provincia = data['provincia']
-                perfil.codigo_postal = data['codigo_postal']
-                perfil.telefono = data['telefono']
-                perfil.guardar_datos = True
-                perfil.save()
-            else:
-                perfil, create = PerfilUsuario.objects.get_or_create(user=request.user)
-                perfil.guardar_datos = False
-                perfil.save()
-
-        else:
-            carrito = request.session['carrito']
-            if not carrito:
-                return redirect('core:home')
-            
-            productos = []
-            for producto_id,cantidad in carrito.items():
-                producto = get_object_or_404(Producto,id=int(producto_id))
-                productos.append({
-                    'producto_id': producto.id,
-                    'nombre':producto.nombre,
-                    'precio_unitario':float(producto.precio),
-                    'cantidad':cantidad,
-                    'subtotal':float(producto.precio)*cantidad
-                })
-            
-            total_carrito = sum(producto['subtotal'] for producto in productos)
-
-            # * Borrar el carrito
-            del request.session['carrito']
-            request.session.modified = True
-            
-        historial = HistorialCompras.objects.create(
-        usuario=carrito.usuario if request.user.is_authenticated else None,
-        productos=productos,
-        total_compra=total_carrito,
-        estado=status,
-        forma_de_pago=forma_pago,
-        merchant_order_id=merchant_order_id,
-        recibir_mail=data['recibir_estado_pedido']
-        )
-
-        DatosFacturacion.objects.create(
-            historial=historial,
-            nombre=data['nombre'],
-            apellido=data['apellido'],
-            razon_social=data['razon_social'],
-            dni_cuit=data['dni_cuit'],
-            tipo_factura=data['tipo_factura'],
-            telefono=data['telefono'],
-            email=data['email'],
-            codigo_postal=data['codigo_postal'],
-            provincia=data['provincia'],
-            calle=data['calle'],
-            cuidad=data['cuidad'],
-            calle_detail=data['calle_detail'],
-        )
-
-        return redirect(f"{reverse('payment:success')}?merchant_order_id={merchant_order_id}")
-
 def subir_comprobante(request, token):
     historial = get_object_or_404(HistorialCompras, token_consulta=token)
     if request.method == 'POST':
@@ -335,17 +217,6 @@ def subir_comprobante(request, token):
         form = ComprobanteForm()
 
     return render(request, 'payment/subir_comprobante.html', {'form': form, 'historial': historial})
-
-def generar_identificador_pago(letra):
-    fecha = datetime.now().strftime('%d%m%y')
-    sufijo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-    return f"{letra}-{fecha}-{sufijo}"
-
-def generar_identificador_unico(letra):
-    while True:
-        nuevo_id = generar_identificador_pago(letra)
-        if not HistorialCompras.objects.filter(merchant_order_id=nuevo_id).exists():
-            return nuevo_id
         
 def failure(request):
     return render(request,'payment/fail.html')

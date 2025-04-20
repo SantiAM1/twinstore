@@ -51,3 +51,4 @@ class SubcategoriaAdmin(admin.ModelAdmin):
         return False
 
 admin.site.register(Producto, ProductoAdmin)
+admin.site.register(CategoriaEspecificacion)

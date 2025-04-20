@@ -3,12 +3,12 @@ from django.contrib.auth.models import User
 import uuid
 
 from django import forms
+import re
 
 class UsuarioForm(forms.Form):
     TIPO_FACTURA_CHOICES = [
         ('A', 'IVA Responsable Inscripto'),
         ('B', 'Consumidor Final'),
-        ('C', 'Monotributista'),
     ]
     PROVINCIAS_CHOICES = [
         ('A', 'Ciudad Autónoma de Buenos Aires'),
@@ -37,7 +37,7 @@ class UsuarioForm(forms.Form):
         ('X', 'Tucumán'),
     ]
     SELECT_ATTRS = forms.Select(attrs={'class': 'users-select bloqueable'})
-    INPUT_ATTRS = forms.TextInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none','autocomplete':'off','placeholder':' '})
+    INPUT_ATTRS = forms.TextInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100','autocomplete':'off','placeholder':' '})
 
     tipo_factura = forms.ChoiceField(
         choices=TIPO_FACTURA_CHOICES,
@@ -74,7 +74,7 @@ class UsuarioForm(forms.Form):
     calle_detail = forms.CharField(max_length=255, required=False, label="Apartamento / Piso / Detalle",
         widget=INPUT_ATTRS
         )
-    cuidad = forms.CharField(max_length=255, required=True, label="Localidad / Ciudad *",
+    ciudad = forms.CharField(max_length=255, required=True, label="Localidad / Ciudad *",
         widget=INPUT_ATTRS
         )
     provincia = forms.ChoiceField(choices=PROVINCIAS_CHOICES, required=True,
@@ -84,7 +84,7 @@ class UsuarioForm(forms.Form):
         widget=INPUT_ATTRS
         )
     email = forms.EmailField(required=True, label="Email *",
-        widget=forms.EmailInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none','autocomplete':'off','placeholder':' '})
+        widget=forms.EmailInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100','autocomplete':'off','placeholder':' '})
         )
     telefono = forms.CharField(max_length=20, required=False, label="Telefono",
         widget=INPUT_ATTRS
@@ -99,6 +99,79 @@ class UsuarioForm(forms.Form):
         label='Recibir mails sobre el estado del pedido',
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
+
+    def clean_razon_social(self):
+        value = self.cleaned_data['razon_social']
+        if value and not re.match(r'^[\w\s\.,\-&áéíóúÁÉÍÓÚñÑ]+$', value):
+            raise forms.ValidationError("Razón social inválida.")
+        return value
+
+    def clean_codigo_postal(self):
+        value = self.cleaned_data['codigo_postal']
+        if not re.match(r'^[A-Z]?\d{4}[A-Z]{0,3}$', value, re.IGNORECASE):
+            raise forms.ValidationError("Código postal inválido.")
+        return value.upper()
+
+    def clean_calle(self):
+        value = self.cleaned_data['calle']
+        value = value.strip()
+
+        match = re.match(r'^(.*?)(?:\s+(\d+))$', value)
+        if not match:
+            raise forms.ValidationError("Debe ingresar calle y número")
+
+        calle_nombre = match.group(1).strip()
+        calle_altura = match.group(2)
+
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', calle_nombre):
+            raise forms.ValidationError("Nombre de calle inválido. Solo letras y espacios.")
+
+        if not calle_altura.isdigit() or int(calle_altura) <= 0:
+            raise forms.ValidationError("Altura de calle inválida.")
+
+        return value
+    
+    def clean_ciudad(self):
+        value = self.cleaned_data['ciudad']
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$', value):
+            raise forms.ValidationError("Ciudad inválida.")
+        return value
+    
+    def clean_nombre(self):
+        value = self.cleaned_data['nombre']
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', value):
+            raise forms.ValidationError("El nombre solo debe contener letras y espacios.")
+        return value
+    
+    def clean_apellido(self):
+        value = self.cleaned_data['apellido']
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', value):
+            raise forms.ValidationError("El apellido solo debe contener letras y espacios.")
+        return value
+
+    def clean_dni_cuit(self):
+        value = self.cleaned_data['dni_cuit']
+        if not value.isdigit():
+            raise forms.ValidationError("El DNI/CUIT debe contener solo números")
+        if len(value) in [7, 8]:
+            return value
+        elif len(value) == 11 and self._validar_cuit(value):
+            return value
+        else:
+            raise forms.ValidationError("DNI/CUIT Invalido")
+
+    def _validar_cuit(self, cuit):
+        mult = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]
+        try:
+            total = sum(int(cuit[i]) * mult[i] for i in range(10))
+            verificador = 11 - (total % 11)
+            if verificador == 11:
+                verificador = 0
+            elif verificador == 10:
+                verificador = 9
+            return verificador == int(cuit[-1])
+        except (ValueError, IndexError):
+            return False
 
 class BuscarPedidoForm(forms.Form):
     token = forms.CharField(

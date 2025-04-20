@@ -80,7 +80,7 @@ def mi_perfil(request):
             perfil.apellido = data['apellido']
             perfil.calle = data['calle']
             perfil.calle_detail = data['calle_detail']
-            perfil.cuidad = data['cuidad']
+            perfil.ciudad = data['ciudad']
             perfil.provincia = data['provincia']
             perfil.codigo_postal = data['codigo_postal']
             perfil.telefono = data['telefono']
@@ -94,7 +94,7 @@ def mi_perfil(request):
             'apellido': perfil.apellido,
             'calle': perfil.calle,
             'calle_detail': perfil.calle_detail,
-            'cuidad': perfil.cuidad,
+            'ciudad': perfil.ciudad,
             'provincia': perfil.provincia,
             'codigo_postal': perfil.codigo_postal,
             'email': request.user.email,

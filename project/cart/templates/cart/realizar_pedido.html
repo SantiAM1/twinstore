@@ -3,21 +3,22 @@
 
 {% block head %}
     <title>Facturacion - Twinstore</title>
+    <link rel="stylesheet" href="{% static 'css/facturacion.css' %}">
+    <link rel="stylesheet" href="{% static 'css/forms-ts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/substyles/mp-button.css' %}">
 {% endblock head %}
 
 {% block headend %}
-    <link rel="stylesheet" href="{% static 'css/facturacion.css' %}">
-    <link rel="stylesheet" href="{% static 'css/forms-ts.css' %}">
 {% endblock headend %}
 
 {% block contenidomain %}
 <main class="padding-1rem">
-    <form class="users-perfil flex font-roboto width-100" method="post" action="{% url 'payment:realizar_pedido' %}">
+    <form class="users-perfil flex font-roboto width-100" method="post" action="{% url 'cart:realizar_pedido' %}">
         {% csrf_token %}
         <div class="users-perfil-facturacion flex flex-column gap-1rem">
             <h2 class="font-roboto">Detalles de facturacion</h2>
             <span>Personales **</span>
-            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select bloqueable border-none font-roboto" required>
+            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select bloqueable font-roboto" required>
                 <option value="" selected disabled>Tipo de factura *</option>
                 {% for value, label in form.tipo_factura.field.choices %}
                     {% if value %}
@@ -28,33 +29,57 @@
             <div id="dni_cuit_container" class="container-form display-none">
                 {{form.dni_cuit}}
                 <label for="{{ form.dni_cuit.id_for_label }}" id="dni_cuit_label" class="form-label">{{form.dni_cuit.label}}</label>
+                <div class="error display-none" id="dni_cuit_error"></div>
+                {% for error in form.dni_cuit.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
             </div>
             <div id="razon_social_container" class="container-form display-none">
                 {{form.razon_social}}
                 <label for="{{ form.razon_social.id_for_label }}" class="form-label">{{form.razon_social.label}}</label>
+                <div class="error display-none" id="razon_social_error"></div>
+                {% for error in form.razon_social.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
             </div>
             <div class="container-form">
                 {{form.nombre}}
                 <label for="{{ form.nombre.id_for_label }}" class="form-label">{{form.nombre.label}}</label>
+                <div class="error display-none" id="nombre_error"></div>
+                {% for error in form.nombre.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
             </div>
             <div class="container-form">
                 {{form.apellido}}
                 <label for="{{ form.apellido.id_for_label }}" class="form-label">{{form.apellido.label}}</label>
+                <div class="error display-none" id="apellido_error"></div>
+                {% for error in form.apellido.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
             </div>
             <span>Direccion **</span>
             <div class="container-form">
                 {{form.calle}}
                 <label for="{{ form.calle.id_for_label }}" class="form-label">{{form.calle.label}}</label>
+                <div class="error display-none" id="calle_error"></div>
+                {% for error in form.calle.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
             </div>
             <div class="container-form">
                 {{form.calle_detail}}
                 <label for="{{ form.calle_detail.id_for_label }}" class="form-label">{{form.calle_detail.label}}</label>
             </div>
             <div class="container-form">
-                {{form.cuidad}}
-                <label for="{{ form.cuidad.id_for_label }}" class="form-label">{{form.cuidad.label}}</label>
+                {{form.ciudad}}
+                <label for="{{ form.ciudad.id_for_label }}" class="form-label">{{form.ciudad.label}}</label>
+                <div class="error display-none" id="ciudad_error"></div>
+                {% for error in form.ciudad.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
             </div>
-            <select name="{{ form.provincia.html_name }}" id="{{ form.provincia.id_for_label }}" class="users-select bloqueable border-none font-roboto" required>
+            <select name="{{ form.provincia.html_name }}" id="{{ form.provincia.id_for_label }}" class="users-select width-100 bloqueable font-roboto" required>
                 <option value="" selected disabled>Provincia *</option>
                 {% for value, label in form.provincia.field.choices %}
                     {% if value %}
@@ -65,6 +90,10 @@
             <div class="container-form">
                 {{form.codigo_postal}}
                 <label for="{{ form.codigo_postal.id_for_label }}" class="form-label">{{form.codigo_postal.label}}</label>
+                <div class="error display-none" id="codigo_postal_error"></div>
+                {% for error in form.codigo_postal.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
             </div>
             <span>Contacto</span>
             <div class="container-form">

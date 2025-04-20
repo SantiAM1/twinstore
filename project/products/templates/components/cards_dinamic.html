@@ -1,4 +1,3 @@
-
 {% if producto.descuento > 0 %}
     <div class="descuento-box font-roboto position-absolute">
         <i class="bi bi-tag-fill icon-descuento position-absolute"></i>
@@ -18,7 +17,7 @@
             </p>
         </div>
     {% else %}
-        <p>${{producto.precio}}</p>
+        <p class="prod-precio">${{producto.precio}}</p>
     {% endif %}
     <strong>Ver mas</strong>
 </a>

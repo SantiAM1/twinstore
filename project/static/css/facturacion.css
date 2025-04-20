@@ -111,3 +111,16 @@ input[type="radio"]:checked + label + .cart-formadepago-details {
 .product-result p,select, select option {
     font-family: 'Roboto';
 }
+
+.error{
+    position: absolute;
+    top: 30px;
+    left: 0;
+    font-size: 0.8rem;
+    color: crimson;
+    font-style: italic;
+    width: 100%;
+    background-color: #ededed;
+    border-left:4px solid rgb(216 111 132);
+    padding-left: 0.75rem;
+}

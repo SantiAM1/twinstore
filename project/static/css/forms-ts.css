@@ -18,6 +18,7 @@
 }
 
 .form-input {
+    border: none;
     font-size: 1rem;
     background-color: #ededed;
     border-left: 4px solid #1b8dd8;
@@ -69,6 +70,7 @@ input[type="email"]:focus ~ .form-label,
 .container-checkbox label {font-size: 0.9rem;}
 
 .users-select {
+    border: none;
     width: 100%;
     padding: 10px;
     background-color: #f3f3f3;

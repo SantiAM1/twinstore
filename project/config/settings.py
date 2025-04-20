@@ -26,8 +26,6 @@ MERCADOPAGO_ACCESS_TOKEN = env("MERCADOPAGO_ACCESS_TOKEN")
 MP_WEBHOOK_KEY = env("MP_WEBHOOK_KEY")
 DJANGO_SECRET_KEY = env("DJANGO_SECRET_KEY")
 
-MERCADOPAGO_PUBLIC_KEY = "APP_USR-af870896-2a1f-49b0-8bf4-5e5a0d887878"
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,7 +39,7 @@ SECRET_KEY = DJANGO_SECRET_KEY
 DEBUG = True
 
 # * Host
-MY_NGROK_URL='127.0.0.1:8000'
+MY_NGROK_URL='twinstore.com.ar'
 
 # ! Actualizar el HOST con el dominio
 ALLOWED_HOSTS = [f'{MY_NGROK_URL}','127.0.0.1']

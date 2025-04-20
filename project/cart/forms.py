@@ -4,7 +4,6 @@ class PedidoForm(forms.Form):
     TIPO_FACTURA_CHOICES = [
         ('A', 'IVA Responsable Inscripto'),
         ('B', 'Consumidor Final'),
-        ('C', 'Monotributista'),
     ]
     PROVINCIAS_CHOICES = [
         ('A', 'Ciudad Autónoma de Buenos Aires'),
@@ -40,7 +39,7 @@ class PedidoForm(forms.Form):
     apellido = forms.CharField(max_length=255, required=True)
     calle = forms.CharField(max_length=255, required=True, label="Dirección de la calle")
     calle_detail = forms.CharField(max_length=255, required=False, label="Apartamento / Piso / Detalle")
-    cuidad = forms.CharField(max_length=255, required=True, label="Localidad / Ciudad")
+    ciudad = forms.CharField(max_length=255, required=True, label="Localidad / Ciudad")
     provincia = forms.ChoiceField(choices=PROVINCIAS_CHOICES, required=True)
     codigo_postal = forms.CharField(max_length=10, required=True)
     email = forms.EmailField(required=True)
