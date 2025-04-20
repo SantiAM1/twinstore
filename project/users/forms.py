@@ -177,7 +177,7 @@ class BuscarPedidoForm(forms.Form):
     token = forms.CharField(
         required=True,
         widget=forms.TextInput(attrs={
-            'placeholder': 'Código de búsqueda...',
+            'placeholder': 'Código de seguimiento...',
             'class': 'user-form-control',
         })
     )

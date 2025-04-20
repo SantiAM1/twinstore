@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock meta %}
+
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/substyles/login-register.css' %}">
 <link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}">

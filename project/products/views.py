@@ -70,7 +70,9 @@ def return_filtros_dinamicos(request, categoria):
     sub_categoria_seleccionada = request.GET.get('sub_categoria')
     if sub_categoria_seleccionada:
         productos = productos.filter(sub_categoria__nombre=sub_categoria_seleccionada)
-
+        sub_categoria = SubCategoria.objects.get(nombre=sub_categoria_seleccionada)
+    else:
+        sub_categoria = None
     #* 🔹 Obtener atributos antes del filtro
     atributos_previos = get_atributos(productos)
 
@@ -93,13 +95,13 @@ def return_filtros_dinamicos(request, categoria):
 
     filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q","pagina"]}
 
-    return productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro
+    return productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro,sub_categoria
 
 # ----- Categoria AJAX ----- #
 @bloquear_si_mantenimiento
 @throttle_classes([FiltrosDinamicosThrottle])
 def categoria_ajax(request, categoria):
-    productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro = return_filtros_dinamicos(request, categoria)
+    productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro,sub_categoria = return_filtros_dinamicos(request, categoria)
 
     user_agent = get_user_agent(request)
     if user_agent.is_mobile:
@@ -160,7 +162,7 @@ def categoria_ajax(request, categoria):
 
 # ----- Filtracion por categoria ----- #
 def categoria(request, categoria):
-    productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro = return_filtros_dinamicos(request, categoria)
+    productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro,sub_categoria = return_filtros_dinamicos(request, categoria)
 
     user_agent = get_user_agent(request)
     if user_agent.is_mobile:
@@ -173,7 +175,8 @@ def categoria(request, categoria):
         'atributos_unicos':atributos_unicos,
         'marcas':marcas,
         'filtros_aplicados':filtros_aplicados,
-        'pagina':pagina
+        'pagina':pagina,
+        'sub_categoria':sub_categoria
     })
 
     return render(request, 'products/category.html', {
@@ -185,7 +188,8 @@ def categoria(request, categoria):
         'atributos_unicos':atributos_unicos,
         'marcas':marcas,
         'filtros_aplicados':filtros_aplicados,
-        'pagina':pagina
+        'pagina':pagina,
+        'sub_categoria':sub_categoria
     })
 
 # ----- Busqueda de productos ----- #

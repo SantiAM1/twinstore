@@ -1,11 +1,22 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block meta %}
+<meta name="description" content={{categoria.description_seo|default:"Twinstore es una empresa de venta de productos informaticos. Envíos a todo el país."}}>
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Twinstore">
+<meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
+<meta property="og:image" content="{% static 'img/mail.webp' %}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% endblock meta %}
+
 {% block head %}
 <title>{{categoria}} - Twistore</title>
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
 <link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
 {% endblock head %}
+
 {% block contenidomain %}
 <div class="product-box main-box">
     <nav class="flex justify-between items-center products-nav">

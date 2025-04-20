@@ -1,6 +1,7 @@
 from re import T
 from django.db import models
 from core.utils import obtener_valor_dolar
+from django.utils.text import slugify
 
 class Marca(models.Model):
     nombre = models.CharField(max_length=30)
@@ -10,7 +11,19 @@ class Marca(models.Model):
         return self.nombre
 
 class Categoria(models.Model):
-    nombre = models.CharField(max_length=30) 
+    nombre = models.CharField(max_length=30)
+    descripcion_seo = models.CharField(
+    max_length=160,
+    blank=True,
+    help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres."
+    )
+    slug = models.SlugField(unique=True,blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return self.nombre
@@ -18,6 +31,13 @@ class Categoria(models.Model):
 class SubCategoria(models.Model):
     nombre = models.CharField(max_length=30)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='subcategorias', default=1)
+    descripcion_seo = models.CharField(max_length=160,blank=True,help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres.")
+    slug = models.SlugField(unique=True,blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nombre
@@ -31,6 +51,13 @@ class Producto(models.Model):
     descuento = models.IntegerField(default=0)
     sku = models.CharField(max_length=20, unique=True, blank=True, null=True,editable=False)
     portada = models.ImageField(upload_to='productos/portadas/',null=True, blank=True)
+    descripcion_seo = models.CharField(
+    max_length=160,
+    blank=True,
+    help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres."
+    )
+
+
 
     @property
     def precio_anterior(self):

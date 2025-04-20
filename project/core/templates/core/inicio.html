@@ -1,5 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block meta %}
+<meta name="description" content="Twinstore es una empresa de venta de productos informaticos. Envíos a todo el país.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Twinstore">
+<meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
+<meta property="og:image" content="{% static 'img/mail.webp' %}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% endblock meta %}
+
 {% block head %}
 <title>Twinstore</title>
 <link
