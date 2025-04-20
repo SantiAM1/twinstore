@@ -17,6 +17,30 @@
 
     .landing-box {width: 150px; 
         height: 150px;}
+
+    .contacto-footer{width: 100%;}
+    
+    .contacto-footer,.contacto-footer-info {flex-direction: column;
+        align-items: start;
+    }
+    
+    .contacto-footer-item.contacto-footer-item {border: none;
+        padding: 0.5rem 0;
+    }
+
+    .footer-info-top {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .footer-info-top-item:last-child {
+        align-items: start;
+    }
+
+    .footer-info-bottom {
+        padding: 0 2rem;
+    }
+
 }
 
 @media screen and (width <= 800px) {

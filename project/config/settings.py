@@ -131,6 +131,11 @@ CONTENT_SECURITY_POLICY = {
             "data:"
         ],
         "img-src": ["'self'", "data:"],
+        "frame-src": [
+            "'self'",
+            "https://www.google.com",
+            "https://maps.google.com",
+        ],
     }
 }
 

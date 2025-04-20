@@ -10,9 +10,11 @@
     gap: 0.3rem;
 }
 
-.nav-link {
-    color: #000;
+.nav-link.nav-link,.nav-boton {
+    color: #414141;
     transition: color 0.3s;
+    font-weight: bold;
+    font-size: 0.9rem;
 }
 
 .nav-item:hover {color: var(--color-ts)}
@@ -35,6 +37,7 @@
 
 .nav-productos-items {
     background-color: #ededed;
+    color: #242424;
     padding: 1rem;
     gap: 1rem;
 }

@@ -11,13 +11,13 @@
     <span>{{ producto.nombre }}</span>
     {% if producto.descuento > 0 %}
         <div class="product-descount-box">
-            <p class="precio-anterior">${{ producto.precio_anterior }}</p>
+            <p class="precio-anterior">${{ producto.precio_anterior|floatformat:0 }}</p>
             <p class="precio-descuento font-roboto">
-                ${{ producto.precio }}
+                ${{ producto.precio|floatformat:0 }}
             </p>
         </div>
     {% else %}
-        <p class="prod-precio">${{producto.precio}}</p>
+        <p class="prod-precio font-roboto font-bold text-center">${{producto.precio|floatformat:0}}</p>
     {% endif %}
-    <strong>Ver mas</strong>
+    <strong>Agregar al carrito</strong>
 </a>

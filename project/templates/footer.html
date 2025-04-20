@@ -1,24 +1,65 @@
 {% load static %}
-<div class="link-box-footer">
-    <div class="link-box-item">
-        Links
+<footer class="flex flex-column items-center justify-center">
+    <div class="flex contacto-footer gap-1rem items-center">
+        <div style="padding-right: 2rem;">
+            <img src="{% static 'img/footer-logo.webp' %}" alt="Logo Twinstore" height="80">
+        </div>
+        <div class="flex contacto-footer-info">
+            <div class="contacto-footer-item flex flex-column gap-05rem">
+                <h3 class="font-roboto">Atencion online</h3>
+                <p>contacto@twinstore.com.ar</p>
+                <a href="#" class="decoration-none"><i class="bi bi-whatsapp"></i> +54 9 3413491911</a>
+            </div>
+            <div class="contacto-footer-item flex flex-column gap-05rem">
+                <h3>Atencion al cliente</h3>
+                <p>Lunes a viernes de 10:00 a 18:00 hs</p>
+                <p>Sabados de 10:00 a 16:00 hs</p>
+            </div>
+            <div class="contacto-footer-item flex flex-column gap-05rem">
+                <h3>Nuestras redes</h3>
+                <div class="flex width-100 justify-center gap-05rem">
+                    <i class="bi bi-instagram footer-icon"></i>
+                    <i class="bi bi-whatsapp footer-icon"></i>
+                    <i class="bi bi-linkedin footer-icon"></i>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="flex justify-between links-a-list">
-        <a href="#">Marcas</a>
-        <a href="#">Quienes somos</a>
-        <a href="{% url 'core:local' %}">Nuestro local</a>
-        <a href="#">Servicio tecnico</a>
-        <a href="#">Contacto</a>
+    <div class="footer-divider"></div>
+    <div class="flex flex-column footer-info width-100 items-center">
+        <div class="flex gap-1rem footer-info-top width-100">
+            <div class="footer-info-top-item flex flex-column gap-05rem">
+                <h3>INFORMACION</h3>
+                <ul class="list-none">
+                    <li>INICIO</li>
+                    <li>CONTACTO</li>
+                    <li>¿DONDE ESTAMOS?</li>
+                    <li>POLITICAS DE PRIVACIDAD</li>
+                    <li>¿NECESITAS AYUDA?</li>
+                    <li>PREGUNTAS FRECUENTES (FAQ)</li>
+                    <li>POLITICA DE DEVOLUCION</li>
+                    <li>MEDIOS DE PAGO</li>
+                    <li>BOTON DE ARREPENTIMIENTO</li>
+                </ul>
+            </div>
+            <div class="footer-info-top-item flex flex-column gap-05rem">
+                <h3>NUESTRO PUNTO DE RETIRO</h3>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6697.595927486162!2d-60.820425444083476!3d-32.92993576950616!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95b64dc8dca9f287%3A0x4311ebbdc02a5ecc!2sTwinstore!5e0!3m2!1ses!2sar!4v1745181627389!5m2!1ses!2sar" width="340" height="150" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <p>Juan Elorza 2906, Funes.</p>
+            </div>
+            <div class="footer-info-top-item flex flex-column gap-05rem items-center">
+                <h3>FORMA DE PAGO</h3>
+                <div>
+                    <p><img src="{% static 'img/mp-formadepago.webp' %}" alt="Mercado pago" height="13">MERCADO PAGO</p>
+                    <p><i class="bi bi-cash"></i> EFECTIVO</p>
+                    <p><i class="bi bi-bank"></i> TRANSFERENCIA</p>
+                </div>
+                <a href="http://qr.afip.gob.ar/?qr=eZAhEASOmW_X1xbJCVBy3A,," target="_F960AFIPInfo"><img src="{% static 'img/DATAWEB.jpg' %}" border="0" height="80" width="50" alt="data fiscal"></a>
+            </div>
+        </div>
+        <div class="width-100 footer-info-bottom">
+            <p>© 2025 Twinstore - Todos los derechos reservados.</p>
+            <p>Powered by T#</p>
+        </div>
     </div>
-</div>
-<div class="flex justify-between redes-footer">
-    <div>
-        <i class="bi bi-instagram"></i>
-        <i class="bi bi-facebook"></i>
-        <i class="bi bi-whatsapp"></i>
-    </div>
-    <p>
-        Twinstore © 2024. Todos los derechos reservados.
-    </p>
-    <a href="http://qr.afip.gob.ar/?qr=eZAhEASOmW_X1xbJCVBy3A,," target="_F960AFIPInfo"><img src="{% static 'img/DATAWEB.jpg' %}" border="0" height="80" width="50" alt="data fiscal"></a>
-</div>
+</footer>

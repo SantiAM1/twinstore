@@ -28,6 +28,8 @@
     width: 100%;
     margin-bottom: 0.3rem;
     display: block;
+    font-weight: bold;
+    color: #2c2c2c;
 }
 
 .filter-link,.sub-filter-link {
@@ -36,6 +38,7 @@
     margin: 0.2rem;
     width: max-content;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 1.1rem;
 }
 
 .filter-active-box {
