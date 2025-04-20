@@ -62,7 +62,7 @@
     padding-bottom: 0.5rem;
 }
 
-.filter-link-mobile {
+.filter-link-mobile,.subfilter-link-mobile {
     display: block;
     text-decoration: none;
     color: #444;

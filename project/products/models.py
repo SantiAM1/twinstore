@@ -17,13 +17,12 @@ class Categoria(models.Model):
     blank=True,
     help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres."
     )
-    slug = models.SlugField(unique=True,blank=True)
+    slug = models.SlugField(max_length=50, blank=True,unique=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.nombre)
         super().save(*args, **kwargs)
-
 
     def __str__(self):
         return self.nombre
@@ -32,12 +31,20 @@ class SubCategoria(models.Model):
     nombre = models.CharField(max_length=30)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='subcategorias', default=1)
     descripcion_seo = models.CharField(max_length=160,blank=True,help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres.")
-    slug = models.SlugField(unique=True,blank=True)
+    slug = models.SlugField(max_length=50, blank=True,unique=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.nombre)
+            prefijo = self.categoria.nombre[0].lower()
+            base_slug = f"{prefijo}-{slugify(self.nombre)}"
+            slug = base_slug
+            i = 1
+            while SubCategoria.objects.exclude(id=self.id).filter(slug=slug).exists():
+                slug = f"{base_slug}-{i}"
+                i += 1
+            self.slug = slug
         super().save(*args, **kwargs)
+
 
     def __str__(self):
         return self.nombre
@@ -51,13 +58,28 @@ class Producto(models.Model):
     descuento = models.IntegerField(default=0)
     sku = models.CharField(max_length=20, unique=True, blank=True, null=True,editable=False)
     portada = models.ImageField(upload_to='productos/portadas/',null=True, blank=True)
-    descripcion_seo = models.CharField(
-    max_length=160,
-    blank=True,
-    help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres."
-    )
+    descripcion_seo = models.CharField(max_length=160,blank=True,help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres.")
+    slug = models.SlugField(max_length=100, blank=True,unique=True)
 
+    def save(self, *args, **kwargs):
+        # Detectar si cambió el nombre
+        if self.pk:
+            original = Producto.objects.filter(pk=self.pk).first()
+            if original and original.nombre != self.nombre:
+                self.slug = None  # Forzamos que se regenere
 
+        self.generar_slug()
+        super().save(*args, **kwargs)
+
+    def generar_slug(self):
+        if not self.slug:
+            base_slug = slugify(self.nombre)
+            slug = base_slug
+            i = 1
+            while Producto.objects.exclude(id=self.id).filter(slug=slug).exists():
+                slug = f"{base_slug}-{i}"
+                i += 1
+            self.slug = slug
 
     @property
     def precio_anterior(self):

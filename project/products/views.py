@@ -1,8 +1,8 @@
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.shortcuts import render
 
 from core.decorators import bloquear_si_mantenimiento
-from .models import Producto, SubCategoria,Marca,ImagenProducto
+from .models import Producto, SubCategoria,Marca,ImagenProducto,Categoria
 from django.db.models import Q
 from django_user_agents.utils import get_user_agent
 from django.template.loader import render_to_string
@@ -57,9 +57,12 @@ def filtrar_atributo(dict, productos, atributos_unicos):
     
     return productos.distinct()
 
-def return_filtros_dinamicos(request, categoria):
-    sub_categorias = SubCategoria.objects.filter(categoria__nombre=categoria)
-    productos = Producto.objects.filter(sub_categoria__in=sub_categorias).select_related('marca', 'sub_categoria').prefetch_related('imagenes', 'atributos')
+def return_filtros_dinamicos(request, categoria_obj,subcategoria_obj=None,type='default'):
+    sub_categorias = SubCategoria.objects.filter(categoria=categoria_obj)
+    productos = Producto.objects.filter(sub_categoria__in=sub_categorias).select_related('marca', 'sub_categoria').prefetch_related('atributos')
+
+    if subcategoria_obj:
+        productos = productos.filter(sub_categoria=subcategoria_obj)
 
     #* 🔹 Filtrar por marcas
     marca_seleccionada = request.GET.get('marca')
@@ -70,9 +73,7 @@ def return_filtros_dinamicos(request, categoria):
     sub_categoria_seleccionada = request.GET.get('sub_categoria')
     if sub_categoria_seleccionada:
         productos = productos.filter(sub_categoria__nombre=sub_categoria_seleccionada)
-        sub_categoria = SubCategoria.objects.get(nombre=sub_categoria_seleccionada)
-    else:
-        sub_categoria = None
+
     #* 🔹 Obtener atributos antes del filtro
     atributos_previos = get_atributos(productos)
 
@@ -87,6 +88,8 @@ def return_filtros_dinamicos(request, categoria):
 
     #* 🔹 Ordenar los productos
     productos, filtro=ordenby(request,productos)
+
+    prod_totales = len(productos)
     
     pagina_actual = request.GET.get('pagina', 1)
     paginator = Paginator(productos, 12)
@@ -95,80 +98,89 @@ def return_filtros_dinamicos(request, categoria):
 
     filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q","pagina"]}
 
-    return productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro,sub_categoria
+    if type == 'default':
+        return productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro,prod_totales,subcategoria_obj
+    elif type == 'ajax':
+        user_agent = get_user_agent(request)
+        if user_agent.is_mobile:
+            html_filtros = render_to_string(
+                'partials/filtros_dinamicos_mobile.html',{
+                    'atributos_unicos': atributos_unicos,
+                    'request':request,
+                    'sub_categorias':sub_categorias,
+                    'subcategoria_obj':subcategoria_obj,
+                    'marcas':marcas,
+                    'categoria' :categoria_obj,
+                }, request=request
+                )
+
+            html = render_to_string('partials/product_grid.html', {
+                'productos': productos,
+                'pagina':pagina
+            }, request=request)
+
+            html_activos = render_to_string(
+            'partials/filtros_activos_mobile.html', {
+                'filtros_aplicados':filtros_aplicados,
+                'request': request,
+            },
+            request=request
+            )
+            html_paginacion = render_to_string('partials/paginacion.html', {
+            'pagina':pagina},
+            request=request
+            )
+            return JsonResponse({'activos':html_activos,'html':html,'filtros':html_filtros,'paginacion':html_paginacion})
+
+        html_filtros = render_to_string(
+            'partials/filtros_dinamicos.html', {
+                'filtros_aplicados':filtros_aplicados,
+                'request': request,
+                'sub_categorias': sub_categorias,
+                'atributos_unicos': atributos_unicos,
+                'marcas': marcas,
+                'subcategoria_obj':subcategoria_obj,
+                'categoria':categoria_obj
+            },
+            request=request
+        )
+        html_navlinks = render_to_string('partials/header_links.html',{
+            'categoria':categoria_obj,
+            'sub_categorias':sub_categorias,
+            'subcategoria_obj':subcategoria_obj
+        },request=request)
+        html_orden = render_to_string('partials/orden_resultado.html',{
+            'cantidad_productos':len(productos),
+            'filtro':filtro,
+            'request':request,
+            'prod_totales':prod_totales
+        },request=request)
+        html = render_to_string('partials/product_grid.html', {
+            'productos': productos
+        }, request=request)
+        html_paginacion = render_to_string('partials/paginacion.html', {
+            'pagina':pagina},
+            request=request
+            )
+        return JsonResponse({'html': html,'filtros':html_filtros,'navlinks':html_navlinks,'orden':html_orden,'paginacion':html_paginacion})
 
 # ----- Categoria AJAX ----- #
 @bloquear_si_mantenimiento
 @throttle_classes([FiltrosDinamicosThrottle])
 def categoria_ajax(request, categoria):
-    productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro,sub_categoria = return_filtros_dinamicos(request, categoria)
-
-    user_agent = get_user_agent(request)
-    if user_agent.is_mobile:
-        html_filtros = render_to_string(
-            'partials/filtros_dinamicos_mobile.html',{
-                'atributos_unicos': atributos_unicos,
-                'request':request,
-                'sub_categorias':sub_categorias,
-                'marcas':marcas
-            }, request=request
-            )
-
-        html = render_to_string('partials/product_grid.html', {
-            'productos': productos,
-            'pagina':pagina
-        }, request=request)
-
-        html_activos = render_to_string(
-        'partials/filtros_activos_mobile.html', {
-            'filtros_aplicados':filtros_aplicados,
-            'request': request,
-        },
-        request=request
-        )
-        html_paginacion = render_to_string('partials/paginacion.html', {
-        'pagina':pagina},
-        request=request
-        )
-        return JsonResponse({'activos':html_activos,'html':html,'filtros':html_filtros,'paginacion':html_paginacion})
-
-    html_filtros = render_to_string(
-        'partials/filtros_dinamicos.html', {
-            'filtros_aplicados':filtros_aplicados,
-            'request': request,
-            'sub_categorias': sub_categorias,
-            'atributos_unicos': atributos_unicos,
-            'marcas': marcas,
-        },
-        request=request
-    )
-    html_navlinks = render_to_string('partials/header_links.html',{
-        'categoria':categoria,
-        'sub_categorias':sub_categorias
-    },request=request)
-    html_orden = render_to_string('partials/orden_resultado.html',{
-        'cantidad_productos':len(productos),
-        'filtro':filtro,
-        'request':request
-    },request=request)
-    html = render_to_string('partials/product_grid.html', {
-        'productos': productos
-    }, request=request)
-    html_paginacion = render_to_string('partials/paginacion.html', {
-        'pagina':pagina},
-        request=request
-        )
-    return JsonResponse({'html': html,'filtros':html_filtros,'navlinks':html_navlinks,'orden':html_orden,'paginacion':html_paginacion})
+    categoria_obj = get_object_or_404(Categoria, slug=categoria)
+    return return_filtros_dinamicos(request, categoria_obj,type='ajax')
 
 # ----- Filtracion por categoria ----- #
 def categoria(request, categoria):
-    productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro,sub_categoria = return_filtros_dinamicos(request, categoria)
+    categoria_obj = get_object_or_404(Categoria, slug=categoria)
+    productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro,prod_totales,subcategoria_obj = return_filtros_dinamicos(request, categoria_obj,type='default')
 
-    user_agent = get_user_agent(request)
-    if user_agent.is_mobile:
-        return render(request,'products/mobile.html',{
+    template = 'products/mobile.html' if get_user_agent(request).is_mobile else 'products/category.html'
+
+    return render(request, template,{
         'productos': productos,
-        'categoria': categoria,
+        'categoria': categoria_obj,
         'sub_categorias':sub_categorias,
         'cantidad_productos':len(productos),
         'filtro' : filtro,
@@ -176,20 +188,39 @@ def categoria(request, categoria):
         'marcas':marcas,
         'filtros_aplicados':filtros_aplicados,
         'pagina':pagina,
-        'sub_categoria':sub_categoria
+        'prod_totales':prod_totales
     })
 
-    return render(request, 'products/category.html', {
+# ----- Filtracion por categoria y subcategoria ----- #
+@bloquear_si_mantenimiento
+@throttle_classes([FiltrosDinamicosThrottle])
+def subcategoria_ajax(request, categoria, subcategoria):
+    categoria_obj = get_object_or_404(Categoria, slug=categoria)
+    subcategoria_obj = get_object_or_404(SubCategoria, slug=subcategoria, categoria=categoria_obj)
+    return return_filtros_dinamicos(request, categoria_obj, subcategoria_obj,type='ajax')
+
+def categoria_subcategoria(request, categoria, subcategoria):
+    categoria_obj = get_object_or_404(Categoria, slug=categoria)
+    subcategoria_obj = get_object_or_404(SubCategoria, slug=subcategoria, categoria=categoria_obj)
+
+    productos, sub_categorias, atributos_unicos, marcas, pagina, filtros_aplicados, filtro,prod_totales,subcategoria_obj = return_filtros_dinamicos(
+        request, categoria_obj, subcategoria_obj,type='default'
+    )
+
+    template = 'products/mobile.html' if get_user_agent(request).is_mobile else 'products/category.html'
+
+    return render(request, template, {
         'productos': productos,
-        'categoria': categoria,
-        'sub_categorias':sub_categorias,
-        'cantidad_productos':len(productos),
-        'filtro' : filtro,
-        'atributos_unicos':atributos_unicos,
-        'marcas':marcas,
-        'filtros_aplicados':filtros_aplicados,
-        'pagina':pagina,
-        'sub_categoria':sub_categoria
+        'categoria': categoria_obj,
+        'sub_categorias': sub_categorias,
+        'cantidad_productos': len(productos),
+        'filtro': filtro,
+        'atributos_unicos': atributos_unicos,
+        'marcas': marcas,
+        'filtros_aplicados': filtros_aplicados,
+        'pagina': pagina,
+        'subcategoria_obj': subcategoria_obj,
+        'prod_totales':prod_totales
     })
 
 # ----- Busqueda de productos ----- #
@@ -240,13 +271,29 @@ def buscar_productos(request):
         })
 
 # ----- Vista individual del producto ----- #
-def producto_view(request,product_name):
-    producto = Producto.objects.get(nombre=product_name)
+def producto_view(request,product_slug):
+    producto = Producto.objects.get(slug=product_slug)
     imagenes = producto.imagenes.all()
     return render(request,'products/producto_view.html',{
         'producto':producto,
         'imagenes':imagenes
         })
+
+from django.shortcuts import get_object_or_404, redirect
+from .models import Producto, Categoria
+
+def slug_dispatcher(request, slug):
+    producto = Producto.objects.filter(slug=slug).first()
+    if producto:
+        return producto_view(request, slug)
+
+    cat = Categoria.objects.filter(slug=slug).first()
+    if cat:
+        return categoria(request, cat.slug)
+
+    # No encontrado
+    raise Http404("No se encontró ningún recurso con ese slug.")
+
 
 # * Solo admin o staff
 @staff_member_required

@@ -5,7 +5,7 @@
         <span class="texto-descuento position-absolute">-{{ producto.descuento }}%</span>
     </div>
 {% endif %}
-<a href="{% url 'products:producto' product_name=producto.nombre %}" class="decoration-none">
+<a href="{% url 'products:slug_dispatcher' producto.slug %}" class="decoration-none">
     <div class="flex items-center justify-center product-card-img">
         <img src="{% static 'img/prod_default.webp' %}" alt="{{ producto.nombre }}" loading="lazy">
     </div>

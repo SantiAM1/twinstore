@@ -126,8 +126,10 @@ def cargar_productos_excel(request):
 
                         if creado:
                             messages.success(request, mark_safe(f'✅ Producto <strong>{producto.nombre}</strong> agregado'))
-
                         else:
+                            if not producto.slug:
+                                producto.generar_slug()
+                                producto.save()
                             precio_dolar_excel = fila['Precio USD']
                             descuento_excel = fila['Descuento']
 

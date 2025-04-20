@@ -1,8 +1,8 @@
-{% if 'sub_categoria' not in request.GET %}
+{% if not subcategoria_obj %}
     <p class="filter-item">Subcategoria<i class="bi bi-chevron-down"></i></p>
     <div class="filter-expanded">
         {% for sub in sub_categorias %}
-            <a href="?sub_categoria={{ sub.nombre }}{% for key, val in request.GET.items %}{% if key != 'sub_categoria' %}&{{ key }}={{ val }}{% endif %}{% endfor %}" class="filter-link-mobile">{{sub.nombre}}</a>
+            <a href="{% url 'products:categoria_subcategoria' categoria.slug sub.slug %}" class="subfilter-link-mobile">{{sub.nombre}}</a>
         {% endfor %}
     </div>
 {% endif %}

@@ -1,13 +1,14 @@
 from django.urls import path
-from .views import categoria,producto_view,buscar_productos,categoria_ajax,editar_producto_view,agregar_imagenes,eliminar_imagen
+from .views import buscar_productos,categoria_ajax,editar_producto_view,agregar_imagenes,eliminar_imagen,categoria_subcategoria,subcategoria_ajax,slug_dispatcher
 
 app_name = "products"
 
 urlpatterns = [
-    path('api/categoria/<str:categoria>/', categoria_ajax, name='categoria_ajax'),
+    path('api/categoria/<slug:categoria>/', categoria_ajax, name='categoria_ajax'),
+    path('api/categoria/<slug:categoria>/<slug:subcategoria>/', subcategoria_ajax, name='subcategoria_ajax'),
+    path('<slug:categoria>/<slug:subcategoria>/', categoria_subcategoria, name="categoria_subcategoria"),
     path('busqueda/',buscar_productos,name="search"),
-    path('<str:categoria>/', categoria, name="categoria"),
-    path('producto/<str:product_name>',producto_view,name='producto'),
+    path('<slug:slug>/', slug_dispatcher, name='slug_dispatcher'),
     path('editar_producto/<int:pk>',editar_producto_view,name='editar_producto'),
     path('agregar_imagenes/<int:producto_id>',agregar_imagenes,name='agregar_imagenes'),
     path('eliminar_imagen/<int:img_id>',eliminar_imagen,name='eliminar_imagen'),

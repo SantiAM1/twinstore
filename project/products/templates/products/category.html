@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block meta %}
-<meta name="description" content={{categoria.description_seo|default:"Twinstore es una empresa de venta de productos informaticos. Envíos a todo el país."}}>
+<meta name="description" content="{% if subcategoria_obj %}{{subcategoria_obj.nombre}}{% else %}{{categoria.nombre}}{% endif %}; {{prod_totales}} resultados.{% if marcas %} Marcas: {{ marcas|join:", " }}.{% endif %}{% for producto in productos|slice:":3" %}{{ producto.nombre }}. {% endfor %}">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="Twinstore">
 <meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
@@ -11,13 +11,14 @@
 {% endblock meta %}
 
 {% block head %}
-<title>{{categoria}} - Twistore</title>
+<title>{{categoria.nombre}} - Twistore</title>
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
 <link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
 {% endblock head %}
 
 {% block contenidomain %}
+{% if subcategoria_obj %} <h1 class="display-none">{{subcategoria_obj.nombre}}</h1> {% else %} <h1 class="display-none">{{categoria.nombre}}</h1>{% endif %}
 <div class="product-box main-box">
     <nav class="flex justify-between items-center products-nav">
         {% include 'partials/header_links.html' %}
@@ -46,11 +47,20 @@
 </div>
 {% endblock contenidomain %}
 {% block myscripts %}
+
+{% if subcategoria_obj %}
 <script nonce="{{ request.csp_nonce }}">
     window.filters = {
-        categoria: "{{categoria}}",
-        apiUrl: "{% url 'products:categoria_ajax' categoria=categoria %}",
+        apiUrl: "{% url 'products:subcategoria_ajax' categoria.slug subcategoria_obj.slug  %}",
     };
 </script>
+{% else %}
+<script nonce="{{ request.csp_nonce }}">
+    window.filters = {
+        apiUrl: "{% url 'products:categoria_ajax' categoria=categoria.slug %}",
+    };
+</script>
+{% endif %}
+
 <script src="{% static 'js/dinamic-filter.js' %}"></script>
 {% endblock myscripts %}

@@ -1,11 +1,11 @@
-{% if 'sub_categoria' not in request.GET %}
+{% if not subcategoria_obj %}
     <div>
         <span class="filter-title">Subcategorías</span>
         <ul class="list-none">
         {% for sub in sub_categorias %}
             <li>
-                <a class="decoration-none filter-link bloqueable"
-                    href="?{% for key, val in request.GET.items %}{% if key != 'sub_categoria' %}{{ key }}={{ val|urlencode }}&{% endif %}{% endfor %}sub_categoria={{ sub.nombre|urlencode }}">
+                <a class="decoration-none sub-filter-link bloqueable"
+                    href="{% url 'products:categoria_subcategoria' categoria.slug sub.slug %}">
                     {{ sub.nombre }}
                 </a>
             </li>

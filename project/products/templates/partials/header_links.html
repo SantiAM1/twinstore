@@ -1,11 +1,11 @@
 <div class="product-links-box">
     <a href="{% url 'core:home' %}" class="decoration-none product-outside-link bloqueable">Inicio</a>
     <i class="bi bi-chevron-right product-outside-link"></i>
-    {% if 'sub_categoria' in request.GET %}
-        <a href="{% url 'products:categoria' categoria=categoria %}" class="decoration-none product-outside-link bloqueable">{{categoria}}</a>
+    {% if subcategoria_obj %}
+        <a href="{% url 'products:slug_dispatcher' categoria.slug %}" class="decoration-none product-outside-link bloqueable">{{categoria.nombre}}</a>
         <i class="bi bi-chevron-right product-outside-link"></i>
-        <span>{{ request.GET.sub_categoria }}</span>
+        <span>{{ subcategoria_obj }}</span>
     {% else %}
-        <span>{{categoria}}</span>
+        <span>{{categoria.nombre}}</span>
     {% endif %}
 </div>

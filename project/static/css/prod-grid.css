@@ -30,7 +30,7 @@
     display: block;
 }
 
-.filter-link {
+.filter-link,.sub-filter-link {
     color: #4d4d4d;
     display: block;
     margin: 0.2rem;
@@ -54,7 +54,7 @@
     max-width: 100%;
 }
 
-.filter-link:hover {
+.filter-link:hover,.sub-filter-link:hover {
     border-bottom: #1a1a1a solid 1px;
 }
 

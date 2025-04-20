@@ -1,5 +1,5 @@
 <div class="flex justify-between gap-1rem items-center product-result">
-    <p>Mostrando {{ cantidad_productos }} resultado/s</p>
+    <p class="font-roboto font-bold">Mostrando {{ cantidad_productos }} / {{prod_totales}} resultado/s</p>
 
     <form method="GET" id="filterForm">
         {% for key, value in request.GET.items %}

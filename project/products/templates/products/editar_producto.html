@@ -30,7 +30,7 @@
                     {% endfor %}
                 {% endif %}
                 <h1>Editar producto: {{ producto.nombre }}</h1>
-                <a href="{% url 'products:producto' producto.nombre %}" class="tw-hover-button decoration-none text-center">Volver al producto</a>
+                <a href="{% url 'products:slug_dispatcher' producto.slug %}" class="tw-hover-button decoration-none text-center">Volver al producto</a>
                 <div class="container-form">
                     {{form.nombre}}
                     <label for="{{ form.nombre.id_for_label }}" class="form-label">{{form.nombre.label}}</label>

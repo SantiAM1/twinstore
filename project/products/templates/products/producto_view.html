@@ -18,13 +18,14 @@
 {% endblock head %}
 
 {% block contenidomain %}
+<h1 class="display-none">{{producto.nombre}}</h1>
 <div class="product-box main-box">
     <nav>
         <a href="{% url 'core:home' %}" class="decoration-none product-outside-link">Inicio</a>
         <i class="bi bi-chevron-right product-outside-link"></i>
-        <a href="{% url 'products:categoria' categoria=producto.sub_categoria.categoria %}" class="decoration-none product-outside-link">{{producto.sub_categoria.categoria}}</a>
+        <a href="{% url 'products:slug_dispatcher' producto.sub_categoria.categoria.slug %}" class="decoration-none product-outside-link">{{producto.sub_categoria.categoria}}</a>
         <i class="bi bi-chevron-right product-outside-link"></i>
-        <a href="{% url 'products:categoria' categoria=producto.sub_categoria.categoria %}?sub_categoria={{ producto.sub_categoria }}"class="decoration-none product-outside-link">{{producto.sub_categoria}}</a>
+        <a href="{% url 'products:categoria_subcategoria' producto.sub_categoria.categoria.slug producto.sub_categoria.slug %}"class="decoration-none product-outside-link">{{producto.sub_categoria}}</a>
         <i class="bi bi-chevron-right product-outside-link"></i>
         <span> {{producto.nombre}} </span>
     </nav>

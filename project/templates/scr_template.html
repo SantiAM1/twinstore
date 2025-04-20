@@ -13,8 +13,8 @@
                 <a href="#" class="hover-pad-weight">Coolers</a>
             </div>
             <div class="result-productos-column flex">
-                <a href="{% url 'products:categoria' categoria='Almacenamiento' %}" class="result-productos-titulo">Almacenamiento</a>
-                <a href="{% url 'products:categoria' categoria='Almacenamiento' %}?sub_categoria=Discos Internos" class="hover-pad-weight">Discos Internos</a>
+                <a href="{% url 'products:slug_dispatcher' slug='almacenamiento' %}" class="result-productos-titulo">Almacenamiento</a>
+                <a href="{% url 'products:slug_dispatcher' slug='almacenamiento' %}?sub_categoria=Discos Internos" class="hover-pad-weight">Discos Internos</a>
                 <a href="#" class="hover-pad-weight">Discos Internos SSD</a>
                 <a href="#" class="hover-pad-weight">Discos Externos</a>
                 <a href="#" class="hover-pad-weight">Discos Externos SSD</a>
@@ -43,9 +43,9 @@
         `,
         'prod_item-accesorios': `
             <div class="result-productos-column flex">
-                <a href="{% url 'products:categoria' categoria='Perifericos' %}" class="result-productos-titulo">Periféricos</a>
-                <a href="#" class="hover-pad-weight">Teclados</a>
-                <a href="#" class="hover-pad-weight">Mouse</a>
+                <a href="{% url 'products:slug_dispatcher' slug='perifericos' %}" class="result-productos-titulo">Periféricos</a>
+                <a href="{% url 'products:categoria_subcategoria' categoria='perifericos' subcategoria='p-teclados' %}" class="hover-pad-weight">Teclados</a>
+                <a href="{% url 'products:categoria_subcategoria' categoria='perifericos' subcategoria='p-mouse' %}" class="hover-pad-weight">Mouses</a>
                 <a href="#" class="hover-pad-weight">Auriculares</a>
                 <a href="#" class="hover-pad-weight">Webcams</a>
                 <a href="#" class="hover-pad-weight">Micrófonos</a>
