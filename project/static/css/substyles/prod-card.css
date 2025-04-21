@@ -1,38 +1,41 @@
 .product-card {
-    border: 1px solid #ddd;
     box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
     width: 193px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 10px;
 }
 
-.product-card span {
-    color: #3a3a3a;
+.prod-anchor {
+    overflow: hidden;
+}
+
+.prod-name {
+    color: #313131;
     height: 57px;
-    display: block;
     padding: 6px 12px 0;
-    width: 100%;
-    text-align: center;
-    font-family: var(--font-roboto);
-    font-weight: bold;
+    font-size: 1.1rem;
 }
 
 .product-card .prod-precio {
     margin-top: 0.5rem;
     text-align: center;
-    color: #474747;
+    color: #2652b3;
+    font-weight: bold;
     font-size: 1.2rem;
 }
 
 .product-card strong {
-    margin: 1rem;
-    width: 80%;
-    background-color: var(--color-ts);
-    padding: 0.3rem;
-    display: inline-block;
-    border-radius: 10px;
-    color: white;
+    margin-top: auto;
+    width: 100%;
     text-align: center;
-    font-family: var(--font-type);
+    font-family: var(--font-roboto);
+    background-color: #005dc0;
+    color: #fff;
+    display: block;
+    padding: 0.7rem;
+    border-radius: 10px 10px 0 0 ;
+    transform: translateY(50px);
+    transition: transform 0.3s ease ,border-radius 0.3s ease;
 }
 
 .product-card-img {
@@ -63,10 +66,12 @@
     z-index: 2;
     top: 18px;
     left: 2px;
+    text-align: center;
     color: rgb(255 255 255);
-    font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     pointer-events: none;
+    display: inline-block;
+    width: 50px;
 }
 
 .product-descount-box {
@@ -81,7 +86,7 @@
     color: #6d6d6d;
     font-weight: lighter;
     display: inline-block;
-    font-size: 0.7rem;
+    font-size: 0.9rem;
 }
 
 .precio-descuento.precio-descuento {
@@ -100,4 +105,8 @@
 .product-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 4px 15px rgb(0 0 0 / 20%);
+}
+
+.product-card:hover strong {	
+    transform: translateY(0);
 }

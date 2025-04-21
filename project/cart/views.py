@@ -14,6 +14,7 @@ from core.decorators import bloquear_si_mantenimiento
 from core.throttling import EnviarWtapThrottle,CarritoThrottle,CalcularPedidoThrottle
 
 from payment.models import HistorialCompras
+from payment.templatetags.custom_filters import formato_pesos
 
 from .models import Producto, Carrito, Pedido
 import mercadopago
@@ -262,9 +263,11 @@ class CalcularPedidoView(APIView):
             if total_processor <= 0:
                 return Response({'error': 'El carrito está vacío'}, status=400)
             
+            print(formato_pesos(total_compra))
+
             return Response({
-                'total': total_compra,
-                'adicional': adicional,
+                'total': formato_pesos(total_compra),
+                'adicional': formato_pesos(adicional) if adicional != 0 else '$0,00',
                 'init_point': init_point,
                 'metodoPagoSeleccionado':data['metodo_pago'],
             })

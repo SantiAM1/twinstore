@@ -10,10 +10,12 @@ from django.core.paginator import Paginator
 from .forms import EditarProducto,ImagenProductoForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, get_object_or_404, redirect
-import os
 from django.contrib import messages
 from rest_framework.decorators import throttle_classes
 from core.throttling import FiltrosDinamicosThrottle
+
+import json
+
 
 # Create your views here.
 # ----- Manejo de filtros ----- #
@@ -68,11 +70,6 @@ def return_filtros_dinamicos(request, categoria_obj,subcategoria_obj=None,type='
     marca_seleccionada = request.GET.get('marca')
     if marca_seleccionada:
         productos = productos.filter(marca__nombre=marca_seleccionada)
-
-    #* 🔹 Filtrar por subcategorias
-    sub_categoria_seleccionada = request.GET.get('sub_categoria')
-    if sub_categoria_seleccionada:
-        productos = productos.filter(sub_categoria__nombre=sub_categoria_seleccionada)
 
     #* 🔹 Obtener atributos antes del filtro
     atributos_previos = get_atributos(productos)
@@ -274,9 +271,12 @@ def buscar_productos(request):
 def producto_view(request,product_slug):
     producto = Producto.objects.get(slug=product_slug)
     imagenes = producto.imagenes.all()
+    thumbnails = [img.imagen_100.url for img in imagenes]
+    thumbnails_json = json.dumps(thumbnails)
     return render(request,'products/producto_view.html',{
         'producto':producto,
-        'imagenes':imagenes
+        'imagenes':imagenes,
+        'thumbnails':thumbnails_json
         })
 
 from django.shortcuts import get_object_or_404, redirect

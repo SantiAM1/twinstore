@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
@@ -12,8 +13,7 @@
     <link rel="stylesheet" href="{% static 'css/substyles/mp-button.css' %}">
 {% endblock head %}
 
-{% block headend %}
-{% endblock headend %}
+{% block theme %}black{% endblock theme %}
 
 {% block contenidomain %}
 <main class="padding-1rem">
@@ -140,7 +140,7 @@
                         {% for pedido in carrito.pedidos.all %}
                         <tr class="cart-finsh-prods">
                             <th><p>{{pedido.get_cantidad}} x</p> {{pedido.producto.nombre}}</th>
-                            <td>${{pedido.get_total_precio}}</td>
+                            <td>{{pedido.get_total_precio|formato_pesos}}</td>
                         </tr>
                         <tr>
                             <th colspan="2" class="border-1px"></th>
@@ -150,7 +150,7 @@
                         {% for pedido in carrito %}
                             <tr class="cart-finsh-prods">
                                 <th><p>{{pedido.cantidad}} x</p> {{pedido.producto.nombre}}</th>
-                                <td>${{pedido.total_precio}}</td>
+                                <td>{{pedido.total_precio|formato_pesos}}</td>
                             </tr>
                             <tr>
                                 <th colspan="2" class="border-1px"></th>
@@ -162,7 +162,7 @@
                 <tfoot>
                     <tr class="cart-finsh-prods">
                         <th>Subtotal</th>
-                        <td>${{total_precio}}</td>
+                        <td>{{total_precio|formato_pesos}}</td>
                     </tr>
                     <tr>
                         <th colspan="2" class="border-1px"></th>
@@ -176,7 +176,7 @@
                     </tr>
                     <tr class="cart-finsh-prods">
                         <th>Total</th>
-                        <td id="total-value">${{ total_precio }}</td>
+                        <td id="total-value">{{ total_precio|formato_pesos }}</td>
                     </tr>
                     <tr>
                         <th colspan="2" class="border-2px"></th>

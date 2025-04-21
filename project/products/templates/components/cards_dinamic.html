@@ -1,23 +1,21 @@
+{% load custom_filters %}
 {% if producto.descuento > 0 %}
-    <div class="descuento-box font-roboto position-absolute">
-        <i class="bi bi-tag-fill icon-descuento position-absolute"></i>
-        <span class="texto-descuento position-absolute">-{{ producto.descuento }}%</span>
-    </div>
+    {% include 'components/descuento.html' %}
 {% endif %}
-<a href="{% url 'products:slug_dispatcher' producto.slug %}" class="decoration-none">
+<a href="{% url 'products:slug_dispatcher' producto.slug %}" class="prod-anchor decoration-none width-100 flex flex-column items-center">
     <div class="flex items-center justify-center product-card-img">
         <img src="{{producto.portada.url}}" alt="{{ producto.nombre }}" loading="lazy">
     </div>
-    <span>{{ producto.nombre }}</span>
+    <span class="display-block width-100 text-center font-bold font-roboto prod-name">{{ producto.nombre }}</span>
     {% if producto.descuento > 0 %}
         <div class="product-descount-box">
-            <p class="precio-anterior">${{ producto.precio_anterior|floatformat:0 }}</p>
+            <p class="precio-anterior">{{ producto.precio_anterior|formato_pesos }}</p>
             <p class="precio-descuento font-roboto">
-                ${{ producto.precio|floatformat:0 }}
+                {{ producto.precio|formato_pesos }}
             </p>
         </div>
     {% else %}
-        <p class="prod-precio font-roboto font-bold text-center">${{producto.precio|floatformat:0}}</p>
+        <p class="prod-precio font-roboto font-bold text-center">{{producto.precio|formato_pesos}}</p>
     {% endif %}
-    <strong>Agregar al carrito</strong>
+    <strong>Ver mas</strong>
 </a>

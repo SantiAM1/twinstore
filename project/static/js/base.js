@@ -1,4 +1,20 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const currentTheme = document.body.dataset.theme;
+    const lastTheme = sessionStorage.getItem('ultimaTheme');
+
+    if (lastTheme && lastTheme !== currentTheme) {
+        if (currentTheme === 'black') {
+            document.body.style.animation = 'cambiarfondooscuro 0.8s forwards';
+        } else if (currentTheme === 'white') {
+            document.body.style.animation = 'cambiarfondoclaro 0.8s forwards';
+        }
+    }
+
+    // Guardar el tema actual para la próxima carga
+    sessionStorage.setItem('ultimaTheme', currentTheme);
+    document.body.addEventListener('animationend', () => {
+        document.body.style.animation = '';
+    });
     // ----- Menu desktop mobile ------ //
     const botonProductos = document.getElementById("boton-productos");
     const boxProdDisplay = document.getElementById("box-productos-display");
@@ -146,17 +162,15 @@ document.addEventListener("DOMContentLoaded", () => {
                             return;
                         }
     
-                        data.forEach(nombre => {
+                        data.forEach(producto => {
                             const div = document.createElement("div");
-                            div.textContent = nombre;
+                            div.textContent = producto.nombre;
                             div.className = "sugerencia-item";
                             div.addEventListener("click", () => {
-                                const nombreFormateado = encodeURIComponent(nombre);
-                                window.location.href = `/productos/producto/${nombreFormateado}`;
+                                window.location.href = `/productos/${producto.slug}/`;
                             });
                             sugerenciasBox.appendChild(div);
                         });
-    
                         sugerenciasBox.style.display = "block";
                     });
             }, 300);
@@ -168,7 +182,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-    
     autocompletar("busqueda-input-arriba", "sugerencias-arriba");
     autocompletar("busqueda-input-abajo", "sugerencias-abajo");
 });

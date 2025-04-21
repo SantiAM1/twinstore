@@ -68,9 +68,7 @@
 
 /* -------- Prod View -------- */
 .product-view{
-    background-color: #fff;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin: 1rem 0;
     padding: 1rem;
     border-radius: 15px;
     border: #9a9a9a solid 1px;
@@ -89,11 +87,41 @@
 
 .product-title-nombre {
     font-size: 1.5rem;
+    color: #1d1d1d;
 }
 
+.product-title-nombre::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 4px;
+    background-image: linear-gradient(135deg, #6139f1, #a648cc);
+    margin: 0.5rem auto 0;
+    border-radius: 10px;
+    }
+
 .product-title-precio{
-    font-size: 1.3rem;
-    font-weight: 500;
+    font-size: 2rem;
+    color: #005dc0;
+}
+
+.product-title-icons {
+    font-size: 1.2rem;
+    color: #005dc0;
+}
+
+.prod-title-name {
+    color: #fff;
+}
+
+.product-title-precio-desc {
+    color: #4a4a4a;
+    text-decoration: line-through;
+}
+
+.product-title-info {
+    font-size: 0.9rem;
+    color: #353535;
 }
 
 .product-title-data {
@@ -122,7 +150,6 @@
 }
 
 .product-specs table td,th {
-    font-family: var(--font-roboto);
     font-size: 1rem;
     color: #1d1d1d;
 }
@@ -133,7 +160,7 @@
 
 .product-specs h2 {
     font-style: italic;
-    color: #1d1d1d;
+    color: #e2e2e2;
 }
 
 .product-specs-divider {
@@ -144,8 +171,10 @@
 }
 
 table.ficha-especificaciones {
-    width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0; /* Opcional: elimina separación entre celdas */
+    border-radius: 12px;
+    overflow: hidden; /* Para que se vea bien el redondeo si hay fondo */
 }
 
 .ficha-especificaciones th {
@@ -164,50 +193,8 @@ table.ficha-especificaciones {
     background: #fafafa;
 }
 
-.thumbnails {
-    align-items: flex-start;
-    gap: 10px;
-    height: 300px;
-}
-
-.thumbnail {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    border-radius: 5px;
-    border: #9a9a9a solid 1px;
-    transition: border 0.3s;
-}
-
-.thumbnail:hover {
-    border-color: var(--color-ts);
-}
-
-.product-slider {
-    width: 400px;
-    height: 400px;
-    overflow-x: scroll;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    justify-content: flex-start;
-}
-
-.product-slider::-webkit-scrollbar {
-    display: none;
-}
-
-.slider-track {
-    gap: 10px;
-    height: 100%;
-}
-
-.slider-track img {
-    width: 400px;
-    height: 400px;
-    flex-shrink: 0;
-    scroll-snap-align: center;
-    border-radius: 10px;
-    object-fit: contain;
+.ficha-especificaciones tr:nth-child(odd) td {
+    background: #e2e2e2;
 }
 
 .prod-editar-btn {
@@ -216,4 +203,38 @@ table.ficha-especificaciones {
     font-size: 1rem;
     padding: 0.5rem 1rem;
     border-radius: 5px;
+    margin-top: 1rem;
+}
+
+/* stylelint-disable-next-line selector-class-pattern */
+.prodImgView,.swiper-slide-image {
+    height: 400px;width: 400px;
+}
+
+.swiper-slide-image {
+    object-fit: contain;
+}
+
+.thumbnail-swiper {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 0.5rem;
+    background-color: #fff;
+    border: 2px solid #ccc;
+}
+
+.swiper-pagination-bullet-active img {
+    border: 2px solid #007bff;
+}
+
+.swiper-pagination-bullet,.swiper-pagination.swiper-pagination {
+    width: max-content;
+    height: max-content;
+    background-color: transparent;
+}
+
+.swiper-pagination.swiper-pagination {
+    left: -25%;
+    top: 0;
 }

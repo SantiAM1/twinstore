@@ -27,13 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const response = await axios.post(window.api.calcularPedido, datos);
                 const { total, adicional, init_point,metodoPagoSeleccionado } = response.data;
-
-                document.getElementById('adicionales-value').innerText = `$${parseFloat(adicional).toLocaleString("es-AR", { minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2, 
-                    useGrouping: false})}`
-                document.getElementById('total-value').innerText = `$${parseFloat(total).toLocaleString("es-AR", { minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2, 
-                    useGrouping: false})}`
+                console.log(total,adicional)
+                document.getElementById('adicionales-value').textContent = adicional
+                document.getElementById('total-value').textContent = total
 
                 const boxCheckout = document.getElementById('box-checkout-pro');
                 boxCheckout.innerHTML = "";

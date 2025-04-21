@@ -11,7 +11,8 @@
     justify-items: center
 }
 
-.product-outside-link {color: #9a9a9a;}
+.product-outside-link {color: #9a9a9a;
+    font-size: 0.9rem;}
 
 .filter-box {
     width: 140px;

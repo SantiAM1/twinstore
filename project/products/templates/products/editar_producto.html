@@ -58,7 +58,7 @@
                     <span class="display-none"></span>
                     <div class="flex height-100 gap-1rem">
                         {% if producto.portada %}
-                        <img src="{{producto.portada.url}}" alt="No hay una portada" class="thumbnail">
+                        <img src="{{producto.portada.url}}" alt="No hay una portada" class="thumbnail-swiper">
                         {% endif %}
                         <label for="{{ form.portada.id_for_label }}" class="form-label-img width-100 height-100 flex items-center justify-center">Portada</label>
                     </div>
@@ -70,7 +70,7 @@
                     <h3>Imágenes existentes</h3>
                     {% for img in imagenes %}
                         <div class="flex height-100 width-100 gap-1rem items-center">
-                            <img src="{{img.imagen.url}}" alt="{{img.imagen}}" class="thumbnail">
+                            <img src="{{img.imagen.url}}" alt="{{img.imagen}}" class="thumbnail-swiper">
                             <a href="{% url 'products:eliminar_imagen' img.id %}" class="tw-hover-button decoration-none">Eliminar Imagen</a>
                         </div>
                     {% endfor %}

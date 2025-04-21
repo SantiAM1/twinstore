@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <div class="header flex flex-column">
     <div class="header-item flex top-header-item">
         <a href="{% url 'core:home' %}">
@@ -43,7 +44,7 @@
                 class="carrito flex items-center position-relative text-center"
             >
                 <div class="carrito-total-precio font-roboto position-relative">
-                    Carrito / ${{total_precio}}
+                    Carrito / {{total_precio|formato_pesos}}
                 </div>
                 <i class="bi bi-cart-fill"></i>
                 <div

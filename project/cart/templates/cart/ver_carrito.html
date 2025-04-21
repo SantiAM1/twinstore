@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
@@ -10,6 +11,8 @@
     <link rel="stylesheet" href="{% static 'css/carrito.css' %}" />
     <link rel="stylesheet" href="{% static 'css/substyles/quantity.css' %}" />
 {% endblock head %}
+
+{% block theme %}black{% endblock theme %}
 
 {% block contenidomain %}
 <main class="padding-1rem">
@@ -42,11 +45,11 @@
                                         {% endif %}
                                     </div>
                                     <div class="cart-prod-cantidad flex flex-column">
-                                        <span>{{ pedido.producto.nombre }}</span>
-                                        <p class="display-none"><span>{{pedido.get_cantidad}} x </span>${{pedido.producto.precio}}</p>
+                                        <span class="font-roboto">{{ pedido.producto.nombre }}</span>
+                                        <p class="display-none"><span>{{pedido.get_cantidad}} x </span>{{pedido.producto.precio|formato_pesos}}</p>
                                     </div>
                                 </td>
-                                <td class="cart-price-sub">${{ pedido.producto.precio }}</td>
+                                <td class="cart-price-sub">{{ pedido.producto.precio|formato_pesos }}</td>
                                 <td>
                                     <div class="flex items-center justify-center quantity-container bloqueable" data-pedido-id="{{ pedido.id }}" data-precio="{{ pedido.producto.precio }}">
                                         <button type="button" name="action" data-action="decrement" class="btn-cantidad"><i class="bi bi-dash"></i></button>
@@ -54,7 +57,7 @@
                                         <button type="button" name="action" data-action="increment" class="btn-cantidad"><i class="bi bi-plus"></i></button>
                                     </div>
                                 </td>
-                                <td class="cart-price-sub cart-total-precio">${{ pedido.get_total_precio }}</td>
+                                <td class="cart-price-sub cart-total-precio">{{ pedido.get_total_precio|formato_pesos }}</td>
                             </tr>
                             <tr>
                                 <td class="cart-divider-prod" colspan="4"></td>
@@ -74,10 +77,10 @@
                                     </div>
                                     <div class="cart-prod-cantidad flex flex-column">
                                         <span>{{ pedido.producto.nombre }}</span>
-                                        <p class="display-none"><span>{{pedido.cantidad}} x </span>${{pedido.producto.precio}}</p>
+                                        <p class="display-none"><span>{{pedido.cantidad}} x </span>{{pedido.producto.precio|formato_pesos}}</p>
                                     </div>
                                 </td>
-                                <td class="cart-price-sub">${{ pedido.producto.precio }}</td>
+                                <td class="cart-price-sub">{{ pedido.producto.precio|formato_pesos }}</td>
                                 <td>
                                     <div class="flex items-center justify-center quantity-container bloqueable" data-pedido-id="{{ pedido.id }}" data-precio="{{ pedido.producto.precio }}">
                                         <button type="button" name="action" data-action="decrement" class="btn-cantidad"><i class="bi bi-dash"></i></button>
@@ -85,7 +88,7 @@
                                         <button type="button" name="action" data-action="increment" class="btn-cantidad"><i class="bi bi-plus"></i></button>
                                     </div>
                                 </td>
-                                <td class="cart-price-sub cart-total-precio">${{ pedido.total_precio }}</td>
+                                <td class="cart-price-sub cart-total-precio">{{ pedido.total_precio|formato_pesos }}</td>
                             </tr>
                             <tr>
                                 <td class="cart-divider-prod" colspan="4"></td>
@@ -103,7 +106,7 @@
                     <tbody>
                         <tr class="cart-finish-info">
                             <th>Subtotal</th>
-                            <td id="cart-subtotal">${{ total_precio }}</td>
+                            <td id="cart-subtotal">{{ total_precio|formato_pesos }}</td>
                         </tr>
                         <tr>
                             <td class="cart-divider-prod" colspan="2"></td>
@@ -119,7 +122,7 @@
                         </tr>
                         <tr class="cart-finish-info total-row">
                             <th class="cart-finish-th">Total</th>
-                            <td id="cart-total">${{ total_precio }}</td>
+                            <td id="cart-total">{{ total_precio|formato_pesos }}</td>
                         </tr>
                         <tr>
                             <td class="cart-divider-main" colspan="2"></td>

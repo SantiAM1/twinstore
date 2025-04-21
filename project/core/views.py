@@ -58,7 +58,7 @@ def buscar_productos(request):
     resultados = cache.get(cache_key)
 
     if not resultados:
-        productos = Producto.objects.filter(nombre__icontains=q).values_list('nombre', flat=True)[:10]
+        productos = Producto.objects.filter(nombre__icontains=q).values('nombre', 'slug')[:10]
         resultados = list(productos)
         cache.set(cache_key, resultados, 60 * 5)
 

@@ -11,7 +11,8 @@
     --box-shadow-outline: rgb(35 77 212 / 80%);
     --footer: rgb(56 93 214);
     --font-type : 'Gill Sans', 'Gill Sans MT', calibri, 'Trebuchet MS', sans-serif;
-    --font-roboto : 'Roboto'
+    --font-roboto : 'Roboto';
+    --black-theme-color: #0c0c0c;
 }
 
 * {
@@ -22,13 +23,20 @@
 }
 
 body {
-    /* background-color: #0c0c0c; */
-    background-color: #ededed;
     height: 100vh;
     margin: 0;
     display:flex;
     flex-direction: column;
 }
+
+body[data-theme="white"] {
+    background-color: #ededed;
+}
+
+body[data-theme="black"] {
+    background-color: var(--black-theme-color);
+}
+
 
 .main-box {
     flex: 1;
@@ -446,4 +454,24 @@ footer {
     height: 20px;
     width: 100%;
     background-image: linear-gradient(to top, #141414 , #041e3a);
+}
+
+@keyframes cambiarfondooscuro {
+    from {
+        background-color: #ededed;
+    }
+
+    to {
+        background-color: var(--black-theme-color);
+    }
+}
+
+@keyframes cambiarfondoclaro {
+    from {
+        background-color: var(--black-theme-color);
+    }
+
+    to {
+        background-color: #ededed;
+    }
 }

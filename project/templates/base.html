@@ -29,7 +29,7 @@
     {% block headend %}
     {% endblock headend %}
 </head>
-<body>
+<body data-theme="{% block theme %}white{% endblock theme %}">
     <header class="header-tag position-fixed">
         {% include 'header.html' %}
     </header>

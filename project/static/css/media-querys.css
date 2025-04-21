@@ -1,6 +1,8 @@
 /* --------Media Queries-------- */
 @media screen and (width <= 1024px) {
 
+    .landing-content {font-size: 1rem;}
+    
     .header {max-width: 90vw;}
 
     .icon-navbar {display: none;}
@@ -86,6 +88,7 @@
     .product-view {
         flex-direction: column;
         align-items: center;
+        margin-top: 5rem;
     }
 
     .thumbnails {
@@ -97,14 +100,31 @@
         width: 100%;
     }
 
-    .product-slider{
-        width: 340px;
-        height: 340px;
+    /* stylelint-disable-next-line selector-class-pattern */
+    .prodImgView,.swiper-slide-image{
+        height: 330px;
+        width: 330px;
     }
 
-    .slider-track img {
-        width: 340px;
-        height: 340px;
+    /* stylelint-disable-next-line selector-class-pattern */
+
+    /* .prodImgView {
+        margin-top: 5rem;
+    }
+
+
+    .swiper-pagination.swiper-pagination {
+        flex-direction: row;
+        top: 0;
+        width: 100%;
+        left: 0;
+    } */
+
+    .swiper-pagination.swiper-pagination {
+        flex-direction: row;
+        top: -27%;
+        width: 100%;
+        left: 0;
     }
 
     .users-pedidos-hide {
@@ -217,4 +237,6 @@
         right: 0.5rem;
         width: 80%;
     }
+
+    .precio-descuento.precio-descuento{font-size: 1rem;}
 }
