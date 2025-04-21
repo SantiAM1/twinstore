@@ -15,11 +15,6 @@
     text-align: start;
 }
 
-.cart-prod-cantidad p {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-weight: bold;
-}
-
 .cart-items {
     width: 60%;
     gap: 2rem;

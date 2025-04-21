@@ -239,4 +239,8 @@
     }
 
     .precio-descuento.precio-descuento{font-size: 1rem;}
+
+    .precio-anterior.precio-anterior {
+        font-size: 0.75rem;
+    }
 }

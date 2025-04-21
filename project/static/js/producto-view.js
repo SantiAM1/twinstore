@@ -1,24 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // const thumbnails = document.querySelectorAll('.scroll-image');
-
-    // thumbnails.forEach((thumb) => {
-    //     const index = parseInt(thumb.dataset.index);
-    //     thumb.addEventListener('click', () => {
-    //         scrollToImage(index);
-    //     });
-    // })
-
-    // function scrollToImage(index) {
-    //     const slider = document.querySelector('.product-slider');
-    //     const imageWidth = slider.querySelector('img').clientWidth;
-    //     const scrollPosition = index * imageWidth;
-    
-    //     slider.scrollTo({
-    //         left: scrollPosition,
-    //         behavior: 'smooth'
-    //     });
-    // }
-    
     const addToCartForm = document.getElementById('add-to-cart-form');
     addToCartForm.addEventListener('submit', async function(e) {
         e.preventDefault();
