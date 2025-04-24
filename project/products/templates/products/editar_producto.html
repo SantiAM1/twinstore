@@ -53,6 +53,12 @@
                     {{form.descuento}}
                     <label for="{{ form.descuento.id_for_label }}" class="form-label">{{form.descuento.label}}</label>
                 </div>
+                <div class="container-checkbox font-roboto">
+                    {{ form.inhabilitar }}
+                    <label class="form-check-label" for="{{ form.inhabilitar.id_for_label }}">
+                        {{ form.inhabilitar.label }}
+                    </label>
+                </div>
                 <div>
                     {{form.portada}}
                     <span class="display-none"></span>

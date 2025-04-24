@@ -89,11 +89,6 @@ class UsuarioForm(forms.Form):
     telefono = forms.CharField(max_length=20, required=False, label="Telefono",
         widget=INPUT_ATTRS
         )
-    guardar_datos = forms.BooleanField(
-        required=False,
-        label="Recordar mis datos para futuras compras",
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
-    )
     recibir_estado_pedido = forms.BooleanField(
         required=False,
         label='Recibir mails sobre el estado del pedido',
@@ -172,6 +167,13 @@ class UsuarioForm(forms.Form):
             return verificador == int(cuit[-1])
         except (ValueError, IndexError):
             return False
+
+class TerminosYCondiciones(forms.Form):
+    aceptar = forms.BooleanField(
+        required=True,
+        error_messages={
+            'required': 'Debés aceptar los Términos y Condiciones para continuar.'
+        })
 
 class BuscarPedidoForm(forms.Form):
     token = forms.CharField(

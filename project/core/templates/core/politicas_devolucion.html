@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<meta name="description" content="¿Tuviste un problema con un producto? Leé nuestra política de devoluciones y conocé los pasos para realizar un cambio o devolución en Twinstore.">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Politicas de devolucion - Twinstore</title>
+<link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="legales-box">
+    <h1>Politicas de devolucion</h1>
+    <p>
+        En Twinstore aceptamos cambios y devoluciones de productos dentro de un plazo de 10 días corridos. En caso de retiro presencial, el plazo comienza a partir de la fecha de entrega. Si el producto fue enviado a domicilio, el plazo se cuenta desde la fecha efectiva de entrega. Las solicitudes deberán gestionarse exclusivamente dentro de los días y horarios de atención publicados en nuestros canales oficiales.
+    </p>
+    <h2>Condiciones generales para el cambio o devolución de un producto</h2>
+    <p class="flex flex-column">
+        Para que un producto pueda ser cambiado o devuelto, debe cumplir con las siguientes condiciones:
+        <i class="bi bi-dot">No debe haber sido abierto.</i>
+        <i class="bi bi-dot">No debe presentar señales de uso o daño.</i>
+        <i class="bi bi-dot">Debe conservar el embalaje original en buen estado.</i>
+        <i class="bi bi-dot">Debe incluir manuales, accesorios y todo elemento entregado con el producto.</i>
+        <i class="bi bi-dot">Es obligatorio presentar la factura o comprobante de compra.</i>
+    </p>
+    <h2>Derecho de devolución (arrepentimiento)</h2>
+    <div class="flex flex-column">
+        <p>De acuerdo con el artículo 34 de la Ley 24.240 de Defensa del Consumidor y los artículos 1.111 y 1.112 del Código Civil y Comercial de la Nación, el comprador tiene derecho a revocar la aceptación de la compra sin expresión de causa dentro de los 10 días corridos desde la entrega del bien o la celebración del contrato.</p>
+        <br>
+        <p>
+        Para ejercer este derecho, el usuario deberá contactarse con Twinstore por correo electrónico a contacto@twinstore.com.ar, indicando el número de pedido y solicitando la devolución. El producto deberá ser devuelto en perfecto estado, sin uso, con sus etiquetas, embalaje original, manuales, factura de compra y accesorios completos.</p>
+        <br>
+        <p>Twinstore se reserva el derecho de rechazar solicitudes de devolución que no cumplan con las condiciones mencionadas, o cuando el producto presente señales de uso o deterioro.</p>
+    </div>
+    <h2>Arrepentimiento de compra</h2>
+    <div>
+        <p>En cumplimiento de la Ley 24.240 de Defensa del Consumidor, si realizaste una compra de forma online (ya sea a través de nuestro sitio web, redes sociales o por contacto telefónico), tenés derecho a ejercer el derecho de arrepentimiento dentro de un plazo de 10 días corridos desde la fecha de recepción del producto.</p>
+        <br>
+        <p>Para gestionar la devolución, el producto debe estar en las mismas condiciones en las que fue entregado: cerrado, sin signos de uso, con su empaque original, manuales, accesorios y factura de compra. Podés acercarlo personalmente a nuestra sucursal o enviarlo por el medio de tu preferencia. Los gastos de envío corren por cuenta del cliente.</p>
+        <br>
+        <p>Una vez recibido el producto y verificado su estado, se emitirá la Nota de Crédito correspondiente y se procederá a reembolsar el importe abonado en un plazo máximo de 72 horas hábiles, utilizando el mismo medio de pago empleado en la compra.</p>
+    </div>
+    <h2>Cambio de un producto</h2>
+    <p>Si deseas cambiar un producto por otro, podés hacerlo dentro de los 5 días corridos desde la fecha de compra. El nuevo producto debe pertenecer al mismo segmento o categoría, y puede ser de igual o mayor valor. En caso de que el nuevo producto tenga un precio superior, el cliente deberá abonar la diferencia.El producto a cambiar deberá cumplir con las condiciones generales de cambio y devolución, es decir: no debe haber sido abierto ni utilizado, debe conservar su empaque original en perfecto estado, contar con todos los accesorios y manuales, y presentarse junto con la factura de compra.El cambio puede gestionarse de forma presencial o enviando el producto a nuestra sucursal. En todos los casos, los gastos de envío y traslado corren por cuenta del cliente sin excepción.</p>
+</section>
+{% endblock contenidomain %}

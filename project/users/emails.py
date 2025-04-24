@@ -39,6 +39,8 @@ def mail_estado_pedido_html(historial,user_email):
         mensaje = "¡Tu pedido ha sido enviado! En las próximas horas te compartiremos más detalles del seguimiento."
     elif historial.estado == "finalizado":
         mensaje = "	¡Gracias por confiar en Twinstore! Tu pedido ha sido entregado y finalizado exitosamente. Esperamos volver a verte pronto."
+    elif historial.estado == "arrepentido":
+        mensaje = "	Pedido cancelado, arrepentido"
     else:
         mensaje = "Estamos esperando la confirmación del pago. Te notificaremos apenas se acredite."
 

@@ -59,6 +59,7 @@ class Producto(models.Model):
     sku = models.CharField(max_length=20, unique=True, blank=True, null=True,editable=False)
     portada = models.ImageField(upload_to='productos/portadas/',null=True, blank=True)
     descripcion_seo = models.CharField(max_length=160,blank=True,help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres.")
+    inhabilitar = models.BooleanField(default=False)
     slug = models.SlugField(max_length=100, blank=True,unique=True)
 
     def save(self, *args, **kwargs):

@@ -31,14 +31,14 @@
             <div class="footer-info-top-item flex flex-column gap-05rem">
                 <h3>INFORMACION</h3>
                 <ul class="list-none">
-                    <li>INICIO</li>
+                    <li><a href="{% url 'core:home' %}" class="decoration-none">INICIO</a></li>
                     <li>CONTACTO</li>
-                    <li>¿DONDE ESTAMOS?</li>
-                    <li>POLITICAS DE PRIVACIDAD</li>
-                    <li>¿NECESITAS AYUDA?</li>
-                    <li>PREGUNTAS FRECUENTES (FAQ)</li>
-                    <li>POLITICA DE DEVOLUCION</li>
-                    <li>MEDIOS DE PAGO</li>
+                    <li><a href="{% url 'core:faq' %}" class="decoration-none">PREGUNTAS FRECUENTES</a></li>
+                    <li><a href="{% url 'core:faq' %}#faq-pago" class="decoration-none">MEDIOS DE PAGO</a></li>
+                    <li><a href="{% url 'core:politicas-privacidad' %}" class="decoration-none">POLITICAS DE PRIVACIDAD</a></li>
+                    <li><a href="{% url 'core:politicas-devolucion' %}" class="decoration-none">POLITICAS DE DEVOLUCION</a></li>
+                    <li><a href="{% url 'core:politicas-envios' %}" class="decoration-none">POLITICAS DE ENVIOS</a></li>
+                    <li><a href="{% url 'core:terminos-condiciones' %}" class="decoration-none">TERMINOS Y CONDICIONES</a></li>
                     <li>BOTON DE ARREPENTIMIENTO</li>
                 </ul>
             </div>

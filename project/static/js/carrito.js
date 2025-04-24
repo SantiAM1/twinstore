@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
             mensaje += `\nCódigo Postal:${codigo_postal}\nDirección:${direccion}`;
 
-            const url = `https://wa.me/5493416544144?text=${encodeURIComponent(mensaje)}`;
+            const url = `https://wa.me/5493413491911?text=${encodeURIComponent(mensaje)}`;
             window.open(url, '_blank');
         })
         .catch(error => {

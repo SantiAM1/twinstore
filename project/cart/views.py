@@ -6,7 +6,7 @@ from django.templatetags.static import static
 from django.template.loader import render_to_string
 from django.urls import reverse
 
-from users.forms import UsuarioForm
+from users.forms import UsuarioForm,TerminosYCondiciones
 from users.models import PerfilUsuario,DatosFacturacion
 
 from core.permissions import BloquearSiMantenimiento
@@ -181,18 +181,15 @@ class AgregarAlCarritoView(APIView):
             subtotal = producto.precio * cantidad
 
             total_processor = carrito_total(request)
-            imagen_url = (
-                producto.imagenes.first().imagen.url
-                if producto.imagenes.first()
-                else static('img/prod_default.webp')
+            imagen_url = producto.portada.url if producto.portada else static('img/prod_default.webp'
             )
             return Response({
-                'total_precio':total_processor['total_precio'],
+                'total_precio':formato_pesos(total_processor['total_precio']),
                 'total_productos':total_processor['total_productos'],
                 'productoNombre':producto.nombre,
                 'imagen_url':imagen_url,
                 'cantidad_pedido':cantidad,
-                'subtotal':subtotal
+                'subtotal':formato_pesos(subtotal)
             })
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -262,8 +259,6 @@ class CalcularPedidoView(APIView):
 
             if total_processor <= 0:
                 return Response({'error': 'El carrito está vacío'}, status=400)
-            
-            print(formato_pesos(total_compra))
 
             return Response({
                 'total': formato_pesos(total_compra),
@@ -339,7 +334,6 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
             "carrito_id":carrito_id
         },
     }
-    print("Preferencia de Mercado Pago:", preference_data)
 
     sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
@@ -361,10 +355,12 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
 @requiere_carrito
 def realizar_pedido(request):
     if request.method == "POST":
+        terms = TerminosYCondiciones(request.POST)
         form = UsuarioForm(request.POST)
-        if not form.is_valid():
+        if not (form.is_valid() and terms.is_valid()):
             return render(request, 'cart/realizar_pedido.html', {
                 'form': form,
+                'terms':terms,
                 'carrito': _obtener_carrito(request),
             })
         else:
@@ -398,27 +394,6 @@ def realizar_pedido(request):
                 # * Borramos el carrito y pedidos
                 carrito.pedidos.all().delete()
                 carrito.delete()
-
-                # * Guardamos los datos si el usuario lo desea
-                if form.cleaned_data['guardar_datos']:
-                    perfil, create = PerfilUsuario.objects.get_or_create(user=request.user)
-                    perfil.tipo_factura = data['tipo_factura']
-                    perfil.dni_cuit = data['dni_cuit']
-                    perfil.razon_social = data['razon_social']
-                    perfil.nombre = data['nombre']
-                    perfil.apellido = data['apellido']
-                    perfil.calle = data['calle']
-                    perfil.calle_detail = data['calle_detail']
-                    perfil.ciudad = data['ciudad']
-                    perfil.provincia = data['provincia']
-                    perfil.codigo_postal = data['codigo_postal']
-                    perfil.telefono = data['telefono']
-                    perfil.guardar_datos = True
-                    perfil.save()
-                else:
-                    perfil, create = PerfilUsuario.objects.get_or_create(user=request.user)
-                    perfil.guardar_datos = False
-                    perfil.save()
 
             else:
                 carrito = request.session['carrito']
@@ -485,13 +460,18 @@ def realizar_pedido(request):
                     'codigo_postal': perfil.codigo_postal,
                     'email': request.user.email,
                     'telefono': perfil.telefono,
-                    'guardar_datos': perfil.guardar_datos
                 })
         else:
             form = UsuarioForm()
+        terms = TerminosYCondiciones()
+        carrito = _obtener_carrito(request)
+        if not carrito:
+            return redirect('core:home')
+
         return render(request, 'cart/realizar_pedido.html', {
-            'carrito': _obtener_carrito(request),
-            'form':form,
+                'carrito': carrito,
+                'form': form,
+                'terms':terms
             })
 
 def _generar_identificador_pago(letra):
@@ -508,21 +488,28 @@ def _generar_identificador_unico(letra):
 def _obtener_carrito(request):
     if request.user.is_authenticated:
         carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
-        return carrito
+        pedidos_validos = []
+        for pedido in carrito.pedidos.all():
+            if pedido.producto.inhabilitar:
+                pedido.delete()
+            else:
+                pedidos_validos.append(pedido)
+        return carrito if pedidos_validos else None
     else:
         if 'anon_cart_id' not in request.session:
             request.session['anon_cart_id'] = f"anon-{uuid.uuid4()}"
-        carrito_session = request.session.get('carrito',{})
+        carrito_session = request.session.get('carrito', {})
         carrito = []
-        for producto_id,cantidad in carrito_session.items():
-            producto = get_object_or_404(Producto,id=int(producto_id))
-            carrito.append({
-                'id':producto.id,
-                'producto':producto,
-                'cantidad':cantidad,
-                'total_precio':producto.precio*cantidad,
+        for producto_id, cantidad in carrito_session.items():
+            producto = get_object_or_404(Producto, id=int(producto_id))
+            if not producto.inhabilitar:
+                carrito.append({
+                    'id': producto.id,
+                    'producto': producto,
+                    'cantidad': cantidad,
+                    'total_precio': producto.precio * cantidad,
                 })
-        return carrito
+        return carrito if carrito else None
 
 # ----- Ver el carro -----#
 def ver_carrito(request):

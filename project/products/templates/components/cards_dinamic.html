@@ -2,7 +2,7 @@
 {% if producto.descuento > 0 %}
     {% include 'components/descuento.html' %}
 {% endif %}
-<a href="{% url 'products:slug_dispatcher' producto.slug %}" class="prod-anchor decoration-none width-100 flex flex-column items-center">
+<a href="{% url 'products:slug_dispatcher' producto.slug %}" class="decoration-none width-100 flex flex-column items-center">
     <div class="flex items-center justify-center product-card-img">
         <img src="{{producto.portada.url}}" alt="{{ producto.nombre }}" loading="lazy">
     </div>

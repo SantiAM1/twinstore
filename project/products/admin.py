@@ -31,9 +31,10 @@ class EspecificacionTecnicaInline(admin.StackedInline):
 
 class ProductoAdmin(admin.ModelAdmin):
     inlines = [AtributoInline, ImagenProductoInline, EspecificacionTecnicaInline]
-    list_display = ['nombre', 'sku', 'precio', 'marca', 'sub_categoria']
+    list_display = ['nombre', 'sku', 'marca', 'sub_categoria']
     search_fields = ['nombre', 'sku']
     list_filter = ['marca', 'sub_categoria']
+    readonly_fields = ['precio','slug']
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
@@ -50,5 +51,9 @@ class SubcategoriaAdmin(admin.ModelAdmin):
     def has_module_permission(self, request):
         return False
 
+@admin.register(CategoriaEspecificacion)
+class CategoriaEspecificacionAdmin(admin.ModelAdmin):
+    def has_module_permission(self, request):
+        return False
+
 admin.site.register(Producto, ProductoAdmin)
-admin.site.register(CategoriaEspecificacion)

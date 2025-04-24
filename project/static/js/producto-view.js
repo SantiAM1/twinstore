@@ -1,47 +1,57 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const consultarDisponibilidad = document.getElementById('consultar-disponibilidad');
+    if (consultarDisponibilidad) {
+        consultarDisponibilidad.addEventListener('click', function() {
+            const nombre = consultarDisponibilidad.dataset.name
+            let mensaje = `Hola Twistore! Me gustaría conocer si cuentan con la disponibilidad de ${nombre}`
+        
+            const url = `https://wa.me/5493413491911?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+        });
+    }
     const addToCartForm = document.getElementById('add-to-cart-form');
-    addToCartForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        const producto_id = document.getElementById('producto-id').value;
-        const cantidad = document.getElementById('quantity').value;
-
-        try {
-            const response = await axios.post(window.api.agregarAlCarrito, {
-                producto_id: parseInt(producto_id),
-                cantidad: parseInt(cantidad),
-            });
-
-            const { total_productos, total_precio, productoNombre,imagen_url,cantidad_pedido,subtotal } = response.data;
-
-            actualizarCarrito(total_precio,total_productos)
-                
-            mostrarFeedbackCarrito(productoNombre, total_precio,imagen_url,cantidad_pedido,subtotal);
-
-        } catch (error) {
-            console.error('Error al agregar producto:', error);
-            alert('Hubo un error al agregar el producto');
-        }
-    });
+    if (addToCartForm) {
+        addToCartForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+    
+            const producto_id = document.getElementById('producto-id').value;
+            const cantidad = document.getElementById('quantity').value;
+    
+            try {
+                const response = await axios.post(window.api.agregarAlCarrito, {
+                    producto_id: parseInt(producto_id),
+                    cantidad: parseInt(cantidad),
+                });
+    
+                const { total_productos, total_precio, productoNombre,imagen_url,cantidad_pedido,subtotal } = response.data;
+    
+                actualizarCarrito(total_precio,total_productos)
+                    
+                mostrarFeedbackCarrito(productoNombre, total_precio,imagen_url,cantidad_pedido,subtotal);
+    
+            } catch (error) {
+                console.error('Error al agregar producto:', error);
+                alert('Hubo un error al agregar el producto');
+            }
+        });
+    }
 
     function mostrarFeedbackCarrito(productoNombre, totalPrecio, imagenUrl,cantidadPedido,subTotal) {
         const feedback = document.getElementById('carrito-feedback');
     
         if (!feedback) return;
     
-        const precioFormateado = parseFloat(totalPrecio).toFixed(2);
-        const subTotalFormateado = parseFloat(subTotal).toFixed(2);
         const htmlNoPurificado = `
             <div class="flex items-center gap-1rem carrito-feedback-imgbox">
                 <img src="${imagenUrl}" alt="${productoNombre} loading="lazy"">
                 <div class="flex flex-column carrito-feedback-info">
                     <p class="font-roboto">${productoNombre}</p>
-                    <p class="font-roboto">${cantidadPedido} x $${subTotalFormateado}</p>
+                    <p class="font-roboto">${cantidadPedido} x ${subTotal}</p>
                 </div>
             </div>
             <div class="flex justify-between carrito-feedback-divider">
                 <p class="font-bold font-roboto">Subtotal</p>
-                <p class="font-bold font-roboto">$${precioFormateado}</p>
+                <p class="font-bold font-roboto">${totalPrecio}</p>
             </div>
             <div class="flex flex-column carrito-feedback-links">
                 <a href="${window.api.verCarrito}" class="font-roboto decoration-none font-bold">VER CARRITO</a>
@@ -77,8 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     
         const precioCarrito = document.querySelector('.carrito-total-precio');
         if (precioCarrito) {
-            const totalFormateado = parseFloat(total_precio).toFixed(2);
-            precioCarrito.textContent = `Carrito / $${totalFormateado}`;
+            precioCarrito.textContent = `Carrito / ${total_precio}`;
         }
     }
 })

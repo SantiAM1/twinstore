@@ -9,7 +9,8 @@ class HistorialCompras(models.Model):
         ('rechazado', 'Rechazado'),
         ('preparando pedido','Preparando pedido'),
         ('enviado','Enviado'),
-        ('finalizado','Finalizado')
+        ('finalizado','Finalizado'),
+        ('arrepentido', 'Arrepentido')
     ]
 
     FORMA_DE_PAGO = [
@@ -28,6 +29,7 @@ class HistorialCompras(models.Model):
     merchant_order_id = models.CharField(max_length=100, blank=True, null=True,unique=True)
     token_consulta = models.UUIDField(default=uuid.uuid4, unique=True)
     recibir_mail = models.BooleanField(default=False)
+    fecha_finalizado = models.DateTimeField(null=True,blank=True)
 
     def __str__(self):
         if self.usuario:

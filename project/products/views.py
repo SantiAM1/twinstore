@@ -16,7 +16,6 @@ from core.throttling import FiltrosDinamicosThrottle
 
 import json
 
-
 # Create your views here.
 # ----- Manejo de filtros ----- #
 def ordenby(request, productos):
@@ -278,9 +277,6 @@ def producto_view(request,product_slug):
         'imagenes':imagenes,
         'thumbnails':thumbnails_json
         })
-
-from django.shortcuts import get_object_or_404, redirect
-from .models import Producto, Categoria
 
 def slug_dispatcher(request, slug):
     producto = Producto.objects.filter(slug=slug).first()

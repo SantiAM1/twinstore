@@ -138,6 +138,7 @@
     font-weight: 600;
     color: #ededed;
     transition: background-color 0.3s ease;
+    width: max-content;
 }
 
 .product-cart:hover {

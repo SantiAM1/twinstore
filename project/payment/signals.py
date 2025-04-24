@@ -2,6 +2,16 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import PagoRecibidoMP, HistorialCompras,ComprobanteTransferencia
 from users.emails import mail_estado_pedido_html
+from django.utils import timezone
+
+@receiver(post_save, sender=HistorialCompras)
+def fecha_finalizacion_historial(sender, instance, created, **kwargs):
+    """
+    Se crea la fecha de cuando el producto es entregado/recibido
+    """
+    if instance.estado == "finalizado" and not instance.fecha_finalizado:
+        HistorialCompras.objects.filter(pk=instance.pk).update(fecha_finalizado=timezone.now())
+
 
 @receiver(post_save, sender=HistorialCompras)
 def enviar_actualizacion_compra(sender, instance, created, **kwargs):

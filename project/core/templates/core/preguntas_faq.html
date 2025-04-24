@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<meta name="description" content="Respondemos tus dudas frecuentes: medios de pago, envíos, tiempos de entrega y mucho más. Twinstore te brinda atención clara y rápida.">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Preguntas Frecuentes - Twinstore</title>
+<link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="faq width-100">
+    <h1>Preguntas Frecuentes - FAQ</h2>
+    <details id="faq-pago">
+        <summary class="flex justify-between list-none font-bold font-roboto cursor-pointer">¿Cuáles son las formas de pago disponibles?<i class="bi bi-three-dots"></i></summary>
+        <p>Podés abonar tus compras a través de Mercado Pago, utilizando tarjeta de crédito, débito, transferencia bancaria o efectivo en puntos de pago como Rapipago o Pago Fácil. También aceptamos transferencia bancaria directa y efectivo en punto de retiro (Funes, Santa Fe).</p>
+    </details>
+    <details id="faq-estado">
+        <summary class="flex justify-between list-none font-bold font-roboto cursor-pointer">¿Cómo puedo seguir el estado de mi pedido?<i class="bi bi-three-dots"></i></summary>
+        <p>Una vez realizada la compra, recibirás por correo electrónico un código de seguimiento. Podés ingresar ese código en el apartado "Pedidos" del sitio para consultar el estado del envío en cualquier momento. Si tenés una cuenta registrada, toda la información relevante sobre tus compras estará disponible en el apartado "Mis pedidos" dentro de tu perfil de usuario.</p>
+    </details>
+    <details id="faq-sesion">
+        <summary class="flex justify-between list-none font-bold font-roboto cursor-pointer">¿Por qué iniciar sesión?<i class="bi bi-three-dots"></i></summary>
+        <p>Iniciar sesión te permite guardar tus datos para futuras compras, ver tu historial de compras, asociar pedidos a tu cuenta y recibir ofertas exclusivas.</p>
+    </details>
+    <details id="faq-asociar">
+        <summary class="flex justify-between list-none font-bold font-roboto cursor-pointer">¿Cómo asocio un pedido a mi cuenta?<i class="bi bi-three-dots"></i></summary>
+        <p>Si realizaste una compra como invitado y luego creaste una cuenta, podés ingresar en el apartado "Mis Pedidos" y colocar el codigo de seguimiento en el apartado "Asociar un pedido a mi cuenta".</p>
+    </details>
+    <details id="faq-cambiar">
+        <summary class="flex justify-between list-none font-bold font-roboto cursor-pointer">¿Puedo cambiar o devolver un producto?<i class="bi bi-three-dots"></i></summary>
+        <p>Sí. Podés solicitar el cambio o la devolución de un producto dentro de los 10 días corridos desde la recepción. El producto debe estar sin uso, en su empaque original y con la factura de compra. Encontrá todos los detalles en nuestras <a href="{% url 'core:politicas-devolucion' %}" class="decoration-none font-roboto politicas-link">Políticas de devolución</a>.</p>
+    </details>
+    <details id="faq-plazos">
+        <summary class="flex justify-between list-none font-bold font-roboto cursor-pointer">¿Cuáles son los plazos y costos de envío?<i class="bi bi-three-dots"></i></summary>
+        <p>Realizamos envíos a todo el país a través de Andreani. Los plazos y costos varían según la localidad y se calculan manualmente antes de realizar la compra. También podés optar por retirar en nuestro punto de retiro sin costo alguno. Para mas informacion consulta nuestras <a href="{% url 'core:politicas-envios' %}" class="decoration-none font-roboto politicas-link">Políticas de envios</a></p>
+    </details>
+    <details id="faq-problema">
+        <summary class="flex justify-between list-none font-bold font-roboto cursor-pointer">¿Qué hago si tengo un problema con mi pedido?<i class="bi bi-three-dots"></i></summary>
+        <p>Ante cualquier inconveniente, escribinos a <span class="politicas-link">contacto@twinstore.com.ar</span> con tu número de pedido. Nuestro equipo va a responderte lo antes posible para resolver el problema de forma rápida y eficiente.</p>
+    </details>
+</section>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+<script nonce="{{request.csp_nonce}}">
+document.addEventListener("DOMContentLoaded", function () {
+    const hash = window.location.hash;
+    if (hash) {
+      const el = document.querySelector(hash);
+      if (el && el.tagName === "DETAILS") {
+        el.setAttribute("open", true);
+
+        setTimeout(() => {
+          const offset = 120;
+          const top = el.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top: top, behavior: "smooth" });
+        }, 200);
+      }
+    }
+  });
+</script>
+
+{% endblock myscripts %}

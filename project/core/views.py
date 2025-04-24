@@ -22,6 +22,21 @@ from django.utils.timezone import now
 from core.utils import obtener_valor_dolar
 # Create your views here.
 
+def terminos_condiciones(request):
+    return render(request,'core/terminos_condiciones.html')
+
+def preguntas_frecuentes(request):
+    return render(request,'core/preguntas_faq.html')
+
+def politicas_envios(request):
+    return render(request, 'core/politicas_envios.html')
+
+def politicas_devolicion(request):
+    return render(request,'core/politicas_devolucion.html')
+
+def politicas_priv(request):
+    return render(request,'core/politicas_privacidad.html')
+
 @staff_member_required
 def verificar_throttle(request):
     # Simulamos usuarios o IPs de prueba (esto es solo demostrativo)
@@ -111,7 +126,6 @@ def cargar_productos_excel(request):
                         sku = f"{marca.nombre[:3].upper()}-{sub_categoria.nombre[:3].upper()}-{uuid.uuid4().hex[:6].upper()}"
 
                         valor_dolar = obtener_valor_dolar()
-                        print(valor_dolar)
 
                         producto, creado = Producto.objects.get_or_create(
                             nombre=fila['Producto'],

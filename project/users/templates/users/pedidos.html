@@ -91,6 +91,10 @@
                         <div style="background-color: #c2c2c2;color: #494949;" class="users-pedidos-status">
                             <span>{{pedido.estado|capfirst}}</span>
                         </div>
+                        {% elif pedido.estado == 'arrepentido' %}
+                        <div style="background-color: #8a0000;color: #fff;" class="users-pedidos-status">
+                            <span>{{pedido.estado|capfirst}}</span>
+                        </div>
                         {% endif %}
                     </td>
                 </tr>

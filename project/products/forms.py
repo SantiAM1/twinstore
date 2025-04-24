@@ -14,7 +14,7 @@ class EditarProducto(forms.ModelForm):
     class Meta:
         INPUT_ATTRS = {'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none','autocomplete':'off','placeholder':' '}
         model = Producto
-        fields = ['nombre', 'marca', 'sub_categoria', 'precio_dolar', 'descuento', 'portada','precio']
+        fields = ['nombre', 'marca', 'sub_categoria', 'precio_dolar', 'descuento', 'portada','precio','inhabilitar']
         widgets = {
             'marca': forms.Select(attrs={'class': 'users-select bloqueable'}),
             'sub_categoria': forms.Select(attrs={'class': 'users-select bloqueable'}),
@@ -22,7 +22,8 @@ class EditarProducto(forms.ModelForm):
             'descuento': forms.NumberInput(attrs=INPUT_ATTRS),
             'nombre': forms.TextInput(attrs=INPUT_ATTRS),
             'portada': forms.FileInput(attrs={'class': 'form-admin-control display-none'}),
-            'precio': forms.NumberInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none', 'readonly': 'readonly'})
+            'precio': forms.NumberInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none', 'readonly': 'readonly'}),
+            'inhabilitar':forms.CheckboxInput()
         }
 
 class ImagenProductoForm(forms.ModelForm):
