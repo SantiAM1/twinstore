@@ -94,6 +94,11 @@ class UsuarioForm(forms.Form):
         label='Recibir mails sobre el estado del pedido',
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
+    preferencias_promociones = forms.BooleanField(
+        required=False,
+        label='Recibir mails promocionales',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
 
     def clean_razon_social(self):
         value = self.cleaned_data['razon_social']

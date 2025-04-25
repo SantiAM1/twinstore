@@ -103,7 +103,7 @@ def notification(request):
                         for producto_id,cantidad in productos_metadata.items():
                             producto = get_object_or_404(Producto,id=int(producto_id))
                             productos.append({
-                                'producto_id': producto.id,
+                                'sku': producto.sku,
                                 'nombre':producto.nombre,
                                 'precio_unitario':float(producto.precio),
                                 'cantidad':cantidad,
@@ -207,7 +207,7 @@ def subir_comprobante(request, token):
             comprobante = form.save(commit=False)
             comprobante.historial = historial
             comprobante.save()
-            messages.success(request, "✅ Comprobante subido correctamente. Lo revisaremos a la brevedad.")
+            messages.success(request, "Comprobante subido correctamente. Lo revisaremos a la brevedad.")
             if request.user.is_authenticated:
                 return redirect('users:mispedidos')
             return redirect('users:ver_pedidos',token=token)

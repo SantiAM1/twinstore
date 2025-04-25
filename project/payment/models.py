@@ -1,16 +1,17 @@
+from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
 
 class HistorialCompras(models.Model):
     ESTADOS = [
-        ('pendiente', 'Pendiente'),
-        ('confirmado', 'Confirmado'),
-        ('rechazado', 'Rechazado'),
-        ('preparando pedido','Preparando pedido'),
-        ('enviado','Enviado'),
-        ('finalizado','Finalizado'),
-        ('arrepentido', 'Arrepentido')
+        ('pendiente', 'Pendiente🟡'),
+        ('confirmado', 'Confirmado🟢'),
+        ('rechazado', 'Rechazado🔴'),
+        ('preparando pedido','Preparando pedido🔵'),
+        ('enviado','Enviado🟣'),
+        ('finalizado','Finalizado⚪'),
+        ('arrepentido', 'Arrepentido⭕')
     ]
 
     FORMA_DE_PAGO = [
@@ -43,6 +44,13 @@ class HistorialCompras(models.Model):
 
     def pagos_completos(self):
         return all(p.status == "approved" for p in self.pagos.all())
+
+    def get_adicional(self):
+        if not self.forma_de_pago == "mercado pago":
+            return 0
+        subtotal = Decimal(sum(producto['subtotal'] for producto in self.productos))
+        return self.total_compra - subtotal
+
 
 class PagoRecibidoMP(models.Model):
     payment_id = models.CharField(max_length=100, unique=True)

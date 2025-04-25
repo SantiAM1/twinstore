@@ -10,34 +10,43 @@
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 {% endblock meta %}
 
+{% block head %}
+<title>Busqueda - Twistore</title>
+<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
+<link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
+<link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
+{% endblock head %}
+
 {% block contenidomain %}
 <div class="product-box main-box">
-    <nav class="flex justify-between items-center products-nav">
+    <nav class="flex justify-between items-center products-nav gap-1rem">
         <div>
-            <a href="{% url 'core:home' %}" class="decoration-none product-outside-link">Inicio</a>
+            <a href="{% url 'core:home' %}" class="decoration-none product-outside-link font-roboto">Inicio</a>
             <i class="bi bi-chevron-right product-outside-link"></i>
-            <span>Resultados de busqueda para: "{{query}}"</span>
+            <span class="font-roboto">Resultados de busqueda para: "<strong class="font-roboto">{{query}}</strong>"</span>
         </div>
-        {% include 'partials/orden_resultado.html' %}
+        <div id="orden-result">
+            {% include 'partials/orden_resultado.html' %}
+        </div>
     </nav>
     <div class="flex gap-1rem product-box-grid">
-        <main class="flex justify-center flex-grow">
+        <main class="flex justify-center">
             <div class="grid-container">
-                {% for producto, imagen_url in productos_imagen %}
-                    <div class="flex flex-column items-center justify-center product-card bg-white position-relative">
-                        {% if imagen_url %}
-                            {% include 'components/cards_dinamic.html' %}
-                        {% else %}
-                            {% include 'components/cards_static.html' %}
-                        {% endif %}
-                    </div>
-                {% endfor %}
+                {% include 'partials/product_grid.html' %}
             </div>
         </main>
     </div>
-    <div class="paginacion margin-1rem flex width-100 justify-center gap-05rem font-roboto">
+    <div class="paginacion margin-1rem flex justify-center gap-05rem font-roboto">
         {% include 'partials/paginacion.html' %}
     </div>
 </div>
-
 {% endblock contenidomain %}
+
+{% block myscripts %}
+<script nonce="{{ request.csp_nonce }}">
+    window.filters = {
+        apiUrl: "{% url 'products:buscar_productos_ajax' %}",
+    };
+</script>
+<script src="{% static 'js/dinamic-filter.js' %}"></script>
+{% endblock myscripts %}

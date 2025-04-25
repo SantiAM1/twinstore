@@ -9,6 +9,9 @@ def enviar_mail_compra(historial_data, user_email):
         'url': historial_data['url'],
         'img': historial_data['img'],
         'token': historial_data['token'],
+        'productos':historial_data['productos'],
+        'adicional':historial_data['adicional'],
+        'total':historial_data['total']
     }
 
     html = render_to_string('emails/compra_exitosa.html', context)
@@ -43,7 +46,7 @@ def enviar_mail_confirm_user(mail_data,user_email):
     msg.send()
 
 @shared_task
-def enviar_mail_estado_pedido(mail_data,user_email):
+def enviar_mail_estado_pedido(mail_data,user_email,template):
     context = {
         'url' : mail_data['url'],
         'img' : mail_data['img'],
@@ -52,7 +55,7 @@ def enviar_mail_estado_pedido(mail_data,user_email):
         'mensaje': mail_data['mensaje'],
     }
 
-    html = render_to_string('emails/estado_pedido.html', context)
+    html = render_to_string(template, context)
     text = f'Hola {user_email}, esto es el estado de tu pedido ID:#{mail_data['pedido_id']}: {mail_data['estado']}'
 
     msg = EmailMultiAlternatives(

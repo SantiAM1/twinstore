@@ -1,13 +1,10 @@
 <div class="flex justify-between gap-1rem items-center product-result">
-    <p class="font-roboto font-bold">Mostrando {{ cantidad_productos }} / {{prod_totales}} resultado/s</p>
-
+    {% with inicio=pagina.start_index end=pagina.end_index total=pagina.paginator.count %}
+        <p class="font-roboto font-bold" id="contador-resultados">
+            Mostrando {{ inicio }}–{{ end }} de {{ total }} resultado{% if total != 1 %}s{% endif %}
+        </p>
+    {% endwith %}
     <form method="GET" id="filterForm">
-        {% for key, value in request.GET.items %}
-            {% if key != "ordenby" %}
-                <input type="hidden" name="{{ key }}" value="{{ value|urlencode }}">
-            {% endif %}
-        {% endfor %}
-
         <select name="ordenby" id="ordenby" class="product-ordenby bloqueable">
             <option value="" disabled selected class="display-none">{{ filtro }}</option>
             <option value="date">Ordenar por los últimos</option>

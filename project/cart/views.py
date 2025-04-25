@@ -384,7 +384,7 @@ def realizar_pedido(request):
                 productos = []
                 for pedido in carrito.pedidos.all():
                     productos.append({
-                        'producto_id': pedido.producto.id,
+                        'sku': pedido.producto.sku,
                         'nombre': pedido.producto.nombre,
                         'precio_unitario': float(pedido.producto.precio),
                         'cantidad': pedido.cantidad,
@@ -404,7 +404,7 @@ def realizar_pedido(request):
                 for producto_id,cantidad in carrito.items():
                     producto = get_object_or_404(Producto,id=int(producto_id))
                     productos.append({
-                        'producto_id': producto.id,
+                        'sku': pedido.producto.sku,
                         'nombre':producto.nombre,
                         'precio_unitario':float(producto.precio),
                         'cantidad':cantidad,

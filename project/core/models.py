@@ -7,13 +7,17 @@ class DolarConfiguracion(models.Model):
     def __str__(self):
         fecha_local = localtime(self.fecha_actualizacion)
         return f"Dolar: {self.valor}, Actualizado el {fecha_local.strftime('%d/%m/%Y a las %H:%M hs')}"
+    
+    class Meta:
+        verbose_name = "Configuración de dólar"
+        verbose_name_plural = "⚙️ Configuración . Dolar"
 
 class ModoMantenimiento(models.Model):
     activo = models.BooleanField(default=False)
 
     def __str__(self):
-        return "🛠️ Sitio en mantenimiento" if self.activo else "✅ Sitio activo"
+        return "❌ Sitio en mantenimiento" if self.activo else "✅ Sitio activo"
 
     class Meta:
-        verbose_name = "Modo Mantenimiento"
-        verbose_name_plural = "Modo Mantenimiento"
+        verbose_name = "Modo de mantenimiento"
+        verbose_name_plural = "⚙️ Configuración · Mantenimiento"

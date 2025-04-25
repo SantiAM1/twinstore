@@ -5,12 +5,14 @@ from django.utils.html import format_html
 
 class AtributoInline(admin.TabularInline):
     model = Atributo
-    extra = 1  # cantidad de filas nuevas vacías
+    extra = 1
+    classes = ['collapse']
 
 class ImagenProductoInline(admin.StackedInline):
     model = ImagenProducto
     extra = 0
     readonly_fields = ['miniatura']
+    classes = ['collapse']
 
     def has_add_permission(self, request, obj):
         if obj and obj.imagenes.count() >= 5:
@@ -28,6 +30,7 @@ class EspecificacionTecnicaInline(admin.StackedInline):
     model = EspecificacionTecnica
     extra = 0
     form = EspecificacionTecnicaForm
+    classes = ['collapse']
 
 class ProductoAdmin(admin.ModelAdmin):
     inlines = [AtributoInline, ImagenProductoInline, EspecificacionTecnicaInline]

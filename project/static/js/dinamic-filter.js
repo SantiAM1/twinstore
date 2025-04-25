@@ -3,15 +3,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener('change', function (e) {
         if (e.target && e.target.id === 'ordenby') {
             const orden = e.target.value;
-    
-            // 🔁 Tomamos los filtros actuales de la URL
             const urlParams = new URLSearchParams(window.location.search);
             urlParams.set('pagina', 1);
-            urlParams.set('ordenby', orden); // actualizamos el ordenamiento
-    
-            // 🔄 Convertimos a objeto y enviamos a la función
+            urlParams.set('ordenby', orden);
             const filtrosActualizados = Object.fromEntries(urlParams.entries());
-    
             aplicarFiltrosDinamicos(filtrosActualizados);
         }
     });
@@ -19,15 +14,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("click", function (e) {
         if (e.target.classList.contains("pagina-btn") && e.target.dataset.pagina) {
             e.preventDefault();
-    
             const pagina = e.target.dataset.pagina;
             const urlParams = new URLSearchParams(window.location.search);
             urlParams.set('pagina', pagina);
-    
             const filtrosActualizados = Object.fromEntries(urlParams.entries());
             aplicarFiltrosDinamicos(filtrosActualizados);
             window.scrollTo({ top: 0, behavior: "smooth" });
-
         }
     });
     

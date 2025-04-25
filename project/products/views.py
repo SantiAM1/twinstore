@@ -146,10 +146,8 @@ def return_filtros_dinamicos(request, categoria_obj,subcategoria_obj=None,type='
             'subcategoria_obj':subcategoria_obj
         },request=request)
         html_orden = render_to_string('partials/orden_resultado.html',{
-            'cantidad_productos':len(productos),
             'filtro':filtro,
-            'request':request,
-            'prod_totales':prod_totales
+            'pagina':pagina
         },request=request)
         html = render_to_string('partials/product_grid.html', {
             'productos': productos
@@ -178,13 +176,11 @@ def categoria(request, categoria):
         'productos': productos,
         'categoria': categoria_obj,
         'sub_categorias':sub_categorias,
-        'cantidad_productos':len(productos),
         'filtro' : filtro,
         'atributos_unicos':atributos_unicos,
         'marcas':marcas,
         'filtros_aplicados':filtros_aplicados,
         'pagina':pagina,
-        'prod_totales':prod_totales
     })
 
 # ----- Filtracion por categoria y subcategoria ----- #
@@ -209,21 +205,19 @@ def categoria_subcategoria(request, categoria, subcategoria):
         'productos': productos,
         'categoria': categoria_obj,
         'sub_categorias': sub_categorias,
-        'cantidad_productos': len(productos),
         'filtro': filtro,
         'atributos_unicos': atributos_unicos,
         'marcas': marcas,
         'filtros_aplicados': filtros_aplicados,
         'pagina': pagina,
         'subcategoria_obj': subcategoria_obj,
-        'prod_totales':prod_totales
     })
 
 # ----- Busqueda de productos ----- #
-def buscar_productos(request):
+def return_busqueda(request,type='default'):
     query = request.GET.get('q', '')
+    pagina_actual = request.GET.get('pagina', 1)
 
-    #* Si encuentra una busqueda procede a realizar el filtro
     if query:
         palabras = query.split()
         productos = Producto.objects.filter(
@@ -231,40 +225,32 @@ def buscar_productos(request):
         )
         for palabra in palabras[1:]:
             productos = productos.filter(Q(nombre__icontains=palabra))
-
-        productos, filtro = ordenby(request, productos)
-
-        pagina_actual = request.GET.get('pagina', 1)
-        paginator = Paginator(productos, 12)
-        pagina = paginator.get_page(pagina_actual)
-
-        productos = pagina.object_list
-
-        return render(request, 'products/search_filter.html', {
-            'productos_imagen': productos,
-            'cantidad_productos': len(productos),
-            'query': query,
-            'filtro': filtro,
-            'pagina':pagina
-        })
-
-    #* En el caso de no encontrar nada se muestran todos los productos
-    productos =Producto.objects.all()
+    else:
+        productos =Producto.objects.all()
+    
     productos, filtro = ordenby(request, productos)
-
-    pagina_actual = request.GET.get('pagina', 1)
     paginator = Paginator(productos, 12)
     pagina = paginator.get_page(pagina_actual)
-
     productos = pagina.object_list
 
-    return render(request, 'products/search_filter.html', {
+    if type == 'default':
+        return render(request, 'products/search_filter.html', {
             'productos': productos,
-            'cantidad_productos': len(productos),
             'query': query,
             'filtro': filtro,
             'pagina':pagina
         })
+    elif type == 'ajax':
+        html_productos = render_to_string('partials/product_grid.html',{'productos':productos})
+        html_pagina = render_to_string('partials/paginacion.html',{'pagina':pagina})
+        html_filtro = render_to_string('partials/orden_resultado.html',{'filtro':filtro,'pagina':pagina})
+        return JsonResponse({'html':html_productos,'paginacion':html_pagina,'orden':html_filtro})
+
+def buscar_productos_ajax(request):
+    return return_busqueda(request,type='ajax')
+
+def buscar_productos(request):
+    return return_busqueda(request,type='default')
 
 # ----- Vista individual del producto ----- #
 def producto_view(request,product_slug):

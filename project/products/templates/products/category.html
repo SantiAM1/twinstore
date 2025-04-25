@@ -47,7 +47,6 @@
 </div>
 {% endblock contenidomain %}
 {% block myscripts %}
-
 {% if subcategoria_obj %}
 <script nonce="{{ request.csp_nonce }}">
     window.filters = {
@@ -61,6 +60,5 @@
     };
 </script>
 {% endif %}
-
 <script src="{% static 'js/dinamic-filter.js' %}"></script>
 {% endblock myscripts %}

@@ -84,6 +84,7 @@ def mi_perfil(request):
             perfil.provincia = data['provincia']
             perfil.codigo_postal = data['codigo_postal']
             perfil.telefono = data['telefono']
+            perfil.preferencias_promociones = data['preferencias_promociones']
             perfil.save()
             messages.success(request,'Usuario actualizado con exito!')
     form = UsuarioForm(initial={
@@ -99,6 +100,7 @@ def mi_perfil(request):
             'codigo_postal': perfil.codigo_postal,
             'email': request.user.email,
             'telefono': perfil.telefono,
+            'preferencias_promociones': perfil.preferencias_promociones
         })
     return render(request,'users/perfil.html',{
         'form':form
