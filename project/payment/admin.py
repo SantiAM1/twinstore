@@ -15,12 +15,13 @@ class ComprobanteTransferenciaInline(admin.StackedInline):
 
 @admin.register(HistorialCompras)
 class HistorialComprasAdmin(admin.ModelAdmin):
-    list_display = ('merchant_order_id', 'mostrar_nombre_apellido', 'total_compra', 'estado', 'fecha_compra','fecha_finalizado')
-    readonly_fields = ('merchant_order_id','detalle_productos','datos_facturacion_expandible','fecha_compra','fecha_finalizado','forma_de_pago','total_compra')
+    list_filter = ('estado', 'estado_staff', 'fecha_compra')
+    list_display = ('merchant_order_id', 'mostrar_nombre_apellido', 'total_compra', 'estado', 'fecha_compra','fecha_finalizado','estado_staff')
+    readonly_fields = ('merchant_order_id','detalle_productos','datos_facturacion_expandible','fecha_compra','forma_de_pago','total_compra','fecha_finalizado')
     fieldsets = (
         (None, {
             'fields': (
-                'detalle_productos','merchant_order_id','total_compra', 'estado', 'forma_de_pago', 'fecha_finalizado','datos_facturacion_expandible'
+                'detalle_productos','merchant_order_id','total_compra', 'estado', 'forma_de_pago', 'fecha_finalizado','datos_facturacion_expandible','estado_staff',
             )
         }),
     )
@@ -72,6 +73,11 @@ class HistorialComprasAdmin(admin.ModelAdmin):
             return False  # no permitir borrar desde la lista
         return obj.estado in ['finalizado', 'arrepentido']
 
+    def advertencia_verificacion(self, obj):
+        if not obj.verificado:
+            return format_html('<span style="color: red; font-weight: bold;">Este historial NO está verificado. ¡Por favor, revise la operación!</span>')
+        return format_html('<span style="color: green; font-weight: bold;">Historial verificado correctamente.</span>')
+
     def detalle_productos(self, obj):
         if not obj.productos:
             return "Sin productos."
@@ -99,3 +105,4 @@ class HistorialComprasAdmin(admin.ModelAdmin):
     detalle_productos.short_description = "Detalle de compra"
     mostrar_nombre_apellido.short_description = "Cliente"
     datos_facturacion_expandible.short_description = "Datos de facturación"
+    advertencia_verificacion.short_description = "Estado de verificación"

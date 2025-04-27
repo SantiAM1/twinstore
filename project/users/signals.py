@@ -11,10 +11,9 @@ def crear_perfil_usuario(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def guardar_perfil_usuario(sender, instance, **kwargs):
-    # Guarda automáticamente el perfil si el usuario se actualiza
     if hasattr(instance, 'perfil'):
         instance.perfil.save()
 
-@receiver(post_save, sender=DatosFacturacion)
-def enviar_mail_compra(sender, instance, **kwargs):
-    mail_buy_send_html(instance.historial,instance.email)
+# @receiver(post_save, sender=DatosFacturacion)
+# def enviar_mail_compra(sender, instance, **kwargs):
+#     mail_buy_send_html(instance.historial,instance.email)

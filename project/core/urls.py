@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import home,local,cargar_productos_excel,buscar_productos,verificar_throttle,politicas_priv,politicas_devolicion,politicas_envios,preguntas_frecuentes,terminos_condiciones
+from .views import home,local,cargar_productos_excel,buscar_productos,verificar_throttle,politicas_priv,politicas_devolicion,politicas_envios,preguntas_frecuentes,terminos_condiciones,boton_arrepentimiento
 
 app_name = "core"
 
@@ -13,5 +13,6 @@ urlpatterns = [
     path('politicas-devoluciones/',politicas_devolicion,name="politicas-devolucion"),
     path('politicas-envios/',politicas_envios,name="politicas-envios"),
     path('preguntas-frecuentes/',preguntas_frecuentes,name="faq"),
-    path('terminos-condiciones/',terminos_condiciones,name="terminos-condiciones")
+    path('terminos-condiciones/',terminos_condiciones,name="terminos-condiciones"),
+    path('arrepentimiento/',boton_arrepentimiento,name="arrepentimiento")
 ]

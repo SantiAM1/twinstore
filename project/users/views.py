@@ -4,6 +4,7 @@ from .models import PerfilUsuario
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
+from django.views.decorators.http import require_POST
 from payment.models import HistorialCompras
 import uuid
 from django.contrib.auth.decorators import login_required
@@ -41,6 +42,17 @@ class RecibirMailView(APIView):
             return Response({'html':html})
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@require_POST
+def arrepentimiento_post(request, historial_id):
+    historial = get_object_or_404(HistorialCompras,id=historial_id)
+    if not historial.check_arrepentimiento():
+        messages.error(request,'Hubo un error al solicitar el Arrepentimiento')
+        return redirect('users:ver_pedidos',token=historial.token_consulta)
+    historial.estado = 'arrepentido'
+    historial.save()
+    messages.success(request,'Arrepentimiento solicitado con exito')
+    return redirect('users:ver_pedidos',token=historial.token_consulta)
 
 @login_required
 def asociar_pedido(request):

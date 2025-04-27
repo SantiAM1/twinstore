@@ -1,8 +1,16 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
 from .models import PagoRecibidoMP, HistorialCompras,ComprobanteTransferencia
 from users.emails import mail_estado_pedido_html
 from django.utils import timezone
+
+# @receiver(post_save, sender=HistorialCompras)
+# def enviar_actualizacion_compra(sender, instance, created, **kwargs):
+#     """
+#     Se envia un mail al actualizar el historial de compras.
+#     """
+#     if instance.recibir_mail and (instance.forma_de_pago == "transferencia" and instance.estado != "pendiente") or (instance.forma_de_pago == "efectivo" and instance.estado != "confirmado") or (instance.forma_de_pago == "mercado pago" and instance.estado != "pendiente"):
+#         mail_estado_pedido_html(instance, instance.facturacion.email)
 
 @receiver(post_save, sender=HistorialCompras)
 def fecha_finalizacion_historial(sender, instance, created, **kwargs):
@@ -12,20 +20,32 @@ def fecha_finalizacion_historial(sender, instance, created, **kwargs):
     if instance.estado == "finalizado" and not instance.fecha_finalizado:
         HistorialCompras.objects.filter(pk=instance.pk).update(fecha_finalizado=timezone.now())
 
-
 @receiver(post_save, sender=HistorialCompras)
-def enviar_actualizacion_compra(sender, instance, created, **kwargs):
+def estado_arrepentido_staff(sender, instance, created, **kwargs):
     """
-    Se envia un mail al actualizar el historial de compras.
+    Cuando un pedido es arrepentido, quita la verificacion
     """
-    if instance.recibir_mail and (instance.forma_de_pago == "transferencia" and instance.estado != "pendiente") or (instance.forma_de_pago == "efectivo" and instance.estado != "confirmado") or (instance.forma_de_pago == "mercado pago" and instance.estado != "pendiente"):
-        mail_estado_pedido_html(instance, instance.facturacion.email)
+    if instance.estado == "arrepentido" and instance.estado_staff != 'no verificado':
+        HistorialCompras.objects.filter(pk=instance.pk).update(estado_staff='no verificado')
 
 @receiver(post_save, sender=ComprobanteTransferencia)
 def aprobar_historial_transferencia(sender, instance, created, **kwargs):
-    if instance.aprobado and instance.historial.estado != 'confirmado':
-        instance.historial.estado = 'confirmado'
-        instance.historial.save()
+    """
+    Actualiza el estado del Historial cuando se cambia el estado del comprobante
+    """
+    if instance.estado == 'aprobado':
+        HistorialCompras.objects.filter(pk=instance.historial.pk).update(estado='confirmado')
+    elif instance.estado == 'rechazado':
+        instance.delete()
+
+@receiver(post_save, sender=ComprobanteTransferencia)
+def actualizar_verificacion_transferencia(sender, instance, created, **kwargs):
+    """
+    Cambia el ESTADO STAFF cuando se recibe una transferencia
+    """
+    historial = instance.historial
+    if created:
+        HistorialCompras.objects.filter(pk=historial.pk).update(estado_staff='transferencia recibida')
 
 @receiver(post_save, sender=PagoRecibidoMP)
 def asociar_pago_y_actualizar_estado(sender, instance, created, **kwargs):

@@ -2,6 +2,8 @@ from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
+from django.utils import timezone
+from datetime import timedelta
 
 class HistorialCompras(models.Model):
     ESTADOS = [
@@ -20,6 +22,16 @@ class HistorialCompras(models.Model):
         ('transferencia','Transferencia')
     ]
 
+    ESTADOS_STAFF = [
+    ('no verificado', 'No verificado'),
+    ('revision en curso', 'Revisión en curso'),
+    ('esperando respuesta', 'Esperando respuesta del cliente'),
+    ('pedido realizado', 'Pedido realizado al proveedor'),
+    ('completado', 'Completado'),
+    ('cancelado', 'Cancelado'),
+    ('transferencia recibida','Transferencia recibida')
+    ]
+
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     productos = models.JSONField()
     total_compra = models.DecimalField(max_digits=10, decimal_places=2)
@@ -31,6 +43,7 @@ class HistorialCompras(models.Model):
     token_consulta = models.UUIDField(default=uuid.uuid4, unique=True)
     recibir_mail = models.BooleanField(default=False)
     fecha_finalizado = models.DateTimeField(null=True,blank=True)
+    estado_staff = models.CharField(max_length=50,choices=ESTADOS_STAFF,default='no verificado')
 
     def __str__(self):
         if self.usuario:
@@ -51,6 +64,17 @@ class HistorialCompras(models.Model):
         subtotal = Decimal(sum(producto['subtotal'] for producto in self.productos))
         return self.total_compra - subtotal
 
+    def check_notificacion(self):
+        return True if not self.estado in ['arrepentido','finalizado','rechazado'] else False
+
+    def check_comprobante(self):
+        return True if (self.forma_de_pago == 'transferencia' and not self.estado in ['finalizado','arrepentido']) else False
+
+    def check_arrepentimiento(self):
+        if not self.fecha_finalizado or self.estado == 'arrepentido':
+            return False
+        limite = self.fecha_finalizado + timedelta(days=10)
+        return timezone.now() <= limite
 
 class PagoRecibidoMP(models.Model):
     payment_id = models.CharField(max_length=100, unique=True)
@@ -68,10 +92,17 @@ class PagoRecibidoMP(models.Model):
 from django.db import models
 
 class ComprobanteTransferencia(models.Model):
+
+    ESTADOS = [
+        ('aprobado','Aprobado'),
+        ('rechazado','Rechazado'),
+        ('no verificado','No verificado')
+    ]
+
     historial = models.OneToOneField("HistorialCompras", on_delete=models.CASCADE, related_name="comprobante")
     file = models.FileField(upload_to="comprobantes/")
     fecha_subida = models.DateTimeField(auto_now_add=True)
-    aprobado = models.BooleanField(default=False)
+    estado = models.CharField(max_length=20,choices=ESTADOS,default='no verificado')
     observaciones = models.TextField(blank=True, null=True)
 
     def __str__(self):

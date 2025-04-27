@@ -33,6 +33,7 @@
 
 .faq h1 {
     margin-bottom: 1rem;
+    font-family: 'Roboto';
 }
 
 .faq details {
@@ -53,4 +54,5 @@
     margin: 1rem 0;
     line-height: 1.6;
     color: #1f1f1f;
+    font-family: 'Roboto';
 }

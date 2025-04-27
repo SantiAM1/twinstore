@@ -22,6 +22,9 @@ from django.utils.timezone import now
 from core.utils import obtener_valor_dolar
 # Create your views here.
 
+def boton_arrepentimiento(request):
+    return render(request,'core/arrepentimiento.html')
+
 def terminos_condiciones(request):
     return render(request,'core/terminos_condiciones.html')
 

@@ -38,7 +38,7 @@
 .nav-productos-items {
     background-color: #ededed;
     color: #242424;
-    padding: 1rem;
+    padding: 0.8rem;
     gap: 1rem;
 }
 
@@ -78,6 +78,10 @@
 .result-productos-titulo:hover {
     color: var(--color-ts);
     border-color: var(--color-ts);
+}
+
+.hover-pad-weight {
+    font-size: 0.9rem;
 }
 
 .hover-pad-weight:hover {

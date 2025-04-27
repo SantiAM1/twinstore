@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="{% static 'css/pedidos.css' %}">
 <link rel="stylesheet" href="{% static 'css/substyles/login-register.css' %}">
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
+<link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}">
 {% endblock headend %}
 
 {% block contenidomain %}
@@ -24,77 +25,7 @@
             {% endfor %}
         {% endif %}
         <h1 style="font-family: 'Roboto';text-align: start;padding-bottom: 1rem;font-weight: 300;border-bottom: 1px solid #d6d6d6;margin: 1rem;">Pedido</h1>
-        <table class="users-pedidos-table width-100 text-center">
-            <thead>
-                <tr>
-                    <th>Pedido</th>
-                    <th class="users-pedidos-hide">ID de pago</th>
-                    <th class="users-pedidos-hide">Fecha</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="cart-divider-main" colspan="4"></td>
-                </tr>
-                {% for pedido in historial %}
-                <tr class="users-pedidos-tr">
-                    <td>
-                        <ul>
-                            {% for producto in pedido.productos %}
-                                <li class="flex items-center gap-05rem">
-                                    <div class="notification-box">
-                                        {% include 'partials/notificacion.html' %}
-                                    </div>
-                                    <div>
-                                        <span class="users-pedido-count font-bold">{{producto.cantidad}} x</span>
-                                        <p class="users-pedido-prod font-bold"> {{producto.nombre}}</p>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                            {% if pedido.forma_de_pago == 'transferencia' %}
-                                {% if pedido.comprobante %}
-                                    <p class="link-subir-comprobante decoration-none font-roboto subido"><i class="bi bi-paperclip"></i> Comprobante adjunto</p>
-                                {% else %}
-                                    <a href="{% url 'payment:comprobante' pedido.token_consulta %}" class="link-subir-comprobante decoration-none font-roboto"><i class="bi bi-paperclip"></i> Subir comprobante</a>
-                                {% endif %}
-                            {% endif %}
-                        </ul>
-                        <p class="users-pedidos-hide-id display-none width-100 font-roboto">ID de pago: <span>#{{pedido.merchant_order_id}}</span></p>
-                    </td>
-                    <td class="users-pedidos-id users-pedidos-hide font-bold">#{{pedido.merchant_order_id}}</td>
-                    <td class="users-pedidos-hide">{{pedido.fecha_compra|date:"d/m/y"}}</td>
-                    <td>
-                        {% if pedido.estado == 'confirmado' %}
-                            <div style="background-color: #9dfca1;color: #196b00;" class="users-pedidos-status">
-                                <span>{{pedido.estado|capfirst}}</span>
-                            </div>
-                        {% elif pedido.estado == 'rechazado' %}
-                            <div style="background-color: #f59f9f;color: #8a1919;" class="users-pedidos-status">
-                                <span>{{pedido.estado|capfirst}}</span>
-                            </div>
-                        {% elif pedido.estado == 'pendiente' %}
-                            <div style="background-color: #f5ec9f;color: #7b8315;" class="users-pedidos-status">
-                                <span>{{pedido.estado|capfirst}}</span>
-                            </div>
-                        {% elif pedido.estado == 'preparando pedido' %}
-                            <div style="background-color: #9fcbf5;color: #1d70a0;" class="users-pedidos-status">
-                                <span>{{pedido.estado|capfirst}}</span>
-                            </div>
-                        {% elif pedido.estado == 'enviado' %}
-                            <div style="background-color: #da9ff5;color: #911da0;" class="users-pedidos-status">
-                                <span>{{pedido.estado|capfirst}}</span>
-                            </div>
-                        {% elif pedido.estado == 'finalizado' %}
-                        <div style="background-color: #c2c2c2;color: #494949;" class="users-pedidos-status">
-                            <span>{{pedido.estado|capfirst}}</span>
-                        </div>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% include 'partials/table_pedidos.html' %}
     </div>
     <div id="loading-overlay" class="loading-overlay position-fixed display-none flex-column items-center justify-center">
         <div class="spinner"></div>

@@ -1,4 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.btn-arrepentimiento').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modalId = this.getAttribute('data-modal-id');
+            document.getElementById(modalId).style.display = 'block';
+        });
+    });
+    
+    document.querySelectorAll('.cancelar-arrepentimiento').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modalId = this.getAttribute('data-modal-id');
+            document.getElementById(modalId).style.display = 'none';
+        });
+    });
     function asignarListenersNotificaciones() {
         document.addEventListener('click', async function (e) {
             const btn = e.target.closest('.button-notification');

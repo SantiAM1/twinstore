@@ -3,173 +3,86 @@
 <div class="header flex flex-column">
     <div class="header-item flex top-header-item">
         <a href="{% url 'core:home' %}">
-            <img
-                src="{% static 'img/logo.webp' %}"
-                alt="LOGO"
-                class="logo"
-                loading="lazy"
-            />
+            <img src="{% static 'img/logo.webp' %}" alt="LOGO" class="logo" loading="lazy"/>
         </a>
         <div class="busqueda-box position-relative">
-            <form
-                method="GET"
-                action="{% url 'products:search' %}"
-                class="busqueda b-arriba position-relative"
-                autocomplete="off"
-            >
-                <input
-                    name="q"
-                    type="text"
-                    placeholder="Buscar Productos..."
-                    value="{{ query }}"
-                    id="busqueda-input-arriba"
-                    class="busqueda-input border-none bg-transparent font-roboto width-100"
-                />
-                <button
-                    type="submit"
-                    class="busqueda-boton position-absolute border-none bg-transparent cursor-pointer"
-                >
-                    <i class="bi bi-search lupa"></i>
-                </button>
+            <form method="GET" action="{% url 'products:search' %}" class="busqueda b-arriba position-relative" autocomplete="off">
+                <input name="q" type="text" placeholder="Buscar Productos..." value="{{ query }}" id="busqueda-input-arriba" class="busqueda-input border-none bg-transparent font-roboto width-100"/>
+                <button type="submit"class="busqueda-boton position-absolute border-none bg-transparent cursor-pointer"><i class="bi bi-search lupa"></i></button>
             </form>
-            <div
-                id="sugerencias-arriba"
-                class="sugerencias-box position-absolute width-100"
-                style="display: none"
-            ></div>
+            <div id="sugerencias-arriba" class="sugerencias-box position-absolute width-100" style="display: none"></div>
         </div>
         <div class="box-carrito-login flex items-center position-relative">
-            <a
-                href="{% url 'cart:ver_carrito' %}"
-                class="carrito flex items-center position-relative text-center"
-            >
-                <div class="carrito-total-precio font-roboto position-relative">
-                    Carrito / {{total_precio|formato_pesos}}
-                </div>
+            <a href="{% url 'cart:ver_carrito' %}" class="carrito flex items-center position-relative text-center">
+                <div class="carrito-total-precio font-roboto position-relative">Carrito / {{total_precio|formato_pesos}}</div>
                 <i class="bi bi-cart-fill"></i>
-                <div
-                    class="flex justify-center items-center position-absolute carrito-cantidad"
-                    id="carrito-cantidad"
-                >
-                    {{total_productos}}
-                </div>
+                <div class="flex justify-center items-center position-absolute carrito-cantidad" id="carrito-cantidad">{{total_productos}}</div>
             </a>
-            <div
-                id="carrito-feedback"
-                class="carrito-feedback oculto position-absolute font-roboto bg-white"
-            ></div>
+            <div id="carrito-feedback" class="carrito-feedback oculto position-absolute font-roboto bg-white"></div>
             <div class="user-menu cursor-pointer position-relative">
                 <div class="user-icon flex items-center">
                     <i class="bi bi-person"></i>
                     <i class="bi bi-chevron-down"></i>
                 </div>
-
-                <ul
-                    class="dropdown list-none position-absolute"
-                    id="userDropdown"
-                >
-                    {% if user.is_authenticated %} {% if user.is_staff %}
-                    <li>
-                        <a
-                            href="{% url 'admin:index' %}"
-                            class="dropdown-buttons display-block decoration-none font-roboto"
-                            >🔐 Panel de administración</a
-                        >
-                    </li>
-                    <li>
-                        <a
-                            href="{% url 'core:cargar_excel' %}"
-                            class="dropdown-buttons display-block decoration-none font-roboto"
-                            >🗂️ Administrar productos</a
-                        >
-                    </li>
+                <ul class="dropdown list-none position-absolute" id="userDropdown">
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                        <li>
+                            <a href="{% url 'admin:index' %}" class="dropdown-buttons display-block decoration-none font-roboto">🔐 Panel de administración</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'core:cargar_excel' %}" class="dropdown-buttons display-block decoration-none font-roboto">🗂️ Administrar productos</a>
+                        </li>
                     {% endif %}
-                    <li>
-                        <a
-                            href="{% url 'users:perfil' %}"
-                            class="dropdown-buttons display-block decoration-none font-roboto"
-                            >Perfil</a
-                        >
-                    </li>
-                    <li>
-                        <a
-                            href="{% url 'users:mispedidos' %}"
-                            class="dropdown-buttons display-block decoration-none font-roboto"
-                            >Mis Pedidos</a
-                        >
-                    </li>
-                    <li>
-                        <a
-                            href="{% url 'users:logout' %}"
-                            class="dropdown-buttons display-block decoration-none font-roboto"
-                            >Cerrar Sesión</a
-                        >
-                    </li>
+                        <li>
+                            <a href="{% url 'users:perfil' %}" class="dropdown-buttons display-block decoration-none font-roboto">Perfil</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'users:mispedidos' %}"class="dropdown-buttons display-block decoration-none font-roboto">Mis Pedidos</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'users:logout' %}"class="dropdown-buttons display-block decoration-none font-roboto">Cerrar Sesión</a>
+                        </li>
                     {% else %}
-                    <li>
-                        <a
-                            href="{% url 'users:login' %}"
-                            class="dropdown-buttons display-block decoration-none font-roboto"
-                            >Iniciar Sesión</a
-                        >
-                    </li>
-                    <li>
-                        <a
-                            href="{% url 'users:singup' %}"
-                            class="dropdown-buttons display-block decoration-none font-roboto"
-                            >Registrarse</a
-                        >
-                    </li>
+                        <li>
+                            <a href="{% url 'users:login' %}" class="dropdown-buttons display-block decoration-none font-roboto">Iniciar Sesión</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'users:singup' %}" class="dropdown-buttons display-block decoration-none font-roboto">Registrarse</a>
+                        </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </div>
     <div class="header-item flex">
-        <button
-            id="open-menu"
-            class="menu-toggle font-roboto border-none display-none bg-transparent cursor-pointer"
-        >
-            ☰ Menú
-        </button>
+        <button id="open-menu"class="menu-toggle font-roboto border-none display-none bg-transparent cursor-pointer">☰ Menú</button>
         <nav class="navbar position-relative" id="nav">
-            <div
-                class="box-productos-display flex display-none position-absolute"
-                id="box-productos-display"
-            >
+            <div class="box-productos-display flex display-none position-absolute" id="box-productos-display">
                 <ul class="ul-productos-display">
-                    <li
-                        class="nav-productos-items flex categoria-selec"
-                        id="prod_item-componentes"
-                    >
+                    <li class="nav-productos-items flex categoria-selec" id="prod_item-componentes">
                         <i class="bi bi-cpu"></i>Componentes
                     </li>
-                    <li
-                        class="nav-productos-items flex"
-                        id="prod_item-computos"
-                    >
+                    <li class="nav-productos-items flex" id="prod_item-computos">
                         <i class="bi bi-pc-display"></i>Computos
                     </li>
-                    <li
-                        class="nav-productos-items flex"
-                        id="prod_item-accesorios"
-                    >
+                    <li class="nav-productos-items flex" id="prod_item-accesorios">
                         <i class="bi bi-headphones"></i>Accesorios
-                    </li>
-                    <li
-                        class="nav-productos-items flex"
-                        id="prod_item-celulares"
-                    >
-                        <i class="bi bi-printer"></i>Impresion
                     </li>
                     <li class="nav-productos-items flex" id="prod_item-gaming">
                         <i class="bi bi-controller"></i>Gaming
                     </li>
+                    <li class="nav-productos-items flex" id="prod_item-celulares">
+                        <i class="bi bi-phone"></i>Celulares
+                    </li>
+                    <li class="nav-productos-items flex" id="prod_item-impresion">
+                        <i class="bi bi-printer"></i>Impresion
+                    </li>
+                    <li class="nav-productos-items flex" id="prod_item-marcas">
+                        <i class="bi bi-boxes"></i>Marcas
+                    </li>
                 </ul>
-                <div
-                    class="result-productos-display flex"
-                    id="result-productos-display"
-                >
+                <div class="result-productos-display flex"id="result-productos-display">
                     <div class="result-productos-column flex">
                         <a href="#" class="result-productos-titulo">Hardware</a>
                         <a href="#" class="hover-pad-weight">Gabinetes</a>
@@ -180,96 +93,59 @@
                         <a href="#" class="hover-pad-weight">Coolers</a>
                     </div>
                     <div class="result-productos-column flex">
-                        <a href="#" class="result-productos-titulo"
-                            >Almacenamiento</a
-                        >
+                        <a href="#" class="result-productos-titulo">Almacenamiento</a>
                         <a href="#" class="hover-pad-weight">Discos Internos</a>
-                        <a href="#" class="hover-pad-weight"
-                            >Discos Internos SSD</a
-                        >
+                        <a href="#" class="hover-pad-weight">Discos Internos SSD</a>
                         <a href="#" class="hover-pad-weight">Discos Externos</a>
-                        <a href="#" class="hover-pad-weight"
-                            >Discos Externos SSD</a
-                        >
+                        <a href="#" class="hover-pad-weight">Discos Externos SSD</a>
                         <a href="#" class="hover-pad-weight">Pen Drive</a>
                         <a href="#" class="hover-pad-weight">Memorias Flash</a>
                     </div>
                     <div class="result-productos-column flex">
-                        <a href="#" class="result-productos-titulo"
-                            >Memoria Ram</a
-                        >
-                        <a href="#" class="hover-pad-weight"
-                            >Memorias Notebook</a
-                        >
+                        <a href="#" class="result-productos-titulo">Memoria Ram</a>
+                        <a href="#" class="hover-pad-weight">Memorias Notebook</a>
                         <a href="#" class="hover-pad-weight">Memorias PC</a>
                     </div>
                 </div>
             </div>
             <ul class="nav-list flex">
                 <li>
-                    <button
-                        class="nav-boton nav-item flex border-none bg-transparent cursor-pointer items-center"
-                        id="boton-productos"
-                    >
+                    <button class="nav-boton nav-item flex border-none bg-transparent cursor-pointer items-center" id="boton-productos">
                         <i class="bi bi-cpu icon-navbar"></i>
                         <div>Productos<i class="bi bi-chevron-down"></i></div>
                     </button>
                 </li>
                 <li>
-                    <a
-                        href="{% url 'users:buscar_pedidos' %}"
-                        class="nav-link nav-item"
-                    >
-                        <i class="bi bi-box-seam icon-navbar"></i>
-                        Pedidos
+                    <a href="{% url 'users:buscar_pedidos' %}" class="nav-link nav-item">
+                        <i class="bi bi-box-seam icon-navbar"></i> Pedidos
                     </a>
                 </li>
                 <li>
                     <a href="#" class="nav-link nav-item">
-                        <i class="bi bi-person icon-navbar"></i>
-                        Quienes somos
+                        <i class="bi bi-person icon-navbar"></i> Quiénes somos
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'core:local' %}" class="nav-link nav-item">
-                        <i class="bi bi-geo-alt icon-navbar"></i>
-                        Punto de retiro
+                        <i class="bi bi-geo-alt icon-navbar"></i> Punto de retiro
                     </a>
                 </li>
                 <li>
                     <a href="#" class="nav-link nav-item">
-                        <i class="bi bi-gear icon-navbar"></i>
-                        Servicio Tecnico
+                        <i class="bi bi-gear icon-navbar"></i> Servicio Técnico
                     </a>
                 </li>
                 <li>
                     <a href="#" class="nav-link nav-item">
-                        <i class="bi bi-chat icon-navbar"></i>
-                        Contacto
+                        <i class="bi bi-chat icon-navbar"></i> Contacto
                     </a>
                 </li>
             </ul>
         </nav>
-        <div
-            class="busqueda-box busqueda-boton-button position-relative display-none"
-        >
-            <form
-                method="GET"
-                action="{% url 'products:search' %}"
-                class="busqueda position-relative b-abajo display-none"
-                autocomplete="off"
-            >
-                <input
-                    name="q"
-                    type="text"
-                    placeholder="Buscar Productos..."
-                    value="{{ query }}"
-                    id="busqueda-input-abajo"
-                    class="busqueda-input border-none bg-transparent width-100"
-                />
-                <button
-                    class="busqueda-boton position-absolute border-none bg-transparent cursor-pointer"
-                >
+        <div class="busqueda-box busqueda-boton-button position-relative display-none">
+            <form method="GET" action="{% url 'products:search' %}" class="busqueda position-relative b-abajo display-none" autocomplete="off">
+                <input name="q" type="text" placeholder="Buscar Productos..." value="{{ query }}" id="busqueda-input-abajo" class="busqueda-input border-none bg-transparent width-100"/>
+                <button class="busqueda-boton position-absolute border-none bg-transparent cursor-pointer">
                     <i class="bi bi-search lupa"></i>
                 </button>
             </form>

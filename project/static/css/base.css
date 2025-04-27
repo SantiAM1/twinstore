@@ -103,15 +103,14 @@ body[data-theme="black"] {
     transition: height 0.3s ease, padding 0.3s ease;
 }
 
-.header a {
-    text-decoration: none;
-    font-size: 0.8rem;
-}
+
 
 .header {
     max-width: 80vw;
     margin: auto;
 }
+
+.header a {text-decoration: none;}
 
 .header-item {
     justify-content: space-evenly;
