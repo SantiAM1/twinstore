@@ -35,14 +35,7 @@ class SubCategoria(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            prefijo = self.categoria.nombre[0].lower()
-            base_slug = f"{prefijo}-{slugify(self.nombre)}"
-            slug = base_slug
-            i = 1
-            while SubCategoria.objects.exclude(id=self.id).filter(slug=slug).exists():
-                slug = f"{base_slug}-{i}"
-                i += 1
-            self.slug = slug
+            self.slug = slugify(self.nombre)
         super().save(*args, **kwargs)
 
 
@@ -106,7 +99,7 @@ class Atributo(models.Model):
 
     def __str__(self):
         return f"{self.nombre}: {self.valor}"
-    
+
 class CategoriaEspecificacion(models.Model):
     nombre = models.CharField(max_length=100)
 

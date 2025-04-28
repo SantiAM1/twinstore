@@ -16,31 +16,26 @@
 <link rel="stylesheet" href="{% static 'css/home.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}"/>
 <link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}"/>
-<style>
-    .swiper-slide picture {
-        width: 100%;
-    }
-</style>
 {% endblock head %}
 
 {% block contenidomain %}
 <section class="carousel position-relative overflow-hidden">
     <div class="carousel-track flex height-100">
         <picture>
-            <source media="(max-width: 768px)" srcset="{% static 'img/banner_1_mobile.webp' %}">
-            <img src="{% static 'img/banner_1.webp' %}" alt="Banner 1" fetchpriority="high" class="height-100">
+            <source media="(max-width: 768px)" srcset="{% static 'img/banners/banner_1_mobile.webp' %}">
+            <img src="{% static 'img/banners/banner_1.webp' %}" alt="Banner 1" fetchpriority="high" class="height-100">
         </picture>
         <picture>
-            <source media="(max-width: 768px)" srcset="{% static 'img/banner_2_mobile.webp' %}">
-            <img src="{% static 'img/banner_2.webp' %}" alt="Banner 2" loading="lazy" class="height-100">
+            <source media="(max-width: 768px)" srcset="{% static 'img/banners/banner_2_mobile.webp' %}">
+            <img src="{% static 'img/banners/banner_2.webp' %}" alt="Banner 2" loading="lazy" class="height-100">
         </picture>
         <picture>
-            <source media="(max-width: 768px)" srcset="{% static 'img/banner_3_mobile.webp' %}">
-            <img src="{% static 'img/banner_3.webp' %}" alt="Banner 3" loading="lazy" class="height-100">
+            <source media="(max-width: 768px)" srcset="{% static 'img/banners/banner_3_mobile.webp' %}">
+            <img src="{% static 'img/banners/banner_3.webp' %}" alt="Banner 3" loading="lazy" class="height-100">
         </picture>
         <picture>
-            <source media="(max-width: 768px)" srcset="{% static 'img/banner_3_mobile.webp' %}">
-            <img src="{% static 'img/banner_4.webp' %}" alt="Banner 3" loading="lazy" class="height-100">
+            <source media="(max-width: 768px)" srcset="{% static 'img/banners/banner_3_mobile.webp' %}">
+            <img src="{% static 'img/banners/banner_4.webp' %}" alt="Banner 3" loading="lazy" class="height-100">
         </picture>
     </div>
 </section>
@@ -98,6 +93,7 @@
         </div>
     </section>
 </main>
+{% include 'widgets/contactanos.html' with color="white" %}
 {% if messages %}
     {% for message in messages %}
     <div class="notification-mainpage position-fixed">
@@ -135,15 +131,5 @@
             },
         },
     });
-    const carousel = new Swiper(".myCarousel", {
-        autoplay: {
-            delay: 3500,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: ".swiper-pagination",
-        },
-        loop: true,
-    })
 </script>
 {% endblock myscripts %}

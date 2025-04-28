@@ -64,19 +64,16 @@
                         <i class="bi bi-cpu"></i>Componentes
                     </li>
                     <li class="nav-productos-items flex" id="prod_item-computos">
-                        <i class="bi bi-pc-display"></i>Computos
+                        <i class="bi bi-pc-display"></i>PC | Notebooks
                     </li>
                     <li class="nav-productos-items flex" id="prod_item-accesorios">
-                        <i class="bi bi-headphones"></i>Accesorios
-                    </li>
-                    <li class="nav-productos-items flex" id="prod_item-gaming">
-                        <i class="bi bi-controller"></i>Gaming
+                        <i class="bi bi-headphones"></i>Periféricos
                     </li>
                     <li class="nav-productos-items flex" id="prod_item-celulares">
                         <i class="bi bi-phone"></i>Celulares
                     </li>
                     <li class="nav-productos-items flex" id="prod_item-impresion">
-                        <i class="bi bi-printer"></i>Impresion
+                        <i class="bi bi-printer"></i>Impresión
                     </li>
                     <li class="nav-productos-items flex" id="prod_item-marcas">
                         <i class="bi bi-boxes"></i>Marcas
@@ -90,21 +87,17 @@
                         <a href="#" class="hover-pad-weight">Motherboards</a>
                         <a href="#" class="hover-pad-weight">Procesadores</a>
                         <a href="#" class="hover-pad-weight">Fuentes</a>
-                        <a href="#" class="hover-pad-weight">Coolers</a>
+                        <a href="#" class="hover-pad-weight">Memoria Ram</a>
                     </div>
                     <div class="result-productos-column flex">
                         <a href="#" class="result-productos-titulo">Almacenamiento</a>
-                        <a href="#" class="hover-pad-weight">Discos Internos</a>
-                        <a href="#" class="hover-pad-weight">Discos Internos SSD</a>
+                        <a href="#" class="hover-pad-weight">Discos Rigidos</a>
+                        <a href="#" class="hover-pad-weight">Discos SSD</a>
                         <a href="#" class="hover-pad-weight">Discos Externos</a>
-                        <a href="#" class="hover-pad-weight">Discos Externos SSD</a>
-                        <a href="#" class="hover-pad-weight">Pen Drive</a>
-                        <a href="#" class="hover-pad-weight">Memorias Flash</a>
                     </div>
                     <div class="result-productos-column flex">
-                        <a href="#" class="result-productos-titulo">Memoria Ram</a>
-                        <a href="#" class="hover-pad-weight">Memorias Notebook</a>
-                        <a href="#" class="hover-pad-weight">Memorias PC</a>
+                        <a href="#" class="result-productos-titulo">Otros</a>
+                        <a href="#" class="hover-pad-weight">Coolers</a>
                     </div>
                 </div>
             </div>
@@ -121,7 +114,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link nav-item">
+                    <a href="{% url 'core:quienes_somos' %}" class="nav-link nav-item">
                         <i class="bi bi-person icon-navbar"></i> Quiénes somos
                     </a>
                 </li>
@@ -131,12 +124,12 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link nav-item">
+                    <a href="{% url 'core:servicio_tecnico' %}" class="nav-link nav-item">
                         <i class="bi bi-gear icon-navbar"></i> Servicio Técnico
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link nav-item">
+                    <a href="{% url 'core:contacto' %}" class="nav-link nav-item">
                         <i class="bi bi-chat icon-navbar"></i> Contacto
                     </a>
                 </li>

@@ -62,7 +62,7 @@
                 </div>
                 {% if producto.inhabilitar %}
                     <p class="font-bold font-roboto" style="font-style: italic;color: rgb(99, 35, 160);">Producto con alta rotacion de stock. Consultar disponibilidad</p>
-                    <a href="#" id="consultar-disponibilidad" data-name="{{producto.nombre}}"  class="decoration-none flex items-center text-center cursor-pointer product-cart display-block justify-center" style="">
+                    <a href="#" id="consultar-disponibilidad" data-name="{{producto.nombre}}" class="decoration-none flex items-center text-center cursor-pointer product-cart display-block justify-center" rel="noopener noreferrer">
                         <i class="bi bi-whatsapp"></i> Consultar disponiblidad
                     </a>
                 {% else %}
@@ -87,7 +87,7 @@
             </div>
         </div>
     </div>
-    <div class="product-specs">
+    <section class="product-specs">
         {% if producto.especificaciones.all %}
         <h2 class="font-roboto">Caracteristicas del producto</h2>
         <div class="product-specs-divider"></div>
@@ -113,8 +113,9 @@
             <h2>No hay especificaciones disponibles :/</h2>
         </div>
         {% endif %}
-    </div>
+    </section>
 </div>
+{% include 'widgets/gaming.html' with color="black" %}
 {% endblock contenidomain %}
 {% block myscripts %}
 <script src="{% static 'js/producto-view.js' %}"></script>

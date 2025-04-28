@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<meta name="description" content="Conocé todos los medios de contacto de Twinstore. Nosotros te asesoramos y solucionamos cualquier duda!">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Contacto - Twinstore</title>
+<link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="legales-box">
+    <h1>Contacto</h1>
+    <p>En Twinstore queremos que tu experiencia sea rápida, clara y cercana. Si necesitás ayuda o tenés alguna consulta, podés comunicarte directamente con nosotros:</p>
+    <ul class="contacto-links">
+        <li>
+            📩 Correo Electronico: <a href="mailto:contacto@twinstore.com.ar" class="politicas-link decoration-none">contacto@twinstore.com.ar</a>
+        </li>
+        <li>
+            📱 <a href="https://wa.me/5493413491911" target="_blank" rel="noopener noreferrer" class="politicas-link decoration-none">¡Chateá con nosotros por WhatsApp!</a>
+        </li>
+    </ul>
+</section>
+{% endblock contenidomain %}

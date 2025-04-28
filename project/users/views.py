@@ -51,7 +51,7 @@ def arrepentimiento_post(request, historial_id):
         return redirect('users:ver_pedidos',token=historial.token_consulta)
     historial.estado = 'arrepentido'
     historial.save()
-    messages.success(request,'Arrepentimiento solicitado con exito')
+    messages.success(request,'Arrepentimiento solicitado con éxito')
     return redirect('users:ver_pedidos',token=historial.token_consulta)
 
 @login_required
@@ -67,7 +67,7 @@ def asociar_pedido(request):
                 else:
                     historial.usuario = request.user
                     historial.save()
-                    messages.success(request,'Pedido asociado con exito!')
+                    messages.success(request,'Pedido asociado con éxito!')
                 return redirect('users:mispedidos')
             else:
                 messages.error(request, "No existe un pedido con ese código.")
@@ -98,7 +98,7 @@ def mi_perfil(request):
             perfil.telefono = data['telefono']
             perfil.preferencias_promociones = data['preferencias_promociones']
             perfil.save()
-            messages.success(request,'Usuario actualizado con exito!')
+            messages.success(request,'Usuario actualizado con éxito!')
     form = UsuarioForm(initial={
             'tipo_factura': perfil.tipo_factura,
             'dni_cuit': perfil.dni_cuit,
@@ -149,7 +149,7 @@ def ver_pedido(request,token):
 @login_required
 def cerrar_sesion(request):
     logout(request)
-    messages.info(request,'Sesion cerrada con exito!')
+    messages.info(request,'Sesién cerrada con éxito!')
     return redirect('core:home')
 
 def iniciar_sesion(request):
@@ -216,7 +216,7 @@ def verificar_email(request, token):
         perfil.email_verificado = True
         perfil.token_verificacion = None
         perfil.save()
-        messages.success(request,'Usuario confirmado con exito!')
+        messages.success(request,'Usuario confirmado con éxito!')
         return redirect('users:login')
     except:
         return render(request,'users/error_mail.html')

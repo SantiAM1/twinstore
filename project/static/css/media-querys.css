@@ -1,5 +1,25 @@
 /* --------Media Queries-------- */
+
+@media screen and (width <= 1200px) {
+    .quienes-box {
+        flex-direction: column;
+    }
+
+    .cards-box {padding: 0;}
+
+    .cards-swiper {
+        width: 200px;
+        height: 320px;
+    }
+}
+
 @media screen and (width <= 1024px) {
+    .mini-widget {
+        flex-direction: column;
+        gap: 2rem;
+        margin: 1rem;
+        padding: 2rem;
+    }
 
     .landing-content {font-size: 1rem;}
     

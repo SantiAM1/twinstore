@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<meta name="description" content="En Twinstore somos dos hermanos apasionados por el hardware, ayudando a otros a resolver sus necesidades tecnológicas con dedicación y pasión.">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Quiénes somos - Twinstore</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+<link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endblock head %}
+
+{% block contenidomain %}
+<main class="legales-box flex gap-1rem quienes-box items-center">
+    <div>
+        <h1 class="font-roboto">¿Quiénes somos?</h1>
+        <p>Somos dos hermanos mellizos apasionados por el hardware, un hobby de dos niños que con los años se convirtió en el proyecto de dos adultos.</p>
+        <br>
+        <p>Hoy en dia ambos estudiamos carreras universitarias, uno Medicina y otro Ingeniería, y nos dedicamos a ayudar a otros con sus necesidades tecnológicas.</p>
+        <br>
+        <p>Este proyecto es nuestra forma de crecer haciendo lo que amamos y ¿Qué mejor forma que compartirlo con ustedes?</p>
+        <div class="width-100 padding-10px border-1px"></div>
+        <div class="width-100 padding-10px"></div>
+        <p>Toda esta aventura comenzó hace muchos años nuestro padre, quien fue y es nuestro guía y mentor. Desde peques nos enseñó a armar y conectar compus, y la pasión en sus ojos se trasladó de forma inevitable a nosotros</p>
+        <br>
+        <p>Así, con el tiempo fuimos creciento entre cables, microprocesadores y gabinetes. Hoy seguimos sus pasos y construimos sobre sus hombros, porque este proyecto es, sin duda, fruto del amor de nuestro papá.</p>
+    </div>
+    <aside class="cards-box">
+        <div class="cards cards-swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><img src="{% static 'img/quienes-somos/foto1.webp' %}" alt=""></div>
+                <div class="swiper-slide"><img src="{% static 'img/quienes-somos/foto2.webp' %}" alt=""></div>
+                <div class="swiper-slide"><img src="{% static 'img/quienes-somos/foto3.webp' %}" alt=""></div>
+                <div class="swiper-slide"><img src="{% static 'img/quienes-somos/foto4.webp' %}" alt=""></div>
+                <div class="swiper-slide"><img src="{% static 'img/quienes-somos/foto5.webp' %}" alt=""></div>
+            </div>
+        </div>
+    </aside>
+</main>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script nonce="{{ request.csp_nonce }}">
+    const cards = new Swiper(".cards-swiper", {
+        effect: "cards",
+        grabCursor: true,
+    });
+</script>
+{% endblock myscripts %}
+

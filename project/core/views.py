@@ -22,6 +22,18 @@ from django.utils.timezone import now
 from core.utils import obtener_valor_dolar
 # Create your views here.
 
+def contacto(request):
+    return render(request,'core/contacto.html')
+
+def politicas_tecnico(request):
+    return render(request,'core/politicas_tecnico.html')
+
+def servicio_tecnico(request):
+    return render(request,'core/servicio_tecnico.html')
+
+def quienes_somos(request):
+    return render(request,'core/quienes_somos.html')
+
 def boton_arrepentimiento(request):
     return render(request,'core/arrepentimiento.html')
 
