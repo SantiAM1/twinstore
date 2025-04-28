@@ -52,7 +52,7 @@ class SubCategoria(models.Model):
 class Producto(models.Model):
     nombre = models.CharField(max_length=50,unique=True)
     marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
-    sub_categoria = models.ForeignKey(SubCategoria, on_delete=models.CASCADE, related_name='productos')
+    sub_categoria = models.ForeignKey(SubCategoria, on_delete=models.CASCADE, related_name='productos',null=True,blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     precio_dolar = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     descuento = models.IntegerField(default=0)

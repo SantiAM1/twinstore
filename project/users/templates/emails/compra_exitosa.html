@@ -6,52 +6,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body style="font-family: 'Poppins', Arial, sans-serif;; background: #f4f4f4; padding: 20px;">
-    <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; position: relative;">
+    <div style="max-width: 700px; margin: auto; background: white;; border-radius: 8px; position: relative;">
         <img src="{{img}}" alt="Logo Twinstore" style="height: 100px; position: absolute; right: 10px; top: 10px;">
-    <h2 style="color: #007BFF; width: 200px;">¡Gracias por tu compra!</h2>
-    <br>
-    <p style="text-align: center;font-size: 1.2rem">🎉 ¡Hemos recibido tu pedido con exito! 🎉</p>
-    <p style="font-size: 0.9rem;color: #686868;margin: 0;">Este es tu codigo de consulta:</p>
-    <p style="margin: 0;font-size: 0.9rem"><strong>{{token}}</strong></p>
-    <br>
-    <p style="text-align: center;">
-        <a href="{{url}}" 
-        style="font-weight: bold; padding: 12px 20px; background-color: #286aa7; color: white; text-decoration: none; border-radius: 5px;">
-        Ver pedido →
-        </a>
-    </p>
-    <br>
-    <p style="font-size: 1.2rem">Detalle de compra</p>
-    <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; margin-top: 10px;">
-        <thead>
-            <tr style="background-color: #f4f4f4;">
-                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">SKU</th>
-                <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Producto</th>
-                <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">Cantidad</th>
-                <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">Subtotal</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-            <tr>
-                <td style="padding: 10px; border: 1px solid #ddd;">{{producto.sku}}</td>
-                <td style="padding: 10px; border: 1px solid #ddd;">{{producto.nombre}}</td>
-                <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{producto.cantidad}}</td>
-                <td style="padding: 10px; border: 1px solid #ddd; text-align: right;">{{producto.subtotal|formato_pesos}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr>
-                <th colspan="3" style="padding: 10px; border: 1px solid #ddd; text-align: end;">Adicionales</td>
-                <td colspan="2" style="padding: 10px; border: 1px solid #ddd; text-align: right;">{{adicional|formato_pesos}}</td>
-            </tr>
-            <tr>
-                <th colspan="3" style="padding: 10px; border: 1px solid #ddd; text-align: right;">Total</td>
-                <td colspan="1" style="padding: 10px; border: 1px solid #ddd; text-align: right;">{{total|formato_pesos}}</td>
-            </tr>
-        </tfoot>
-    </table>
+        <h2 style="color: #007BFF; width: 200px; padding: 20px;">¡Gracias por tu compra!</h2>
+        <br>
+        <p style="text-align: center;font-size: 1.2rem; padding: 10px;">🎉 ¡Hemos recibido tu pedido con exito! 🎉</p>
+        <p style="font-size: 0.9rem;color: #686868;margin: 0;padding-left: 20px;">Este es tu codigo de consulta:</p>
+        <p style="margin: 0;font-size: 0.9rem;padding-left: 20px;"><strong>{{token}}</strong></p>
+        <br>
+        <p style="text-align: center;">
+            <a href="{{url}}" 
+            style="font-weight: bold; padding: 12px 20px; background-color: #286aa7; color: white; text-decoration: none; border-radius: 5px;">
+            Ver pedido →
+            </a>
+        </p>
+        <br>
+        <p style="font-size: 1.2rem;padding-left: 20px;">Detalle de compra</p>
+        <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; margin-top: 10px;">
+            <thead>
+                <tr style="background-color: #f4f4f4;">
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;font-size: 0.8rem;">SKU</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;font-size: 0.8rem;">Producto</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center;font-size: 0.8rem;">Cantidad</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: right;font-size: 0.8rem;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;font-size: 0.8rem;">{{producto.sku}}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;font-size: 0.8rem;">{{producto.nombre}}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; text-align: center;font-size: 0.8rem;">{{producto.cantidad}}</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; text-align: right;font-size: 0.8rem;">{{producto.subtotal|formato_pesos}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3" style="padding: 10px; border: 1px solid #ddd; text-align: end;font-size: 0.8rem;">Adicionales</td>
+                    <td colspan="2" style="padding: 10px; border: 1px solid #ddd; text-align: right;font-size: 0.8rem;">{{adicional|formato_pesos}}</td>
+                </tr>
+                <tr>
+                    <th colspan="3" style="padding: 10px; border: 1px solid #ddd; text-align: right;font-size: 0.8rem;">Total</td>
+                    <td colspan="1" style="padding: 10px; border: 1px solid #ddd; text-align: right;font-size: 0.8rem;">{{total|formato_pesos}}</td>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 </body>
 </html>
