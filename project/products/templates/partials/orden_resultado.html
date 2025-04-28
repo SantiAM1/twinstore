@@ -1,6 +1,6 @@
 <div class="flex justify-between gap-1rem items-center product-result">
     {% with inicio=pagina.start_index end=pagina.end_index total=pagina.paginator.count %}
-        <p class="font-roboto font-bold" id="contador-resultados">
+        <p class="font-roboto font-bold color-fff" id="contador-resultados">
             Mostrando {{ inicio }}–{{ end }} de {{ total }} resultado{% if total != 1 %}s{% endif %}
         </p>
     {% endwith %}

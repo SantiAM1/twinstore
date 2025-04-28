@@ -67,6 +67,7 @@
     text-align: center;
     border: #c5c5c5 solid 1px;
     border-left: #8b8b8b solid 4px;
+    border-radius: 0 10px 10px 0;
 }
 
 .pagina-btn {

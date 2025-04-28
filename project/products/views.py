@@ -252,6 +252,33 @@ def buscar_productos_ajax(request):
 def buscar_productos(request):
     return return_busqueda(request,type='default')
 
+def return_gaming(request,type='default'):
+    productos = Producto.objects.filter(etiquetas__nombre="gaming")
+    pagina_actual = request.GET.get('pagina', 1)
+
+    productos, filtro = ordenby(request, productos)
+    paginator = Paginator(productos, 12)
+    pagina = paginator.get_page(pagina_actual)
+    productos = pagina.object_list
+
+    if type == 'default':
+        return render(request, 'products/gaming.html', {
+            'productos': productos,
+            'filtro': filtro,
+            'pagina':pagina
+        })
+    elif type == 'ajax':
+        html_productos = render_to_string('partials/product_grid.html',{'productos':productos})
+        html_pagina = render_to_string('partials/paginacion.html',{'pagina':pagina})
+        html_filtro = render_to_string('partials/orden_resultado.html',{'filtro':filtro,'pagina':pagina})
+        return JsonResponse({'html':html_productos,'paginacion':html_pagina,'orden':html_filtro})
+
+def gaming_ajax(request):
+    return return_gaming(request,"ajax")
+
+def gaming(request):
+    return return_gaming(request,"default")
+
 # ----- Vista individual del producto ----- #
 def producto_view(request,product_slug):
     producto = Producto.objects.get(slug=product_slug)

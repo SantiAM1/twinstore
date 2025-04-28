@@ -2,29 +2,34 @@
 {% load static %}
 
 {% block meta %}
-<meta name="description" content="Resultados de búsqueda para {{query}}. En Twinstore, encontrá lo que estás buscando.">
+<meta name="description" content="Descubrí todo el mundo Gaming en Twinstore. Equipos, componentes y periféricos para potenciar tu experiencia de juego.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="Twinstore">
-<meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
+<meta property="og:description" content="Lo mejor del Gaming en un solo lugar, Twinstore Gaming_.">
 <meta property="og:image" content="{% static 'img/mail.webp' %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 {% endblock meta %}
 
+{% block theme %}gaming{% endblock theme %}
+
 {% block head %}
-<title>Busqueda - Twistore</title>
+<title>Gaming - Twistore</title>
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
 <link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
 {% endblock head %}
 
 {% block contenidomain %}
-<h1 class="display-none">Busqueda {{query}}</h1>
+<h1 class="display-none">Gaming</h1>
 <div class="product-box main-box">
+    <h2 class="color-fff text-center font-bold font-roboto" style="font-size: 1.8rem;">Conocé nuestro apartado Gaming_</h2>
+    <div class="padding-10px border-1px"></div>
+    <div class="padding-10px"></div>
     <nav class="flex justify-between items-center products-nav gap-1rem">
         <div>
             <a href="{% url 'core:home' %}" class="decoration-none product-outside-link font-roboto">Inicio</a>
             <i class="bi bi-chevron-right product-outside-link"></i>
-            <span class="font-roboto">Resultados de busqueda para: "<strong class="font-roboto">{{query}}</strong>"</span>
+            <span class="font-roboto font-bold color-fff">Gaming</span>
         </div>
         <div id="orden-result">
             {% include 'partials/orden_resultado.html' %}
@@ -46,7 +51,7 @@
 {% block myscripts %}
 <script nonce="{{ request.csp_nonce }}">
     window.filters = {
-        apiUrl: "{% url 'products:buscar_productos_ajax' %}",
+        apiUrl: "{% url 'products:gaming_api' %}",
     };
 </script>
 <script src="{% static 'js/dinamic-filter.js' %}"></script>
