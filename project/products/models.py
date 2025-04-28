@@ -100,6 +100,13 @@ class Atributo(models.Model):
     def __str__(self):
         return f"{self.nombre}: {self.valor}"
 
+class Etiquetas(models.Model):
+    producto = models.ForeignKey(Producto, related_name="etiquetas", on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.nombre
+
 class CategoriaEspecificacion(models.Model):
     nombre = models.CharField(max_length=100)
 
