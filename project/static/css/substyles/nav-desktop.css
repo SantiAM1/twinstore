@@ -40,6 +40,8 @@
     color: #242424;
     padding: 0.8rem;
     gap: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
 }
 
 .nav-productos-items.categoria-selec {
@@ -58,12 +60,10 @@
 
 .result-productos-column {
     flex-direction: column;
-    gap: 1rem;
     min-width: 30%;
 }
 
 .result-productos-column a {
-    padding: 0;
     text-align: start;
     color: #545454;
     transition: all 0.2s;
@@ -77,11 +77,15 @@
 
 .result-productos-titulo:hover {
     color: var(--color-ts);
-    border-color: var(--color-ts);
 }
 
 .hover-pad-weight {
     font-size: 0.9rem;
+    padding-top: 0.8rem;
+}
+
+.result-productos-column:hover .result-productos-titulo{
+    border-color: var(--color-ts);
 }
 
 .hover-pad-weight:hover {
