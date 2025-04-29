@@ -23,13 +23,17 @@
 {% endblock head %}
 
 {% block contenidomain %}
-{% if subcategoria_obj %} <h1 class="display-none">{{subcategoria_obj.nombre}}</h1> {% else %} <h1 class="display-none">{{categoria.nombre}}</h1>{% endif %}
 {% if productos %}
 <ul class="flex items-center justify-between filter-ordenar-box position-relative list-none width-100">
     <li class="flex items-center filter-button"><i class="bi bi-sliders"></i>Filtros</li>
     <li class="flex items-center ordenar-button"><i class="bi bi-arrow-down-up"></i>Ordenar</li>
     <div class="filter-box-mobile display-none position-absolute width-100" id="filters-box-mobile">
-        {% include 'partials/filtros_dinamicos_mobile.html' %}
+        <p class="filter-item">Categorias<i class="bi bi-chevron-down"></i></p>
+        <div class="filter-expanded">
+            {% for cat in categorias %}
+                <a href="{% url 'products:categoria' seccion_id cat.slug %}" class="subfilter-link-mobile">{{cat.nombre}}</a>
+            {% endfor %}
+        </div>
     </div>
     <div class="ordenar-box-mobile display-none position-absolute width-100">
         <a href="#" data-orden="date" class="ordenar-opcion">Por los Últimos</a>
@@ -39,14 +43,15 @@
 </ul>
 {% endif %}
 <div class="padding-10px">
-    {% include 'partials/header_links.html' %}
-    <span class="prods-dinamic-title font-roboto font-bold">{% if subcategoria_obj %}{{subcategoria_obj.nombre}}{% else %}{{categoria.nombre}}{% endif %}</span>
+    <div>
+        <a href="{% url 'core:home' %}" class="decoration-none product-outside-link bloqueable font-roboto">Inicio</a>
+        <i class="bi bi-chevron-right product-outside-link"></i>
+        <span class="font-roboto font-bold">{{seccion_id|capfirst}}</span>
+    </div>
+    <span class="prods-dinamic-title font-roboto font-bold">{{seccion_id|capfirst}}</span>
     {% if productos %}<p class="font-roboto font-bold" style="color: #363636;">{{pagina.paginator.count}} Resultados</p>{% endif %}
 </div>
 {% if productos %}
-<div id="filter-active-mobile">
-    {% include 'partials/filtros_activos_mobile.html' %}
-</div>
 <main class="product-box flex items-center flex-column width-100">
     <div class="grid-container">
         {% include 'partials/product_grid.html' %}
@@ -63,21 +68,11 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
-
-{% if subcategoria_obj %}
 <script nonce="{{ request.csp_nonce }}">
     window.filters = {
-        apiUrl: "{% url 'products:subcategoria_ajax' seccion_id categoria.slug subcategoria_obj.slug  %}",
+        apiUrl: "{% url 'products:supercategoria_ajax' seccion_id %}",
     };
 </script>
-{% else %}
-<script nonce="{{ request.csp_nonce }}">
-    window.filters = {
-        apiUrl: "{% url 'products:categoria_ajax' seccion_id categoria.slug %}",
-    };
-</script>
-{% endif %}
-
 <script src="{% static 'js/dinamic-filter.js' %}"></script>
 <script src="{% static 'js/mobile-filters.js' %}"></script>
 {% endblock myscripts %}

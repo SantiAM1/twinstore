@@ -23,8 +23,12 @@
 {% block contenidomain %}
 {% if subcategoria_obj %} <h1 class="display-none">{{subcategoria_obj.nombre}}</h1> {% else %} <h1 class="display-none">{{categoria.nombre}}</h1>{% endif %}
 <div class="product-box flex items-center flex-column width-100">
-    <nav class="flex justify-between items-center products-nav">
-        {% include 'partials/header_links.html' %}
+    <nav class="flex justify-between items-center items-start products-nav">
+        <div class="flex flex-column">
+            {% include 'partials/header_links.html' %}
+            <span class="prods-dinamic-title font-roboto font-bold">{% if subcategoria_obj %}{{subcategoria_obj.nombre}}{% else %}{{categoria.nombre}}{% endif %}</span>
+            {% if productos %}<p class="font-roboto font-bold" style="color: #363636;">{{pagina.paginator.count}} Resultados</p>{% endif %}
+        </div>
         <div id="orden-result">
             {% include 'partials/orden_resultado.html' %}
         </div>

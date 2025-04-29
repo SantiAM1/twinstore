@@ -79,10 +79,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (response.data.filtros && filterBox) {
                 filterBox.innerHTML = DOMPurify.sanitize(response.data.filtros);
             }
-            const linksProds = document.querySelector('.product-links-box');
-            if (response.data.navlinks && linksProds) {
-                linksProds.innerHTML = DOMPurify.sanitize(response.data.navlinks);
-            }
+            // const linksProds = document.querySelector('.product-links-box');
+            // if (response.data.navlinks && linksProds) {
+            //     linksProds.innerHTML = DOMPurify.sanitize(response.data.navlinks);
+            // }
             const orderResult = document.getElementById('orden-result')
             if (orderResult) {
                 orderResult.innerHTML =  DOMPurify.sanitize(response.data.orden);

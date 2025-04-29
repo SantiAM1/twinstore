@@ -113,7 +113,7 @@ border-radius: 10px;
     gap: 2rem;
     place-items: center;
     justify-content: center;
-    padding: 3rem 0;
+    padding: 1rem 0 3rem;
 }
 
 .landing-box {

@@ -20,6 +20,7 @@
     color: white;
     padding: 0.3rem;
     border-radius: 10px;
+    font-size: 1.1rem;
 }
 
 .menu.active {
@@ -52,6 +53,7 @@
     text-decoration: none;
     display: block;
     width: 100%;
+    color: #fff;
 }
 
 .menu li {

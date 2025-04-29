@@ -3,69 +3,21 @@
     <li class="dropdown-mobile">
         <span class="toggle">Productos<i class="bi bi-chevron-down"></i></span>
         <ul class="submenu">
+            {% for title,html in render_menu_mobile.items %}
             <li class="dropdown-mobile">
-                <span class="toggle"><div class="menu-subtitle"><i class="bi bi-cpu"></i>Componentes</div><i class="bi bi-chevron-down"></i></span>
+                <span class="toggle"><div class="menu-subtitle">{{title|capfirst}}</div><i class="bi bi-chevron-down"></i></span>
                 <ul class="submenu">
-                    <li class="dropdown-mobile">
-                        <span class="toggle">Hardware<i class="bi bi-chevron-down"></i></span>
-                        <ul class="submenu">
-                            <li><span>Gabinetes</span></li>
-                            <li><span>Placas de video</span></li>
-                            <li><span>Motherboards</span></li>
-                            <li><span>Procesadores</span></li>
-                            <li><span>Fuentes</span></li>
-                            <li><span>Coolers</span></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown-mobile">
-                        <span class="toggle">Almacenamiento<i class="bi bi-chevron-down"></i></span>
-                        <ul class="submenu">
-                            <li><span>Discos Internos</span></li>
-                            <li><span>Discos Internos SSD</span></li>
-                            <li><span>Discos Externos</span></li>
-                            <li><span>Discos Externos SSD</span></li>
-                            <li><span>Pen Drive</span></li>
-                            <li><span>Memorias Flash</span></li>
-                        </ul>
-                    </li>
-                    <li><span>Memorias RAM</span></li>
+                {% for item in html %}
+                    {{item}}
+                {% endfor %}
                 </ul>
             </li>
-            <li class="dropdown-mobile">
-                <span class="toggle"><div class="menu-subtitle"><i class="bi bi-pc-display"></i>Computos</div><i class="bi bi-chevron-down"></i></span>
-                <ul class="submenu">
-                    <li><span>Hardware</span></li>
-                    <li><span>Almacenamiento</span></li>
-                    <li><span>Memorias RAM</span></li>
-                </ul>
-            </li>
-            <li class="dropdown-mobile">
-                <span class="toggle"><div class="menu-subtitle"><i class="bi bi-headphones"></i>Accesorios</div><i class="bi bi-chevron-down"></i></span>
-                <ul class="submenu">
-                    <li class="dropdown-mobile">
-                        <span class="toggle">Perifericos<i class="bi bi-chevron-down"></i></span>
-                        <ul class="submenu">
-                            <li><span><a href="#">Teclados</a></span></li>
-                            <li><span><a href="#">Mouses</a></span></li>
-                            <li><span>Webcams</span></li>
-                            <li><span>Microfonos</span></li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-            <li><span><div class="menu-subtitle"><i class="bi bi-printer"></i>Impresion</div></span></li>
-            <li><span><div class="menu-subtitle"><i class="bi bi-controller"></i>Gaming</div></span></li>
+            {% endfor %}
         </ul>
     </li>
-    <li class="dropdown-mobile">
-        <span class="toggle">Marcas<i class="bi bi-chevron-down"></i></span>
-        <ul class="submenu">
-            <li><span>Subopción 1.2.1</span></li>
-            <li><span>Subopción 1.2.1</span></li>
-        </ul>
-    </li>
-    <li><span>Quienes somos</span></li>
-    <li><span>Nuestro local</span></li>
-    <li><span>Servicio tecnico</span></li>
-    <li><span>Contacto</span></li>
+    <li><span><a href="{% url 'users:buscar_pedidos' %}">Pedidos</a></span></li>
+    <li><span><a href="{% url 'core:quienes_somos' %}">Quiénes somos</a></span></li>
+    <li><span><a href="{% url 'core:local' %}">Punto de retiro</a></span></li>
+    <li><span><a href="{% url 'core:servicio_tecnico' %}">Servicio técnico</a></span></li>
+    <li><span><a href="{% url 'core:contacto' %}">Contacto</a></span></li>
 </ul>

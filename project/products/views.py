@@ -22,13 +22,13 @@ def ordenby(request, productos):
     orden = request.GET.get('ordenby', 'date')
     if orden == 'price_lower':
         productos = productos.order_by('precio')
-        filtro = 'Ordenar por precio: menor a mayor'
+        filtro = 'Por precio: menor a mayor'
     elif orden == 'price_higher':
         productos = productos.order_by('-precio')
-        filtro = 'Ordenar por precio: mayor a menor'
+        filtro = 'Por precio: mayor a menor'
     else:
         productos = productos.order_by('-id')
-        filtro = 'Ordenar por los últimos'
+        filtro = 'Los últimos'
     return productos, filtro
 
 def get_atributos(productos):
@@ -70,7 +70,8 @@ def return_supercategoria(request,seccion_id,type='default'):
     productos = pagina.object_list
 
     if type == 'default':
-        return render(request, 'products/supercategory.html', {
+        template = 'products/supercat_mobile.html' if get_user_agent(request).is_mobile else 'products/supercategory.html'
+        return render(request, template, {
             'productos': productos,
             'filtro': filtro,
             'pagina':pagina,
@@ -80,7 +81,7 @@ def return_supercategoria(request,seccion_id,type='default'):
     elif type == 'ajax':
         html_productos = render_to_string('partials/product_grid.html',{'productos':productos})
         html_pagina = render_to_string('partials/paginacion.html',{'pagina':pagina})
-        html_filtro = render_to_string('partials/orden_resultado.html',{'filtro':filtro,'pagina':pagina})
+        html_filtro = render_to_string('partials/orden_resultado.html',{'filtro':filtro,'pagina':pagina,'productos':productos})
         return JsonResponse({'html':html_productos,'paginacion':html_pagina,'orden':html_filtro})
 
 def supercategoria_ajax(request,seccion_id):
@@ -139,6 +140,7 @@ def return_filtros_dinamicos(request, seccion_id,categoria_obj,subcategoria_obj=
                     'subcategoria_obj':subcategoria_obj,
                     'marcas':marcas,
                     'categoria' :categoria_obj,
+                    'seccion_id':seccion_id
                 }, request=request
                 )
 
@@ -173,15 +175,10 @@ def return_filtros_dinamicos(request, seccion_id,categoria_obj,subcategoria_obj=
             },
             request=request
         )
-        html_navlinks = render_to_string('partials/header_links.html',{
-            'categoria':categoria_obj,
-            'sub_categorias':sub_categorias,
-            'subcategoria_obj':subcategoria_obj,
-            'seccion_id':seccion_id
-        },request=request)
         html_orden = render_to_string('partials/orden_resultado.html',{
             'filtro':filtro,
-            'pagina':pagina
+            'pagina':pagina,
+            'productos':productos
         },request=request)
         html = render_to_string('partials/product_grid.html', {
             'productos': productos
@@ -190,7 +187,7 @@ def return_filtros_dinamicos(request, seccion_id,categoria_obj,subcategoria_obj=
             'pagina':pagina},
             request=request
             )
-        return JsonResponse({'html': html,'filtros':html_filtros,'navlinks':html_navlinks,'orden':html_orden,'paginacion':html_paginacion})
+        return JsonResponse({'html': html,'filtros':html_filtros,'orden':html_orden,'paginacion':html_paginacion})
 
 @bloquear_si_mantenimiento
 @throttle_classes([FiltrosDinamicosThrottle])

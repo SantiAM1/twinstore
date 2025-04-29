@@ -1,15 +1,25 @@
 <div class="flex justify-between gap-1rem items-center product-result {% if not productos %}hidden{% endif %}"> 
     {% with inicio=pagina.start_index end=pagina.end_index total=pagina.paginator.count %}
         <p class="font-roboto font-bold {{color}}" id="contador-resultados">
-            Mostrando {{ inicio }}–{{ end }} de {{ total }} resultado{% if total != 1 %}s{% endif %}
+            Mostrando {{ inicio }}–{{ end }} de {{ total }}
         </p>
     {% endwith %}
     <form method="GET" id="filterForm">
-        <select name="ordenby" id="ordenby" class="product-ordenby bloqueable">
+        <select id="ordenby" name="ordenby" class="custom-select bloqueable">
+            {% if 'ordenby' in request.GET %}
+            <option value="" disabled selected class="display-none">{{ filtro }}</option>
+            {% else %}
+            <option value="" disabled selected class="display-none text-center">Ordenar los productos</option>
+            {% endif %}
+            <option value="date">Los últimos</option>
+            <option value="price_lower">Por precio: menor a mayor</option>
+            <option value="price_higher">Por precio: mayor a menor</option>
+        </select>
+        <!-- <select name="ordenby" id="ordenby" class="product-ordenby bloqueable">
             <option value="" disabled selected class="display-none">{{ filtro }}</option>
             <option value="date">Ordenar por los últimos</option>
             <option value="price_lower">Ordenar por precio: menor a mayor</option>
             <option value="price_higher">Ordenar por precio: mayor a menor</option>
-        </select>
+        </select> -->
     </form>
 </div>
