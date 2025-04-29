@@ -1,16 +1,16 @@
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
 from .models import PagoRecibidoMP, HistorialCompras,ComprobanteTransferencia
-from users.emails import mail_estado_pedido_html
+from users.emails import mail_estado_pedido_html,mail_obs_comprobante_html
 from django.utils import timezone
 
-# @receiver(post_save, sender=HistorialCompras)
-# def enviar_actualizacion_compra(sender, instance, created, **kwargs):
-#     """
-#     Se envia un mail al actualizar el historial de compras.
-#     """
-#     if instance.recibir_mail and (instance.forma_de_pago == "transferencia" and instance.estado != "pendiente") or (instance.forma_de_pago == "efectivo" and instance.estado != "confirmado") or (instance.forma_de_pago == "mercado pago" and instance.estado != "pendiente"):
-#         mail_estado_pedido_html(instance, instance.facturacion.email)
+@receiver(post_save, sender=HistorialCompras)
+def enviar_actualizacion_compra(sender, instance, created, **kwargs):
+    """
+    Se envia un mail al actualizar el historial de compras.
+    """
+    if instance.recibir_mail and (instance.forma_de_pago == "transferencia" and instance.estado != "pendiente") or (instance.forma_de_pago == "efectivo" and instance.estado != "confirmado") or (instance.forma_de_pago == "mercado pago" and instance.estado != "pendiente"):
+        mail_estado_pedido_html(instance, instance.facturacion.email)
 
 @receiver(post_save, sender=HistorialCompras)
 def fecha_finalizacion_historial(sender, instance, created, **kwargs):
@@ -37,6 +37,13 @@ def aprobar_historial_transferencia(sender, instance, created, **kwargs):
         HistorialCompras.objects.filter(pk=instance.historial.pk).update(estado='confirmado')
     elif instance.estado == 'rechazado':
         instance.delete()
+
+@receiver(post_save, sender=ComprobanteTransferencia)
+def aprobar_historial_transferencia(sender, instance, created, **kwargs):
+    """
+    Enviar un mail con las observaciones si el comprobante fue rechazado
+    """
+    mail_obs_comprobante_html(instance.historial,instance.observaciones)
 
 @receiver(post_save, sender=ComprobanteTransferencia)
 def actualizar_verificacion_transferencia(sender, instance, created, **kwargs):

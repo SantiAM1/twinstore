@@ -39,14 +39,14 @@ SECRET_KEY = DJANGO_SECRET_KEY
 DEBUG = True
 
 # * Host
-MY_NGROK_URL='twinstore.com.ar'
+SITE_URL = "http://127.0.0.1:8000"
 
 # ! Actualizar el HOST con el dominio
-ALLOWED_HOSTS = [f'{MY_NGROK_URL}','127.0.0.1']
+ALLOWED_HOSTS = [f'{SITE_URL}','127.0.0.1']
 
 # ! Verificar las correspondencias
 CSRF_TRUSTED_ORIGINS = [
-    f"https://{MY_NGROK_URL}"
+    f"https://{SITE_URL}"
 ]
 
 # * Sessions
@@ -228,8 +228,6 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-SITE_URL = "http://127.0.0.1:8000"
 
 # Celery Configuration
 CELERY_BROKER_URL = 'redis://localhost:6379/0'

@@ -66,3 +66,24 @@ def enviar_mail_estado_pedido(mail_data,user_email,template):
     )
     msg.attach_alternative(html, "text/html")
     msg.send()
+
+@shared_task
+def enviar_mail_comprobante_obs(mail_data,user_email):
+    context = {
+        'url' : mail_data['url'],
+        'img' : mail_data['img'],
+        'pedido_id': mail_data['pedido_id'],
+        'observaciones': mail_data['observaciones'],
+    }
+
+    html = render_to_string('emails/comprobantes_obs.html', context)
+    text = f'Hola {user_email}, queremos contarte que el pedido con ID:#{mail_data['pedido_id']} ha sido rechazado. Observaciones: {mail_data['observaciones']}'
+
+    msg = EmailMultiAlternatives(
+        subject='Observaciones Comprobante - Twinstore',
+        body=text,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[user_email]
+    )
+    msg.attach_alternative(html, "text/html")
+    msg.send()

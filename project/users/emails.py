@@ -1,27 +1,27 @@
 from django.conf import settings
-from .tasks import enviar_mail_compra,enviar_mail_confirm_user,enviar_mail_estado_pedido
+from .tasks import enviar_mail_compra,enviar_mail_confirm_user,enviar_mail_estado_pedido,enviar_mail_comprobante_obs
 
 def mail_confirm_user_html(usuario):
     """Envía el mail de confirmación de cuenta"""
     perfil = usuario.perfil
     token = perfil.token_verificacion
-    site_url = f'{settings.MY_NGROK_URL}'
+    site_url = f'{settings.SITE_URL}'
     mail_data = {
-        'url' : f"http://{site_url}/usuario/verificar/{token}",
-        'img' : f"http://{site_url}/static/img/mail.webp"
+        'url' : f"{site_url}/usuario/verificar/{token}",
+        'img' : f"{site_url}/static/img/mail.webp"
     }
     enviar_mail_confirm_user.delay(mail_data,user_email=usuario.email)
 
 def mail_buy_send_html(historial,user_email):
     """Envía el mail de compra exitosa"""
     token = historial.token_consulta
-    site_url = f'{settings.MY_NGROK_URL}'
+    site_url = f'{settings.SITE_URL}'
     productos = historial.productos
     adicional = historial.get_adicional()
     total = historial.total_compra
     historial_data = {
-    'url': f"http://{site_url}/usuario/ver_pedido/{token}",
-    'img': f"http://{site_url}/static/img/mail.webp",
+    'url': f"{site_url}/usuario/ver_pedido/{token}",
+    'img': f"{site_url}/static/img/mail.webp",
     'token': token,
     'productos':productos,
     'adicional':adicional,
@@ -32,7 +32,7 @@ def mail_buy_send_html(historial,user_email):
 def mail_estado_pedido_html(historial,user_email):
     """Envía el mail cuando hay un cambio en el estado del pedido"""
     token = historial.token_consulta
-    site_url = f'{settings.MY_NGROK_URL}'
+    site_url = f'{settings.SITE_URL}'
 
     finalizado = False
     if historial.estado == "confirmado":
@@ -57,10 +57,23 @@ def mail_estado_pedido_html(historial,user_email):
     estado = estado.capitalize()
 
     mail_data = {
-        'url': f"http://{site_url}/usuario/ver_pedido/{token}",
-        'img': f"http://{site_url}/static/img/mail.webp",
+        'url': f"{site_url}/usuario/ver_pedido/{token}",
+        'img': f"{site_url}/static/img/mail.webp",
         'pedido_id': historial.merchant_order_id,
         'estado': estado,
         'mensaje': mensaje
     }
     enviar_mail_estado_pedido.delay(mail_data, user_email,template)
+
+def mail_obs_comprobante_html(historial,observaciones):
+    token = historial.token_consulta
+    user_email = historial.facturacion.email
+    pedido_id = historial.merchant_order_id
+    site_url = f'{settings.SITE_URL}'
+    mail_data = {
+        'url': f"{site_url}/usuario/ver_pedido/{token}",
+        'img' : f"{site_url}/static/img/mail.webp",
+        'observaciones':observaciones,
+        'pedido_id':pedido_id
+    }
+    enviar_mail_comprobante_obs.delay(mail_data,user_email)

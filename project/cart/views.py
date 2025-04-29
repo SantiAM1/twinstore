@@ -273,7 +273,7 @@ class CalcularPedidoView(APIView):
 # ----- Preferencias de MP ----- #
 
 def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,recibir_mail,productos,usuario):
-    site_url = f'{settings.MY_NGROK_URL}'
+    site_url = f'{settings.SITE_URL}'
 
     argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
 
