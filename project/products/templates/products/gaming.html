@@ -54,7 +54,7 @@
 {% block myscripts %}
 <script nonce="{{ request.csp_nonce }}">
     window.filters = {
-        apiUrl: "{% url 'products:gaming_api' %}",
+        apiUrl: "{% url 'products:gaming_ajax' %}",
     };
 </script>
 <script src="{% static 'js/dinamic-filter.js' %}"></script>

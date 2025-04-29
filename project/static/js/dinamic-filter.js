@@ -76,11 +76,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             // * COMPUTADORA
             const filterBox = document.querySelector('.filter-box');
-            if (filterBox) {
+            if (response.data.filtros && filterBox) {
                 filterBox.innerHTML = DOMPurify.sanitize(response.data.filtros);
             }
             const linksProds = document.querySelector('.product-links-box');
-            if (linksProds) {
+            if (response.data.navlinks && linksProds) {
                 linksProds.innerHTML = DOMPurify.sanitize(response.data.navlinks);
             }
             const orderResult = document.getElementById('orden-result')

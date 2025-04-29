@@ -40,7 +40,7 @@ class Categoria(models.Model):
 
 class SubCategoria(models.Model):
     nombre = models.CharField(max_length=30)
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='subcategorias', default=1)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='subcategorias')
     descripcion_seo = models.CharField(max_length=160,blank=True,help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres.")
     slug = models.SlugField(max_length=50, blank=True,unique=True)
 

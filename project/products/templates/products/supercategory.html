@@ -3,7 +3,6 @@
 {% load compress %}
 
 {% block meta %}
-<meta name="description" content="{% if subcategoria_obj %}{{subcategoria_obj.nombre}}{% else %}{{categoria.nombre}}{% endif %}; {{prod_totales}} resultados.{% if marcas %} Marcas: {{ marcas|join:", " }}.{% endif %}{% for producto in productos|slice:":3" %}{{ producto.nombre }}. {% endfor %}">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="Twinstore">
 <meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
@@ -12,7 +11,7 @@
 {% endblock meta %}
 
 {% block head %}
-<title>{{categoria.nombre}} - Twistore</title>
+<title>{{seccion_id|capfirst}} - Twistore</title>
 {% compress css %}
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
 <link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
@@ -21,10 +20,14 @@
 {% endblock head %}
 
 {% block contenidomain %}
-{% if subcategoria_obj %} <h1 class="display-none">{{subcategoria_obj.nombre}}</h1> {% else %} <h1 class="display-none">{{categoria.nombre}}</h1>{% endif %}
+<h1 class="display-none">{{seccion_id|capfirst}}</h1>
 <div class="product-box flex items-center flex-column width-100">
     <nav class="flex justify-between items-center products-nav">
-        {% include 'partials/header_links.html' %}
+        <div class="product-links-box">
+            <a href="{% url 'core:home' %}" class="decoration-none product-outside-link bloqueable font-roboto">Inicio</a>
+            <i class="bi bi-chevron-right product-outside-link"></i>
+            <span class="font-roboto font-bold">{{seccion_id|capfirst}}</span>
+        </div>
         <div id="orden-result">
             {% include 'partials/orden_resultado.html' %}
         </div>
@@ -32,7 +35,19 @@
     {% if productos %}
     <div class="flex gap-1rem product-box-grid">
         <div class="flex flex-column filter-box">
-            {% include 'partials/filtros_dinamicos.html' %}
+            <div>
+                <span class="filter-title">Categorías</span>
+                <ul class="list-none">
+                {% for cat in categorias %}
+                    <li>
+                        <a class="decoration-none sub-filter-link bloqueable"
+                            href="{% url 'products:categoria' seccion_id cat.slug %}">
+                            {{ cat.nombre }}
+                        </a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
         </div>
         <div style="border-right: 2px solid #bbbbbb"></div>
         <main class="flex justify-center">
@@ -57,18 +72,10 @@
 {% include 'widgets/gaming.html' with color="white" %}
 {% endblock contenidomain %}
 {% block myscripts %}
-{% if subcategoria_obj %}
 <script nonce="{{ request.csp_nonce }}">
     window.filters = {
-        apiUrl: "{% url 'products:subcategoria_ajax' seccion_id categoria.slug subcategoria_obj.slug  %}",
+        apiUrl: "{% url 'products:supercategoria_ajax' seccion_id %}",
     };
 </script>
-{% else %}
-<script nonce="{{ request.csp_nonce }}">
-    window.filters = {
-        apiUrl: "{% url 'products:categoria_ajax' seccion_id categoria.slug %}",
-    };
-</script>
-{% endif %}
 <script src="{% static 'js/dinamic-filter.js' %}"></script>
 {% endblock myscripts %}

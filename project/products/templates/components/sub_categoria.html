@@ -5,7 +5,7 @@
         {% for sub in sub_categorias %}
             <li>
                 <a class="decoration-none sub-filter-link bloqueable"
-                    href="{% url 'products:categoria_subcategoria' categoria.slug sub.slug %}">
+                    href="{% url 'products:categoria_subcategoria' seccion_id categoria.slug sub.slug %}">
                     {{ sub.nombre }}
                 </a>
             </li>

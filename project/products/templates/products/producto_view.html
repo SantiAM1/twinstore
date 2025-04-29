@@ -31,9 +31,11 @@
     <nav>
         <a href="{% url 'core:home' %}" class="decoration-none product-outside-link">Inicio</a>
         <i class="bi bi-chevron-right product-outside-link"></i>
-        <a href="{% url 'products:slug_dispatcher' producto.sub_categoria.categoria.slug %}" class="decoration-none product-outside-link">{{producto.sub_categoria.categoria}}</a>
+        <a href="{% url 'products:slug_dispatcher' producto.sub_categoria.categoria.seccion_id %}" class="decoration-none product-outside-link">{{producto.sub_categoria.categoria.seccion_id|capfirst}}</a>
         <i class="bi bi-chevron-right product-outside-link"></i>
-        <a href="{% url 'products:categoria_subcategoria' producto.sub_categoria.categoria.slug producto.sub_categoria.slug %}"class="decoration-none product-outside-link">{{producto.sub_categoria}}</a>
+        <a href="{% url 'products:categoria' producto.sub_categoria.categoria.seccion_id producto.sub_categoria.categoria.slug %}" class="decoration-none product-outside-link">{{producto.sub_categoria.categoria}}</a>
+        <i class="bi bi-chevron-right product-outside-link"></i>
+        <a href="{% url 'products:categoria_subcategoria' producto.sub_categoria.categoria.seccion_id producto.sub_categoria.categoria.slug producto.sub_categoria.slug %}"class="decoration-none product-outside-link">{{producto.sub_categoria}}</a>
         <i class="bi bi-chevron-right product-outside-link"></i>
         <span class="prod-title-name font-bold font-roboto"> {{producto.nombre}} </span>
     </nav>
