@@ -107,7 +107,8 @@ def notification(request):
                                 'nombre':producto.nombre,
                                 'precio_unitario':float(producto.precio),
                                 'cantidad':cantidad,
-                                'subtotal':float(producto.precio)*cantidad
+                                'subtotal':float(producto.precio)*cantidad,
+                                'proveedor':producto.proveedor
                             })
 
                         # * Logica de usuarios, borrar el carrito si el pago no fue rechazado

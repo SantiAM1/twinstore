@@ -65,4 +65,3 @@ class CategoriaEspecificacionAdmin(admin.ModelAdmin):
         return False
 
 admin.site.register(Producto, ProductoAdmin)
-admin.site.register(Etiquetas)

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
+{% load compress %}
 
 {% block meta %}
 <meta name="description" content={{producto.description_seo|default:"Los mejores productos al mejor precio en Twinstore. Envíos a todo el país."}}>
@@ -13,11 +14,13 @@
 
 {% block head %}
 <title>{{producto.nombre}} - Twinstore</title>
+{% compress css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 <link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/quantity.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
 <link rel="stylesheet" href="{% static 'css/prod-view.css' %}" />
+{% endcompress %}
 {% endblock head %}
 
 {% block theme %}black{% endblock theme %}

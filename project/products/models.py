@@ -54,6 +54,7 @@ class Producto(models.Model):
     descripcion_seo = models.CharField(max_length=160,blank=True,help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres.")
     inhabilitar = models.BooleanField(default=False)
     slug = models.SlugField(max_length=100, blank=True,unique=True)
+    proveedor = models.CharField(max_length=30,blank=True,null=True)
 
     def save(self, *args, **kwargs):
         # Detectar si cambió el nombre

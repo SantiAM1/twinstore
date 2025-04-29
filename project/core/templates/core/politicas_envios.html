@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load compress %}
 
 {% block meta %}
 <meta name="description" content="Conocé los tiempos, costos y condiciones de envío de Twinstore. Realizamos entregas a todo el país a través de Andreani. Información clara para tu compra online.">
@@ -8,7 +9,9 @@
 
 {% block head %}
 <title>Politicas de envio - Twinstore</title>
+{% compress css %}
 <link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endcompress %}
 {% endblock head %}
 
 {% block contenidomain %}

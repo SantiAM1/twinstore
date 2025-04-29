@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% compress css %}
 
 {% block meta %}
 <meta name="description" content="Ejercé tu derecho de arrepentimiento como consumidor. Iniciá tu solicitud fácilmente si te arrepentiste de una compra en Twinstore.">
@@ -8,7 +9,9 @@
 
 {% block head %}
 <title>Botón de arrepentimiento - Twinstore</title>
+{% compress css %}
 <link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endcompress %}
 {% endblock head %}
 
 {% block contenidomain %}

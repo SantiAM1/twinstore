@@ -39,7 +39,7 @@ SECRET_KEY = DJANGO_SECRET_KEY
 DEBUG = True
 
 # * Host
-SITE_URL = "http://127.0.0.1:8000"
+SITE_URL = "127.0.0.1:8000"
 
 # ! Actualizar el HOST con el dominio
 ALLOWED_HOSTS = [f'{SITE_URL}','127.0.0.1']
@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'cart',
     'users',
     'payment',
+    'compressor',
 ]
 
 MIDDLEWARE = [
@@ -225,6 +226,14 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+COMPRESS_ENABLED = not DEBUG
+COMPRESS_OFFLINE = True  # Compila los archivos al hacer collectstatic
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -253,44 +262,3 @@ TIME_ZONE = 'America/Argentina/Buenos_Aires'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-        'performance_file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': 'logs/performance.log',
-            'formatter': 'simple',
-        },
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': 'logs/mi_proyecto.log',
-            'formatter': 'simple',
-        },
-    },
-    'loggers': {
-        'payment': {  # nombre que usarías con logging.getLogger('payment')
-            'handlers': ['console', 'file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'performance': {
-            'handlers': ['performance_file', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    }
-}

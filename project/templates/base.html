@@ -1,4 +1,5 @@
 {% load static %}
+{% load compress %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -22,10 +23,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     {% block head %}
     {% endblock head %}
+    {% compress css %}
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="stylesheet" href="{% static 'css/substyles/menu-mobile.css' %}">
     <link rel="stylesheet" href="{% static 'css/substyles/nav-desktop.css' %}">
     <link rel="stylesheet" href="{% static 'css/media-querys.css' %}">
+    {% endcompress %}
     {% block headend %}
     {% endblock headend %}
 </head>

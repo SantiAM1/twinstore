@@ -86,8 +86,10 @@ class HistorialComprasAdmin(admin.ModelAdmin):
             '<tr>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">SKU</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Producto</th>'
+            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Precio Unitario</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Cantidad</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Subtotal</th>'
+            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Proveedor</th>'
             '</tr>'
         )
         for p in obj.productos:
@@ -95,8 +97,10 @@ class HistorialComprasAdmin(admin.ModelAdmin):
                 f'<tr>'
                 f'<td style="padding: 6px;">{p["sku"]}</td>'
                 f'<td style="padding: 6px;">{p["nombre"]}</td>'
+                f'<td style="padding: 6px;">{p["precio_unitario"]}</td>'
                 f'<td style="padding: 6px;">{p["cantidad"]}</td>'
                 f'<td style="padding: 6px;">${p["subtotal"]:,.2f}</td>'
+                f'<td style="padding: 6px;">{p["proveedor"]}</td>'
                 f'</tr>'
             )
         html += '</table>'

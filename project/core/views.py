@@ -6,7 +6,7 @@ from django.utils.safestring import mark_safe
 import pandas as pd
 import uuid
 from .forms import ExcelUploadForm,DolarActualizar
-from products.models import Producto, Marca, Categoria, SubCategoria, Atributo
+from products.models import Producto, Marca, Categoria, SubCategoria, Atributo,Etiquetas
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.core.cache import cache
@@ -149,6 +149,7 @@ def cargar_productos_excel(request):
                                 'sub_categoria': sub_categoria,
                                 'precio_dolar': fila['Precio USD'],
                                 'descuento': fila['Descuento'],
+                                'proveedor':fila['Proveedor'],
                                 'sku': sku
                             }
                         )
@@ -156,6 +157,9 @@ def cargar_productos_excel(request):
                         if creado:
                             messages.success(request, mark_safe(f'✅ Producto <strong>{producto.nombre}</strong> agregado'))
                         else:
+                            if fila.get('Proveedor'):
+                                producto.proveedor = fila['Proveedor']
+                                producto.save(update_fields=['proveedor'])
                             if not producto.slug:
                                 producto.generar_slug()
                                 producto.save()
@@ -181,6 +185,7 @@ def cargar_productos_excel(request):
 
                         # Eliminar atributos anteriores para no duplicar
                         producto.atributos.all().delete()
+                        producto.etiquetas.all().delete()
 
                         # Cargar nuevos atributos separados por ';'
                         if 'Atributos' in fila and isinstance(fila['Atributos'], str):
@@ -192,6 +197,13 @@ def cargar_productos_excel(request):
                                     valor = valor.strip()
                                     if nombre and valor:
                                         Atributo.objects.get_or_create(producto=producto, nombre=nombre, valor=valor)
+
+                        if 'Etiquetas' in fila and isinstance(fila['Etiquetas'], str):
+                            etiquetas = fila['Etiquetas'].split(';')
+                            for nombre_etiqueta in etiquetas:
+                                nombre_etiqueta = nombre_etiqueta.strip()
+                                if nombre_etiqueta:
+                                    Etiquetas.objects.get_or_create(producto=producto, nombre=nombre_etiqueta)
 
                     messages.success(request, f"Productos cargados correctamente. Se eliminaron {eliminados} productos.")
                     return redirect('core:cargar_excel')

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load compress %}
 
 {% block meta %}
 <meta name="description" content="Resultados de búsqueda para {{query}}. En Twinstore, encontrá lo que estás buscando.">
@@ -12,9 +13,11 @@
 
 {% block head %}
 <title>Busqueda - Twistore</title>
+{% compress css %}
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
 <link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
+{% endcompress %}
 {% endblock head %}
 
 {% block contenidomain %}

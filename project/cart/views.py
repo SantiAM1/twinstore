@@ -389,6 +389,7 @@ def realizar_pedido(request):
                         'precio_unitario': float(pedido.producto.precio),
                         'cantidad': pedido.cantidad,
                         'subtotal': float(pedido.get_total_precio()),
+                        'proveedor':pedido.producto.proveedor
                     })
 
                 # * Borramos el carrito y pedidos
@@ -404,11 +405,12 @@ def realizar_pedido(request):
                 for producto_id,cantidad in carrito.items():
                     producto = get_object_or_404(Producto,id=int(producto_id))
                     productos.append({
-                        'sku': pedido.producto.sku,
+                        'sku': producto.sku,
                         'nombre':producto.nombre,
                         'precio_unitario':float(producto.precio),
                         'cantidad':cantidad,
-                        'subtotal':float(producto.precio)*cantidad
+                        'subtotal':float(producto.precio)*cantidad,
+                        'proveedor':producto.proveedor
                     })
                 
                 total_carrito = sum(producto['subtotal'] for producto in productos)

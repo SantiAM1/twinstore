@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load compress %}
 
 {% block meta %}
 <meta name="description" content="Conocé cómo Twinstore protege tus datos personales. Accedé a nuestra política de privacidad y descubrí cómo usamos y almacenamos tu información.">
@@ -8,7 +9,9 @@
 
 {% block head %}
 <title>Politicas de privacidad - Twinstore</title>
+{% compress css %}
 <link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endcompress %}
 {% endblock head %}
 
 {% block contenidomain %}

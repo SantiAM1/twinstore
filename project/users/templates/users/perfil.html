@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load compress %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
@@ -9,9 +10,11 @@
     <title>Mi perfil</title>
 {% endblock head %}
 {% block headend %}
+{% compress css %}
 <link rel="stylesheet" href="{% static 'css/forms-ts.css' %}">
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
 <link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}">
+{% endcompress %}
 {% endblock headend %}
 
 {% block contenidomain %}

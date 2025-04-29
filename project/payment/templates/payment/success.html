@@ -1,15 +1,18 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load compress %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
 {% endblock meta %}
 
 {% block head %}
-    <title>Compra exitosa - Twinstore</title>
+<title>Compra exitosa - Twinstore</title>
 {% endblock head %}
 {% block headend %}
-    <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
+{% endcompress %}
 {% endblock headend %}
 
 {% block contenidomain %}
@@ -31,7 +34,7 @@
                 {% endif %}
                 <p><i class="bi bi-check2-all"></i> Una vez validado el pago, te notificaremos por correo electrónico.</p><br>
                 <div class="link-comprobante-box">
-                    <a href="{% url 'payment:comprobante' historial.token_consulta %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer link-comprobante-button">
+                    <a href="{% url 'payment:comprobante' historial.token_consulta %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer link-comprobante-button decoration-none">
                         Subir comprobante ahora
                     </a>
                 </div>

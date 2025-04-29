@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load compress %}
 
 {% block meta %}
 <meta name="description" content="Conocé los Términos y Condiciones de uso de Twinstore. Información clara sobre compras, envíos, devoluciones, privacidad y derechos del consumidor en Argentina.">
@@ -8,7 +9,9 @@
 
 {% block head %}
 <title>Terminos y condiciones - Twinstore</title>
+{% compress css %}
 <link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endcompress %}
 {% endblock head %}
 
 {% block contenidomain %}

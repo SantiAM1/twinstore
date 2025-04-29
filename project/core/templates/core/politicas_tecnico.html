@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load compress %}
 
 {% block meta %}
 <meta name="description" content="¿Dejaste un producto en nuestras manos? Leé nuestra política de servicio técnico y conocé como cuidamos y entregamos tus productos.">
@@ -8,7 +9,9 @@
 
 {% block head %}
 <title>Política de Servicio Técnico - Twinstore</title>
+{% compress css %}
 <link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endcompress %}
 {% endblock head %}
 
 {% block contenidomain %}

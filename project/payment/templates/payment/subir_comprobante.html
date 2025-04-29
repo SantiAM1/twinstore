@@ -1,16 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load compress %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
 {% endblock meta %}
 
 {% block head %}
-    <title>Subir Comprobante - Twinstore</title>
+<title>Subir Comprobante - Twinstore</title>
 {% endblock head %}
 
 {% block headend %}
-    <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
+{% endcompress %}
 {% endblock headend %}
 
 {% block contenidomain %}

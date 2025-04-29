@@ -246,6 +246,8 @@ def return_busqueda(request,type='default'):
         html_filtro = render_to_string('partials/orden_resultado.html',{'filtro':filtro,'pagina':pagina})
         return JsonResponse({'html':html_productos,'paginacion':html_pagina,'orden':html_filtro})
 
+@bloquear_si_mantenimiento
+@throttle_classes([FiltrosDinamicosThrottle])
 def buscar_productos_ajax(request):
     return return_busqueda(request,type='ajax')
 
@@ -273,6 +275,8 @@ def return_gaming(request,type='default'):
         html_filtro = render_to_string('partials/orden_resultado.html',{'filtro':filtro,'pagina':pagina})
         return JsonResponse({'html':html_productos,'paginacion':html_pagina,'orden':html_filtro})
 
+@bloquear_si_mantenimiento
+@throttle_classes([FiltrosDinamicosThrottle])
 def gaming_ajax(request):
     return return_gaming(request,"ajax")
 
