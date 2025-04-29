@@ -300,6 +300,9 @@ def slug_dispatcher(request, slug):
     if producto:
         return producto_view(request, slug)
 
+    test = Categoria.objects.filter(seccion_id=slug)
+    print(test)
+
     cat = Categoria.objects.filter(slug=slug).first()
     if cat:
         return categoria(request, cat.slug)

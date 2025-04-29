@@ -73,6 +73,7 @@
     color: #000;
     font-weight: 600;
     border-bottom: #bbb solid 2px;
+    margin-bottom: 0.5rem;
 }
 
 .result-productos-titulo:hover {
@@ -81,7 +82,7 @@
 
 .hover-pad-weight {
     font-size: 0.9rem;
-    padding-top: 0.8rem;
+    padding-bottom: 1em;
 }
 
 .result-productos-column:hover .result-productos-titulo{

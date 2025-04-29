@@ -44,24 +44,26 @@ class ProductoAdmin(admin.ModelAdmin):
     list_filter = ['marca', 'sub_categoria']
     readonly_fields = ['precio','slug']
 
-@admin.register(Categoria)
-class CategoriaAdmin(admin.ModelAdmin):
-    def has_module_permission(self, request):
-        return False
-    
 @admin.register(Marca)
 class MarcaAdmin(admin.ModelAdmin):
     def has_module_permission(self, request):
         return False  # Oculta de la barra lateral
-
-@admin.register(SubCategoria)
-class SubcategoriaAdmin(admin.ModelAdmin):
-    def has_module_permission(self, request):
-        return False
 
 @admin.register(CategoriaEspecificacion)
 class CategoriaEspecificacionAdmin(admin.ModelAdmin):
     def has_module_permission(self, request):
         return False
 
+# @admin.register(Categoria)
+# class CategoriaAdmin(admin.ModelAdmin):
+#     def has_module_permission(self, request):
+#         return False
+
+# @admin.register(SubCategoria)
+# class SubcategoriaAdmin(admin.ModelAdmin):
+#     def has_module_permission(self, request):
+#         return False
+
 admin.site.register(Producto, ProductoAdmin)
+admin.site.register(Categoria)
+admin.site.register(SubCategoria)

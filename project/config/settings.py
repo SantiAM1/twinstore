@@ -160,7 +160,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.carrito_total',
-                'core.context_processors.menu_categorias',
+                'core.context_processors.render_menu',
             ],
         },
     },

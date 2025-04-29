@@ -1,6 +1,18 @@
 <div class="product-links-box">
     <a href="{% url 'core:home' %}" class="decoration-none product-outside-link bloqueable font-roboto">Inicio</a>
     <i class="bi bi-chevron-right product-outside-link"></i>
+    {% if categoria.seccion_id == 'componentes' %}
+        <span class="decoration-none product-outside-link bloqueable font-roboto">Componentes</span>
+    {% elif categoria.seccion_id == 'computos' %}
+        <span class="decoration-none product-outside-link bloqueable font-roboto">PC - Notebooks</span>
+    {% elif categoria.seccion_id == 'accesorios' %}
+        <span class="decoration-none product-outside-link bloqueable font-roboto">Accesorios</span>
+    {% elif categoria.seccion_id == 'celulares' %}
+        <span class="decoration-none product-outside-link bloqueable font-roboto">Celulares</span>
+    {% elif categoria.seccion_id == 'impresion' %}
+        <span class="decoration-none product-outside-link bloqueable font-roboto">Impresión</span>
+    {% endif %}
+    <i class="bi bi-chevron-right product-outside-link"></i>
     {% if subcategoria_obj %}
         <a href="{% url 'products:slug_dispatcher' categoria.slug %}" class="decoration-none product-outside-link bloqueable font-roboto">{{categoria.nombre}}</a>
         <i class="bi bi-chevron-right product-outside-link"></i>

@@ -16,9 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.style.animation = '';
     });
     // ----- Menu desktop mobile ------ //
+    const categorias = JSON.parse(document.getElementById('menu-json').textContent);
     const botonProductos = document.getElementById("boton-productos");
     const boxProdDisplay = document.getElementById("box-productos-display");
     const resultProdDisplay = document.getElementById("result-productos-display");
+
+    if (!resultProdDisplay.innerHTML.trim()) {
+        resultProdDisplay.innerHTML = DOMPurify.sanitize(categorias["componentes"].join(""));
+    }
 
     botonProductos.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -37,7 +42,13 @@ document.addEventListener("DOMContentLoaded", () => {
         item.addEventListener("mouseenter", () => {
             navItems.forEach(navItem => navItem.classList.remove("categoria-selec"));
             item.classList.add("categoria-selec");
-            resultProdDisplay.innerHTML = DOMPurify.sanitize(categorias[item.id] || '<div class="result-productos-column flex">No hay contenido disponible</div>');
+            let columna = categorias[item.id]
+            if (columna) {
+                columna = columna.join("")
+            } else {
+                columna = '<div class="result-productos-column flex">No hay contenido disponible</div>'
+            }
+            resultProdDisplay.innerHTML = DOMPurify.sanitize(columna);
         });
     });
 

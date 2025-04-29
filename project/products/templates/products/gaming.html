@@ -24,7 +24,7 @@
 
 {% block contenidomain %}
 <h1 class="display-none">Gaming</h1>
-<div class="product-box main-box">
+<div class="product-box flex items-center flex-column width-100">
     <h2 class="color-fff text-center font-bold font-roboto" style="font-size: 1.8rem;">Conocé nuestro apartado Gaming_</h2>
     <div class="padding-10px border-1px"></div>
     <div class="padding-10px"></div>
@@ -35,7 +35,7 @@
             <span class="font-roboto font-bold color-fff">Gaming</span>
         </div>
         <div id="orden-result">
-            {% include 'partials/orden_resultado.html' %}
+            {% include 'partials/orden_resultado.html' with color="color-fff" %}
         </div>
     </nav>
     <div class="flex gap-1rem product-box-grid">

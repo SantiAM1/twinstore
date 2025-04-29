@@ -11,6 +11,15 @@ class Marca(models.Model):
         return self.nombre
 
 class Categoria(models.Model):
+
+    SECCIONES_MENU = [
+    ('componentes', 'Componentes'),
+    ('computos', 'PC y Notebooks'),
+    ('accesorios', 'Accesorios'),
+    ('celulares', 'Celulares'),
+    ('impresion', 'Impresión'),
+    ]
+
     nombre = models.CharField(max_length=30)
     descripcion_seo = models.CharField(
     max_length=160,
@@ -18,6 +27,8 @@ class Categoria(models.Model):
     help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres."
     )
     slug = models.SlugField(max_length=50, blank=True,unique=True)
+    seccion_id = models.CharField(max_length=50, blank=True, null=True,choices=SECCIONES_MENU)
+    orden = models.PositiveIntegerField(default=0, help_text="Orden de aparición en el menú")
 
     def save(self, *args, **kwargs):
         if not self.slug:
