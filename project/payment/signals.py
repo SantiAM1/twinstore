@@ -43,7 +43,8 @@ def aprobar_historial_transferencia(sender, instance, created, **kwargs):
     """
     Enviar un mail con las observaciones si el comprobante fue rechazado
     """
-    mail_obs_comprobante_html(instance.historial,instance.observaciones)
+    if instance.estado == 'rechazado' and instance.observaciones:
+        mail_obs_comprobante_html(instance.historial,instance.observaciones)
 
 @receiver(post_save, sender=ComprobanteTransferencia)
 def actualizar_verificacion_transferencia(sender, instance, created, **kwargs):
