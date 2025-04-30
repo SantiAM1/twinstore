@@ -34,6 +34,10 @@
     transition: transform 0.3s ease ,border-radius 0.3s ease;
 }
 
+.product-card strong.gaming {
+    background: linear-gradient(135deg, #00708b, #00ff6a);
+}
+
 .product-card-img {
     width: 147.5px;
     height: 147.5px;

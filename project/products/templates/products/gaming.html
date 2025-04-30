@@ -24,7 +24,7 @@
 
 {% block contenidomain %}
 <div class="product-box flex items-center flex-column width-100">
-    <nav class="flex justify-between items-center products-nav gap-1rem">
+    <nav class="flex justify-between items-center items-start products-nav gap-1rem">
         <div>
             <div>
                 <a href="{% url 'core:home' %}" class="decoration-none product-outside-link font-roboto">Inicio</a>
@@ -89,12 +89,16 @@
         <div style="border-right: 2px solid #ffffff"></div>
         <main class="flex justify-center">
             <div class="grid-container">
-                {% include 'partials/product_grid.html' %}
+                {% include 'partials/product_grid.html' with strong='gaming' %}
             </div>
         </main>
     </div>
     <div class="paginacion margin-1rem flex justify-center gap-05rem font-roboto">
         {% include 'partials/paginacion.html' %}
+    </div>
+    <div id="loading-overlay" class="loading-overlay position-fixed display-none flex-column items-center justify-center">
+        <div class="spinner"></div>
+        <p>Procesando...</p>
     </div>
 </div>
 {% endblock contenidomain %}

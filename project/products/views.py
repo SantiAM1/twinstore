@@ -18,8 +18,8 @@ import json
 
 # Create your views here.
 # ----- Manejo de filtros ----- #
-def esencials_ajax(request,productos,pagina,filtro,color=None):
-    html_productos = render_to_string('partials/product_grid.html',{'productos':productos},request=request)
+def esencials_ajax(request,productos,pagina,filtro,color=None,strong=None):
+    html_productos = render_to_string('partials/product_grid.html',{'productos':productos,'strong':strong},request=request)
     html_pagina = render_to_string('partials/paginacion.html',{'pagina':pagina},request=request)
     html_orden = render_to_string('partials/orden_resultado.html',{'filtro':filtro,'pagina':pagina,'productos':productos,'color':color},request=request)
     html_count = render_to_string('partials/productos_count.html',{'productos':productos,'pagina':pagina,'color':color})
@@ -276,7 +276,7 @@ def return_gaming(request,type='default'):
             'pagina':pagina
         })
     elif type == 'ajax':
-        html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro,color='color-fff')
+        html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro,color='color-fff',strong='gaming')
         return JsonResponse({'grid':html_productos,'paginacion':html_pagina,'orden':html_orden,'count':html_count})
 
 @bloquear_si_mantenimiento

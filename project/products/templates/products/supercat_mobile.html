@@ -3,6 +3,7 @@
 {% load compress %}
 
 {% block meta %}
+<meta name="description" content="{{seccion_id|capfirst}}; {{pagina.paginator.count}} resultados. {% for producto in productos|slice:":5" %}{{ producto.nombre }}. {% endfor %}">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="Twinstore">
 <meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
