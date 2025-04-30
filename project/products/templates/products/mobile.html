@@ -23,7 +23,6 @@
 {% endblock head %}
 
 {% block contenidomain %}
-{% if subcategoria_obj %} <h1 class="display-none">{{subcategoria_obj.nombre}}</h1> {% else %} <h1 class="display-none">{{categoria.nombre}}</h1>{% endif %}
 {% if productos %}
 <ul class="flex items-center justify-between filter-ordenar-box position-relative list-none width-100">
     <li class="flex items-center filter-button"><i class="bi bi-sliders"></i>Filtros</li>
@@ -40,8 +39,10 @@
 {% endif %}
 <div class="padding-10px">
     {% include 'partials/header_links.html' %}
-    <span class="prods-dinamic-title font-roboto font-bold">{% if subcategoria_obj %}{{subcategoria_obj.nombre}}{% else %}{{categoria.nombre}}{% endif %}</span>
-    {% if productos %}<p class="font-roboto font-bold" style="color: #363636;">{{pagina.paginator.count}} Resultados</p>{% endif %}
+    <h1 class="prods-dinamic-title font-roboto font-bold">{% if subcategoria_obj %}{{subcategoria_obj.nombre}}{% else %}{{categoria.nombre}}{% endif %}</h1>
+    <div id="productos-count">
+        {% include 'partials/productos_count.html' %}
+    </div>
 </div>
 {% if productos %}
 <div id="filter-active-mobile">

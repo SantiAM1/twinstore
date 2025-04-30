@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load compress %}
+
+{% block meta %}
+<meta name="description" content="{{subcategoria.nombre}}; {{pagina.paginator.count}} resultados.{% if marcas %} Marcas: {{ marcas|join:", " }}.{% endif %}{% for producto in productos|slice:":3" %}{{ producto.nombre }}. {% endfor %}">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Twinstore">
+<meta property="og:description" content="Lo mejor del Gaming en un solo lugar, Twinstore Gaming_.">
+<meta property="og:image" content="{% static 'img/mail.webp' %}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% endblock meta %}
+
+{% block theme %}gaming{% endblock theme %}
+
+{% block head %}
+<title>Gaming - Twistore</title>
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
+<link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
+<link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
+{% endcompress %}
+{% endblock head %}
+
+{% block contenidomain %}
+<div class="product-box flex items-center flex-column width-100">
+    <nav class="flex justify-between items-center products-nav gap-1rem">
+        <div>
+            <div>
+                <a href="{% url 'core:home' %}" class="decoration-none product-outside-link font-roboto">Inicio</a>
+                <i class="bi bi-chevron-right product-outside-link"></i>
+                <a href="{% url 'products:gaming' %}" class="decoration-none product-outside-link font-roboto">Gaming</a>
+                <i class="bi bi-chevron-right product-outside-link"></i>
+                <span class="font-roboto font-bold color-fff">{{subcategoria.nombre}}</span>
+            </div>
+            <h1 class="prods-dinamic-title gaming font-roboto font-bold">{{subcategoria.nombre}} Gaming</h1>
+            <div id="productos-count">
+                {% include 'partials/productos_count.html' with color='color-fff' %}
+            </div>
+        </div>
+        <div id="orden-result">
+            {% include 'partials/orden_resultado.html' with color="color-fff" %}
+        </div>
+    </nav>
+    {% if productos %}
+    <div class="flex gap-1rem product-box-grid">
+        <div class="flex flex-column filter-box">
+            {% include 'partials/filtros_dinamicos.html' with tag="gaming" %}
+        </div>
+        <div style="border-right: 2px solid #ffffff"></div>
+        <main class="flex justify-center">
+            <div class="grid-container">
+                {% include 'partials/product_grid.html' %}
+            </div>
+        </main>
+    </div>
+    <div class="paginacion margin-1rem flex justify-center gap-05rem font-roboto">
+        {% include 'partials/paginacion.html' %}
+    </div>
+    {% else %}
+    <div class="flex items-center justify-center">
+        <img src="{% static 'img/empty_gaming.webp' %}" height="600" width="600" alt="No hay nada aqui">
+    </div>
+    {% endif %}
+</div>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+<script nonce="{{ request.csp_nonce }}">
+    window.filters = {
+        apiUrl: "{% url 'products:gaming_subcategoria_ajax' subcategoria.slug %}",
+    };
+</script>
+<script src="{% static 'js/dinamic-filter.js' %}"></script>
+{% endblock myscripts %}

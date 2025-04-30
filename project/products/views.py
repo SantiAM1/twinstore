@@ -18,6 +18,20 @@ import json
 
 # Create your views here.
 # ----- Manejo de filtros ----- #
+def esencials_ajax(request,productos,pagina,filtro,color=None):
+    html_productos = render_to_string('partials/product_grid.html',{'productos':productos},request=request)
+    html_pagina = render_to_string('partials/paginacion.html',{'pagina':pagina},request=request)
+    html_orden = render_to_string('partials/orden_resultado.html',{'filtro':filtro,'pagina':pagina,'productos':productos,'color':color},request=request)
+    html_count = render_to_string('partials/productos_count.html',{'productos':productos,'pagina':pagina,'color':color})
+    return html_productos,html_pagina,html_orden,html_count
+
+def paginator(request,productos):
+    pagina_actual = request.GET.get('pagina', 1)
+    paginator = Paginator(productos, 12)
+    pagina = paginator.get_page(pagina_actual)
+    productos = pagina.object_list
+    return productos,pagina
+
 def ordenby(request, productos):
     orden = request.GET.get('ordenby', 'date')
     if orden == 'price_lower':
@@ -45,29 +59,24 @@ def get_atributos(productos):
 def filtrar_atributo(dict, productos, atributos_unicos):
     filtros = {}
 
-    for nombre_atributo, valores in dict.lists():  # permite múltiples valores por clave
+    for nombre_atributo, valores in dict.lists():
         if nombre_atributo in atributos_unicos:
             filtros[nombre_atributo] = valores
 
-    # Aplicamos los filtros individualmente (AND lógico)
     for atributo, valores in filtros.items():
         productos = productos.filter(
             atributos__nombre=atributo,
             atributos__valor__in=valores
         )
-    
     return productos.distinct()
 
 # ----- Supercategoria ----- #
 def return_supercategoria(request,seccion_id,type='default'):
     categorias = Categoria.objects.filter(seccion_id=seccion_id)
     productos = Producto.objects.filter(sub_categoria__categoria__in=categorias)
-    pagina_actual = request.GET.get('pagina', 1)
 
     productos, filtro = ordenby(request, productos)
-    paginator = Paginator(productos, 12)
-    pagina = paginator.get_page(pagina_actual)
-    productos = pagina.object_list
+    productos,pagina = paginator(request,productos)
 
     if type == 'default':
         template = 'products/supercat_mobile.html' if get_user_agent(request).is_mobile else 'products/supercategory.html'
@@ -79,10 +88,8 @@ def return_supercategoria(request,seccion_id,type='default'):
             'seccion_id':seccion_id
         })
     elif type == 'ajax':
-        html_productos = render_to_string('partials/product_grid.html',{'productos':productos})
-        html_pagina = render_to_string('partials/paginacion.html',{'pagina':pagina})
-        html_filtro = render_to_string('partials/orden_resultado.html',{'filtro':filtro,'pagina':pagina,'productos':productos})
-        return JsonResponse({'html':html_productos,'paginacion':html_pagina,'orden':html_filtro})
+        html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro)
+        return JsonResponse({'grid':html_productos,'paginacion':html_pagina,'orden':html_orden,'count':html_count})
 
 def supercategoria_ajax(request,seccion_id):
     return return_supercategoria(request,seccion_id,type='ajax')
@@ -119,11 +126,7 @@ def return_filtros_dinamicos(request, seccion_id,categoria_obj,subcategoria_obj=
     productos, filtro=ordenby(request,productos)
 
     prod_totales = len(productos)
-    
-    pagina_actual = request.GET.get('pagina', 1)
-    paginator = Paginator(productos, 12)
-    pagina = paginator.get_page(pagina_actual)
-    productos = pagina.object_list
+    productos,pagina = paginator(request,productos)
 
     filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q","pagina"]}
 
@@ -144,11 +147,6 @@ def return_filtros_dinamicos(request, seccion_id,categoria_obj,subcategoria_obj=
                 }, request=request
                 )
 
-            html = render_to_string('partials/product_grid.html', {
-                'productos': productos,
-                'pagina':pagina
-            }, request=request)
-
             html_activos = render_to_string(
             'partials/filtros_activos_mobile.html', {
                 'filtros_aplicados':filtros_aplicados,
@@ -156,11 +154,8 @@ def return_filtros_dinamicos(request, seccion_id,categoria_obj,subcategoria_obj=
             },
             request=request
             )
-            html_paginacion = render_to_string('partials/paginacion.html', {
-            'pagina':pagina},
-            request=request
-            )
-            return JsonResponse({'activos':html_activos,'html':html,'filtros':html_filtros,'paginacion':html_paginacion})
+            html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro)
+            return JsonResponse({'activos':html_activos,'grid':html_productos,'filtros':html_filtros,'paginacion':html_pagina,'count':html_count})
 
         html_filtros = render_to_string(
             'partials/filtros_dinamicos.html', {
@@ -175,19 +170,8 @@ def return_filtros_dinamicos(request, seccion_id,categoria_obj,subcategoria_obj=
             },
             request=request
         )
-        html_orden = render_to_string('partials/orden_resultado.html',{
-            'filtro':filtro,
-            'pagina':pagina,
-            'productos':productos
-        },request=request)
-        html = render_to_string('partials/product_grid.html', {
-            'productos': productos
-        }, request=request)
-        html_paginacion = render_to_string('partials/paginacion.html', {
-            'pagina':pagina},
-            request=request
-            )
-        return JsonResponse({'html': html,'filtros':html_filtros,'orden':html_orden,'paginacion':html_paginacion})
+        html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro)
+        return JsonResponse({'grid': html_productos,'filtros':html_filtros,'orden':html_orden,'paginacion':html_pagina,'count':html_count})
 
 @bloquear_si_mantenimiento
 @throttle_classes([FiltrosDinamicosThrottle])
@@ -245,7 +229,6 @@ def categoria_subcategoria(request, seccion_id,categoria, subcategoria):
 # ----- Busqueda de productos ----- #
 def return_busqueda(request,type='default'):
     query = request.GET.get('q', '')
-    pagina_actual = request.GET.get('pagina', 1)
 
     if query:
         palabras = query.split()
@@ -258,9 +241,7 @@ def return_busqueda(request,type='default'):
         productos =Producto.objects.all()
     
     productos, filtro = ordenby(request, productos)
-    paginator = Paginator(productos, 12)
-    pagina = paginator.get_page(pagina_actual)
-    productos = pagina.object_list
+    productos,pagina = paginator(request,productos)
 
     if type == 'default':
         return render(request, 'products/search_filter.html', {
@@ -270,10 +251,8 @@ def return_busqueda(request,type='default'):
             'pagina':pagina
         })
     elif type == 'ajax':
-        html_productos = render_to_string('partials/product_grid.html',{'productos':productos})
-        html_pagina = render_to_string('partials/paginacion.html',{'pagina':pagina})
-        html_filtro = render_to_string('partials/orden_resultado.html',{'filtro':filtro,'pagina':pagina})
-        return JsonResponse({'html':html_productos,'paginacion':html_pagina,'orden':html_filtro})
+        html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro,color='color-fff')
+        return JsonResponse({'grid':html_productos,'paginacion':html_pagina,'orden':html_orden,'count':html_count})
 
 @bloquear_si_mantenimiento
 @throttle_classes([FiltrosDinamicosThrottle])
@@ -286,12 +265,9 @@ def buscar_productos(request):
 # ----- Gaming ----- #
 def return_gaming(request,type='default'):
     productos = Producto.objects.filter(etiquetas__nombre="gaming")
-    pagina_actual = request.GET.get('pagina', 1)
 
     productos, filtro = ordenby(request, productos)
-    paginator = Paginator(productos, 12)
-    pagina = paginator.get_page(pagina_actual)
-    productos = pagina.object_list
+    productos,pagina = paginator(request,productos)
 
     if type == 'default':
         return render(request, 'products/gaming.html', {
@@ -300,10 +276,8 @@ def return_gaming(request,type='default'):
             'pagina':pagina
         })
     elif type == 'ajax':
-        html_productos = render_to_string('partials/product_grid.html',{'productos':productos})
-        html_pagina = render_to_string('partials/paginacion.html',{'pagina':pagina})
-        html_filtro = render_to_string('partials/orden_resultado.html',{'filtro':filtro,'pagina':pagina})
-        return JsonResponse({'html':html_productos,'paginacion':html_pagina,'orden':html_filtro})
+        html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro,color='color-fff')
+        return JsonResponse({'grid':html_productos,'paginacion':html_pagina,'orden':html_orden,'count':html_count})
 
 @bloquear_si_mantenimiento
 @throttle_classes([FiltrosDinamicosThrottle])
@@ -312,6 +286,64 @@ def gaming_ajax(request):
 
 def gaming(request):
     return return_gaming(request,"default")
+
+def return_gaming_subcategoria(request,slug,type='default'):
+    subcategoria = SubCategoria.objects.filter(slug=slug).first()
+    if not subcategoria:
+        return redirect('products:gaming')
+    productos = Producto.objects.filter(
+        etiquetas__nombre__iexact="gaming", 
+        sub_categoria=subcategoria).distinct()
+    #* 🔹 Filtrar por marcas
+    marca_seleccionada = request.GET.get('marca')
+    if marca_seleccionada:
+        productos = productos.filter(marca__nombre=marca_seleccionada)
+
+    #* 🔹 Obtener atributos antes del filtro
+    atributos_previos = get_atributos(productos)
+
+    #* 🔹 Aplicar filtros
+    productos = filtrar_atributo(request.GET, productos, atributos_previos)
+
+    #* 🔹 Obtener solo los atributos válidos después del filtro
+    atributos_unicos = get_atributos(productos)
+
+    marcas = Marca.objects.filter(producto__in=productos).distinct()
+
+    productos, filtro = ordenby(request, productos)
+    productos,pagina = paginator(request,productos)
+
+    filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q","pagina"]}
+
+    if type == 'default':
+        return render(request, 'products/gaming_subcat.html', {
+            'productos': productos,
+            'filtro': filtro,
+            'pagina':pagina,
+            'subcategoria':subcategoria,
+            'atributos_unicos':atributos_unicos,
+            'marcas':marcas,
+            'filtros_aplicados':filtros_aplicados
+        })
+    elif type == 'ajax':
+        html_filtros = render_to_string(
+            'partials/filtros_dinamicos.html', {
+                'filtros_aplicados':filtros_aplicados,
+                'request': request,
+                'atributos_unicos': atributos_unicos,
+                'marcas': marcas,
+                'tag':'gaming'
+            },
+            request=request
+        )
+        html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro,color='color-fff')
+        return JsonResponse({'grid':html_productos,'paginacion':html_pagina,'orden':html_orden,'filtros':html_filtros,'count':html_count})
+
+def gaming_subcategoria_ajax(request,slug):
+    return return_gaming_subcategoria(request,slug,type='ajax')
+
+def gaming_subcategoria(request,slug):
+    return return_gaming_subcategoria(request,slug,type='default')
 
 # ----- Vista individual del producto ----- #
 def producto_view(request,product_slug):
@@ -330,13 +362,9 @@ def slug_dispatcher(request, slug):
     if producto:
         return producto_view(request, slug)
 
-    test = Categoria.objects.filter(seccion_id=slug)
-    if test:
+    seccion_id = Categoria.objects.filter(seccion_id=slug)
+    if seccion_id:
         return supercategoria(request,slug)
-
-    cat = Categoria.objects.filter(slug=slug).first()
-    if cat:
-        return categoria(request, cat.slug)
 
     # No encontrado
     raise Http404("No se encontró ningún recurso con ese slug.")

@@ -60,23 +60,23 @@
         <nav class="navbar position-relative" id="nav">
             <div class="box-productos-display flex display-none position-absolute" id="box-productos-display">
                 <ul class="ul-productos-display">
-                    <li class="nav-productos-items flex categoria-selec" id="componentes">
-                        <i class="bi bi-cpu"></i>Componentes
+                    <li>
+                        <a href="{% url 'products:slug_dispatcher' 'componentes' %}" class="nav-productos-items flex categoria-selec" id="componentes"><i class="bi bi-cpu"></i>Componentes</a>
                     </li>
-                    <li class="nav-productos-items flex" id="computos">
-                        <i class="bi bi-pc-display"></i>PC | Notebooks
+                    <li>
+                        <a href="{% url 'products:slug_dispatcher' 'computos' %}" class="nav-productos-items flex" id="computos"><i class="bi bi-laptop"></i></i>PC | Notebooks</a>
                     </li>
-                    <li class="nav-productos-items flex" id="accesorios">
-                        <i class="bi bi-headphones"></i>Accesorios
+                    <li>
+                        <a href="{% url 'products:slug_dispatcher' 'accesorios' %}" class="nav-productos-items flex" id="accesorios"><i class="bi bi-headphones"></i>Accesorios</a>
                     </li>
-                    <li class="nav-productos-items flex" id="celulares">
-                        <i class="bi bi-phone"></i>Celulares
+                    <li>
+                        <a href="{% url 'products:slug_dispatcher' 'dispositivos' %}" class="nav-productos-items flex" id="dispositivos"><i class="bi bi-phone"></i>Dispositivos</a>
                     </li>
-                    <li class="nav-productos-items flex" id="impresion">
-                        <i class="bi bi-printer"></i>Impresión
+                    <li>
+                        <a href="{% url 'products:slug_dispatcher' 'impresion' %}" class="nav-productos-items flex" id="impresion"><i class="bi bi-printer"></i>Impresión</a>
                     </li>
-                    <li class="nav-productos-items flex" id="gaming">
-                        <i class="bi bi-controller"></i>Gaming
+                    <li>
+                        <a href="{% url 'products:gaming' %}" class="nav-productos-items flex" id="gaming"><i class="bi bi-controller"></i>Gaming</a>
                     </li>
                 </ul>
                 <div class="result-productos-display flex"id="result-productos-display"></div>

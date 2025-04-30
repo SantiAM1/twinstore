@@ -24,8 +24,8 @@
 .filter-box {
     width: 140px;
     flex-shrink: 0;
-    gap: 2rem;
-    padding-top: 1.5rem;
+    gap: 1.5rem;
+    padding-top: 1rem;
 }
 
 .filter-box ul {
@@ -34,11 +34,14 @@
 
 .filter-title {
     border-bottom: 2px var(--color-ts) solid;
-    width: 100%;
     margin-bottom: 0.3rem;
-    display: block;
-    font-weight: bold;
     color: #2c2c2c;
+}
+
+.filter-title-gaming {
+    border-bottom: 2px #fff solid;
+    margin-bottom: 0.3rem;
+    color: #ecebaf;
 }
 
 .filter-link,.sub-filter-link {
@@ -70,6 +73,11 @@
     border-bottom: #1a1a1a solid 1px;
 }
 
+.sub-filter-link.color-fff:hover,
+.filter-link.color-fff:hover {
+    border-bottom: #fff solid 1px;
+}
+
 .product-ordenby{
     height: 2rem;
     text-align: center;
@@ -91,6 +99,10 @@
     color: #446de0;
     font-size: 2rem;
     padding-top: 0.3rem;
+}
+
+.prods-dinamic-title.gaming {
+    color: #ebe96f;
 }
 
 .custom-select {

@@ -1,20 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const temas = {
+        white: '#ededed',
+        black: getComputedStyle(document.documentElement).getPropertyValue('--black-theme-color'),
+        gaming: '#c01276',
+    };
+    
     const currentTheme = document.body.dataset.theme;
+    console.log(currentTheme)
     const lastTheme = sessionStorage.getItem('ultimaTheme');
-
+    
     if (lastTheme && lastTheme !== currentTheme) {
-        if (currentTheme === 'black') {
-            document.body.style.animation = 'cambiarfondooscuro 0.8s forwards';
-        } else if (currentTheme === 'white') {
-            document.body.style.animation = 'cambiarfondoclaro 0.8s forwards';
-        }
+        const fromBg = temas[lastTheme] || '#ededed';
+        const toBg = temas[currentTheme] || '#ededed';
+    
+        document.body.style.setProperty('--from-bg', fromBg);
+        document.body.style.setProperty('--to-bg', toBg);
+        document.body.style.animation = 'cambiarfondo 0.8s forwards';
     }
-
-    // Guardar el tema actual para la próxima carga
+    
     sessionStorage.setItem('ultimaTheme', currentTheme);
+    
     document.body.addEventListener('animationend', () => {
         document.body.style.animation = '';
     });
+    
     // ----- Menu desktop mobile ------ //
     const categorias = JSON.parse(document.getElementById('menu-json').textContent);
     const botonProductos = document.getElementById("boton-productos");

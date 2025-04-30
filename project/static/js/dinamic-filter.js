@@ -72,17 +72,18 @@ document.addEventListener("DOMContentLoaded", () => {
             // * GRID COMPARTIDO
             const gridBox = document.querySelector('.grid-container');
             if (gridBox) {
-                gridBox.innerHTML = DOMPurify.sanitize(response.data.html)
+                gridBox.innerHTML = DOMPurify.sanitize(response.data.grid)
+            }
+            // * Count
+            const prodCount = document.getElementById('productos-count');
+            if (prodCount) {
+                prodCount.innerHTML = DOMPurify.sanitize(response.data.count)
             }
             // * COMPUTADORA
             const filterBox = document.querySelector('.filter-box');
             if (response.data.filtros && filterBox) {
                 filterBox.innerHTML = DOMPurify.sanitize(response.data.filtros);
             }
-            // const linksProds = document.querySelector('.product-links-box');
-            // if (response.data.navlinks && linksProds) {
-            //     linksProds.innerHTML = DOMPurify.sanitize(response.data.navlinks);
-            // }
             const orderResult = document.getElementById('orden-result')
             if (orderResult) {
                 orderResult.innerHTML =  DOMPurify.sanitize(response.data.orden);

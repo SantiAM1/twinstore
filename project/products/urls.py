@@ -12,19 +12,23 @@ from .views import (
     gaming,
     gaming_ajax,
     categoria,
-    supercategoria_ajax
+    supercategoria_ajax,
+    gaming_subcategoria,
+    gaming_subcategoria_ajax
     )
 
 app_name = "products"
 
 urlpatterns = [
     path('api/gaming/',gaming_ajax,name="gaming_ajax"),
+    path('api/gaming/<slug:slug>',gaming_subcategoria_ajax,name="gaming_subcategoria_ajax"),
     path('api/supercategoria/<slug:seccion_id>/',supercategoria_ajax,name="supercategoria_ajax"),
     path('api/categoria/<slug:seccion_id>/<slug:categoria>/', categoria_ajax, name='categoria_ajax'),
     path('api/categoria/<slug:seccion_id>/<slug:categoria>/<slug:subcategoria>/', subcategoria_ajax, name='subcategoria_ajax'),
     path('api/buscar_productos_ajax/', buscar_productos_ajax, name='buscar_productos_ajax'),
     path('<slug:seccion_id>/<slug:categoria>/<slug:subcategoria>/', categoria_subcategoria, name="categoria_subcategoria"),
     path('<slug:seccion_id>/<slug:categoria>/', categoria, name="categoria"),
+    path('gaming/<slug:slug>',gaming_subcategoria,name="gaming_subcategoria"),
     path('gaming/',gaming,name="gaming"),
     path('busqueda/',buscar_productos,name="search"),
     path('<slug:slug>/', slug_dispatcher, name='slug_dispatcher'),

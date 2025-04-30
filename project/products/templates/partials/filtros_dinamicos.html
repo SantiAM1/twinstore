@@ -9,6 +9,6 @@
     {% endfor %}
     </div>
 {% endif %}
-{% include 'components/sub_categoria.html' %}
-{% include 'components/atribute.html'%}
-{% include 'components/marcas.html' %}
+{% if not tag == 'gaming' %}{% include 'components/sub_categoria.html' %}{% endif %}
+{% if not tag == 'gaming' %}{% include 'components/atribute.html' %}{% else %}{% include 'components/atribute_gaming.html' %}{% endif %}
+{% if not tag == 'gaming' %}{% include 'components/marcas.html' %}{% else %}{% include 'components/marcas_gaming.html' %}{% endif %}

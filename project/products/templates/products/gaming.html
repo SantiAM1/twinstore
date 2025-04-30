@@ -23,22 +23,70 @@
 {% endblock head %}
 
 {% block contenidomain %}
-<h1 class="display-none">Gaming</h1>
 <div class="product-box flex items-center flex-column width-100">
-    <h2 class="color-fff text-center font-bold font-roboto" style="font-size: 1.8rem;">Conocé nuestro apartado Gaming_</h2>
-    <div class="padding-10px border-1px"></div>
-    <div class="padding-10px"></div>
     <nav class="flex justify-between items-center products-nav gap-1rem">
         <div>
-            <a href="{% url 'core:home' %}" class="decoration-none product-outside-link font-roboto">Inicio</a>
-            <i class="bi bi-chevron-right product-outside-link"></i>
-            <span class="font-roboto font-bold color-fff">Gaming</span>
+            <div>
+                <a href="{% url 'core:home' %}" class="decoration-none product-outside-link font-roboto">Inicio</a>
+                <i class="bi bi-chevron-right product-outside-link"></i>
+                <span class="font-roboto font-bold color-fff">Gaming</span>
+            </div>
+            <h1 class="prods-dinamic-title gaming font-roboto font-bold">Gaming</h1>
+            <div id="productos-count">
+                {% include 'partials/productos_count.html' with color='color-fff' %}
+            </div>
         </div>
         <div id="orden-result">
             {% include 'partials/orden_resultado.html' with color="color-fff" %}
         </div>
     </nav>
     <div class="flex gap-1rem product-box-grid">
+        <div class="flex flex-column filter-box">
+            <div>
+                <span class="filter-title-gaming display-block font-bold width-100">Periféricos</span>
+                <ul class="list-none">
+                    <li>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="{% url 'products:gaming_subcategoria' 'teclados' %}">Teclados</a>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="{% url 'products:gaming_subcategoria' 'mouse' %}">Mouse</a>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">Auriculares</a>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">Monitores</a>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">Joysticks</a>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">Volantes</a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <span class="filter-title-gaming display-block font-bold width-100">Hardware</span>
+                <ul class="list-none">
+                    <li>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">Placas de Video</a>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">Procesadores</a>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">Motherboards</a>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="{% url 'products:gaming_subcategoria' 'gabinetes' %}">Gabinetes</a>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">Coolers</a>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">Fuentes</a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <span class="filter-title-gaming display-block font-bold width-100">Muebles</span>
+                <ul class="list-none">
+                    <li>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">Sillas</a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <span class="filter-title-gaming display-block font-bold width-100">Listas para Jugar</span>
+                <ul class="list-none">
+                    <li>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">PCs Armadas</a>
+                        <a class="decoration-none sub-filter-link bloqueable color-fff" href="#">Notebooks</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div style="border-right: 2px solid #ffffff"></div>
         <main class="flex justify-center">
             <div class="grid-container">
                 {% include 'partials/product_grid.html' %}

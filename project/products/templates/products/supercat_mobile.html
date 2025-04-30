@@ -3,7 +3,6 @@
 {% load compress %}
 
 {% block meta %}
-<meta name="description" content="{% if subcategoria_obj %}{{subcategoria_obj.nombre}}{% else %}{{categoria.nombre}}{% endif %}; {{prod_totales}} resultados.{% if marcas %} Marcas: {{ marcas|join:", " }}.{% endif %}{% for producto in productos|slice:":3" %}{{ producto.nombre }}. {% endfor %}">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="Twinstore">
 <meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
@@ -48,8 +47,10 @@
         <i class="bi bi-chevron-right product-outside-link"></i>
         <span class="font-roboto font-bold">{{seccion_id|capfirst}}</span>
     </div>
-    <span class="prods-dinamic-title font-roboto font-bold">{{seccion_id|capfirst}}</span>
-    {% if productos %}<p class="font-roboto font-bold" style="color: #363636;">{{pagina.paginator.count}} Resultados</p>{% endif %}
+    <h1 class="prods-dinamic-title font-roboto font-bold">{{seccion_id|capfirst}}</h1>
+    <div id="productos-count">
+        {% include 'partials/productos_count.html' %}
+    </div>
 </div>
 {% if productos %}
 <main class="product-box flex items-center flex-column width-100">

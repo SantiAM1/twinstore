@@ -5,7 +5,7 @@ import json
 from django_user_agents.utils import get_user_agent
 
 def render_menu(request):
-    ORDEN_SECCIONES = ["componentes", "computos", "accesorios", "celulares", "impresion"]
+    ORDEN_SECCIONES = ["componentes", "computos", "accesorios", "dispositivos", "impresion"]
     data_desk = cache.get('menu_desktop')
     data_mob = cache.get('menu_mobile')
     if not data_desk or not data_mob:

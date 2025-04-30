@@ -13,6 +13,10 @@
     --font-type : 'Gill Sans', 'Gill Sans MT', calibri, 'Trebuchet MS', sans-serif;
     --font-roboto : 'Roboto';
     --black-theme-color: #0c0c0c;
+    --white-bg: #ededed;
+    --black-bg: var(--black-theme-color);
+    --gaming-bg: linear-gradient(135deg, #ff014d, #722daa);
+
 }
 
 * {
@@ -23,13 +27,16 @@
 }
 
 body {
+    --from-bg: var(--white-bg);
+    --to-bg: var(--white-bg);
+
     margin: 0;
     display:flex;
     flex-direction: column;
 }
 
 body[data-theme="white"] {
-    background-color: #ededed;
+    background-color: var(--primary-color);
 }
 
 body[data-theme="black"] {
@@ -40,6 +47,15 @@ body[data-theme="gaming"] {
     background: linear-gradient(135deg, #ff014d, #722daa);
 }
 
+@keyframes cambiarfondo {
+    from {
+        background: var(--from-bg);
+    }
+
+    to {
+        background: var(--to-bg);
+    }
+}
 
 .main-box {
     flex: 1;

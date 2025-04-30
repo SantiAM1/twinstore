@@ -22,17 +22,16 @@
 
 {% block contenidomain %}
 <h1 class="display-none">Busqueda {{query}}</h1>
-<div class="product-box main-box">
-    <nav class="flex justify-between items-center products-nav gap-1rem">
+<div class="product-box flex items-center flex-column width-100">
+    <nav class="flex justify-between items-center products-nav">
         <div>
-            <a href="{% url 'core:home' %}" class="decoration-none product-outside-link font-roboto">Inicio</a>
-            <i class="bi bi-chevron-right product-outside-link"></i>
-            <span class="font-roboto">Resultados de busqueda para: "<strong class="font-roboto">{{query}}</strong>"</span>
+            <span class="font-roboto">Resultados de: "<strong class="font-roboto">{{query}}</strong>"</span>
         </div>
         <div id="orden-result">
             {% include 'partials/orden_resultado.html' %}
         </div>
     </nav>
+    {% if productos %}
     <div class="flex gap-1rem product-box-grid">
         <main class="flex justify-center">
             <div class="grid-container">
@@ -43,6 +42,11 @@
     <div class="paginacion margin-1rem flex justify-center gap-05rem font-roboto">
         {% include 'partials/paginacion.html' %}
     </div>
+    {% else %}
+    <div class="flex items-center justify-center">
+        <img src="{% static 'img/empty.webp' %}" height="600" width="600" alt="No hay nada aqui">
+    </div>
+    {% endif %}
 </div>
 {% endblock contenidomain %}
 
