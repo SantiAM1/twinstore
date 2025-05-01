@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 ciudad: document.getElementById('id_ciudad').value,
                 codigo_postal: document.getElementById('id_codigo_postal').value,
                 recibir_mail: document.getElementById('id_recibir_estado_pedido').checked,
+                telefono: document.getElementById('id_telefono').value,
+                razon_social: document.getElementById('id_razon_social').value,
             };
             document.querySelectorAll('.error').forEach(div => div.innerText = '');
 

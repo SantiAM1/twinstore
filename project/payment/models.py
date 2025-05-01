@@ -23,16 +23,6 @@ class HistorialCompras(models.Model):
         ('transferencia','Transferencia')
     ]
 
-    ESTADOS_STAFF = [
-    ('no verificado', 'No verificado'),
-    ('revision en curso', 'Revisión en curso'),
-    ('esperando respuesta', 'Esperando respuesta del cliente'),
-    ('pedido realizado', 'Pedido realizado al proveedor'),
-    ('completado', 'Completado'),
-    ('cancelado', 'Cancelado'),
-    ('transferencia recibida','Transferencia recibida')
-    ]
-
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     productos = models.JSONField()
     total_compra = models.DecimalField(max_digits=10, decimal_places=2)
@@ -44,7 +34,7 @@ class HistorialCompras(models.Model):
     token_consulta = models.UUIDField(default=uuid.uuid4, unique=True)
     recibir_mail = models.BooleanField(default=False)
     fecha_finalizado = models.DateTimeField(null=True,blank=True)
-    estado_staff = models.CharField(max_length=50,choices=ESTADOS_STAFF,default='no verificado')
+    requiere_revision = models.BooleanField(default=True)
 
     def __str__(self):
         if self.usuario:
@@ -60,10 +50,13 @@ class HistorialCompras(models.Model):
         return all(p.status == "approved" for p in self.pagos.all())
 
     def get_adicional(self):
-        if not self.forma_de_pago == "mercado pago":
+        if self.forma_de_pago != "mercado pago":
             return 0
-        subtotal = Decimal(sum(producto['subtotal'] for producto in self.productos))
-        return self.total_compra - subtotal
+        
+        subtotal = sum(Decimal(str(p['subtotal'])) for p in self.productos)
+        total = Decimal(str(self.total_compra))
+        
+        return total - subtotal
 
     def check_notificacion(self):
         return True if not self.estado in ['arrepentido','finalizado','rechazado'] else False
@@ -77,6 +70,14 @@ class HistorialCompras(models.Model):
         limite = self.fecha_finalizado + timedelta(days=10)
         return timezone.now() <= limite
 
+class EstadoPedido(models.Model):
+    historial = models.ForeignKey(HistorialCompras, on_delete=models.CASCADE, related_name='estados')
+    estado = models.CharField(max_length=100)
+    fecha = models.DateTimeField(auto_now_add=True)
+    comentario = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"_____________{self.estado}"
 class PagoRecibidoMP(models.Model):
     payment_id = models.CharField(max_length=100, unique=True)
     merchant_order_id = models.CharField(max_length=100, blank=True, null=True)

@@ -17,7 +17,8 @@ def mail_buy_send_html(historial,user_email):
     token = historial.token_consulta
     site_url = f'{settings.SITE_URL}'
     productos = historial.productos
-    adicional = historial.get_adicional()
+    # adicional = historial.get_adicional()
+    adicional = 0
     total = historial.total_compra
     historial_data = {
     'url': f"{site_url}/usuario/ver_pedido/{token}",

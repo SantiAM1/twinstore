@@ -1,7 +1,10 @@
 from django.contrib import admin
-from .models import HistorialCompras,PagoRecibidoMP,ComprobanteTransferencia
+from .models import HistorialCompras,PagoRecibidoMP,ComprobanteTransferencia,EstadoPedido
 from django.utils.html import format_html, format_html_join
 from django.urls import reverse
+from django.utils.timezone import localtime
+from django.template.defaultfilters import date as date_filter
+
 # Register your models here.
 
 admin.site.register(PagoRecibidoMP)
@@ -9,29 +12,51 @@ admin.site.register(PagoRecibidoMP)
 class ComprobanteTransferenciaInline(admin.StackedInline):
     model = ComprobanteTransferencia
     can_delete = False
-    extra = 0
+    extra = 1
     classes = ['collapse']
     readonly_fields = ['file', 'fecha_subida']
 
+class EstadoPedidoInline(admin.StackedInline):
+    model = EstadoPedido
+    can_delete = False
+    extra = 0
+    classes = ['collapse']
+    verbose_name_plural = "📝 Historial de estados del pedido"
+    ordering = ['-fecha']
+    readonly_fields = ['render_estado_pedido']
+    fields = ['render_estado_pedido']
+
+    def render_estado_pedido(self, obj):
+        color = "#f0ec23" if "(Servidor)" in obj.estado else "#ee4f2d"
+        fecha_local = localtime(obj.fecha)
+        fecha = date_filter(fecha_local, "d M Y H:i")
+        comentario = obj.comentario or "—"
+        return format_html(
+            f"""<p style="color:{color}">Comentario: {comentario}</p><p style="color:{color}">Fecha: {fecha}</p>"""
+        )
+
+    render_estado_pedido.short_description = "Informacion"
+
 @admin.register(HistorialCompras)
 class HistorialComprasAdmin(admin.ModelAdmin):
-    list_filter = ('estado', 'estado_staff', 'fecha_compra')
-    list_display = ('merchant_order_id', 'mostrar_nombre_apellido', 'total_compra', 'estado', 'fecha_compra','fecha_finalizado','estado_staff')
+    inlines = [EstadoPedidoInline]
+    search_fields = ('merchant_order_id',)
+    list_filter = ('estado', 'fecha_compra', 'requiere_revision')
+    list_display = ('merchant_order_id', 'mostrar_nombre_apellido', 'total_compra', 'estado', 'fecha_compra','fecha_finalizado','requiere_revision')
     readonly_fields = ('merchant_order_id','detalle_productos','datos_facturacion_expandible','fecha_compra','forma_de_pago','total_compra','fecha_finalizado')
     fieldsets = (
         (None, {
             'fields': (
-                'detalle_productos','merchant_order_id','total_compra', 'estado', 'forma_de_pago', 'fecha_finalizado','datos_facturacion_expandible','estado_staff',
+                'detalle_productos','merchant_order_id','total_compra', 'estado', 'forma_de_pago', 'fecha_finalizado','datos_facturacion_expandible'
             )
         }),
     )
 
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
-        if obj:  # Solo en vista de edición/detalle
-            if obj.forma_de_pago == 'transferencia':
-                # Aunque no exista comprobante aún, mostramos igual si queremos permitir verlo como readonly
-                inline_instances.append(ComprobanteTransferenciaInline(self.model, self.admin_site))
+        inline_instances.append(EstadoPedidoInline(self.model, self.admin_site))
+        if obj and obj.forma_de_pago == 'transferencia':
+            inline_instances.append(ComprobanteTransferenciaInline(self.model, self.admin_site))
         return inline_instances
 
     def mostrar_nombre_apellido(self, obj):
@@ -73,11 +98,6 @@ class HistorialComprasAdmin(admin.ModelAdmin):
             return False  # no permitir borrar desde la lista
         return obj.estado in ['finalizado', 'arrepentido']
 
-    def advertencia_verificacion(self, obj):
-        if not obj.verificado:
-            return format_html('<span style="color: red; font-weight: bold;">Este historial NO está verificado. ¡Por favor, revise la operación!</span>')
-        return format_html('<span style="color: green; font-weight: bold;">Historial verificado correctamente.</span>')
-
     def detalle_productos(self, obj):
         if not obj.productos:
             return "Sin productos."
@@ -109,4 +129,3 @@ class HistorialComprasAdmin(admin.ModelAdmin):
     detalle_productos.short_description = "Detalle de compra"
     mostrar_nombre_apellido.short_description = "Cliente"
     datos_facturacion_expandible.short_description = "Datos de facturación"
-    advertencia_verificacion.short_description = "Estado de verificación"
