@@ -40,14 +40,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = True
 
 # * Host
-SITE_URL = "989f-181-228-88-6.ngrok-free.app"
+SITE_URL = "twinstore.com.ar"
 
 # ! Actualizar el HOST con el dominio
-ALLOWED_HOSTS = [f'{SITE_URL}','127.0.0.1']
+ALLOWED_HOSTS = [f'{SITE_URL}','www.twinstore.com.ar']
 
 # ! Verificar las correspondencias
 CSRF_TRUSTED_ORIGINS = [
-    f"https://{SITE_URL}"
+    f"https://{SITE_URL}", "https://www.twinstore.com.ar"
 ]
 
 # * Sessions
@@ -56,9 +56,12 @@ SESSION_COOKIE_AGE = 86400
 SESSION_COOKIE_HTTPONLY = True
 
 # ! Descomentar antes de producción
-# SESSION_COOKIE_SECURE = True        # * Solo se envían por HTTPS
-# CSRF_COOKIE_SECURE = True           # * Igual para CSRF
-# CSRF_COOKIE_HTTPONLY = True         # * Protege aún más
+SESSION_COOKIE_SECURE = True        # * Solo se envían por HTTPS
+CSRF_COOKIE_SECURE = True           # * Igual para CSRF
+CSRF_COOKIE_HTTPONLY = True         # * Protege aún más
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # Application definition
 
@@ -106,11 +109,6 @@ AXES_LOCKOUT_PARAMETERS = ['username', 'ip_address']
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = 1
 AXES_RESET_ON_SUCCESS = True
-
-# ! Descomentar antes de producción
-# SECURE_HSTS_SECONDS = 31536000
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
 
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {

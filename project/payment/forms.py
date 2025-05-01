@@ -1,8 +1,9 @@
 from django import forms
 from .models import ComprobanteTransferencia,EstadoPedido
 from django.core.exceptions import ValidationError
+import magic
 
-MAX_FILE_SIZE_MB = 5
+MAX_FILE_SIZE_MB = 2
 
 class ComprobanteForm(forms.ModelForm):
     class Meta:
@@ -17,12 +18,23 @@ class ComprobanteForm(forms.ModelForm):
     def clean_file(self):
         file = self.cleaned_data.get('file')
         if file:
-            if not file.name.lower().endswith(('.jpg', '.jpeg', '.png', '.pdf')):
+            # ✅ Verificá extensión
+            ext_permitidas = ['.jpg', '.jpeg', '.png', '.pdf']
+            if not file.name.lower().endswith(tuple(ext_permitidas)):
                 raise ValidationError("❌ Solo se permiten archivos JPG, JPEG, PNG o PDF.")
             
-            max_size = MAX_FILE_SIZE_MB * 1024 * 1024  # MB to bytes
+            # ✅ Verificá tipo real de archivo
+            file_type = magic.from_buffer(file.read(2048), mime=True)
+            file.seek(0)  # Volvés al inicio del archivo para evitar romper el guardado
+
+            if file_type not in ['image/jpeg', 'image/png', 'application/pdf']:
+                raise ValidationError(f"❌ Tipo de archivo inválido: {file_type}")
+
+            # ✅ Validá tamaño
+            max_size = MAX_FILE_SIZE_MB * 1024 * 1024
             if file.size > max_size:
                 raise ValidationError(f"❌ El archivo supera el límite de {MAX_FILE_SIZE_MB} MB.")
+
         return file
 
 class EstadoPedidoForm(forms.ModelForm):

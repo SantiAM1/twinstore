@@ -191,11 +191,6 @@
         "orden": 2,
         "subcategorias": [
             {
-                "nombre": "Discos Rigidos",
-                "descripcion_seo": "",
-                "slug": "discos-rigidos"
-            },
-            {
                 "nombre": "Discos SSD",
                 "descripcion_seo": "",
                 "slug": "discos-ssd"
@@ -204,6 +199,11 @@
                 "nombre": "Discos Externos",
                 "descripcion_seo": "",
                 "slug": "discos-externos"
+            },
+            {
+                "nombre": "Discos Rigidos",
+                "descripcion_seo": "",
+                "slug": "discos-rigidos"
             }
         ]
     },
