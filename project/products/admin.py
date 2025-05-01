@@ -39,7 +39,7 @@ class EspecificacionTecnicaInline(admin.StackedInline):
 
 class ProductoAdmin(admin.ModelAdmin):
     inlines = [AtributoInline, ImagenProductoInline, EspecificacionTecnicaInline,EtiquetasInline]
-    list_display = ['nombre', 'sku', 'marca', 'sub_categoria']
+    list_display = ['nombre', 'sku', 'marca', 'sub_categoria','inhabilitar']
     search_fields = ['nombre', 'sku']
     list_filter = ['marca', 'sub_categoria']
     readonly_fields = ['precio','slug']

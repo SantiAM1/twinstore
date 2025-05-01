@@ -25,7 +25,8 @@ environ.Env.read_env(os.path.join(os.path.dirname(__file__), ".env"))
 MERCADOPAGO_ACCESS_TOKEN = env("MERCADOPAGO_ACCESS_TOKEN")
 MP_WEBHOOK_KEY = env("MP_WEBHOOK_KEY")
 DJANGO_SECRET_KEY = env("DJANGO_SECRET_KEY")
-
+EXCEL_TOKEN = env("EXCEL_TOKEN")
+SECRET_KEY = DJANGO_SECRET_KEY
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -33,7 +34,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = DJANGO_SECRET_KEY
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

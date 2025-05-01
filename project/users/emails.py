@@ -48,6 +48,8 @@ def mail_estado_pedido_html(historial,user_email):
         finalizado = True
     elif historial.estado == "arrepentido":
         mensaje = "	Pedido cancelado, arrepentido"
+    elif historial.estado == "retiro listo":
+        mensaje = "Tu pedido ya se encuentra en nuestro punto de retiro listo para ser retirado. Te esperamos!"
     else:
         mensaje = "Estamos esperando la confirmación del pago. Te notificaremos apenas se acredite."
 

@@ -16,7 +16,7 @@ from .decorators import bloquear_si_mantenimiento
 from .throttling import PrediccionBusquedaThrottle
 from rest_framework.decorators import throttle_classes
 from .models import DolarConfiguracion
-
+from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.timezone import now
 from core.utils import obtener_valor_dolar
@@ -118,6 +118,17 @@ def cargar_productos_excel(request):
                         messages.error(request, "El archivo Excel está vacío.")
                         return redirect('core:cargar_excel')
 
+                    token_columna = df.get('Token')
+                    if token_columna is None or token_columna.isna().all():
+                        messages.error(request, "El archivo no contiene un campo 'Token'.")
+                        return redirect('core:cargar_excel')
+
+                    token_archivo = str(token_columna.dropna().iloc[0]).strip()
+
+                    if token_archivo != settings.EXCEL_TOKEN:
+                        messages.error(request, "Token inválido. No se cargó el archivo.")
+                        return redirect('core:cargar_excel')
+
                     nombres_en_excel = df['Producto'].tolist()
                     productos_existentes = Producto.objects.all()
                     productos_a_eliminar = productos_existentes.exclude(nombre__in=nombres_en_excel)
@@ -150,7 +161,8 @@ def cargar_productos_excel(request):
                                 'precio_dolar': fila['Precio USD'],
                                 'descuento': fila['Descuento'],
                                 'proveedor':fila['Proveedor'],
-                                'sku': sku
+                                'sku': sku,
+                                'inhabilitar': True if fila['Inhabilitar'] else False
                             }
                         )
 
@@ -160,6 +172,11 @@ def cargar_productos_excel(request):
                             if fila.get('Proveedor'):
                                 producto.proveedor = fila['Proveedor']
                                 producto.save(update_fields=['proveedor'])
+                            if fila.get('Inhabilitar') == 'Si':
+                                producto.inhabilitar = True
+                            else:
+                                producto.inhabilitar = False
+                            producto.save(update_fields=['inhabilitar'])
                             if not producto.slug:
                                 producto.generar_slug()
                                 producto.save()

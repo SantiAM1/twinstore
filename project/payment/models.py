@@ -11,6 +11,7 @@ class HistorialCompras(models.Model):
         ('confirmado', 'Confirmado🟢'),
         ('rechazado', 'Rechazado🔴'),
         ('preparando pedido','Preparando pedido🔵'),
+        ('retiro listo','Listo para retirar✔️'),
         ('enviado','Enviado🟣'),
         ('finalizado','Finalizado⚪'),
         ('arrepentido', 'Arrepentido⭕')
