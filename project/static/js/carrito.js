@@ -14,15 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     action:action,
                 });
 
-                const { total_productos, total_precio, cantidad } = response.data;
+                const { total_productos, total_precio, cantidad,sub_total } = response.data;
 
                 container.querySelector('.input-value-cart').value = cantidad
                 const fila = container.closest('tr');
                 const precioSubtotal = fila?.querySelector('.cart-total-precio');
-                const precio = parseFloat(container.dataset.precio);
+                // const precio = parseFloat(container.dataset.precio);
 
-                if (precioSubtotal && !isNaN(precio)) {
-                    precioSubtotal.textContent = `$${(precio * cantidad).toFixed(2)}`;
+                if (precioSubtotal) {
+                    precioSubtotal.textContent = `${sub_total}`;
 
                     // Animación suave
                     precioSubtotal.classList.remove('animate-flash'); // reset
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 actualizarCarrito(total_precio,total_productos)
-                
+                console.log(total_precio)
                 if (parseInt(total_productos) === 0) {
                     mostrarCarritoVacio()
                 }
@@ -53,12 +53,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     function actualizarPreciosCarrito(total_precio) {
-        const totalFormateado = parseFloat(total_precio).toFixed(2)
         const subTotal = document.getElementById('cart-subtotal');
         const total = document.getElementById('cart-total');
         if (subTotal && total) {
-            subTotal.textContent = `$${totalFormateado}`;
-            total.textContent = `$${totalFormateado}`
+            subTotal.textContent = `${total_precio}`;
+            total.textContent = `${total_precio}`
         }
     }
 
@@ -131,8 +130,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const carritoBox = document.getElementById('carrito-box');
         if (carritoBox) {
             carritoBox.innerHTML = `
-            <p class="cart-empty-msg">Tu carrito esta vacio</p>
-            <a href="/" class="decoration-none cart-volver-tienda">Volver a la tienda</a>
+            <p class="cart-empty-msg font-roboto">Tu carrito esta vacio</p>
+            <a href="/" class="decoration-none cart-volver-tienda font-roboto color-fff font-bold text-center padding1rem">Volver a la tienda</a>
             `
         }
     }
@@ -144,8 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     
         const precioCarrito = document.querySelector('.carrito-total-precio');
         if (precioCarrito) {
-            const totalFormateado = parseFloat(total_precio).toFixed(2);
-            precioCarrito.textContent = `Carrito / $${totalFormateado}`;
+            precioCarrito.textContent = `Carrito / ${total_precio}`;
         }
     }
 })

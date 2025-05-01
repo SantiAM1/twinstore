@@ -153,6 +153,8 @@ def cargar_productos_excel(request):
 
                         valor_dolar = obtener_valor_dolar()
 
+                        inhabilitar_str = str(fila.get('Inhabilitar', '')).strip().lower()
+                        inhabilitar_flag = inhabilitar_str in ['si', 'sí', 'true', '1']
                         producto, creado = Producto.objects.get_or_create(
                             nombre=fila['Producto'],
                             defaults={
@@ -162,7 +164,7 @@ def cargar_productos_excel(request):
                                 'descuento': fila['Descuento'],
                                 'proveedor':fila['Proveedor'],
                                 'sku': sku,
-                                'inhabilitar': True if fila['Inhabilitar'] else False
+                                'inhabilitar': inhabilitar_flag
                             }
                         )
 
@@ -172,10 +174,8 @@ def cargar_productos_excel(request):
                             if fila.get('Proveedor'):
                                 producto.proveedor = fila['Proveedor']
                                 producto.save(update_fields=['proveedor'])
-                            if fila.get('Inhabilitar') == 'Si':
-                                producto.inhabilitar = True
-                            else:
-                                producto.inhabilitar = False
+                            inhabilitar_str = str(fila.get('Inhabilitar', '')).strip().lower()
+                            producto.inhabilitar = inhabilitar_str in ['si', 'sí', 'true', '1']
                             producto.save(update_fields=['inhabilitar'])
                             if not producto.slug:
                                 producto.generar_slug()

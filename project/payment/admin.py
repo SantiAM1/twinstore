@@ -4,6 +4,7 @@ from django.utils.html import format_html, format_html_join
 from django.urls import reverse
 from django.utils.timezone import localtime
 from django.template.defaultfilters import date as date_filter
+from .forms import EstadoPedidoForm
 
 # Register your models here.
 
@@ -18,13 +19,16 @@ class ComprobanteTransferenciaInline(admin.StackedInline):
 
 class EstadoPedidoInline(admin.StackedInline):
     model = EstadoPedido
+    form = EstadoPedidoForm  # 👈 Usamos el form custom
     can_delete = False
     extra = 0
     classes = ['collapse']
-    verbose_name_plural = "📝 Historial de estados del pedido"
     ordering = ['-fecha']
     readonly_fields = ['render_estado_pedido']
-    fields = ['render_estado_pedido']
+    verbose_name_plural = "📝 Historial de estados del pedido"
+
+    def get_fields(self, request, obj=None):
+        return ['render_estado_pedido', 'estado', 'comentario']
 
     def render_estado_pedido(self, obj):
         color = "#f0ec23" if "(Servidor)" in obj.estado else "#ee4f2d"
@@ -93,10 +97,10 @@ class HistorialComprasAdmin(admin.ModelAdmin):
             )
         return format_html(html)
 
-    def has_delete_permission(self, request, obj=None):
-        if obj is None:
-            return False  # no permitir borrar desde la lista
-        return obj.estado in ['finalizado', 'arrepentido']
+    # def has_delete_permission(self, request, obj=None):
+    #     if obj is None:
+    #         return False  # no permitir borrar desde la lista
+    #     return obj.estado in ['finalizado', 'arrepentido']
 
     def detalle_productos(self, obj):
         if not obj.productos:

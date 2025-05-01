@@ -30,7 +30,7 @@
                 </div>
             {% endfor %}
         {% endif %}
-        <form method="post" style="padding: 1rem" class="flex gap-1rem items-center flex-column">
+        <form method="post" class="flex gap-1rem items-center flex-column padding1rem">
             {% csrf_token %}
             {{form.token}}
             <button type="submit" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-pedido-button">Buscar pedido</button>

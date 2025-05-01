@@ -33,7 +33,7 @@
         <div>
             <input type="checkbox" id="asociar-prod" class="asociar-prod display-none">
             <label for="asociar-prod" class="flex justify-between items-center font-roboto users-asociar-pedido">Asociar un pedido a mi cuenta<i class="bi bi-chevron-down"></i></label>
-            <form method="post" style="padding: 1rem" class="users-pedido-asociar flex items-center flex-column gap-1rem" action="{% url 'users:asociar_pedido' %}">
+            <form method="post" class="users-pedido-asociar flex items-center flex-column gap-1rem padding1rem" action="{% url 'users:asociar_pedido' %}">
                 {% csrf_token %}
                 {{form.token}}
                 <button type="submit" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-pedido-button">Asociar pedido</button>

@@ -24,7 +24,6 @@ from .context_processors import carrito_total
 from .permissions import TieneCarrito
 from .decorators import requiere_carrito
 
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -40,6 +39,8 @@ from datetime import timedelta
 import random
 import string
 from datetime import datetime
+from datetime import date
+
 
 # ----- APIS ----- #
 class EnviarWtapView(APIView):
@@ -101,6 +102,7 @@ class ActualizarPedidoView(APIView):
                 cantidad = pedido.cantidad if pedido else 0
             else:
                 carrito = request.session.get('carrito',{})
+                
                 pedido_key = str(pedido_id)
                 if pedido_key in carrito:
                     if action == "increment":
@@ -114,10 +116,11 @@ class ActualizarPedidoView(APIView):
                 request.session['carrito'] = carrito
                 request.session.modified = True
                 cantidad = carrito[pedido_key] if pedido_key in carrito else 0
-            
-            total_processor = carrito_total(request)
+
+            total_processor = carrito_total(request,type='views',pedido=pedido if request.user.is_authenticated else pedido_key)
             return Response({
-                'total_precio':total_processor['total_precio'],
+                'total_precio':formato_pesos(total_processor['total_precio']),
+                'sub_total':formato_pesos(total_processor['sub_total']),
                 'total_productos':total_processor['total_productos'],
                 'cantidad':cantidad,
             })
@@ -554,7 +557,7 @@ def generar_presupuesto(request):
         logo_base64 = base64.b64encode(f.read()).decode("utf-8")
 
 
-    context = {'carrito':carrito,'fecha':datetime.date.today(),'logo_base64': logo_base64,'total_compra':total_compra,'adicional':adicional}
+    context = {'carrito':carrito,'fecha':date.today(),'logo_base64': logo_base64,'total_compra':total_compra,'adicional':adicional}
     html_string = render_to_string("presupuesto.html", context)
     pdf_file = HTML(string=html_string).write_pdf()
 

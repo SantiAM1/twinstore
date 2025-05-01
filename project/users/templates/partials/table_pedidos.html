@@ -72,6 +72,10 @@
                 <div style="background-color: #8a0000;color: #fff;" class="users-pedidos-status">
                     <span>{{pedido.estado|capfirst}}</span>
                 </div>
+                {% elif pedido.estado == 'listo para retirar' %}
+                <div style="background-color: #69b7e4;color: #2e2e2e;" class="users-pedidos-status">
+                    <span>{{pedido.estado|capfirst}}</span>
+                </div>
                 {% endif %}
             </td>
         </tr>

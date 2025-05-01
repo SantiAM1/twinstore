@@ -11,7 +11,7 @@ class HistorialCompras(models.Model):
         ('confirmado', 'Confirmado🟢'),
         ('rechazado', 'Rechazado🔴'),
         ('preparando pedido','Preparando pedido🔵'),
-        ('retiro listo','Listo para retirar✔️'),
+        ('listo para retirar','Listo para retirar✔️'),
         ('enviado','Enviado🟣'),
         ('finalizado','Finalizado⚪'),
         ('arrepentido', 'Arrepentido⭕')
@@ -65,10 +65,10 @@ class HistorialCompras(models.Model):
         return True if (self.forma_de_pago == 'transferencia' and not self.estado in ['finalizado','arrepentido']) else False
 
     def check_arrepentimiento(self):
-        if not self.fecha_finalizado or self.estado == 'arrepentido':
-            return False
-        limite = self.fecha_finalizado + timedelta(days=10)
-        return timezone.now() <= limite
+        if self.fecha_finalizado and self.estado == 'finalizado':
+            limite = self.fecha_finalizado + timedelta(days=10)
+            return timezone.now() <= limite
+        return False
 
 class EstadoPedido(models.Model):
     historial = models.ForeignKey(HistorialCompras, on_delete=models.CASCADE, related_name='estados')

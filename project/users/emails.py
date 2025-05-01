@@ -1,5 +1,7 @@
 from django.conf import settings
 from .tasks import enviar_mail_compra,enviar_mail_confirm_user,enviar_mail_estado_pedido,enviar_mail_comprobante_obs
+import base64
+import os
 
 def mail_confirm_user_html(usuario):
     """Envía el mail de confirmación de cuenta"""
@@ -8,7 +10,7 @@ def mail_confirm_user_html(usuario):
     site_url = f'{settings.SITE_URL}'
     mail_data = {
         'url' : f"{site_url}/usuario/verificar/{token}",
-        'img' : f"{site_url}/static/img/mail.webp"
+        'img' : get_img_logo_url()
     }
     enviar_mail_confirm_user.delay(mail_data,user_email=usuario.email)
 
@@ -17,12 +19,11 @@ def mail_buy_send_html(historial,user_email):
     token = historial.token_consulta
     site_url = f'{settings.SITE_URL}'
     productos = historial.productos
-    # adicional = historial.get_adicional()
-    adicional = 0
+    adicional = historial.get_adicional()
     total = historial.total_compra
     historial_data = {
     'url': f"{site_url}/usuario/ver_pedido/{token}",
-    'img': f"{site_url}/static/img/mail.webp",
+    'img': get_img_logo_url(),
     'token': token,
     'productos':productos,
     'adicional':adicional,
@@ -49,8 +50,8 @@ def mail_estado_pedido_html(historial,user_email):
         finalizado = True
     elif historial.estado == "arrepentido":
         mensaje = "	Pedido cancelado, arrepentido"
-    elif historial.estado == "retiro listo":
-        mensaje = "Tu pedido ya se encuentra en nuestro punto de retiro listo para ser retirado. Te esperamos!"
+    elif historial.estado == "listo para retirar":
+        mensaje = "Tu pedido ya se encuentra en nuestro punto de retiro. Te esperamos!"
     else:
         mensaje = "Estamos esperando la confirmación del pago. Te notificaremos apenas se acredite."
 
@@ -61,7 +62,7 @@ def mail_estado_pedido_html(historial,user_email):
 
     mail_data = {
         'url': f"{site_url}/usuario/ver_pedido/{token}",
-        'img': f"{site_url}/static/img/mail.webp",
+        'img': get_img_logo_url(),
         'pedido_id': historial.merchant_order_id,
         'estado': estado,
         'mensaje': mensaje
@@ -75,8 +76,11 @@ def mail_obs_comprobante_html(historial,observaciones):
     site_url = f'{settings.SITE_URL}'
     mail_data = {
         'url': f"{site_url}/usuario/ver_pedido/{token}",
-        'img' : f"{site_url}/static/img/mail.webp",
+        'img' : get_img_logo_url(),
         'observaciones':observaciones,
         'pedido_id':pedido_id
     }
     enviar_mail_comprobante_obs.delay(mail_data,user_email)
+
+def get_img_logo_url():
+    return f"{settings.SITE_URL}/static/img/mail.png"

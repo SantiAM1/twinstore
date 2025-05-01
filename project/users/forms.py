@@ -53,7 +53,7 @@ class UsuarioForm(forms.Form):
     razon_social = forms.CharField(
         max_length=255,
         required=False,
-        label='Razon Social *',
+        label='Razón Social *',
         widget=INPUT_ATTRS
         )
     nombre = forms.CharField(
@@ -80,13 +80,13 @@ class UsuarioForm(forms.Form):
     provincia = forms.ChoiceField(choices=PROVINCIAS_CHOICES, required=True,
         widget=SELECT_ATTRS
         )
-    codigo_postal = forms.CharField(max_length=10, required=True, label="Codigo Postal *",
+    codigo_postal = forms.CharField(max_length=10, required=True, label="Código Postal *",
         widget=INPUT_ATTRS
         )
     email = forms.EmailField(required=True, label="Email *",
         widget=forms.EmailInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100','autocomplete':'off','placeholder':' '})
         )
-    telefono = forms.CharField(max_length=20, required=False, label="Telefono",
+    telefono = forms.CharField(max_length=20, required=False, label="Teléfono",
         widget=INPUT_ATTRS
         )
     recibir_estado_pedido = forms.BooleanField(
@@ -180,6 +180,15 @@ class TerminosYCondiciones(forms.Form):
             'required': 'Debés aceptar los Términos y Condiciones para continuar.'
         })
 
+class EmailUsuarioRecuperacion(forms.Form):
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+        'placeholder':'Ingresa tu email',
+        'class':'user-form-control',
+        'style':'min-width:300px'
+    }))
+
 class BuscarPedidoForm(forms.Form):
     token = forms.CharField(
         required=True,
@@ -227,6 +236,30 @@ class RegistrarForm(forms.Form):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('Ya existe un usuario registrado con este email.')
         return email
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if len(password) < 8:
+            raise forms.ValidationError("La contraseña debe tener al menos 8 caracteres.")
+        return password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        password_repeat = cleaned_data.get("password_repeat")
+
+        if password and password_repeat and password != password_repeat:
+            self.add_error('password_repeat', "Las contraseñas no coinciden.")
+
+class RestablecerContraseña(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'placeholder': 'Contraseña',
+        'class': 'user-form-control'
+    }))
+    password_repeat = forms.CharField(widget=forms.PasswordInput(attrs={
+        'placeholder': 'Repetir contraseña',
+        'class': 'user-form-control'
+    }))
 
     def clean_password(self):
         password = self.cleaned_data.get('password')

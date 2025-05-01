@@ -1,4 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
+    termCondiciones = document.getElementById('id_aceptar');
+    termCondiciones.addEventListener('change',function() {
+        document.querySelectorAll('input[name="forma_pago"]').forEach(radio => {
+            radio.checked = false;
+        });
+    })
+
     document.querySelectorAll('input[name="forma_pago"]').forEach((radio) => {
         radio.addEventListener('change', async (e) => {
             const form = document.querySelector('.users-perfil');

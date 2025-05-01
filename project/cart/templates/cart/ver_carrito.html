@@ -15,7 +15,7 @@
 {% block theme %}black{% endblock theme %}
 
 {% block contenidomain %}
-<main class="padding-1rem">
+<main class="padding-1rem"> 
     <div class="cart-box flex justify-between gap-1rem" id="carrito-box">
         {% if not empty %}
             <div class="cart-items flex flex-column justify-between">
@@ -135,8 +135,8 @@
                 </div>
             </div>
         {% else %}
-            <p class="cart-empty-msg">Tu carrito esta vacio</p>
-            <a href="{% url 'core:home' %}" class="decoration-none cart-volver-tienda">Volver a la tienda</a>
+            <p class="cart-empty-msg font-roboto">Tu carrito esta vacio</p>
+            <a href="{% url 'core:home' %}" class="decoration-none cart-volver-tienda font-roboto color-fff font-bold text-center padding1rem">Volver a la tienda</a>
         {% endif %}
     </div>
 </main>

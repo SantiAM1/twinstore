@@ -124,3 +124,11 @@ input[type="radio"]:checked + label + .cart-formadepago-details {
     border-left:4px solid rgb(216 111 132);
     padding-left: 0.75rem;
 }
+
+.email-container {
+    margin-bottom: 0.7rem;
+}
+
+.email-msg {
+    top:25px;font-style: italic;color: #414141;font-size: 0.9rem;
+}

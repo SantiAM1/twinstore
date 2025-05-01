@@ -3,9 +3,9 @@ from django.contrib.auth.models import User
 import uuid
 
 from django.db import models
-from django.contrib.auth.models import User
 import uuid
-
+from django.utils import timezone
+from datetime import timedelta
 from payment.models import HistorialCompras
 
 class PerfilUsuario(models.Model):
@@ -88,3 +88,16 @@ class DatosFacturacion(models.Model):
     def __str__(self):
         return f"Datos Facturación #{self.id} - {self.nombre} {self.apellido}"
 
+class TokenUsers(models.Model):
+    TIPO = [
+        ('recuperar','Recuperar'),
+        ('crear','Crear'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='token_usuario')
+    token = models.UUIDField(default=uuid.uuid4, unique=True)
+    creado = models.DateTimeField(auto_now_add=True)
+    tipo = models.CharField(max_length=30,choices=TIPO)
+
+    def expirado(self):
+        return timezone.now() > self.creado + timedelta(hours=1)

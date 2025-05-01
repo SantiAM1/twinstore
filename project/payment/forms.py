@@ -1,5 +1,5 @@
 from django import forms
-from .models import ComprobanteTransferencia
+from .models import ComprobanteTransferencia,EstadoPedido
 from django.core.exceptions import ValidationError
 
 MAX_FILE_SIZE_MB = 5
@@ -24,3 +24,16 @@ class ComprobanteForm(forms.ModelForm):
             if file.size > max_size:
                 raise ValidationError(f"❌ El archivo supera el límite de {MAX_FILE_SIZE_MB} MB.")
         return file
+
+class EstadoPedidoForm(forms.ModelForm):
+    class Meta:
+        model = EstadoPedido
+        fields = ['estado', 'comentario']  # Campos editables
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Si es una instancia ya guardada, ocultamos los campos
+        if self.instance and self.instance.pk:
+            self.fields['estado'].widget = forms.HiddenInput()
+            self.fields['comentario'].widget = forms.HiddenInput()

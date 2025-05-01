@@ -40,7 +40,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = True
 
 # * Host
-SITE_URL = "77fc-181-228-88-6.ngrok-free.app"
+SITE_URL = "989f-181-228-88-6.ngrok-free.app"
 
 # ! Actualizar el HOST con el dominio
 ALLOWED_HOSTS = [f'{SITE_URL}','127.0.0.1']

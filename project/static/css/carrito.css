@@ -6,6 +6,7 @@
     width: 100%;
     margin: auto;
     padding: 1rem;
+    height: max-content;
     background-color: white;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
@@ -172,12 +173,9 @@
 }
 
 .cart-volver-tienda {
-    color: white;
-    padding: 0.8rem;
-    font-weight: bold;
-    text-align: center;
     background-color: var(--color-ts);
     transition: all ease 0.3s;
+    border-radius: 10px;
 }
 
 .cart-empty-msg {

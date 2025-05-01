@@ -87,3 +87,17 @@ def enviar_mail_comprobante_obs(mail_data,user_email):
     )
     msg.attach_alternative(html, "text/html")
     msg.send()
+
+@shared_task
+def enviar_mail_reset_password(context):
+    url = context['url']
+    user_email = context['email']
+    text_message = f"Link de recuperación: {url}"
+    
+    msg = EmailMultiAlternatives(
+        subject='Recuperar tu contraseña - Twinstore',
+        body=text_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[user_email]
+    )
+    msg.send()

@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from .forms import RegistrarForm,LoginForm,BuscarPedidoForm,UsuarioForm
-from .models import PerfilUsuario
+from .models import PerfilUsuario,TokenUsers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
@@ -11,6 +11,13 @@ from django.contrib.auth.decorators import login_required
 from .emails import mail_confirm_user_html
 from django.utils import timezone
 from datetime import timedelta
+from .tasks import enviar_mail_reset_password
+from django.conf import settings
+from .forms import EmailUsuarioRecuperacion,RestablecerContraseña
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import PasswordResetForm
+from django.utils.translation import gettext_lazy as _
+from django import forms
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -223,27 +230,74 @@ def verificar_email(request, token):
 
 def reenviar_verificacion(request, token):
     token = token
-    perfil = PerfilUsuario.objects.filter(token_verificacion=token).first()
-    
-    if perfil.email_verificado:
-        return redirect('core:home')
+    perfil = get_object_or_404(PerfilUsuario,token_verificacion=token)
 
-    # ⏱️ Verificamos si ya envió uno recientemente (último intento guardado en sesión)
     ultimo_envio = request.session.get('ultimo_envio_verificacion')
     ahora = timezone.now()
-
     if ultimo_envio:
         hace_cuanto = ahora - timezone.datetime.fromisoformat(ultimo_envio)
-        if hace_cuanto < timedelta(minutes=2):  # Espera mínima entre reintentos
+        if hace_cuanto < timedelta(minutes=2):
             messages.warning(request, "⏳ Por favor, esperá unos minutos antes de volver a reenviar el mail.")
             return redirect('users:email_enviado',token=token)
 
     user = perfil.user
-
     mail_confirm_user_html(user)
-
     request.session['ultimo_envio_verificacion'] = ahora.isoformat()
-
     messages.success(request, "📧 Te reenviamos el correo de verificación.")
-
     return redirect('users:email_enviado',token=token)
+
+def recuperar_contraseña(request):
+    if request.method == "POST":
+        form = EmailUsuarioRecuperacion(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = User.objects.filter(email=email).first()
+            if user:
+                tiene_token = TokenUsers.objects.filter(user=user,tipo="recuperar").first()
+                if tiene_token:
+                    if tiene_token.expirado():
+                        tiene_token.delete()
+                    else:
+                        messages.error(request, f"Ya has solicitado esta acción, si el error persiste contactanos.")
+                        return redirect('users:recuperar') 
+                token = TokenUsers.objects.create(user=user,tipo="recuperar")
+                url = f"{settings.SITE_URL}/usuario/restablecer/{token.token}/"
+                context = {
+                    "email":user.email,
+                    "url":url
+                }
+                enviar_mail_reset_password.delay(context)
+                messages.success(request, f"Email enviado con exito!")
+                return redirect('users:login')
+            else:
+                messages.error(request, "No existe un usuario con ese correo")
+                return redirect('users:singup')
+
+    form = EmailUsuarioRecuperacion()
+    return render(request,'users/recuperar_password.html',{'form':form})
+
+def restablecer_contraseña(request,token):
+    token_obj = get_object_or_404(TokenUsers, token=token,tipo="recuperar")
+
+    if token_obj.expirado():
+        token_obj.delete()
+        messages.error(request, "⏳ El enlace expiró. Solicitá uno nuevo.")
+        return redirect('users:login')
+    
+    if request.method == "POST":
+        form = RestablecerContraseña(request.POST)
+        if form.is_valid():
+            nueva_contraseña = form.cleaned_data['password']
+            user = token_obj.user
+            user.set_password(nueva_contraseña)
+            user.save()
+            token_obj.delete()
+            messages.success(request, "Contraseña actualizada con éxito.")
+            return redirect('users:login')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+            return render(request,'users/restablecer_password.html',{'form':form})
+    form = RestablecerContraseña()
+    return render(request,'users/restablecer_password.html',{'form':form})

@@ -52,9 +52,18 @@ def get_atributos(productos):
             if atributo.nombre not in atributos_unicos:
                 atributos_unicos[atributo.nombre] = set()
             atributos_unicos[atributo.nombre].add(atributo.valor)
+    
+    atributos_ordenados = {}
+    for nombre, valores in atributos_unicos.items():
+        try:
+            valores_convertidos = sorted(int(v) for v in valores)
+            atributos_ordenados[nombre] = [str(v) for v in valores_convertidos]
+        except ValueError:
+            atributos_ordenados[nombre] = sorted(valores)
 
-    atributos_unicos = {k: list(v) for k, v in atributos_unicos.items()}
-    return atributos_unicos
+    return atributos_ordenados
+    # atributos_unicos = {k: list(v) for k, v in atributos_unicos.items()}
+    # return atributos_unicos
 
 def filtrar_atributo(dict, productos, atributos_unicos):
     filtros = {}

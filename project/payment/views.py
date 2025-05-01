@@ -147,19 +147,6 @@ def notification(request):
                         historial = HistorialCompras.objects.get(merchant_order_id=merchant_order_id)
                         creado = False
 
-                    pago, creado = PagoRecibidoMP.objects.update_or_create(
-                        payment_id=payment_id,
-                        defaults={
-                            'merchant_order_id': pago_info.get("order", {}).get("id"),
-                            'status': status,
-                            'payer_email': pago_info.get("payer", {}).get("email"),
-                            'transaction_amount': pago_info.get("transaction_amount"),
-                            'payment_type': pago_info.get("payment_type_id"),
-                            'external_reference': pago_info.get("external_reference"),
-                        }
-                    )
-                    procesar_pago_y_estado(pago)
-
                     # * Creacion de los Datos de facturacion
                     if creado:
                         try:
@@ -179,6 +166,19 @@ def notification(request):
                             import traceback
                             print("❌ Error al crear Datos de Facturación:")
                             traceback.print_exc()
+
+                    pago, creado = PagoRecibidoMP.objects.update_or_create(
+                        payment_id=payment_id,
+                        defaults={
+                            'merchant_order_id': pago_info.get("order", {}).get("id"),
+                            'status': status,
+                            'payer_email': pago_info.get("payer", {}).get("email"),
+                            'transaction_amount': pago_info.get("transaction_amount"),
+                            'payment_type': pago_info.get("payment_type_id"),
+                            'external_reference': pago_info.get("external_reference"),
+                        }
+                    )
+                    procesar_pago_y_estado(pago)
                 else:
                     print(f"❌ Error al consultar pago {payment_id}")
         return HttpResponse(status=200)

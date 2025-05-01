@@ -10,5 +10,6 @@
     </div>
 {% endif %}
 {% if not tag == 'gaming' %}{% include 'components/sub_categoria.html' %}{% endif %}
-{% if not tag == 'gaming' %}{% include 'components/atribute.html' %}{% else %}{% include 'components/atribute_gaming.html' %}{% endif %}
+{% if subcategoria_obj %}{% include 'components/atribute.html' %}{% endif %}
+{% if tag == 'gaming' %}{% include 'components/atribute_gaming.html' %}{% endif %}
 {% if not tag == 'gaming' %}{% include 'components/marcas.html' %}{% else %}{% include 'components/marcas_gaming.html' %}{% endif %}
