@@ -3,7 +3,6 @@ document.querySelectorAll('.form-admin-control').forEach((input) => {
         const fileName = input.files.length ? input.files[0].name : 'Ningún archivo seleccionado';
 
         const span = input.nextElementSibling;
-        console.log(span)
         if (span) {
             span.textContent = `Imagen seleccionada: ${fileName}`;
             span.classList.add('active');

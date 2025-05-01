@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.cache import cache
 from products.models import Categoria
 from django.template.loader import render_to_string
@@ -8,6 +9,7 @@ def render_menu(request):
     ORDEN_SECCIONES = ["componentes", "computos", "accesorios", "dispositivos", "impresion"]
     data_desk = cache.get('menu_desktop')
     data_mob = cache.get('menu_mobile')
+    data_desk = {}
     if not data_desk or not data_mob:
         data_desk = {}
         data_mob = {}

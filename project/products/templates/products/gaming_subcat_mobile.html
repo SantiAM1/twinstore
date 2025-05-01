@@ -3,22 +3,23 @@
 {% load compress %}
 
 {% block meta %}
-<meta name="description" content="{{seccion_id|capfirst}}; {{pagina.paginator.count}} resultados. {% for producto in productos|slice:":5" %}{{ producto.nombre }}. {% endfor %}">
+<meta name="description" content="Descubrí todo el mundo Gaming en Twinstore. Equipos, componentes y periféricos para potenciar tu experiencia de juego.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="Twinstore">
-<meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
+<meta property="og:description" content="Lo mejor del Gaming en un solo lugar, Twinstore Gaming_.">
 <meta property="og:image" content="{% static 'img/mail.webp' %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 {% endblock meta %}
 
+{% block theme %}gaming{% endblock theme %}
 
 {% block head %}
-<title>{{categoria}} - Twistore</title>
+<title>Gaming - Twistore</title>
 {% compress css %}
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
 <link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
-<link rel="stylesheet" href="{% static 'css/mobile-filters.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
+<link rel="stylesheet" href="{% static 'css/mobile-filters.css' %}" />
 {% endcompress %}
 {% endblock head %}
 
@@ -28,31 +29,31 @@
     <li class="flex items-center filter-button"><i class="bi bi-sliders"></i>Filtros</li>
     <li class="flex items-center ordenar-button"><i class="bi bi-arrow-down-up"></i>Ordenar</li>
     <div class="filter-box-mobile display-none position-absolute width-100" id="filters-box-mobile">
-        <p class="filter-item flex justify-between font-roboto margin-1rem">Categorias<i class="bi bi-chevron-down"></i></p>
-        <div class="filter-expanded">
-            {% for cat in categorias %}
-                <a href="{% url 'products:categoria' seccion_id cat.slug %}" class="subfilter-link-mobile display-block font-roboto decoration-none margin-1rem">{{cat.nombre}}</a>
-            {% endfor %}
-        </div>
+        {% include 'partials/filtros_dinamicos_mobile.html' %}
     </div>
     {% include 'components/ordenar_mobile.html' %}
 </ul>
 {% endif %}
 <div class="padding-10px">
     <div>
-        <a href="{% url 'core:home' %}" class="decoration-none product-outside-link bloqueable font-roboto">Inicio</a>
+        <a href="{% url 'core:home' %}" class="decoration-none product-outside-link font-roboto">Inicio</a>
         <i class="bi bi-chevron-right product-outside-link"></i>
-        <span class="font-roboto font-bold">{{seccion_id|capfirst}}</span>
+        <a href="{% url 'products:gaming' %}" class="decoration-none product-outside-link font-roboto">Gaming</a>
+        <i class="bi bi-chevron-right product-outside-link"></i>
+        <span class="font-roboto font-bold color-fff">{{subcategoria.nombre}}</span>
     </div>
-    <h1 class="prods-dinamic-title font-roboto font-bold">{{seccion_id|capfirst}}</h1>
+    <h1 class="prods-dinamic-title gaming font-roboto font-bold">{{subcategoria.nombre|cut:"Gaming"}} Gaming</h1>
     <div id="productos-count">
-        {% include 'partials/productos_count.html' %}
+        {% include 'partials/productos_count.html' with color='color-fff' %}
     </div>
 </div>
 {% if productos %}
+<div id="filter-active-mobile">
+    {% include 'partials/filtros_activos_mobile.html' %}
+</div>
 <main class="product-box flex items-center flex-column width-100">
     <div class="grid-container">
-        {% include 'partials/product_grid.html' %}
+        {% include 'partials/product_grid.html' with strong='gaming' %}
     </div>
 </main>
 <div class="paginacion margin-1rem flex justify-center gap-05rem font-roboto">
@@ -60,15 +61,14 @@
 </div>
 {% else %}
 <div class="flex items-center justify-center">
-    <img src="{% static 'img/empty.webp' %}" height="300" width="300" alt="No hay nada aqui">
+    <img src="{% static 'img/empty_gaming.webp' %}" height="300" width="300" alt="No hay nada aqui">
 </div>
 {% endif %}
 {% endblock contenidomain %}
-
 {% block myscripts %}
 <script nonce="{{ request.csp_nonce }}">
     window.filters = {
-        apiUrl: "{% url 'products:supercategoria_ajax' seccion_id %}",
+        apiUrl: "{% url 'products:gaming_subcategoria_ajax' subcategoria.slug %}",
     };
 </script>
 <script src="{% static 'js/dinamic-filter.js' %}"></script>

@@ -13,6 +13,46 @@
                 </ul>
             </li>
             {% endfor %}
+            <li class="dropdown-mobile">
+                <span class="toggle"><div class="menu-subtitle">Gaming</div><i class="bi bi-chevron-down"></i></span>
+                <ul class="submenu">
+                    <li class="dropdown-mobile">
+                        <span class="toggle">Periféricos<i class="bi bi-chevron-down"></i></span>
+                        <ul class="submenu">
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'teclados' %}">Teclados</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'mouse' %}">Mouse</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'auriculares' %}">Auriculares</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'monitores' %}">Monitores</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'joysticks' %}">Joysticks</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'volantes' %}">Volantes</a></span></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-mobile">
+                        <span class="toggle">Hardware<i class="bi bi-chevron-down"></i></span>
+                        <ul class="submenu">
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'placas-de-vide' %}">Placas de Video</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'procesadores' %}">Procesadores</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'motherboards' %}">Motherboards</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'gabinetes' %}">Gabinetes</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'coolers' %}">Coolers</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'fuentes' %}">Fuentes</a></span></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-mobile">
+                        <span class="toggle">Muebles<i class="bi bi-chevron-down"></i></span>
+                        <ul class="submenu">
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'sills' %}">Sillas</a></span></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-mobile">
+                        <span class="toggle">Listas para Jugar<i class="bi bi-chevron-down"></i></span>
+                        <ul class="submenu">
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'pcs-gaming' %}">PCs Armadas</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'notebooks-gaming' %}">Notebooks</a></span></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </li>
     <li><span><a href="{% url 'users:buscar_pedidos' %}">Pedidos</a></span></li>

@@ -30,11 +30,7 @@
     <div class="filter-box-mobile display-none position-absolute width-100" id="filters-box-mobile">
         {% include 'partials/filtros_dinamicos_mobile.html' %}
     </div>
-    <div class="ordenar-box-mobile display-none position-absolute width-100">
-        <a href="#" data-orden="date" class="ordenar-opcion">Por los Últimos</a>
-        <a href="#" data-orden="price_higher" class="ordenar-opcion">Por precio: Mayor a menor</a>
-        <a href="#" data-orden="price_lower" class="ordenar-opcion">Por precio: Menor a mayor</a>
-    </div>
+    {% include 'components/ordenar_mobile.html' %}
 </ul>
 {% endif %}
 <div class="padding-10px">
@@ -64,7 +60,6 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
-
 {% if subcategoria_obj %}
 <script nonce="{{ request.csp_nonce }}">
     window.filters = {
@@ -78,7 +73,6 @@
     };
 </script>
 {% endif %}
-
 <script src="{% static 'js/dinamic-filter.js' %}"></script>
 <script src="{% static 'js/mobile-filters.js' %}"></script>
 {% endblock myscripts %}

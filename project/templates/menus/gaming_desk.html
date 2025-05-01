@@ -1,26 +1,25 @@
 <div class="result-productos-column flex">
-    <a href="#" class="result-productos-titulo">Periféricos</a>
-    <a href="#" class="hover-pad-weight">Teclados</a>
-    <a href="#" class="hover-pad-weight">Mouse</a>
-    <a href="#" class="hover-pad-weight">Auriculares</a>
-    <a href="#" class="hover-pad-weight">Monitores</a>
-    <a href="#" class="result-productos-titulo">Accesorios</a>
-    <a href="#" class="hover-pad-weight">Mouse Pads</a>
-    <a href="#" class="hover-pad-weight">LEDs RBG</a>
+    <a href="{% url 'products:gaming' %}" class="result-productos-titulo">Periféricos</a>
+    <a href="{% url 'products:gaming_subcategoria' 'teclados' %}" class="hover-pad-weight">Teclados</a>
+    <a href="{% url 'products:gaming_subcategoria' 'mouse' %}" class="hover-pad-weight">Mouse</a>
+    <a href="{% url 'products:gaming_subcategoria' 'auriculares' %}" class="hover-pad-weight">Auriculares</a>
+    <a href="{% url 'products:gaming_subcategoria' 'monitores' %}" class="hover-pad-weight">Monitores</a>
+    <a href="{% url 'products:gaming_subcategoria' 'joysticks' %}" class="hover-pad-weight">Joysticks</a>
+    <a href="{% url 'products:gaming_subcategoria' 'volantes' %}" class="hover-pad-weight">Volantes</a>
 </div>
 <div class="result-productos-column flex">
-    <a href="#" class="result-productos-titulo">PCs Gaming</a>
-    <a href="#" class="hover-pad-weight">Categoria A</a>
-    <a href="#" class="hover-pad-weight">Categoria B</a>
-    <a href="#" class="hover-pad-weight">Categoria C</a>
+    <a href="{% url 'products:gaming' %}" class="result-productos-titulo">Hardware</a>
+    <a href="{% url 'products:gaming_subcategoria' 'placas-de-video' %}" class="hover-pad-weight">Placas de Video</a>
+    <a href="{% url 'products:gaming_subcategoria' 'procesadores' %}" class="hover-pad-weight">Procesadores</a>
+    <a href="{% url 'products:gaming_subcategoria' 'motherboards' %}" class="hover-pad-weight">Motherboards</a>
+    <a href="{% url 'products:gaming_subcategoria' 'gabinetes' %}" class="hover-pad-weight">Gabinetes</a>
+    <a href="{% url 'products:gaming_subcategoria' 'coolers' %}" class="hover-pad-weight">Coolers</a>
+    <a href="{% url 'products:gaming_subcategoria' 'fuentes' %}" class="hover-pad-weight">Fuentes</a>
 </div>
 <div class="result-productos-column flex">
-    <a href="#" class="result-productos-titulo">Otros</a>
-    <a href="#" class="hover-pad-weight">Coolers</a>
+    <a href="{% url 'products:gaming' %}" class="result-productos-titulo">Muebles</a>
+    <a href="{% url 'products:gaming_subcategoria' 'sillas' %}" class="hover-pad-weight">Sillas</a>
+    <a href="{% url 'products:gaming' %}" class="result-productos-titulo">Listas para Jugar</a>
+    <a href="{% url 'products:gaming_subcategoria' 'pcs-gaming' %}" class="hover-pad-weight">PCs Armadas</a>
+    <a href="{% url 'products:gaming_subcategoria' 'notebooks-gaming' %}" class="hover-pad-weight">Notebooks</a>
 </div>
-
-
-
-
-
-

@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const response = await axios.post(window.api.calcularPedido, datos);
                 const { total, adicional, init_point,metodoPagoSeleccionado } = response.data;
-                console.log(total,adicional)
                 document.getElementById('adicionales-value').textContent = adicional
                 document.getElementById('total-value').textContent = total
 

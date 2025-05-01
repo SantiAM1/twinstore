@@ -45,12 +45,8 @@
 }
 
 .filter-item {
-    display:flex;
     color: #333;
     font-size: 20px;
-    font-family: var(--font-type);
-    justify-content: space-between;
-    margin: 1rem;
     border-bottom: 1px rgb(184 184 184) solid;
 }
 
@@ -63,23 +59,15 @@
 }
 
 .filter-link-mobile,.subfilter-link-mobile {
-    display: block;
-    text-decoration: none;
     color: #444;
-    margin: 1rem;
     font-size: 16px;
     border-bottom: 1px solid #d6d6d6;
-    font-family: var(--font-type);
 }
 
 .ordenar-opcion {
-    display: block;
-    text-decoration: none;
     color: #444;
-    margin: 1rem;
     font-size: 16px;
     border-bottom: 1px solid #d6d6d6;
-    font-family: var(--font-type);
 }
 
 .filter-box-mobile.show {

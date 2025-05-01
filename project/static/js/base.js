@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     
     const currentTheme = document.body.dataset.theme;
-    console.log(currentTheme)
     const lastTheme = sessionStorage.getItem('ultimaTheme');
     
     if (lastTheme && lastTheme !== currentTheme) {

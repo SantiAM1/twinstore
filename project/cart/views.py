@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404,render
 from django.conf import settings
 from django.utils import timezone
@@ -368,7 +368,7 @@ def realizar_pedido(request):
             forma_pago = request.POST.get('forma_pago')
 
             if forma_pago not in ['efectivo', 'transferencia']:
-                return redirect("core:home")
+                raise Http404("Medios de pago no validos")
             elif forma_pago == 'transferencia':
                 merchant_order_id = _generar_identificador_unico('T')
                 status = 'pendiente'
@@ -377,7 +377,7 @@ def realizar_pedido(request):
                 status = 'confirmado'
 
             if request.user.is_authenticated:
-                carrito = Carrito.objects.filter(usuario=request.user).first()
+                carrito = get_object_or_404(Carrito, usuario=request.user)
                 total_carrito = carrito.get_total()
 
                 # * Armamos el detalle de productos
@@ -399,7 +399,7 @@ def realizar_pedido(request):
             else:
                 carrito = request.session['carrito']
                 if not carrito:
-                    return redirect('core:home')
+                    raise Http404("Carrito vacio")
                 
                 productos = []
                 for producto_id,cantidad in carrito.items():

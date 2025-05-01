@@ -90,6 +90,8 @@ def return_supercategoria(request,seccion_id,type='default'):
     elif type == 'ajax':
         html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro)
         return JsonResponse({'grid':html_productos,'paginacion':html_pagina,'orden':html_orden,'count':html_count})
+    
+    raise Http404("Respuesta no valida")
 
 def supercategoria_ajax(request,seccion_id):
     return return_supercategoria(request,seccion_id,type='ajax')
@@ -253,6 +255,8 @@ def return_busqueda(request,type='default'):
     elif type == 'ajax':
         html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro,color='color-fff')
         return JsonResponse({'grid':html_productos,'paginacion':html_pagina,'orden':html_orden,'count':html_count})
+    
+    raise Http404("Tipo de respuesta no válido")
 
 @bloquear_si_mantenimiento
 @throttle_classes([FiltrosDinamicosThrottle])
@@ -270,7 +274,8 @@ def return_gaming(request,type='default'):
     productos,pagina = paginator(request,productos)
 
     if type == 'default':
-        return render(request, 'products/gaming.html', {
+        template = 'products/gaming_mobile.html' if get_user_agent(request).is_mobile else 'products/gaming.html'
+        return render(request, template, {
             'productos': productos,
             'filtro': filtro,
             'pagina':pagina
@@ -278,6 +283,8 @@ def return_gaming(request,type='default'):
     elif type == 'ajax':
         html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro,color='color-fff',strong='gaming')
         return JsonResponse({'grid':html_productos,'paginacion':html_pagina,'orden':html_orden,'count':html_count})
+
+    raise Http404("Tipo de respuesta no válido")
 
 @bloquear_si_mantenimiento
 @throttle_classes([FiltrosDinamicosThrottle])
@@ -288,9 +295,7 @@ def gaming(request):
     return return_gaming(request,"default")
 
 def return_gaming_subcategoria(request,slug,type='default'):
-    subcategoria = SubCategoria.objects.filter(slug=slug).first()
-    if not subcategoria:
-        return redirect('products:gaming')
+    subcategoria = get_object_or_404(SubCategoria, slug=slug)
     productos = Producto.objects.filter(
         etiquetas__nombre__iexact="gaming", 
         sub_categoria=subcategoria).distinct()
@@ -316,28 +321,55 @@ def return_gaming_subcategoria(request,slug,type='default'):
     filtros_aplicados = {key: value for key, value in request.GET.items() if key not in ["ordenby", "q","pagina"]}
 
     if type == 'default':
-        return render(request, 'products/gaming_subcat.html', {
+        user_agent = get_user_agent(request)
+        template = 'products/gaming_subcat_mobile.html' if user_agent.is_mobile else 'products/gaming_subcat.html'
+        return render(request, template, {
             'productos': productos,
             'filtro': filtro,
             'pagina':pagina,
             'subcategoria':subcategoria,
             'atributos_unicos':atributos_unicos,
             'marcas':marcas,
-            'filtros_aplicados':filtros_aplicados
+            'filtros_aplicados':filtros_aplicados,
+            'tag':'gaming'
         })
     elif type == 'ajax':
-        html_filtros = render_to_string(
-            'partials/filtros_dinamicos.html', {
+        user_agent = get_user_agent(request)
+        if user_agent.is_mobile:
+            html_filtros = render_to_string(
+                'partials/filtros_dinamicos_mobile.html',{
+                    'atributos_unicos': atributos_unicos,
+                    'request':request,
+                    'marcas':marcas,
+                    'tag':'gaming',
+                }, request=request
+                )
+
+            html_activos = render_to_string(
+            'partials/filtros_activos_mobile.html', {
                 'filtros_aplicados':filtros_aplicados,
                 'request': request,
-                'atributos_unicos': atributos_unicos,
-                'marcas': marcas,
-                'tag':'gaming'
             },
             request=request
-        )
-        html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro,color='color-fff')
-        return JsonResponse({'grid':html_productos,'paginacion':html_pagina,'orden':html_orden,'filtros':html_filtros,'count':html_count})
+            )
+            html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro,color='color-fff',strong='gaming')
+            return JsonResponse({'activos':html_activos,'grid':html_productos,'filtros':html_filtros,'paginacion':html_pagina,'count':html_count})
+        
+        else:
+            html_filtros = render_to_string(
+                'partials/filtros_dinamicos.html', {
+                    'filtros_aplicados':filtros_aplicados,
+                    'request': request,
+                    'atributos_unicos': atributos_unicos,
+                    'marcas': marcas,
+                    'tag':'gaming'
+                },
+                request=request
+            )
+            html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro,color='color-fff',strong='gaming')
+            return JsonResponse({'grid':html_productos,'paginacion':html_pagina,'orden':html_orden,'filtros':html_filtros,'count':html_count})
+    
+    raise Http404("Tipo de respuesta no válido")
 
 def gaming_subcategoria_ajax(request,slug):
     return return_gaming_subcategoria(request,slug,type='ajax')
@@ -365,7 +397,6 @@ def slug_dispatcher(request, slug):
     seccion_id = Categoria.objects.filter(seccion_id=slug)
     if seccion_id:
         return supercategoria(request,slug)
-
     # No encontrado
     raise Http404("No se encontró ningún recurso con ese slug.")
 

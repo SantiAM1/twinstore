@@ -24,7 +24,7 @@
 
 {% block contenidomain %}
 <div class="product-box flex items-center flex-column width-100">
-    <nav class="flex justify-between items-center products-nav gap-1rem">
+    <nav class="flex justify-between items-center products-nav items-start gap-1rem">
         <div>
             <div>
                 <a href="{% url 'core:home' %}" class="decoration-none product-outside-link font-roboto">Inicio</a>
@@ -33,7 +33,7 @@
                 <i class="bi bi-chevron-right product-outside-link"></i>
                 <span class="font-roboto font-bold color-fff">{{subcategoria.nombre}}</span>
             </div>
-            <h1 class="prods-dinamic-title gaming font-roboto font-bold">{{subcategoria.nombre}} Gaming</h1>
+            <h1 class="prods-dinamic-title gaming font-roboto font-bold">{{ subcategoria.nombre|cut:"Gaming" }} Gaming</h1>
             <div id="productos-count">
                 {% include 'partials/productos_count.html' with color='color-fff' %}
             </div>
@@ -50,7 +50,7 @@
         <div style="border-right: 2px solid #ffffff"></div>
         <main class="flex justify-center">
             <div class="grid-container">
-                {% include 'partials/product_grid.html' %}
+                {% include 'partials/product_grid.html' with strong='gaming' %}
             </div>
         </main>
     </div>

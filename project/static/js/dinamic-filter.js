@@ -46,8 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
             const ordenSeleccionado = this.dataset.orden;
             const urlParams = new URLSearchParams(window.location.search);
-    
-            urlParams.set('ordenby', ordenSeleccionado); // Sobrescribe el orden actual
+
+            urlParams.set('pagina', 1);
+            urlParams.set('ordenby', ordenSeleccionado);
     
             const filtrosActualizados = Object.fromEntries(urlParams.entries());
     
@@ -99,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const filterMobileBox = document.getElementById('filters-box-mobile');
-            if (filterMobileBox) {
+            if (filterMobileBox && response.data.filtros) {
                 filterMobileBox.innerHTML = DOMPurify.sanitize(response.data.filtros);
             
                 if (!filterMobileBox.dataset.listenerSet) {
