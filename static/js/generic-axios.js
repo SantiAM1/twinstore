@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const csrftoken = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('csrftoken='))
-    ?.split('=')[1];
+    const csrftoken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     axios.defaults.headers.common['X-CSRFToken'] = csrftoken;
 });
 

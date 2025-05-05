@@ -43,7 +43,7 @@ DEBUG = True
 SITE_URL = "twinstore.com.ar"
 
 # ! Actualizar el HOST con el dominio
-ALLOWED_HOSTS = [f'{SITE_URL}','www.twinstore.com.ar']
+ALLOWED_HOSTS = [f'{SITE_URL}','www.twinstore.com.ar','127.0.0.1']
 
 # ! Verificar las correspondencias
 CSRF_TRUSTED_ORIGINS = [

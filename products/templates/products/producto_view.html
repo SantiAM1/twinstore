@@ -14,8 +14,8 @@
 
 {% block head %}
 <title>{{producto.nombre}} - Twinstore</title>
-{% compress css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+{% compress css %}
 <link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/quantity.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
@@ -82,12 +82,12 @@
                 </form>
                 {% endif %}
                 <div>
-                    <p class="product-title-info font-roboto font-bold"><i class="bi bi-truck product-title-icons"></i> Envios a todo el pais</p>
+                    <p class="product-title-info font-roboto font-bold"><i class="bi bi-truck product-title-icons"></i> Envíos a todo el país</p>
                     <p class="product-title-info font-roboto font-bold"><i class="bi bi-geo-alt-fill product-title-icons"></i> Retira en nuestro local</p>
                 </div>
-                <p class="product-title-data">Codigo SKU:{{producto.sku}}</p>
+                <p class="product-title-data">Código SKU:{{producto.sku}}</p>
                 <p class="product-title-data">
-                    Categoria:{{producto.sub_categoria}}
+                    Categoría:{{producto.sub_categoria}}
                 </p>
             </div>
         </div>
