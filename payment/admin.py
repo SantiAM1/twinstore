@@ -88,10 +88,10 @@ class HistorialComprasAdmin(admin.ModelAdmin):
             f'<td style="padding: 6px;">{f.nombre} {f.apellido}</td>'
             f'<td style="padding: 6px;">{f.dni_cuit}</td>'
             f'<td style="padding: 6px;">{f.email}</td>'
-            f'<td style="padding: 6px;">{f.calle} {f.calle_detail or ''}, {f.ciudad or '-'} CP({f.codigo_postal or '-'}), {f.get_provincia_display()}</td>'
+            f"<td style='padding: 6px;'>{f.calle} {f.calle_detail or ''}, {f.ciudad or '-'} CP({f.codigo_postal or '-'}), {f.get_provincia_display()}</td>"
             f'<td style="padding: 6px;">{f.get_tipo_factura_display()}</td>'
-            f'<td style="padding: 6px;">{f.telefono or '-'}</td>'
-            f'<td style="padding: 6px;">{f.razon_social or '-'}</td>'
+            f"<td style='padding: 6px;'>{f.telefono or '-'}</td>"
+            f"<td style='padding: 6px;'>{f.razon_social or '-'}</td>"
             f'</tr>'
             '</table>'
             )
