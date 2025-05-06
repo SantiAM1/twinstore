@@ -9,7 +9,7 @@ class MantenimientoGlobalMiddleware:
 
     def __call__(self, request):
         es_mantenimiento = request.path.startswith('/mantenimiento')
-        es_admin = request.path.startswith('/admin')
+        es_admin = request.path.startswith('/panel-admin-twinstore')
 
         usuario = request.user
         es_staff = usuario.is_authenticated and (usuario.is_staff or usuario.is_superuser)
