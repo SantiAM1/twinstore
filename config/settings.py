@@ -17,9 +17,12 @@ import os
 import environ
 from csp.constants import NONCE
 
-#  * Inicializar environ
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
-environ.Env.read_env(os.path.join(os.path.dirname(__file__), ".env"))
+#  * Inicializar environ
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 #  * Cargar la variable de entorno del archivo .env
 MERCADOPAGO_ACCESS_TOKEN = env("MERCADOPAGO_ACCESS_TOKEN")
@@ -27,41 +30,39 @@ MP_WEBHOOK_KEY = env("MP_WEBHOOK_KEY")
 DJANGO_SECRET_KEY = env("DJANGO_SECRET_KEY")
 EXCEL_TOKEN = env("EXCEL_TOKEN")
 SECRET_KEY = DJANGO_SECRET_KEY
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG").lower() == "true"
 
 # * Host
 SITE_URL = "twinstore.com.ar"
 
 # ! Actualizar el HOST con el dominio
-ALLOWED_HOSTS = [f'{SITE_URL}','www.twinstore.com.ar','127.0.0.1']
+ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(",")
 
 # ! Verificar las correspondencias
 CSRF_TRUSTED_ORIGINS = [
-    f"https://{SITE_URL}", "https://www.twinstore.com.ar"
+    f"https://twinstore.com.ar", "https://www.twinstore.com.ar"
 ]
 
 # * Sessions
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 86400
 SESSION_COOKIE_HTTPONLY = True
-
-# ! Descomentar antes de producción
 SESSION_COOKIE_SECURE = True        # * Solo se envían por HTTPS
 CSRF_COOKIE_SECURE = True           # * Igual para CSRF
 CSRF_COOKIE_HTTPONLY = True         # * Protege aún más
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# if DEBUG:
+#     SESSION_COOKIE_SECURE = False
+#     CSRF_COOKIE_SECURE = False
+
 
 # Application definition
 
@@ -136,6 +137,8 @@ CONTENT_SECURITY_POLICY = {
             "https://www.google.com",
             "https://maps.google.com",
         ],
+        "object-src": ["'none'"],
+        "base-uri": ["'self'"]
     }
 }
 
@@ -190,11 +193,11 @@ REST_FRAMEWORK = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'project',
-        'USER': 'santi',
-        'PASSWORD': 'santi_db_project',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': env("DB_NAME"),
+        'USER': env("DB_USER"),
+        'PASSWORD': env("DB_PASSWORD"),
+        'HOST': env("DB_HOST"),
+        'PORT': env("DB_PORT"),
     }
 }
 
@@ -221,9 +224,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # Asegúrate de importar os o usar Path para definir BASE_DIR
-]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 COMPRESS_ENABLED = not DEBUG
@@ -239,10 +239,10 @@ STATICFILES_FINDERS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Celery Configuration
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 # Configuración de SMTP para enviar emails con Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -262,3 +262,24 @@ TIME_ZONE = 'America/Argentina/Buenos_Aires'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}] {levelname} {name} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",  # Podés usar DEBUG si querés más detalle
+    },
+}

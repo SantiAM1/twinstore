@@ -16,7 +16,6 @@ class BloquearSiMantenimiento(BasePermission):
                 modo_mantenimiento = False
 
         if modo_mantenimiento and not es_staff:
-            print(f"🔒 Bloqueado por mantenimiento: {request.path} - {user}")
             return False
 
         return True

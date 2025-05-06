@@ -25,7 +25,6 @@ def resize_to_size(image_field, size=(200, 200)):
         img.save(fp=buffer, format='WEBP', quality=85)
         return ContentFile(buffer.getvalue())
     except Exception as e:
-        print(f"[ERROR al redimensionar portada]: {e}")
         return None
 
 @receiver(pre_save, sender=Producto)

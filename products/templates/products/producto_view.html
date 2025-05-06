@@ -96,23 +96,27 @@
         {% if producto.especificaciones.all %}
         <h2 class="font-roboto">Caracteristicas del producto</h2>
         <div class="product-specs-divider"></div>
-        <table class="ficha-especificaciones width-100">
-            {% for especificacion in producto.especificaciones.all %}
-            <thead>
-                <tr>
-                    <th colspan="2" class="font-roboto font-bold">{{ especificacion.categoria.nombre }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for key, value in especificacion.datos.items %}
-                <tr>
-                    <td class="font-roboto">{{ key }}</td>
-                    <td class="font-roboto">{{ value }}</td>
-                </tr>
+        <input type="checkbox" class="display-none" name="expandir-specs" id="expandir-specs">
+        <label for="expandir-specs" class="flex justify-between bg-white padding1rem font-bold font-roboto label-prod-specs">Descripción<i class="bi bi-arrow-down"></i></label>
+        <div class="contenedor-tabla">
+            <table class="ficha-especificaciones width-100">
+                {% for especificacion in producto.especificaciones.all %}
+                <thead>
+                    <tr>
+                        <th colspan="2" class="font-roboto font-bold">{{ especificacion.categoria.nombre }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, value in especificacion.datos.items %}
+                    <tr>
+                        <td class="font-roboto">{{ key }}</td>
+                        <td class="font-roboto">{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
                 {% endfor %}
-            </tbody>
-            {% endfor %}
-        </table>
+            </table>
+        </div>
         {% else %}
         <div>
             <h2>No hay especificaciones disponibles :/</h2>

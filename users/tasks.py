@@ -34,7 +34,7 @@ def enviar_mail_confirm_user(mail_data,user_email):
     }
 
     html = render_to_string('emails/bienvenida_usuario.html', context)
-    text = f'Hola {user_email}, para verificar tu cuenta hacé clic en: {mail_data['url']}'
+    text = f'Hola {user_email}, para verificar tu cuenta hacé clic en: {mail_data["url"]}'
 
     msg = EmailMultiAlternatives(
         subject='Confirmá tu cuenta en Twinstore',
@@ -56,7 +56,7 @@ def enviar_mail_estado_pedido(mail_data,user_email,template):
     }
 
     html = render_to_string(template, context)
-    text = f'Hola {user_email}, esto es el estado de tu pedido ID:#{mail_data['pedido_id']}: {mail_data['estado']}'
+    text = f"Hola {user_email}, esto es el estado de tu pedido ID:#{mail_data['pedido_id']}: {mail_data['estado']}"
 
     msg = EmailMultiAlternatives(
         subject='Estado de tu pedido - Twinstore',
@@ -77,7 +77,7 @@ def enviar_mail_comprobante_obs(mail_data,user_email):
     }
 
     html = render_to_string('emails/comprobantes_obs.html', context)
-    text = f'Hola {user_email}, queremos contarte que el pedido con ID:#{mail_data['pedido_id']} ha sido rechazado. Observaciones: {mail_data['observaciones']}'
+    text = f"Hola {user_email}, queremos contarte que el pedido con ID:#{mail_data['pedido_id']} ha sido rechazado. Observaciones: {mail_data['observaciones']}"
 
     msg = EmailMultiAlternatives(
         subject='Observaciones Comprobante - Twinstore',

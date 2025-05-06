@@ -5,7 +5,7 @@ from django.conf import settings
 from core.views import pagina_mantenimiento
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('panel-admin-twinstore/', admin.site.urls),
     path('',include('core.urls')),
     path('productos/',include('products.urls')),
     path('carro/',include('cart.urls')),

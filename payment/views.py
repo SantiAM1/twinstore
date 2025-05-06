@@ -25,9 +25,6 @@ from cart.decorators import requiere_carrito
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.db import SessionStore
 
-import logging
-logger = logging.getLogger(__name__)
-
 # -----WEBHOOK----- #
 @csrf_exempt
 def notification(request):
@@ -84,7 +81,6 @@ def notification(request):
 
                     metadata = pago_info.get("metadata", {})
                     if not validar_metadata(metadata):
-                        print("❌ Metadata inválida o incompleta.")
                         return HttpResponse(status=400)
 
                     # * Lista de productos!
@@ -164,7 +160,6 @@ def notification(request):
                             )
                         except Exception as e:
                             import traceback
-                            print("❌ Error al crear Datos de Facturación:")
                             traceback.print_exc()
 
                     pago, creado = PagoRecibidoMP.objects.update_or_create(
@@ -180,7 +175,7 @@ def notification(request):
                     )
                     procesar_pago_y_estado(pago)
                 else:
-                    print(f"❌ Error al consultar pago {payment_id}")
+                    pass
         return HttpResponse(status=200)
 
 def procesar_pago_y_estado(pago: PagoRecibidoMP):
@@ -190,11 +185,8 @@ def procesar_pago_y_estado(pago: PagoRecibidoMP):
         historial = HistorialCompras.objects.get(merchant_order_id=pago.merchant_order_id)
         if not historial.pagos.filter(pk=pago.pk).exists():
             historial.pagos.add(pago)
-            print(f"🔗 Asociado pago {pago.payment_id} al historial {historial.id}")
         pagos = historial.pagos.all()
         total_pagado = sum((p.transaction_amount or 0 for p in pagos if p.status == "approved"), Decimal('0.00'))
-
-        print(f"💰 Total pagado: {total_pagado} / Total requerido: {historial.total_compra}")
 
         comentario_extra = ""
         if all(p.status == "approved" for p in pagos):
@@ -218,10 +210,8 @@ def procesar_pago_y_estado(pago: PagoRecibidoMP):
             comentario=f'Total recibido: {pago.transaction_amount}, Estado del pago: {pago.status}.\n{comentario_extra}\nEstado final del historial: {historial.estado}.'
         )
 
-        print(f"🔄 Estado del historial {historial.id} actualizado a: {historial.estado}")
-
     except HistorialCompras.DoesNotExist:
-        print(f"⚠️ No se encontró historial con merchant_order_id {pago.merchant_order_id}")
+        return None
 
 def validar_metadata(metadata: dict) -> bool:
     if not isinstance(metadata, dict):
@@ -245,20 +235,15 @@ def validar_metadata(metadata: dict) -> bool:
 
     for campo in campos_requeridos:
         if campo not in metadata:
-            print(f"❌ Faltante en metadata: {campo}")
             return False
         if metadata[campo] in [None, '', []] and campo not in ['razon_social', 'telefono']:
-            print(f"⚠️ Campo vacío o inválido: {campo}")
             return False
 
     if not isinstance(metadata['productos'], dict):
-        print("❌ 'productos' no es un dict")
         return False
     if not isinstance(metadata['usuario'], dict):
-        print("❌ 'usuario' no es un dict")
         return False
     if not isinstance(metadata['recibir_mail'], bool):
-        print("❌ 'recibir_mail' no es booleano")
         return False
 
     return True
@@ -282,7 +267,8 @@ def subir_comprobante(request, token):
                 return redirect('users:mispedidos')
             return redirect('users:ver_pedidos',token=token)
         else:
-            print(form.errors)
+            messages.error(request,"Error al subir el comprobante.")
+            return redirect('users:ver_pedidos',token=token)
     else:
         form = ComprobanteForm()
 

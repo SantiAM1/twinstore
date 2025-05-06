@@ -245,7 +245,6 @@ class CalcularPedidoView(APIView):
                 tipo_factura = data.get('tipo_factura','')
                 telefono = data.get('telefono', '')
                 recibir_mail = data.get('recibir_mail')
-                print(telefono,razon_social)
                 try:
                     preference = preference_mp(total_compra,carrito_id,dni_cuit,ident_type,email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,recibir_mail,productos,usuario)
                     init_point = preference.get("init_point", "")
