@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 razonSocialContainer.style.display = 'none';
                 razonSocialInput.required = false;
-            } else if (value === 'A') {
+            } else if (value === 'A' && value === 'C') {
                 dniCuitLabel.textContent = 'CUIT *';
                 dniCuitInput.required = true;
                 dniCuitContainer.style.display = 'block';

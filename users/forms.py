@@ -9,6 +9,7 @@ class UsuarioForm(forms.Form):
     TIPO_FACTURA_CHOICES = [
         ('A', 'IVA Responsable Inscripto'),
         ('B', 'Consumidor Final'),
+        ('C', 'Monotributista')
     ]
     PROVINCIAS_CHOICES = [
         ('A', 'Ciudad Autónoma de Buenos Aires'),
