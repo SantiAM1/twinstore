@@ -5,6 +5,21 @@ from django.conf import settings
 from sendgrid.helpers.mail import Mail
 from sendgrid import SendGridAPIClient
 
+def master_mail(user_email,subject,html_content):
+    message = Mail(
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to_emails=user_email,
+        subject=subject,
+        html_content=html_content
+    )
+    try:
+        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+        response = sg.send(message)
+        return response.status_code
+    except Exception as e:
+        print("❌ Error al enviar mail de confirmación:", e)
+        return None
+
 @shared_task
 def enviar_mail_compra(historial_data, user_email):
     context = {
@@ -19,20 +34,7 @@ def enviar_mail_compra(historial_data, user_email):
     html_content = render_to_string('emails/compra_exitosa.html', context)
     subject = 'Compra recibida - Twinstore'
 
-    message = Mail(
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to_emails=user_email,
-        subject=subject,
-        html_content=html_content
-    )
-
-    try:
-        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-        response = sg.send(message)
-        return response.status_code
-    except Exception as e:
-        print("❌ Error al enviar mail de confirmación:", e)
-        return None
+    return master_mail(user_email,subject,html_content)
 
 @shared_task
 def enviar_mail_confirm_user(mail_data,user_email):
@@ -41,17 +43,10 @@ def enviar_mail_confirm_user(mail_data,user_email):
         'img' : mail_data['img']
     }
 
-    html = render_to_string('emails/bienvenida_usuario.html', context)
-    text = f'Hola {user_email}, para verificar tu cuenta hacé clic en: {mail_data["url"]}'
+    html_content = render_to_string('emails/bienvenida_usuario.html', context)
+    subject="Confirmá tu cuenta en Twinstore"
 
-    msg = EmailMultiAlternatives(
-        subject='Confirmá tu cuenta en Twinstore',
-        body=text,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[user_email]
-    )
-    msg.attach_alternative(html, "text/html")
-    msg.send()
+    return master_mail(user_email,subject,html_content)
 
 @shared_task
 def enviar_mail_estado_pedido(mail_data,user_email,template):
@@ -63,17 +58,10 @@ def enviar_mail_estado_pedido(mail_data,user_email,template):
         'mensaje': mail_data['mensaje'],
     }
 
-    html = render_to_string(template, context)
-    text = f"Hola {user_email}, esto es el estado de tu pedido ID:#{mail_data['pedido_id']}: {mail_data['estado']}"
+    html_content = render_to_string(template, context)
+    subject='Estado de tu pedido - Twinstore'
 
-    msg = EmailMultiAlternatives(
-        subject='Estado de tu pedido - Twinstore',
-        body=text,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[user_email]
-    )
-    msg.attach_alternative(html, "text/html")
-    msg.send()
+    return master_mail(user_email,subject,html_content)
 
 @shared_task
 def enviar_mail_comprobante_obs(mail_data,user_email):
@@ -84,28 +72,19 @@ def enviar_mail_comprobante_obs(mail_data,user_email):
         'observaciones': mail_data['observaciones'],
     }
 
-    html = render_to_string('emails/comprobantes_obs.html', context)
-    text = f"Hola {user_email}, queremos contarte que el pedido con ID:#{mail_data['pedido_id']} ha sido rechazado. Observaciones: {mail_data['observaciones']}"
+    html_content = render_to_string('emails/comprobantes_obs.html', context)
+    subject='Observaciones Comprobante - Twinstore'
 
-    msg = EmailMultiAlternatives(
-        subject='Observaciones Comprobante - Twinstore',
-        body=text,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[user_email]
-    )
-    msg.attach_alternative(html, "text/html")
-    msg.send()
+    return master_mail(user_email,subject,html_content)
 
 @shared_task
 def enviar_mail_reset_password(context):
     url = context['url']
     user_email = context['email']
-    text_message = f"Link de recuperación: {url}"
-    
-    msg = EmailMultiAlternatives(
+    text_message = f"Hola, para recuperar tu contraseña hacé clic en el siguiente enlace:\n{url}"
+
+    return master_mail(
+        user_email=user_email,
         subject='Recuperar tu contraseña - Twinstore',
-        body=text_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[user_email]
+        html_content=f"<p>{text_message}</p>"
     )
-    msg.send()
