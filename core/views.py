@@ -188,7 +188,6 @@ def cargar_productos_excel(request):
                             if not producto.slug:
                                 producto.generar_slug()
                                 producto.save()
-                            precio_dolar_excel = fila['Precio USD']
                             descuento_excel = fila['Descuento']
 
                             hubo_cambio = False
