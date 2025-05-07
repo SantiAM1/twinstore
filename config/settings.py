@@ -271,9 +271,22 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
+        "file_mercadopago": {
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "mercadopago.log",
+            "formatter": "verbose",
+            "level": "INFO",
+        },
+    },
+    "loggers": {
+        "mercadopago": {
+            "handlers": ["file_mercadopago"],
+            "level": "INFO",
+            "propagate": False,
+        },
     },
     "root": {
         "handlers": ["console"],
-        "level": "INFO",  # Podés usar DEBUG si querés más detalle
+        "level": "INFO",
     },
 }

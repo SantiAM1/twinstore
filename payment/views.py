@@ -25,6 +25,9 @@ from cart.decorators import requiere_carrito
 from django.contrib.sessions.models import Session
 from django.contrib.sessions.backends.db import SessionStore
 
+import logging
+logger = logging.getLogger('mercadopago')
+
 # -----WEBHOOK----- #
 @csrf_exempt
 def notification(request):
@@ -35,6 +38,8 @@ def notification(request):
         # ✅ Buscamos el ID dinámicamente según el tipo de notificación:
         dataID = request.GET.get("data.id") or request.GET.get("id")
         topic = request.GET.get("topic") or request.GET.get("type")
+
+        logger.info(f"Webhook recibido - ID: {dataID}, Tipo: {topic}")
 
         if not xSignature or not xRequestId or not dataID:
             return HttpResponseBadRequest("Missing required headers or parameters.")
@@ -54,6 +59,7 @@ def notification(request):
                     hash_value = value
 
         if not ts or not hash_value:
+            logger.warning("Firma HMAC inválida")
             return HttpResponseBadRequest("Invalid signature format.")
 
         secret = f"{settings.MP_WEBHOOK_KEY}"
@@ -63,6 +69,8 @@ def notification(request):
         sha = hmac_obj.hexdigest()
 
         if sha == hash_value:
+
+            logger.info("✅ HMAC validado correctamente")
 
             payment_id = request.GET.get("data.id") or request.GET.get("id")
             topic = request.GET.get("topic") or request.GET.get("type")
@@ -75,17 +83,19 @@ def notification(request):
                 response = requests.get(url, headers=headers)
                 pago_info = response.json()
 
+                logger.info(f"📦 Procesando pago ID: {payment_id}, estado: {response.status_code}")
+
                 if response.status_code == 200:
 
-                    print("RESPUESTA EXITOSA!✅✅")
+                    logger.info("✅✅ Respuesta exitosa!")
 
                     status = pago_info.get("status")
 
                     metadata = pago_info.get("metadata", {})
                     if not validar_metadata(metadata):
-                        print("ERROR EN LA METADATA❌❌")
+                        logger.warning("❌ Metadata inválida")
                         return HttpResponse(status=400)
-                    print("METADATA CORRECTA!✅✅")
+                    logger.info("✅✅ Metadata correcta!")
 
                     # * Lista de productos!
                     productos_metadata = metadata.get('productos','')
@@ -147,6 +157,7 @@ def notification(request):
                         historial = HistorialCompras.objects.get(merchant_order_id=merchant_order_id)
                         creado = False
 
+                    logger.info(f"Historial {'creado' if creado else 'actualizado'} para orden: {merchant_order_id}")
                     # * Creacion de los Datos de facturacion
                     if creado:
                         try:
@@ -164,6 +175,7 @@ def notification(request):
                             )
                         except Exception as e:
                             import traceback
+                            logger.error(f"Error creando DatosFacturacion: {e}")
                             traceback.print_exc()
 
                     pago, creado = PagoRecibidoMP.objects.update_or_create(
@@ -179,7 +191,7 @@ def notification(request):
                     )
                     procesar_pago_y_estado(pago)
                 else:
-                    print("ERROR EN LA RESPUESTA DE MP❌❌")
+                    logger.error("❌ Error al obtener datos de Mercado Pago")
         return HttpResponse(status=200)
 
 def procesar_pago_y_estado(pago: PagoRecibidoMP):
@@ -213,6 +225,8 @@ def procesar_pago_y_estado(pago: PagoRecibidoMP):
             estado='Pago de mercado pago recibido (Servidor)',
             comentario=f'Total recibido: {pago.transaction_amount}, Estado del pago: {pago.status}.\n{comentario_extra}\nEstado final del historial: {historial.estado}.'
         )
+        logger.info(f"Total pagado: {total_pagado} / Total esperado: {historial.total_compra}")
+        logger.info(f"Estado final del historial: {historial.estado}")
 
     except HistorialCompras.DoesNotExist:
         return None
