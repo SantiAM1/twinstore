@@ -20,6 +20,7 @@ from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.timezone import now
 from core.utils import obtener_valor_dolar
+from decimal import Decimal
 # Create your views here.
 
 def contacto(request):
@@ -155,12 +156,19 @@ def cargar_productos_excel(request):
 
                         inhabilitar_str = str(fila.get('Inhabilitar', '')).strip().lower()
                         inhabilitar_flag = inhabilitar_str in ['si', 'sí', 'true', '1']
+
+                        try:
+                            precio_dolar_excel = Decimal(str(fila['Precio USD']).replace(',', '.'))
+                        except Exception as e:
+                            messages.error(request, f"❌ Error al convertir el precio: {fila['Precio USD']}")
+                            continue  # o raise según tu lógica
+
                         producto, creado = Producto.objects.get_or_create(
                             nombre=fila['Producto'],
                             defaults={
                                 'marca': marca,
                                 'sub_categoria': sub_categoria,
-                                'precio_dolar': fila['Precio USD'],
+                                'precio_dolar': precio_dolar_excel,
                                 'descuento': fila['Descuento'],
                                 'proveedor':fila['Proveedor'],
                                 'sku': sku,
