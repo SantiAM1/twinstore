@@ -223,8 +223,9 @@ def procesar_pago_y_estado(pago: PagoRecibidoMP):
         EstadoPedido.objects.create(
             historial=historial,
             estado='Pago de mercado pago recibido (Servidor)',
-            comentario=f'Total recibido: {pago.transaction_amount}, Estado del pago: {pago.status}.\n{comentario_extra}\nEstado final del historial: {historial.estado}.'
+            comentario=f'Total recibido: {pago.transaction_amount}.\nEstado del pago: {pago.status}.\nForma de pago: {pago.payment_id}.\n{comentario_extra}\nEstado final del historial: {historial.estado}.'
         )
+        logger.info(f"Forma de pago: {pago.payment_type}")
         logger.info(f"Total pagado: {total_pagado} / Total esperado: {historial.total_compra}")
         logger.info(f"Estado final del historial: {historial.estado}")
 

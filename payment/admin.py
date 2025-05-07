@@ -35,6 +35,7 @@ class EstadoPedidoInline(admin.StackedInline):
         fecha_local = localtime(obj.fecha)
         fecha = date_filter(fecha_local, "d M Y H:i")
         comentario = obj.comentario or "—"
+        comentario = comentario.replace('\n', '<br>')
         return format_html(
             f"""<p style="color:{color}">Comentario: {comentario}</p><p style="color:{color}">Fecha: {fecha}</p>"""
         )

@@ -90,8 +90,6 @@ class PagoRecibidoMP(models.Model):
 
     def __str__(self):
         return f"Pago {self.payment_id} - {self.status}"
-    
-from django.db import models
 
 class ComprobanteTransferencia(models.Model):
 
