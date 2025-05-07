@@ -20,7 +20,7 @@ from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.timezone import now
 from core.utils import obtener_valor_dolar
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 # Create your views here.
 
 def contacto(request):
@@ -158,10 +158,22 @@ def cargar_productos_excel(request):
                         inhabilitar_flag = inhabilitar_str in ['si', 'sí', 'true', '1']
 
                         try:
-                            precio_dolar_excel = Decimal(str(fila['Precio USD']).replace(',', '.'))
-                        except Exception as e:
-                            messages.error(request, f"❌ Error al convertir el precio: {fila['Precio USD']}")
-                            continue  # o raise según tu lógica
+                            # Conversión segura del precio en USD
+                            precio_raw = fila.get('Precio USD', '')
+                            precio_str = str(precio_raw).replace(',', '.')
+                            precio_dolar_excel = Decimal(precio_str)
+                        except (InvalidOperation, TypeError, ValueError) as e:
+                            messages.error(request, f"❌ Error al convertir el precio: {fila.get('Precio USD')} → {e}")
+                            continue
+
+                        try:
+                            # Conversión segura del descuento
+                            descuento_raw = fila.get('Descuento', '0')
+                            descuento_str = str(descuento_raw).replace(',', '.')
+                            descuento_excel = Decimal(descuento_str)
+                        except (InvalidOperation, TypeError, ValueError) as e:
+                            messages.error(request, f"❌ Error al convertir el descuento: {fila.get('Descuento')} → {e}")
+                            continue
 
                         producto, creado = Producto.objects.get_or_create(
                             nombre=fila['Producto'],
