@@ -2,6 +2,8 @@ from celery import shared_task
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
+from sendgrid.helpers.mail import Mail
+from sendgrid import SendGridAPIClient
 
 @shared_task
 def enviar_mail_compra(historial_data, user_email):
@@ -14,17 +16,23 @@ def enviar_mail_compra(historial_data, user_email):
         'total':historial_data['total']
     }
 
-    html = render_to_string('emails/compra_exitosa.html', context)
-    text = f"Gracias por tu compra! Este es tu código de seguimiento: {historial_data['token']}"
+    html_content = render_to_string('emails/compra_exitosa.html', context)
+    subject = 'Compra recibida - Twinstore'
 
-    msg = EmailMultiAlternatives(
-        subject='Compra recibida - Twinstore',
-        body=text,
+    message = Mail(
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[user_email]
+        to_emails=user_email,
+        subject=subject,
+        html_content=html_content
     )
-    msg.attach_alternative(html, "text/html")
-    msg.send()
+
+    try:
+        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+        response = sg.send(message)
+        return response.status_code
+    except Exception as e:
+        print("❌ Error al enviar mail de confirmación:", e)
+        return None
 
 @shared_task
 def enviar_mail_confirm_user(mail_data,user_email):
