@@ -77,11 +77,15 @@ def notification(request):
 
                 if response.status_code == 200:
 
+                    print("RESPUESTA EXITOSA!✅✅")
+
                     status = pago_info.get("status")
 
                     metadata = pago_info.get("metadata", {})
                     if not validar_metadata(metadata):
+                        print("ERROR EN LA METADATA❌❌")
                         return HttpResponse(status=400)
+                    print("METADATA CORRECTA!✅✅")
 
                     # * Lista de productos!
                     productos_metadata = metadata.get('productos','')
@@ -175,7 +179,7 @@ def notification(request):
                     )
                     procesar_pago_y_estado(pago)
                 else:
-                    pass
+                    print("ERROR EN LA RESPUESTA DE MP❌❌")
         return HttpResponse(status=200)
 
 def procesar_pago_y_estado(pago: PagoRecibidoMP):
