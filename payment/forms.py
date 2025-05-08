@@ -2,6 +2,7 @@ from django import forms
 from .models import ComprobanteTransferencia,EstadoPedido
 from django.core.exceptions import ValidationError
 import magic
+import os
 
 MAX_FILE_SIZE_MB = 2
 
@@ -29,6 +30,10 @@ class ComprobanteForm(forms.ModelForm):
 
             if file_type not in ['image/jpeg', 'image/png', 'application/pdf']:
                 raise ValidationError(f"❌ Tipo de archivo inválido: {file_type}")
+
+            ext = os.path.splitext(file.name)[1].lower()
+            if ext not in ext_permitidas:
+                raise ValidationError("❌ Extensión de archivo no permitida.")
 
             # ✅ Validá tamaño
             max_size = MAX_FILE_SIZE_MB * 1024 * 1024

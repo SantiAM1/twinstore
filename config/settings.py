@@ -103,6 +103,8 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
+
 AXES_LOCKOUT_PARAMETERS = ['username', 'ip_address']
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = 1
