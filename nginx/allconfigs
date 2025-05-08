@@ -17,19 +17,24 @@ server {
     listen 80;
     server_name twinstore.com.ar www.twinstore.com.ar;
 
-    location = /payment/webhook/ {
+    add_header Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()" always;
+
+    location ^~ /payment/webhook/ {
         proxy_pass http://web:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
     }
 
-    set $redirect 1;
-    if ($http_cf_visitor ~ '"scheme":"https"') {
-        set $redirect 0;
-    }
-    if ($redirect = 1) {
-        return 301 https://$host$request_uri;
+    location / {
+        if ($http_x_forwarded_proto != "https") {
+            return 301 https://$host$request_uri;
+        }
+
+        proxy_pass http://web:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
     }
 
     location /static/ {
@@ -38,13 +43,6 @@ server {
 
     location /media/ {
         alias /app/media/;
-    }
-
-    location / {
-        proxy_pass http://web:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-Proto https;
     }
 
     location = /favicon.ico {
