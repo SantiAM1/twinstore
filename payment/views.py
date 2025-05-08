@@ -91,6 +91,8 @@ def notification(request):
 
                     status = pago_info.get("status")
 
+                    logger.info(f"ℹ️ℹ️ Estado de mercado pago{status}!")
+
                     metadata = pago_info.get("metadata", {})
                     if not validar_metadata(metadata):
                         logger.warning("❌ Metadata inválida")
@@ -111,24 +113,17 @@ def notification(request):
                             'proveedor':producto.proveedor
                         })
 
-                    # * Logica de usuarios, borrar el carrito si el pago no fue rechazado
+                    # * Obtener el usuario
                     if metadata['usuario'].get('user'):
                         User = get_user_model()
                         email = metadata['usuario'].get('user')
                         usuario = User.objects.get(email=email)
-                        if status in ['approved', 'in_process', 'pending']:
-                            carrito = Carrito.objects.filter(id=metadata['carrito_id']).first()
-                            if carrito:
-                                carrito.pedidos.all().delete()
-                                carrito.delete()
+                        flag = True
+                        key = metadata['carrito_id']
                     else:
                         usuario = None
-                        if status in ['approved', 'in_process', 'pending']:
-                            session_key = metadata['usuario'].get('session')
-                            store = SessionStore(session_key=session_key)
-                            if 'carrito' in store:
-                                del store['carrito']
-                                store.save()
+                        flag = False
+                        key = metadata['usuario'].get('session')
 
                     # * Obtenemos el total de la compra
                     merchant_order_id = pago_info.get("order", {}).get("id")
@@ -189,12 +184,12 @@ def notification(request):
                             'external_reference': pago_info.get("external_reference"),
                         }
                     )
-                    procesar_pago_y_estado(pago)
+                    procesar_pago_y_estado(pago,key,flag)
                 else:
                     logger.error("❌ Error al obtener datos de Mercado Pago")
         return HttpResponse(status=200)
 
-def procesar_pago_y_estado(pago: PagoRecibidoMP):
+def procesar_pago_y_estado(pago: PagoRecibidoMP,key,flag):
     if not pago.merchant_order_id:
         return
     try:
@@ -223,14 +218,33 @@ def procesar_pago_y_estado(pago: PagoRecibidoMP):
         EstadoPedido.objects.create(
             historial=historial,
             estado='Pago de mercado pago recibido (Servidor)',
-            comentario=f'Total recibido: {pago.transaction_amount}.\nEstado del pago: {pago.status}.\nForma de pago: {pago.payment_type}.\n{comentario_extra}\nEstado final del historial: {historial.estado}.'
+            comentario=f'Total recibido: {pago.transaction_amount}.\nEstado del pago: {pago.status}.\nForma de pago: {pago.payment_type}.{f"\n{comentario_extra}." if comentario_extra else ""}\nEstado final del historial: {historial.estado}.'
         )
         logger.info(f"Forma de pago: {pago.payment_type}")
         logger.info(f"Total pagado: {total_pagado} / Total esperado: {historial.total_compra}")
         logger.info(f"Estado final del historial: {historial.estado}")
 
+        if (pago.payment_type == 'ticket' and historial.estado == 'pendiente') or historial.estado == 'confirmado':
+            if vaciar_carrito(flag,key):
+                logger.info(f"🧹 Carrito vaciado ({'usuario' if flag else 'sesión'}) → {key}")
+
     except HistorialCompras.DoesNotExist:
         return None
+
+def vaciar_carrito(flag,key):
+    if flag:
+        carrito = Carrito.objects.filter(id=key).first()
+        if carrito:
+            carrito.pedidos.all().delete()
+            carrito.delete()
+            return True
+    else:
+        store = SessionStore(session_key=key)
+        if 'carrito' in store:
+            del store['carrito']
+            store.save()
+            return True
+    return False
 
 def validar_metadata(metadata: dict) -> bool:
     if not isinstance(metadata, dict):
