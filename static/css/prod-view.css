@@ -79,6 +79,7 @@
     padding: 1rem;
     gap: 2rem;
     justify-content: space-between;
+    max-width: 400px;
 }
 
 .product-title-marca {
@@ -238,4 +239,27 @@ table.ficha-especificaciones {
 .swiper-pagination.swiper-pagination {
     left: -25%;
     top: 0;
+}
+
+.contenedor-tabla {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.label-prod-specs {
+    border-radius: 12px;
+    margin-bottom: 0.3rem;
+}
+
+.label-prod-specs i {
+    transition: transform 0.3s ease;
+}
+
+input[name="expandir-specs"]:checked ~ .label-prod-specs i {
+    transform: rotate(180deg);
+}
+
+input[name="expandir-specs"]:checked ~ .contenedor-tabla {
+    max-height: 2000px;
 }

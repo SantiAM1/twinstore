@@ -19,7 +19,13 @@ def resize_to_size(image_field, size=(200, 200)):
         return None
     try:
         img = Image.open(image_field)
-        img = img.convert('RGB')
+        if img.mode in ('RGBA', 'LA'):
+            fondo = Image.new('RGB', img.size, (255, 255, 255))
+            fondo.paste(img, mask=img.split()[-1])  # Pega con máscara alfa
+            img = fondo
+        else:
+            img = img.convert('RGB')
+            
         img.thumbnail(size, RESAMPLE)
         buffer = BytesIO()
         img.save(fp=buffer, format='WEBP', quality=85)
