@@ -18,7 +18,7 @@
     {% endif %} 
 {% endfor %}
 
-{% if 'marca' not in request.GET %}
+{% if 'marca' not in request.GET and not categoria.seccion_id == 'dispositivos' %}
     <p class="filter-item flex justify-between font-roboto margin-1rem">Marca<i class="bi bi-chevron-down"></i></p>
     <div class="filter-expanded">
         {% for marca in marcas %}

@@ -14,12 +14,14 @@ from .views import (
     categoria,
     supercategoria_ajax,
     gaming_subcategoria,
-    gaming_subcategoria_ajax
+    gaming_subcategoria_ajax,
+    producto_imagenes
     )
 
 app_name = "products"
 
 urlpatterns = [
+    path('api/imagenes/<int:producto_id>/<int:color_id>/',producto_imagenes,name="producto_imagen"),
     path('api/gaming/',gaming_ajax,name="gaming_ajax"),
     path('api/gaming/<slug:slug>',gaming_subcategoria_ajax,name="gaming_subcategoria_ajax"),
     path('api/supercategoria/<slug:seccion_id>/',supercategoria_ajax,name="supercategoria_ajax"),

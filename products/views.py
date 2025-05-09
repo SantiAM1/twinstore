@@ -2,7 +2,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import render
 
 from core.decorators import bloquear_si_mantenimiento
-from .models import Producto, SubCategoria,Marca,ImagenProducto,Categoria
+from .models import Producto, SubCategoria,Marca,ImagenProducto,Categoria,ColorProducto
 from django.db.models import Q
 from django_user_agents.utils import get_user_agent
 from django.template.loader import render_to_string
@@ -102,6 +102,8 @@ def return_supercategoria(request,seccion_id,type='default'):
     
     raise Http404("Respuesta no valida")
 
+@bloquear_si_mantenimiento
+@throttle_classes([FiltrosDinamicosThrottle])
 def supercategoria_ajax(request,seccion_id):
     return return_supercategoria(request,seccion_id,type='ajax')
 
@@ -380,6 +382,8 @@ def return_gaming_subcategoria(request,slug,type='default'):
     
     raise Http404("Tipo de respuesta no válido")
 
+@bloquear_si_mantenimiento
+@throttle_classes([FiltrosDinamicosThrottle])
 def gaming_subcategoria_ajax(request,slug):
     return return_gaming_subcategoria(request,slug,type='ajax')
 
@@ -389,14 +393,48 @@ def gaming_subcategoria(request,slug):
 # ----- Vista individual del producto ----- #
 def producto_view(request,product_slug):
     producto = Producto.objects.get(slug=product_slug)
-    imagenes = producto.imagenes.all()
+
+    colores = producto.colores.all()
+    
+    if colores.exists():
+        color_default = colores.first()
+        imagenes = producto.imagenes.filter(color=color_default)
+    else:
+        # imagenes = producto.imagenes.filter(color__isnull=True)
+        imagenes = producto.imagenes.all()
+    
     thumbnails = [img.imagen_100.url for img in imagenes]
     thumbnails_json = json.dumps(thumbnails)
     return render(request,'products/producto_view.html',{
         'producto':producto,
         'imagenes':imagenes,
-        'thumbnails':thumbnails_json
+        'thumbnails':thumbnails_json,
+        'colores':colores,
         })
+
+def producto_imagenes(request,producto_id,color_id):
+    try:
+        producto = get_object_or_404(Producto,id=producto_id)
+    except Producto.DoesNotExist:
+        return Http404('No existe ese producto')
+    
+    try:
+        color = ColorProducto.objects.get(id=color_id, producto=producto)
+    except ColorProducto.DoesNotExist:
+        raise Http404("Color no válido para este producto.")
+
+    imagenes = ImagenProducto.objects.filter(producto=producto, color=color)
+    thumbnails = [img.imagen_100.url for img in imagenes if img.imagen_100]
+
+    carousel_html = render_to_string('partials/product_carousel.html', {
+        'imagenes': imagenes,'producto':producto
+    })
+
+    return JsonResponse({
+        'carousel':carousel_html,
+        'thumbnails': thumbnails,
+    })
+
 
 def slug_dispatcher(request, slug):
     producto = Producto.objects.filter(slug=slug).first()

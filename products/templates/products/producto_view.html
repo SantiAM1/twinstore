@@ -39,17 +39,10 @@
         <i class="bi bi-chevron-right product-outside-link"></i>
         <span class="prod-title-name font-bold font-roboto"> {{producto.nombre}} </span>
     </nav>
-    <div class="flex gap-1rem product-view bg-white">
+    <div class="thum-divider {% if  imagenes|length > 1 %}prod-top-margin{% endif %}"></div>
+    <div class="flex gap-1rem product-view bg-white"> 
         <div class="position-relative">
-            <div class="swiper prodImgView">
-                    <div class="swiper-wrapper bg-white">
-                        {% for imagen in imagenes %}
-                        <div class="swiper-slide">
-                            <img src="{{ imagen.imagen.url }}" class="swiper-slide-image" alt="Imagen principal de {{ producto.nombre }}"/>
-                        </div>
-                        {% endfor %}
-                    </div>
-            </div>
+            {% include 'partials/product_carousel.html' %}
             <div class="swiper-pagination flex flex-column justify-center items-center position-absolute gap-05rem"></div>
         </div>
         <div class="flex flex-column product-info">
@@ -65,6 +58,16 @@
                     {% if producto.descuento > 0 %}<p class="product-title-precio-desc font-roboto font-bold">{{producto.precio_anterior|formato_pesos}}</p>{% endif %}
                     <p class="product-title-precio font-roboto font-bold">{{producto.precio|formato_pesos}}</p>
                 </div>
+                {% if colores %}
+                <div class="flex flex-column">
+                    <p class="font-roboto product-title-info">Colores:</p>
+                    <div class="flex gap-05rem" id="colores-items">
+                        {% for color in colores %}
+                            <button type="button" class="color-selector cursor-pointer {% if forloop.first %}color-activo{% endif %}" data-color-id="{{ color.id }}"style="background-color: {{ color.hex }};"></button>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
                 {% if producto.inhabilitar %}
                     <p class="font-bold font-roboto" style="font-style: italic;color: rgb(99, 35, 160);">Producto con alta rotacion de stock. Consultar disponibilidad</p>
                     <a href="#" id="consultar-disponibilidad" data-name="{{producto.nombre}}" class="decoration-none flex items-center text-center cursor-pointer product-cart display-block justify-center" rel="noopener noreferrer">
@@ -130,17 +133,68 @@
 <script src="{% static 'js/producto-view.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script nonce="{{ request.csp_nonce }}">
-    const thumbnails = JSON.parse('{{ thumbnails|escapejs }}');
-    const swiper = new Swiper(".prodImgView", {
+    window.thumbnails = JSON.parse('{{ thumbnails|escapejs }}');
+
+    window.swiper = new Swiper(".prodImgView", {
         pagination: {
             el: ".swiper-pagination",
             clickable: true,
             renderBullet: function (index, className) {
                 return `<span class="${className}">
-                        <img src="${thumbnails[index]}" class="thumbnail-swiper" alt="Miniatura ${index + 1}" />
-                    </span>`;
+                    <img src="${window.thumbnails[index]}" class="thumbnail-swiper" alt="Miniatura ${index + 1}" />
+                </span>`;
+            },
         },
-        },
+    });
+
+    document.querySelectorAll('.color-selector').forEach(btn => {
+        btn.addEventListener('click', () => {
+
+            document.querySelectorAll('.color-selector').forEach(b => b.classList.remove('color-activo'));
+
+            btn.classList.add('color-activo')
+
+            const colorId = btn.dataset.colorId;
+            const productoId = document.getElementById('producto-id').value;
+            const url = `/productos/api/imagenes/${productoId}/${colorId}`
+            axios.get(url)
+                .then(response => {
+                    const data = response.data;
+
+                    const thumDivider = document.querySelector('.thum-divider');
+                    if (thumDivider) {
+                        if (data.thumbnails.length > 1) {
+                            thumDivider.classList.add('prod-top-margin');
+                        } else {
+                            thumDivider.classList.remove('prod-top-margin');
+                        }
+                    }
+                    // Destruir swiper anterior
+                    if (window.swiper) window.swiper.destroy(true, true);
+
+                    const viejo = document.querySelector('.prodImgView');
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = data.carousel;
+                    viejo.replaceWith(wrapper.firstElementChild);
+
+                    window.thumbnails = data.thumbnails;
+
+                    window.swiper = new Swiper(".prodImgView", {
+                        pagination: {
+                            el: ".swiper-pagination",
+                            clickable: true,
+                            renderBullet: function (index, className) {
+                                return `<span class="${className}">
+                                    <img src="${window.thumbnails[index]}" class="thumbnail-swiper" alt="Miniatura ${index + 1}" />
+                                </span>`;
+                            },
+                        },
+                    });
+                })
+                .catch(error => {
+                    console.error("Error al cargar imágenes por color:", error);
+                });
+        });
     });
 </script>
 {% endblock myscripts %}

@@ -108,6 +108,9 @@
     .product-view {
         flex-direction: column;
         align-items: center;
+    }
+
+    .prod-top-margin {
         margin-top: 5rem;
     }
 

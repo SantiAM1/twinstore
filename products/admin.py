@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .forms import EspecificacionTecnicaForm
-from .models import Marca, Categoria, SubCategoria, Producto, ImagenProducto, Atributo, EspecificacionTecnica, CategoriaEspecificacion,Etiquetas
+from .models import Marca, Categoria, SubCategoria, Producto, ImagenProducto, Atributo, EspecificacionTecnica, CategoriaEspecificacion,Etiquetas,ColorProducto
 from django.utils.html import format_html
 
 class AtributoInline(admin.TabularInline):
@@ -31,6 +31,11 @@ class EtiquetasInline(admin.TabularInline):
     extra = 1
     classes = ['collapse']
 
+class ColoresInline(admin.TabularInline):
+    model = ColorProducto
+    extra = 1
+    classes = ['collapse']
+
 class EspecificacionTecnicaInline(admin.StackedInline):
     model = EspecificacionTecnica
     extra = 0
@@ -38,7 +43,7 @@ class EspecificacionTecnicaInline(admin.StackedInline):
     classes = ['collapse']
 
 class ProductoAdmin(admin.ModelAdmin):
-    inlines = [AtributoInline, ImagenProductoInline, EspecificacionTecnicaInline,EtiquetasInline]
+    inlines = [AtributoInline, ImagenProductoInline, ColoresInline,EspecificacionTecnicaInline,EtiquetasInline]
     list_display = ['nombre', 'sku', 'marca', 'sub_categoria','inhabilitar']
     search_fields = ['nombre', 'sku']
     list_filter = ['marca', 'sub_categoria']

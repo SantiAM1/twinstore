@@ -99,8 +99,17 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
 
+class ColorProducto(models.Model):
+    producto = models.ForeignKey(Producto,on_delete=models.CASCADE,related_name='colores')
+    nombre = models.CharField(max_length=50)
+    hex = models.CharField(max_length=7,help_text='Color en HEXADECIMAL (#ffffff)',default='#ffffff')
+
+    def __str__(self):
+        return f"{self.nombre} ({self.producto})"
+    
 class ImagenProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='imagenes',  blank=True)
+    color = models.ForeignKey(ColorProducto,on_delete=models.CASCADE,related_name='imagenes',null=True,blank=True)
     imagen = models.ImageField(upload_to='productos/imagenes/')
     imagen_100 = models.ImageField(upload_to='productos/imagenes/', null=True, blank=True,editable=False)
 
