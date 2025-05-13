@@ -17,7 +17,7 @@
 {% endblock headend %}
 
 {% block contenidomain %}
-<main class="padding-1rem">
+<div class="padding-1rem">
     <div class="flex font-roboto flex-column users-feedback-box">
         <h2 class="text-center">❌ ¡Ups! Algo salió mal. ❌</h2>
         <p>No pudimos procesar tu pago o el mismo fue rechazado.</p>
@@ -34,5 +34,5 @@
             <a href="{% url 'cart:ver_carrito' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver al carrito</a>
         </div>
     </div>
-</main>
+</div>
 {% endblock contenidomain %}

@@ -15,7 +15,7 @@
 {% endblock head %}
 
 {% block contenidomain %}
-<main class="legales-box">
+<div class="legales-box">
     <h1 class="font-roboto">Servicio Técnico</h1>
     <p>Nuestro servicio técnico no es solo un área más: es el corazón de nuestra historia. Liderado por nuestro padre, quien desde hace décadas nos transmitió su pasión por la tecnología, nos enseñó el valor del trabajo bien hecho, el compromiso y el respeto incondicional por cada cliente.</p>
     <br>
@@ -33,7 +33,6 @@
     <div class="width-100 padding-10px border-1px"></div>
     <div class="width-100 padding-10px"></div>
     <p>No te olvides de verificar nuestras <a href="{% url 'core:politicas-tecnico' %}" class="politicas-link decoration-none">Políticas de Servicio Técnico</a>.</p>
-</main>
-{% include 'widgets/ayuda.html' %}
+</div>
 {% endblock contenidomain %}
 

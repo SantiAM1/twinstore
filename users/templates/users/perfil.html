@@ -18,7 +18,7 @@
 {% endblock headend %}
 
 {% block contenidomain %}
-<main class="padding-1rem">
+<div class="padding-1rem">
     <form class="users-perfil" method="post">
         {% csrf_token %}
         <div class="flex flex-column gap-1rem font-roboto width-100">
@@ -96,7 +96,7 @@
             <button type="submit" class="tw-hover-button border-none font-roboto font-bold cursor-pointer">Guardar</button>
         </div>
     </form>
-</main>
+</div>
 {% endblock contenidomain %}
 
 {% block myscripts %}

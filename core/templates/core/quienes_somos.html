@@ -12,11 +12,12 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 {% compress css %}
 <link rel="stylesheet" href="{% static 'css/legales.css' %}">
+<link rel="stylesheet" href="{% static 'css/widgets.css' %}">
 {% endcompress %}
 {% endblock head %}
 
 {% block contenidomain %}
-<main class="legales-box flex gap-1rem quienes-box items-center">
+<div class="legales-box flex gap-1rem quienes-box items-center">
     <div>
         <h1 class="font-roboto">¿Quiénes somos?</h1>
         <p>Somos dos hermanos mellizos apasionados por el hardware, un hobby de dos niños que con los años se convirtió en el proyecto de dos adultos.</p>
@@ -41,8 +42,7 @@
             </div>
         </div>
     </aside>
-</main>
-{% include 'widgets/redes.html' %}
+</div>
 {% endblock contenidomain %}
 
 {% block myscripts %}

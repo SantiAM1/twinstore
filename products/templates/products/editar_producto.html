@@ -20,7 +20,7 @@
 {% endblock headend %}
 
 {% block contenidomain %}
-<main class="padding-1rem">
+<div class="padding-1rem">
     <div class="users-perfil flex font-roboto width-100">
         <div class="flex flex-column gap-1rem width-100">
             <form method="POST" enctype="multipart/form-data" action="{% url 'products:editar_producto' producto.id %}" class="flex flex-column gap-1rem width-100">
@@ -105,7 +105,7 @@
             {% endif %}
         </div>
     </div>
-</main>
+</div>
 {% endblock contenidomain %}
 
 {% block myscripts %}

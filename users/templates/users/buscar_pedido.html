@@ -22,7 +22,7 @@
 {% endblock headend %}
 
 {% block contenidomain %}
-<main class="padding-1rem">
+<div class="padding-1rem">
     <div class="users-pedidos-box bg-white">
         <h1 style="font-family: 'Roboto';text-align: start;padding-bottom: 1rem;font-weight: 300;border-bottom: 1px solid #d6d6d6;margin: 1rem;">Buscar un pedido:</h1>
         {% if messages %}
@@ -38,7 +38,7 @@
             <button type="submit" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-pedido-button">Buscar pedido</button>
         </form>
     </div>
-</main>
+</div>
 {% include 'widgets/usuario.html' %}
 {% endblock contenidomain %}
 

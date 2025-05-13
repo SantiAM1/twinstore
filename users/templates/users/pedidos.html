@@ -23,7 +23,7 @@
 
 
 {% block contenidomain %}
-<main class="padding-1rem">
+<div class="padding-1rem">
     <div class="users-pedidos-box bg-white">
         {% if messages %}
             {% for mensaje in messages %}
@@ -46,7 +46,7 @@
         <div class="spinner"></div>
         <p>Procesando...</p>
     </div>
-</main>
+</div>
 
 {% include 'widgets/usuario.html' %}
 {% endblock contenidomain %}

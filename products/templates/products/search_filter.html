@@ -33,11 +33,11 @@
     </nav>
     {% if productos %}
     <div class="flex gap-1rem product-box-grid">
-        <main class="flex justify-center">
+        <div class="flex justify-center">
             <div class="grid-container">
                 {% include 'partials/product_grid.html' %}
             </div>
-        </main>
+        </div>
     </div>
     <div class="paginacion margin-1rem flex justify-center gap-05rem font-roboto">
         {% include 'partials/paginacion.html' %}

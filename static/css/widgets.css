@@ -71,3 +71,9 @@ font-size: 20px;
 .widget-btn.gaming {
     background: linear-gradient(135deg, #00708b, #07f);
 }
+
+@media screen and (width <= 570px) {
+    .widget-content p {
+    font-size: 0.9rem;
+}
+}
