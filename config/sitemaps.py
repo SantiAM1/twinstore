@@ -7,7 +7,7 @@ class StaticViewSitemap(Sitemap):
     changefreq = 'weekly'
 
     def items(self):
-        return ['core:home', 'products:gaming']
+        return ['core:home', 'products:gaming','core:contacto','core:politicas-tecnico','core:politicas-privacidad','core:politicas-devolucion','core:politicas-envios','core:faq','core:terminos-condiciones','core:arrepentimiento','core:quienes_somos','core:servicio_tecnico']
 
     def location(self, item):
         return reverse(item)
@@ -18,10 +18,13 @@ class CategoriaSitemap(Sitemap):
     priority = 0.9
 
     def items(self):
-        return Categoria.objects.all()
+        return Categoria.objects.all().order_by('id')
 
     def location(self, obj):
         return obj.get_absolute_url()
+
+    def lastmod(self, obj):
+        return obj.updated_at
 
 
 class SubCategoriaSitemap(Sitemap):
@@ -29,10 +32,13 @@ class SubCategoriaSitemap(Sitemap):
     priority = 0.8
 
     def items(self):
-        return SubCategoria.objects.all()
+        return SubCategoria.objects.all().order_by('id')
 
     def location(self, obj):
         return obj.get_absolute_url()
+    
+    def lastmod(self, obj):
+        return obj.updated_at
 
 
 class ProductoSitemap(Sitemap):
@@ -40,7 +46,10 @@ class ProductoSitemap(Sitemap):
     priority = 0.7
 
     def items(self):
-        return Producto.objects.all()
+        return Producto.objects.all().order_by('id')
 
     def location(self, obj):
         return obj.get_absolute_url()
+    
+    def lastmod(self, obj):
+        return obj.updated_at

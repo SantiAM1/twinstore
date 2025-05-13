@@ -53,25 +53,6 @@ def politicas_devolicion(request):
 def politicas_priv(request):
     return render(request,'core/politicas_privacidad.html')
 
-@staff_member_required
-def verificar_throttle(request):
-    # Simulamos usuarios o IPs de prueba (esto es solo demostrativo)
-    ejemplos = [
-        'throttle_user_1',  # Clave ejemplo para usuarios autenticados
-        'throttle_anon_192.168.0.100',  # Clave ejemplo para IP
-    ]
-
-    data = []
-    for clave in ejemplos:
-        valor = cache.get(clave)
-        if valor:
-            data.append({'clave': clave, 'valor': valor})
-
-    return render(request, 'core/throttle_panel.html', {
-        'fecha': now(),
-        'throttles': data,
-    })
-
 def pagina_mantenimiento(request):
     return render(request, 'core/mantenimiento.html')
 

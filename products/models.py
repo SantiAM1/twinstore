@@ -30,6 +30,7 @@ class Categoria(models.Model):
     slug = models.SlugField(max_length=50, blank=True,unique=True)
     seccion_id = models.CharField(max_length=50, blank=True, null=True,choices=SECCIONES_MENU)
     orden = models.PositiveIntegerField(default=0, help_text="Orden de aparición en el menú")
+    updated_at = models.DateTimeField(auto_now=True)
 
     def get_absolute_url(self):
         if self.slug == 'gaming':
@@ -49,6 +50,7 @@ class SubCategoria(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='subcategorias')
     descripcion_seo = models.CharField(max_length=160,blank=True,help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres.")
     slug = models.SlugField(max_length=50, blank=True,unique=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def get_absolute_url(self):
         if self.categoria.slug == 'gaming':
@@ -77,6 +79,7 @@ class Producto(models.Model):
     inhabilitar = models.BooleanField(default=False)
     slug = models.SlugField(max_length=100, blank=True,unique=True)
     proveedor = models.CharField(max_length=30,blank=True,null=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def get_absolute_url(self):
         return reverse('products:slug_dispatcher',args=[self.slug])
