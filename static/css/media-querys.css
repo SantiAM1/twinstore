@@ -143,7 +143,8 @@
         left: 0;
     } */
 
-    .swiper-pagination.swiper-pagination {
+    /* stylelint-disable-next-line selector-class-pattern */
+    .prodImgView ~ .swiper-pagination.swiper-pagination {
         flex-direction: row;
         top: -27%;
         width: 100%;

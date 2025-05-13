@@ -18,62 +18,42 @@
 <link rel="stylesheet" href="{% static 'css/home.css' %}" />
 <link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}"/>
 <link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/widgets.css' %}">
 {% endcompress %}
 {% endblock head %}
 
 {% block contenidomain %}
-<section class="carousel position-relative overflow-hidden">
-    <div class="carousel-track flex height-100">
-        <picture>
-            <source media="(max-width: 768px)" srcset="{% static 'img/banners/banner_1_mobile.webp' %}">
-            <img src="{% static 'img/banners/banner_1.webp' %}" alt="Banner 1" fetchpriority="high" class="height-100">
-        </picture>
-        <picture>
-            <source media="(max-width: 768px)" srcset="{% static 'img/banners/banner_2_mobile.webp' %}">
-            <img src="{% static 'img/banners/banner_2.webp' %}" alt="Banner 2" loading="lazy" class="height-100">
-        </picture>
-        <picture>
-            <source media="(max-width: 768px)" srcset="{% static 'img/banners/banner_3_mobile.webp' %}">
-            <img src="{% static 'img/banners/banner_3.webp' %}" alt="Banner 3" loading="lazy" class="height-100">
-        </picture>
-        <picture>
-            <source media="(max-width: 768px)" srcset="{% static 'img/banners/banner_4_mobile.webp' %}">
-            <img src="{% static 'img/banners/banner_4_rename.webp' %}" alt="Banner 3" loading="lazy" class="height-100">
-        </picture>
-    </div>
-</section>
-<div class="carousel-timer">
-    <div class="carousel-timer-fill"></div>
-</div>
-<main class="padding-1rem">
+{% include 'core/carousel.html' %}
     <h1 class="display-none">Bienvenidos a Twinstore</h1>
-    <div class="landing-grid">
-        <a href="{% url 'products:categoria' 'computos' 'computadoras'  %}" class="landing-box decoration-none">
-            <div class="landing-content font-roboto font-bold flex flex-column items-center justify-center text-center gap-1rem width-100 height-100">
-                <i class="bi bi-tv langing-icons"></i>
-                PC ARMADAS
-            </div>
-        </a>
-        <a href="{% url 'products:slug_dispatcher' slug='componentes' %}" class="landing-box decoration-none">
-            <div class="landing-content font-roboto font-bold flex flex-column items-center justify-center text-center gap-1rem width-100 height-100">
-                <i class="bi bi-box langing-icons"></i>
-                COMPONENTES
-            </div>
-        </a>
-        <a href="{% url 'core:servicio_tecnico' %}" class="landing-box decoration-none">
-            <div class="landing-content font-roboto font-bold flex flex-column items-center justify-center text-center gap-1rem width-100 height-100">
-                <i class="bi bi-wrench langing-icons"></i>
-                SERVICIOS
-            </div>
-        </a>
-        <a href="{% url 'products:slug_dispatcher' slug='dispositivos' %}" class="landing-box decoration-none">
-            <div class="landing-content font-roboto font-bold flex flex-column items-center justify-center text-center gap-1rem width-100 height-100">
-                <i class="bi bi-phone langing-icons"></i>
-                DISPOSITIVOS
-            </div>
-        </a>
-    </div>
-    <section class="langing-section">
+    <section class="landing-grid-section">
+        <div class="landing-grid">
+            <a href="{% url 'products:categoria' 'computos' 'computadoras'  %}" class="landing-box decoration-none">
+                <div class="landing-content font-roboto font-bold flex flex-column items-center justify-center text-center gap-1rem width-100 height-100">
+                    <i class="bi bi-tv langing-icons"></i>
+                    PC ARMADAS
+                </div>
+            </a>
+            <a href="{% url 'products:slug_dispatcher' slug='componentes' %}" class="landing-box decoration-none">
+                <div class="landing-content font-roboto font-bold flex flex-column items-center justify-center text-center gap-1rem width-100 height-100">
+                    <i class="bi bi-box langing-icons"></i>
+                    COMPONENTES
+                </div>
+            </a>
+            <a href="{% url 'core:servicio_tecnico' %}" class="landing-box decoration-none">
+                <div class="landing-content font-roboto font-bold flex flex-column items-center justify-center text-center gap-1rem width-100 height-100">
+                    <i class="bi bi-wrench langing-icons"></i>
+                    SERVICIOS
+                </div>
+            </a>
+            <a href="{% url 'products:slug_dispatcher' slug='dispositivos' %}" class="landing-box decoration-none">
+                <div class="landing-content font-roboto font-bold flex flex-column items-center justify-center text-center gap-1rem width-100 height-100">
+                    <i class="bi bi-phone langing-icons"></i>
+                    DISPOSITIVOS
+                </div>
+            </a>
+        </div>
+    </section>
+    <section class="landing-section">
         <h2 class="text-center width-100 font-roboto position-relative">
             Nuestras ofertas 🔥
         </h2>
@@ -91,12 +71,11 @@
                 </div>
                 {% endfor %}
             </div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next ofertaProds-next"></div>
+            <div class="swiper-button-prev ofertaProds-prev"></div>
         </div>
     </section>
-</main>
-{% include 'widgets/serv-tecnico.html' with color="white" %}
+{% include 'widgets/home.html' %}
 {% if messages %}
     {% for message in messages %}
     <div class="notification-mainpage position-fixed">
@@ -111,12 +90,12 @@
 {% block myscripts %}
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script nonce="{{ request.csp_nonce }}">
-    const swiper = new Swiper(".ofertaProds", {
+    var swiper = new Swiper(".ofertaProds", {
         slidesPerView: 2,
         spaceBetween: 10,
         navigation: {
-            nextEl: ".swiper-button-next",
-            prevEl: ".swiper-button-prev",
+            nextEl: ".ofertaProds-next",
+            prevEl: ".ofertaProds-prev",
         },
         autoplay: {
             delay: 3500,
@@ -134,5 +113,26 @@
             },
         },
     });
+
+    var swiper = new Swiper(".myCarousel", {
+        loop: true,
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        autoplay: {
+            delay: 6000,
+        },
+        slidesPerView: 1,
+    });
+
+    var swiper = new Swiper(".myWidgets", {
+        slidesPerView: 1,
+        spaceBetween: 10,
+        navigation: {
+            nextEl: ".myWidgets-next",
+            prevEl: ".myWidgets-prev",
+        },
+        });
 </script>
 {% endblock myscripts %}

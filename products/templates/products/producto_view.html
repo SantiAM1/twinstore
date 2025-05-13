@@ -127,7 +127,6 @@
         {% endif %}
     </section>
 </div>
-{% include 'widgets/gaming.html' with color="black" %}
 {% endblock contenidomain %}
 {% block myscripts %}
 <script src="{% static 'js/producto-view.js' %}"></script>
@@ -136,6 +135,9 @@
     window.thumbnails = JSON.parse('{{ thumbnails|escapejs }}');
 
     window.swiper = new Swiper(".prodImgView", {
+        zoom: {
+            maxRatio: 2,
+        },
         pagination: {
             el: ".swiper-pagination",
             clickable: true,
@@ -180,6 +182,9 @@
                     window.thumbnails = data.thumbnails;
 
                     window.swiper = new Swiper(".prodImgView", {
+                        zoom: {
+                            maxRatio: 2,
+                        },
                         pagination: {
                             el: ".swiper-pagination",
                             clickable: true,

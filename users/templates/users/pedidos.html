@@ -11,8 +11,10 @@
 {% endblock head %}
 
 {% block headend %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 {% compress css %}
 <link rel="stylesheet" href="{% static 'css/pedidos.css' %}">
+<link rel="stylesheet" href="{% static 'css/widgets.css' %}">
 <link rel="stylesheet" href="{% static 'css/substyles/login-register.css' %}">
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
 <link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}">
@@ -45,9 +47,11 @@
         <p>Procesando...</p>
     </div>
 </main>
-{% include 'widgets/ayuda.html' %}
+
+{% include 'widgets/usuario.html' %}
 {% endblock contenidomain %}
 
 {% block myscripts %}
 <script src="{% static 'js/pedido.js' %}"></script>
+{% include 'widgets/script.html' %}
 {% endblock myscripts %}

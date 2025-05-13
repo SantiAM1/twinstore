@@ -16,7 +16,7 @@
 {% block theme %}black{% endblock theme %}
 
 {% block contenidomain %}
-<main class="padding-1rem">
+<div class="padding-1rem">
     <form class="users-perfil flex font-roboto width-100" method="post" action="{% url 'cart:realizar_pedido' %}">
         {% csrf_token %}
         <div class="users-perfil-facturacion flex flex-column gap-1rem">
@@ -215,7 +215,7 @@
         <div class="spinner"></div>
         <p>Procesando pedido...</p>
     </div>
-</main>
+</div>
 {% endblock contenidomain %}
 
 {% block myscripts %}

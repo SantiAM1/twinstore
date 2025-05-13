@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const temas = {
         white: '#ededed',
         black: getComputedStyle(document.documentElement).getPropertyValue('--black-theme-color'),
-        gaming: '#c01276',
+        gaming: '#2d63aa',
     };
     
     const currentTheme = document.body.dataset.theme;

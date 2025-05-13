@@ -1,0 +1,38 @@
+{% load static %}
+<div class="swiper myCarousel">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide">
+            <a href="{% url 'products:categoria' 'computos' 'computadoras' %}">
+                <picture>
+                    <source media="(max-width: 1000px)" srcset="{% static 'img/banners/mob_1.webp' %}">
+                    <img src="{% static 'img/banners/desk_1.webp' %}" alt="Banner 1">
+                </picture>
+            </a>
+        </div>
+        <div class="swiper-slide">
+            <a href="{% url 'products:gaming' %}">
+                <picture>
+                    <source media="(max-width: 1000px)" srcset="{% static 'img/banners/mob_2.webp' %}">
+                    <img src="{% static 'img/banners/desk_2.webp' %}" alt="Banner 1">
+                </picture>
+            </a>
+        </div>
+        <div class="swiper-slide">
+            <a href="{% url 'products:slug_dispatcher' 'dispositivos' %}">
+                <picture>
+                    <source media="(max-width: 1000px)" srcset="{% static 'img/banners/mob_3.webp' %}">
+                    <img src="{% static 'img/banners/desk_3.webp' %}" alt="Banner 1">
+                </picture>
+            </a>
+        </div>
+        <div class="swiper-slide">
+            <a href="{% url 'products:categoria' 'computos' 'notebooks' %}">
+                <picture>
+                    <source media="(max-width: 1000px)" srcset="{% static 'img/banners/mob_4.webp' %}">
+                    <img src="{% static 'img/banners/desk_4.webp' %}" alt="Banner 1">
+                </picture>
+            </a>
+        </div>
+    </div>
+    <div class="swiper-pagination"></div>
+</div>

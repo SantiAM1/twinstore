@@ -8,6 +8,7 @@
 
 {% block head %}
 <title>Buscar pedido - Twinstore</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 {% endblock head %}
 
 {% block headend %}
@@ -16,6 +17,7 @@
 <link rel="stylesheet" href="{% static 'css/substyles/login-register.css' %}">
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
 <link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}">
+<link rel="stylesheet" href="{% static 'css/widgets.css' %}">
 {% endcompress %}
 {% endblock headend %}
 
@@ -37,5 +39,9 @@
         </form>
     </div>
 </main>
-{% include 'widgets/ayuda.html' %}
+{% include 'widgets/usuario.html' %}
 {% endblock contenidomain %}
+
+{% block myscripts %}
+{% include 'widgets/script.html' %}
+{% endblock myscripts %}

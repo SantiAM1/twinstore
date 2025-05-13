@@ -31,14 +31,16 @@
     {% block headend %}
     {% endblock headend %}
 </head>
-<body data-theme="{% block theme %}white{% endblock theme %}">
+<body data-theme="{% block theme %}white{% endblock theme %}" class="layout">
     <header class="header-tag position-fixed">
         {% include 'header.html' %}
     </header>
     <div class="divider-content"></div>
 
+    <main class="main-content">
     {% block contenidomain %}
     {% endblock contenidomain %}
+    </main>
 
     {% include 'footer.html' %}
     <!-- * Wtap -->
