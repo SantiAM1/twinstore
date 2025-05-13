@@ -40,6 +40,8 @@
             {% include 'partials/orden_resultado.html' with color="color-fff" %}
         </div>
     </nav>
+    {% if productos %}
+    
     <div class="flex gap-1rem product-box-grid">
         <div class="flex flex-column filter-box">
             <div>
@@ -100,6 +102,11 @@
         <div class="spinner"></div>
         <p>Procesando...</p>
     </div>
+    {% else %}
+    <div class="flex items-center justify-center">
+        <img src="{% static 'img/empty.webp' %}" height="600" width="600" alt="No hay nada aqui">
+    </div>
+    {% endif %}
 </div>
 {% endblock contenidomain %}
 
