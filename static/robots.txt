@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /panel-admin-twinstore/
+Disallow: /carro/
+Disallow: /usuario/
+Disallow: /media/
+Disallow: /static/
+Disallow: /*.json$
+Disallow: /*.xml$
+
+Sitemap: https://twinstore.com.ar/sitemap.xml

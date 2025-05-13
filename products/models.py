@@ -2,6 +2,7 @@ from re import T
 from django.db import models
 from core.utils import obtener_valor_dolar
 from django.utils.text import slugify
+from django.urls import reverse
 
 class Marca(models.Model):
     nombre = models.CharField(max_length=30)
@@ -30,6 +31,11 @@ class Categoria(models.Model):
     seccion_id = models.CharField(max_length=50, blank=True, null=True,choices=SECCIONES_MENU)
     orden = models.PositiveIntegerField(default=0, help_text="Orden de aparición en el menú")
 
+    def get_absolute_url(self):
+        if self.slug == 'gaming':
+            return reverse('products:gaming')
+        return reverse('products:categoria',args=[self.seccion_id,self.slug])
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.nombre)
@@ -43,6 +49,11 @@ class SubCategoria(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='subcategorias')
     descripcion_seo = models.CharField(max_length=160,blank=True,help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres.")
     slug = models.SlugField(max_length=50, blank=True,unique=True)
+
+    def get_absolute_url(self):
+        if self.categoria.slug == 'gaming':
+            return reverse('products:gaming_subcategoria',args=[self.slug])
+        return reverse('products:categoria_subcategoria',args=[self.categoria.seccion_id,self.categoria.slug,self.slug])
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -66,6 +77,9 @@ class Producto(models.Model):
     inhabilitar = models.BooleanField(default=False)
     slug = models.SlugField(max_length=100, blank=True,unique=True)
     proveedor = models.CharField(max_length=30,blank=True,null=True)
+
+    def get_absolute_url(self):
+        return reverse('products:slug_dispatcher',args=[self.slug])
 
     def save(self, *args, **kwargs):
         # Detectar si cambió el nombre
