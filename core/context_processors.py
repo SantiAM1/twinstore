@@ -5,6 +5,16 @@ from django.template.loader import render_to_string
 import json
 from django_user_agents.utils import get_user_agent
 
+def canonical_url(request):
+    """Genera la canonical URL limpia, sin parámetros GET"""
+    scheme = "https" if request.is_secure() else "http"
+    domain = request.get_host()
+    path = request.path
+    print(f"{scheme}://{domain}{path}")
+    return {
+        "canonical_url": f"{scheme}://{domain}{path}"
+    }
+
 def render_menu(request):
     ORDEN_SECCIONES = ["componentes", "computos", "accesorios", "dispositivos", "impresion"]
     data_desk = cache.get('menu_desktop')

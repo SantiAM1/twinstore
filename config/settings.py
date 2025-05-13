@@ -163,6 +163,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.carrito_total',
                 'core.context_processors.render_menu',
+                'core.context_processors.canonical_url',
             ],
         },
     },
@@ -274,20 +275,20 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
-        # "file_mercadopago": {
-        #     "class": "logging.FileHandler",
-        #     "filename": BASE_DIR / "logs" / "mercadopago.log",
-        #     "formatter": "verbose",
-        #     "level": "INFO",
-        # },
+        "file_mercadopago": {
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "mercadopago.log",
+            "formatter": "verbose",
+            "level": "INFO",
+        },
     },
-    # "loggers": {
-    #     "mercadopago": {
-    #         "handlers": ["file_mercadopago"],
-    #         "level": "INFO",
-    #         "propagate": False,
-    #     },
-    # },
+    "loggers": {
+        "mercadopago": {
+            "handlers": ["file_mercadopago"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
     "root": {
         "handlers": ["console"],
         "level": "INFO",
