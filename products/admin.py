@@ -14,11 +14,6 @@ class ImagenProductoInline(admin.StackedInline):
     readonly_fields = ['miniatura']
     classes = ['collapse']
 
-    def has_add_permission(self, request, obj):
-        if obj and obj.imagenes.count() >= 5:
-            return False
-        return super().has_add_permission(request, obj)
-
     def miniatura(self, obj):
         if obj.imagen:
             return format_html('<img src="{}" width="100" height="100" style="object-fit: contain;" />', obj.imagen.url)
