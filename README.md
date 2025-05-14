@@ -95,12 +95,14 @@ App encargada de la gestión de usuarios y autenticación:
 ## Cómo desplegar el proyecto en local
 
 - Cloná el repositorio y levantá los contenedores:
+```bash
 git clone https://github.com/SantiAM1/twinstore.git
 cd twinstore
 docker-compose up -d
+```
 
 - Configuración básica del proyecto
-
+```bash
 docker compose exec web bash
 
 # Crear usuario administrador
@@ -111,6 +113,7 @@ python manage.py importar_categorias
 
 # Generar los permisos del Staff
 python manage.py importar_permisos "Gestor de tienda" "Gestor de tienda_permisos.json" 
+```
 
 ---
 
