@@ -25,7 +25,7 @@
 <div class="product-box flex items-center flex-column width-100">
     <nav class="flex justify-between items-center products-nav">
         <div>
-            <span class="font-roboto">Resultados de: "<strong class="font-roboto">{{query}}</strong>"</span>
+            <span class="font-roboto">Resultados de: "<strong class="font-roboto">{% if query %}{{query}}{% else %} {% endif %}</strong>"</span>
         </div>
         <div id="orden-result">
             {% include 'partials/orden_resultado.html' %}
@@ -44,7 +44,7 @@
     </div>
     {% else %}
     <div class="flex items-center justify-center">
-        <img src="{% static 'img/empty.webp' %}" height="600" width="600" alt="No hay nada aqui">
+        <img src="{% static 'img/empty.webp' %}" height="300" width="300" alt="No hay nada aqui">
     </div>
     {% endif %}
 </div>

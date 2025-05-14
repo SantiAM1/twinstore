@@ -264,7 +264,7 @@ def return_busqueda(request,type='default'):
             'pagina':pagina
         })
     elif type == 'ajax':
-        html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro,color='color-fff')
+        html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro)
         return JsonResponse({'grid':html_productos,'paginacion':html_pagina,'orden':html_orden,'count':html_count})
     
     raise Http404("Tipo de respuesta no válido")

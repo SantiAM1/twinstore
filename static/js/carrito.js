@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const carritoBox = document.getElementById('carrito-box');
         if (carritoBox) {
             carritoBox.innerHTML = `
-            <p class="cart-empty-msg font-roboto">Tu carrito esta vacio</p>
+            <p class="cart-empty-msg font-roboto">Tu carrito esta vacío</p>
             <a href="/" class="decoration-none cart-volver-tienda font-roboto color-fff font-bold text-center padding1rem">Volver a la tienda</a>
             `
         }

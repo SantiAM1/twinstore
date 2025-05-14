@@ -119,10 +119,6 @@
         height: auto;
     }
 
-    .product-info {
-        width: 100%;
-    }
-
     /* stylelint-disable-next-line selector-class-pattern */
     .prodImgView,.swiper-slide-image{
         height: 330px;
@@ -183,6 +179,9 @@
 }
 
 @media screen and (width <= 570px) {
+
+    .prod-name {font-size: 0.9rem;}
+
     .header {max-width: 100vw;}
     
     .redes-footer {flex-direction: column;
