@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load compress %}
+
+{% block meta %}
+<meta name="description" content="Ejercé tu derecho de arrepentimiento como consumidor. Iniciá tu solicitud fácilmente si te arrepentiste de una compra en Twinstore.">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Botón de arrepentimiento - Twinstore</title>
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endcompress %}
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="faq width-100">
+    <h1>Arrepentimiento de compra</h1>
+    <p>En cumplimiento de la Ley 24.240 de Defensa del Consumidor ponemos a disposición el <strong>Botón de arrepentimiento</strong>. Para mas información consulta nuestas <a href="{% url 'core:politicas-devolucion' %}" class="politicas-link decoration-none">Políticas de devolución</a>.</p>
+    <details>
+        <summary class="flex justify-between list-none font-bold font-roboto cursor-pointer">¿Qué debo hacer para solicitar la devolución?<i class="bi bi-three-dots"></i></summary>
+        <p>Debes ingresar a tu pedido utilizando tu código de seguimiento o acceder al apartado "Mis pedidos" si tienes una cuenta registrada. <div></div>Si cumples con las condiciones para el arrepentimiento, encontrarás habilitado el Botón de Arrepentimiento, el cual te permitirá iniciar la solicitud de devolución de forma rápida y sencilla.</p>
+    </details>
+    <details>
+        <summary class="flex justify-between list-none font-bold font-roboto cursor-pointer">¿Cuánto tiempo tengo para usar el botón de arrepentimiento?<i class="bi bi-three-dots"></i></summary>
+        <p>Tienes hasta 10 días corridos desde que recibiste el producto para solicitar la devolución mediante el Botón de Arrepentimiento.<br>Pasado ese plazo, la opción dejará de estar disponible.</p>
+    </details>
+    <details>
+        <summary class="flex justify-between list-none font-bold font-roboto cursor-pointer">¿Dónde encuentro mi código de seguimiento?<i class="bi bi-three-dots"></i></summary>
+        <p>El código de seguimiento te será enviado por correo electrónico una vez que confirmemos tu compra. Si no encuentras el correo, puedes comunicarte con nuestro staff. Para proteger la seguridad de nuestros clientes, será obligatorio que demuestres, más allá de toda duda razonable, que eres el titular del pedido.</p>
+    </details>
+    <details>
+        <summary class="flex justify-between list-none font-bold font-roboto cursor-pointer">¿Qué condiciones debo cumplir para solicitar el arrepentimiento de compra?<i class="bi bi-three-dots"></i></summary>
+        <p>Para gestionar la devolución, el producto debe estar en las mismas condiciones en las que fue entregado: cerrado, sin signos de uso, con su empaque original, manuales, accesorios y factura de compra. Podés acercarlo personalmente a nuestra sucursal o enviarlo por el medio de tu preferencia. Los gastos de envío corren por cuenta del cliente.</p>
+    </details>
+</section>
+{% endblock contenidomain %}
+

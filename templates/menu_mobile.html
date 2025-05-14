@@ -1,0 +1,63 @@
+<ul class="menu position-fixed list-none">
+    <li><div class="flex justify-between menu-title">Twinstore<i class="bi bi-x-lg"></i></div></li>
+    <li class="dropdown-mobile">
+        <span class="toggle">Productos<i class="bi bi-chevron-down"></i></span>
+        <ul class="submenu">
+            {% for title,html in render_menu_mobile.items %}
+            <li class="dropdown-mobile">
+                <span class="toggle"><div class="menu-subtitle">{{title|capfirst}}</div><i class="bi bi-chevron-down"></i></span>
+                <ul class="submenu">
+                {% for item in html %}
+                    {{item}}
+                {% endfor %}
+                </ul>
+            </li>
+            {% endfor %}
+            <li class="dropdown-mobile">
+                <span class="toggle"><div class="menu-subtitle">Gaming</div><i class="bi bi-chevron-down"></i></span>
+                <ul class="submenu">
+                    <li class="dropdown-mobile">
+                        <span class="toggle">Periféricos<i class="bi bi-chevron-down"></i></span>
+                        <ul class="submenu">
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'teclados' %}">Teclados</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'mouse' %}">Mouse</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'auriculares' %}">Auriculares</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'monitores' %}">Monitores</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'joysticks' %}">Joysticks</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'volantes' %}">Volantes</a></span></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-mobile">
+                        <span class="toggle">Hardware<i class="bi bi-chevron-down"></i></span>
+                        <ul class="submenu">
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'placas-de-vide' %}">Placas de Video</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'procesadores' %}">Procesadores</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'motherboards' %}">Motherboards</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'gabinetes' %}">Gabinetes</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'coolers' %}">Coolers</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'fuentes' %}">Fuentes</a></span></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-mobile">
+                        <span class="toggle">Muebles<i class="bi bi-chevron-down"></i></span>
+                        <ul class="submenu">
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'sills' %}">Sillas</a></span></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-mobile">
+                        <span class="toggle">Listas para Jugar<i class="bi bi-chevron-down"></i></span>
+                        <ul class="submenu">
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'pcs-gaming' %}">PCs Armadas</a></span></li>
+                            <li><span><a href="{% url 'products:gaming_subcategoria' 'notebooks-gaming' %}">Notebooks</a></span></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li><span><a href="{% url 'users:buscar_pedidos' %}">Pedidos</a></span></li>
+    <li><span><a href="{% url 'core:quienes_somos' %}">Quiénes somos</a></span></li>
+    <li><span><a href="{% url 'core:local' %}">Punto de retiro</a></span></li>
+    <li><span><a href="{% url 'core:servicio_tecnico' %}">Servicio técnico</a></span></li>
+    <li><span><a href="{% url 'core:contacto' %}">Contacto</a></span></li>
+</ul>

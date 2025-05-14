@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load compress %}
+
+{% block meta %}
+<meta name="description" content="{% if subcategoria_obj %}{{subcategoria_obj.nombre}}{% else %}{{categoria.nombre}}{% endif %}; {{prod_totales}} resultados.{% if marcas %} Marcas: {{ marcas|join:", " }}.{% endif %}{% for producto in productos|slice:":3" %}{{ producto.nombre }}. {% endfor %}">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Twinstore">
+<meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
+<meta property="og:image" content="{% static 'img/mail.webp' %}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% endblock meta %}
+
+
+{% block head %}
+<title>{{categoria}} - Twistore</title>
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
+<link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
+<link rel="stylesheet" href="{% static 'css/mobile-filters.css' %}" />
+<link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
+{% endcompress %}
+{% endblock head %}
+
+{% block contenidomain %}
+{% if productos %}
+<ul class="flex items-center justify-between filter-ordenar-box position-relative list-none width-100">
+    <li class="flex items-center filter-button"><i class="bi bi-sliders"></i>Filtros</li>
+    <li class="flex items-center ordenar-button"><i class="bi bi-arrow-down-up"></i>Ordenar</li>
+    <div class="filter-box-mobile display-none position-absolute width-100" id="filters-box-mobile">
+        {% include 'partials/filtros_dinamicos_mobile.html' %}
+    </div>
+    {% include 'components/ordenar_mobile.html' %}
+</ul>
+{% endif %}
+<div class="padding-10px">
+    {% include 'partials/header_links.html' %}
+    <h1 class="prods-dinamic-title font-roboto font-bold">{% if subcategoria_obj %}{{subcategoria_obj.nombre}}{% else %}{{categoria.nombre}}{% endif %}</h1>
+    <div id="productos-count">
+        {% include 'partials/productos_count.html' %}
+    </div>
+</div>
+{% if productos %}
+<div id="filter-active-mobile">
+    {% include 'partials/filtros_activos_mobile.html' %}
+</div>
+<div class="product-box flex items-center flex-column width-100">
+    <div class="grid-container">
+        {% include 'partials/product_grid.html' %}
+    </div>
+</div>
+<div class="paginacion margin-1rem flex justify-center gap-05rem font-roboto">
+    {% include 'partials/paginacion.html' %}
+</div>
+{% else %}
+<div class="flex items-center justify-center">
+    <img src="{% static 'img/empty.webp' %}" height="300" width="300" alt="No hay nada aqui">
+</div>
+{% endif %}
+{% endblock contenidomain %}
+
+{% block myscripts %}
+{% if subcategoria_obj %}
+<script nonce="{{ request.csp_nonce }}">
+    window.filters = {
+        apiUrl: "{% url 'products:subcategoria_ajax' seccion_id categoria.slug subcategoria_obj.slug  %}",
+    };
+</script>
+{% else %}
+<script nonce="{{ request.csp_nonce }}">
+    window.filters = {
+        apiUrl: "{% url 'products:categoria_ajax' seccion_id categoria.slug %}",
+    };
+</script>
+{% endif %}
+<script src="{% static 'js/dinamic-filter.js' %}"></script>
+<script src="{% static 'js/mobile-filters.js' %}"></script>
+{% endblock myscripts %}

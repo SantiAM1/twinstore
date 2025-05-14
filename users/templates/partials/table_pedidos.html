@@ -1,0 +1,98 @@
+<table class="users-pedidos-table width-100 text-center">
+    <thead>
+        <tr>
+            <th>Pedido</th>
+            <th class="users-pedidos-hide">ID de pago</th>
+            <th class="users-pedidos-hide">Fecha</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="cart-divider-main" colspan="4"></td>
+        </tr>
+        {% for pedido in historial %}
+        <tr class="users-pedidos-tr">
+            <td>
+                <ul>
+                    <div class="flex items-center gap-05rem">
+                    {% if pedido.check_notificacion %}
+                    <div class="notification-box">
+                        {% include 'partials/notificacion.html' %}
+                    </div>
+                    {% endif %}
+                        <div>
+                            {% for producto in pedido.productos %}
+                                <li class="flex flex-column">
+                                    <span class="users-pedido-count font-bold">{{producto.cantidad}} x<p class="users-pedido-prod font-roboto font-bold"> {{producto.nombre}}</p></span>
+                                </li>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% if pedido.check_comprobante %}
+                        {% if pedido.comprobante %}
+                            <p class="link-subir-comprobante decoration-none font-roboto subido"><i class="bi bi-paperclip"></i> Comprobante adjunto</p>
+                        {% else %}
+                            <a href="{% url 'payment:comprobante' pedido.token_consulta %}" class="link-subir-comprobante decoration-none font-roboto"><i class="bi bi-paperclip"></i> Subir comprobante</a>
+                        {% endif %}
+                    {% elif pedido.check_arrepentimiento %}
+                        <button class="border-none bg-transparent btn-arrepentimiento font-roboto cursor-pointer" data-modal-id="modal-arrepentimiento-{{pedido.id}}">Solicitar Arrepentimiento</button>
+                    {% endif %}
+                </ul>
+                <p class="users-pedidos-hide-id display-none width-100 font-roboto">ID de pago: <span>#{{pedido.merchant_order_id}}</span></p>
+            </td>
+            <td class="users-pedidos-id users-pedidos-hide font-bold">#{{pedido.merchant_order_id}}</td>
+            <td class="users-pedidos-hide">{{pedido.fecha_compra|date:"d/m/y"}}</td>
+            <td>
+                {% if pedido.estado == 'confirmado' %}
+                    <div style="background-color: #9dfca1;color: #196b00;" class="users-pedidos-status">
+                        <span>{{pedido.estado|capfirst}}</span>
+                    </div>
+                {% elif pedido.estado == 'rechazado' %}
+                    <div style="background-color: #f59f9f;color: #8a1919;" class="users-pedidos-status">
+                        <span>{{pedido.estado|capfirst}}</span>
+                    </div>
+                {% elif pedido.estado == 'pendiente' %}
+                    <div style="background-color: #f5ec9f;color: #7b8315;" class="users-pedidos-status">
+                        <span>{{pedido.estado|capfirst}}</span>
+                    </div>
+                {% elif pedido.estado == 'preparando pedido' %}
+                    <div style="background-color: #9fcbf5;color: #1d70a0;" class="users-pedidos-status">
+                        <span>{{pedido.estado|capfirst}}</span>
+                    </div>
+                {% elif pedido.estado == 'enviado' %}
+                    <div style="background-color: #da9ff5;color: #911da0;" class="users-pedidos-status">
+                        <span>{{pedido.estado|capfirst}}</span>
+                    </div>
+                {% elif pedido.estado == 'finalizado' %}
+                <div style="background-color: #c2c2c2;color: #494949;" class="users-pedidos-status">
+                    <span>{{pedido.estado|capfirst}}</span>
+                </div>
+                {% elif pedido.estado == 'arrepentido' %}
+                <div style="background-color: #8a0000;color: #fff;" class="users-pedidos-status">
+                    <span>{{pedido.estado|capfirst}}</span>
+                </div>
+                {% elif pedido.estado == 'listo para retirar' %}
+                <div style="background-color: #69b7e4;color: #2e2e2e;" class="users-pedidos-status">
+                    <span>{{pedido.estado|capfirst}}</span>
+                </div>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td class="cart-divider-prod" colspan="4"></td>
+        </tr>
+        <div id="modal-arrepentimiento-{{pedido.id}}" class="modal">
+            <div class="modal-content">
+                <h2>Confirmar arrepentimiento</h2>
+                <p>¿Estás seguro de que querés solicitar el arrepentimiento de esta compra? Esta acción no se puede deshacer.</p>
+                <form method="POST" action="{% url 'users:arrepentimiento_post' historial_id=pedido.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sí, confirmar</button>
+                    <button type="button" class="cancelar-arrepentimiento btn btn-secondary" data-modal-id="modal-arrepentimiento-{{pedido.id}}">Cancelar</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </tbody>
+</table>

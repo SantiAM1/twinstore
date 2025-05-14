@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load compress %}
+
+{% block meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock meta %}
+
+{% block contenidomain %}
+<div class="padding-1rem flex justify-center items-center">
+    <div class="flex flex-column gap-1rem">
+        <h1 class="font-roboto">¡Ups! Página no encontrada</h1>
+        <p class="font-roboto">La URL que estás buscando no existe o fue movida.</p>
+    </div>
+</div>
+{% endblock contenidomain %}

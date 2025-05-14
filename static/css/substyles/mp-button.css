@@ -1,0 +1,19 @@
+.boton-checkout-pro {
+    margin-top: 20px;
+    background-color: #468edb;
+    padding: 1rem;
+    border-radius: 12px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.boton-checkout-pro img {
+    width: 50px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.boton-checkout-pro:hover {
+    box-shadow: 0 0 15px rgb(0 153 255 / 30%);
+    background-color: #31659c;
+}

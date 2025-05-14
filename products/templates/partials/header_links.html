@@ -1,0 +1,13 @@
+<div class="product-links-box">
+    <a href="{% url 'core:home' %}" class="decoration-none product-outside-link bloqueable font-roboto">Inicio</a>
+    <i class="bi bi-chevron-right product-outside-link"></i>
+    <a href="{% url 'products:slug_dispatcher' categoria.seccion_id %}" class="decoration-none product-outside-link bloqueable font-roboto">{{categoria.seccion_id|capfirst}}</a>
+    <i class="bi bi-chevron-right product-outside-link"></i>
+    {% if subcategoria_obj %}
+        <a href="{% url 'products:categoria' categoria.seccion_id categoria.slug %}" class="decoration-none product-outside-link bloqueable font-roboto">{{categoria.nombre}}</a>
+        <i class="bi bi-chevron-right product-outside-link"></i>
+        <span class="font-roboto font-bold">{{ subcategoria_obj }}</span>
+    {% else %}
+        <span class="font-roboto font-bold">{{categoria.nombre}}</span>
+    {% endif %}
+</div>

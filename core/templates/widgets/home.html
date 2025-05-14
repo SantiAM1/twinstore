@@ -1,0 +1,53 @@
+<section class="position-relative flex items-center justify-center width-100" style="max-width: 600px; margin: auto;">
+    <div class="swiper-button-prev myWidgets-prev"></div>
+    <div class="swiper myWidgets">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <div class="widget-content flex flex-column height-100 justify-between">
+                    <div>
+                        <h3 class="font-roboto">Seguinos_</h3>
+                        <p class="font-roboto">Y disfruta de twinstore.</p>
+                    </div>
+                    <a href="https://www.instagram.com/twinstore.ar?igsh=cGZ6bnU3bndhOTU3" target="_blank" rel="noopener noreferrer" class="decoration-none widget-btn"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="widget-content flex flex-column height-100 justify-between">
+                    <div>
+                        <h3 class="font-roboto">Twinstore Gaming_</h3>
+                        <p class="font-roboto">Todo para gamers.</p>
+                    </div>
+                    <a href="{% url 'products:gaming' %}" class="decoration-none widget-btn gaming"><i class="bi bi-controller"></i> ¿Jugamos?</a>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="widget-content flex flex-column height-100 justify-between">
+                    <div>
+                        <h3 class="font-roboto">¿Necesitas ayuda?_</h3>
+                        <p class="font-roboto">Ponete en contacto con nuestro equipo.</p>
+                    </div>
+                    <a href="{% url 'core:contacto' %}" class="decoration-none widget-btn"><i class="bi bi-person-raised-hand"></i> Ver mas</a>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="widget-content flex flex-column height-100 justify-between">
+                    <div>
+                        <h3 class="font-roboto">Twinstore Service_</h3>
+                        <p class="font-roboto">Laboratorio propio.</p>
+                    </div>
+                    <a href="{% url 'core:servicio_tecnico' %}" class="decoration-none widget-btn"><i class="bi bi-gear"></i> Ver mas</a>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="widget-content flex flex-column height-100 justify-between">
+                    <div>
+                        <h3 class="font-roboto">Contactanos_</h3>
+                        <p class="font-roboto">Asesorate, sin dramas.</p>
+                    </div>
+                    <a href="{% url 'core:contacto' %}" class="decoration-none widget-btn"><i class="bi bi-telephone"></i> Ir a Contacto</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="swiper-button-next myWidgets-next"></div>
+</section>

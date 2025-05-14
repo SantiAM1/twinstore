@@ -1,0 +1,11 @@
+{% if filtros_aplicados %}
+<div class="flex justify-center filter-active-box-mobile">
+{% for key, value in request.GET.items %}
+    {% if key not in "ordenby" and key not in "q" and key not in "pagina" %}
+        <a class="decoration-none filter-active-link"href="?{% for k, v in request.GET.items %}{% if k != key %}&{{ k }}={{ v }}{% endif %}{% endfor %}">
+            {{ value }}<i class="bi bi-x"></i>
+        </a>
+    {% endif %}
+{% endfor %}
+</div>
+{% endif %}

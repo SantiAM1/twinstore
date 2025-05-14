@@ -1,0 +1,19 @@
+User-agent: *
+Disallow: /panel-admin-twinstore/
+Disallow: /carro/
+Disallow: /usuario/
+Disallow: /payment/
+Disallow: /mantenimiento/
+Disallow: /media/
+Disallow: /static/
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /productos/api
+Disallow: /productos/api/
+Disallow: /api/
+Disallow: /cargar-productos/
+Disallow: /productos/editar_producto/
+Disallow: /productos/agregar_imagenes/
+Disallow: /productos/eliminar_imagen/
+
+Sitemap: https://twinstore.com.ar/sitemap.xml

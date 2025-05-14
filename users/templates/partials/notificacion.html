@@ -1,0 +1,5 @@
+{% if pedido.recibir_mail %}
+<button class="border-none bg-transparent button-notification bloqueable" data-token="{{pedido.token_consulta}}"><i class="bi bi-bell-fill users-notificacion-on"></i></button>
+{% else %}
+<button class="border-none bg-transparent button-notification bloqueable" data-token="{{pedido.token_consulta}}"><i class="bi bi-bell users-notificacion-off"></i></button>
+{% endif %}

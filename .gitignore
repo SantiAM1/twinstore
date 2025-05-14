@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+
+# Entornos virtuales
+.venv/
+env/
+ENV/
+
+# Entornos de desarrollo
+.vscode/
+.idea/
+
+# Archivos de configuración del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos sensibles y de entorno
+.env
+*.env
+
+# Archivos estáticos y multimedia
+/staticfiles/
+media/
+
+# Excel y documentos temporales
+*.xlsx
+*.xls
+*.csv
+
+# Node (si usás algo de frontend)
+node_modules/
+package-lock.json
+package.json
+
+# Configuración de linters o formateadores
+.prettierrc
+.stylelintrc.json
+
+# Logs y archivos de comandos
+logs/
+commands.txt

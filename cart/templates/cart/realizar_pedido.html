@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock meta %}
+
+{% block head %}
+    <title>Facturacion - Twinstore</title>
+    <link rel="stylesheet" href="{% static 'css/facturacion.css' %}">
+    <link rel="stylesheet" href="{% static 'css/forms-ts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/substyles/mp-button.css' %}">
+{% endblock head %}
+
+{% block theme %}black{% endblock theme %}
+
+{% block contenidomain %}
+<div class="padding-1rem">
+    <form class="users-perfil flex font-roboto width-100" method="post" action="{% url 'cart:realizar_pedido' %}">
+        {% csrf_token %}
+        <div class="users-perfil-facturacion flex flex-column gap-1rem">
+            <h2 class="font-roboto">Detalles de facturacion</h2>
+            <span class="font-roboto">Personales **</span>
+            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select bloqueable font-roboto" required>
+                <option value="" selected disabled>Tipo de factura *</option>
+                {% for value, label in form.tipo_factura.field.choices %}
+                    {% if value %}
+                        <option value="{{ value }}" {% if form.tipo_factura.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <div id="dni_cuit_container" class="container-form display-none">
+                {{form.dni_cuit}}
+                <label for="{{ form.dni_cuit.id_for_label }}" id="dni_cuit_label" class="form-label">{{form.dni_cuit.label}}</label>
+                <div class="error display-none" id="dni_cuit_error"></div>
+                {% for error in form.dni_cuit.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div id="razon_social_container" class="container-form display-none">
+                {{form.razon_social}}
+                <label for="{{ form.razon_social.id_for_label }}" class="form-label">{{form.razon_social.label}}</label>
+                <div class="error display-none" id="razon_social_error"></div>
+                {% for error in form.razon_social.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="container-form">
+                {{form.nombre}}
+                <label for="{{ form.nombre.id_for_label }}" class="form-label">{{form.nombre.label}}</label>
+                <div class="error display-none" id="nombre_error"></div>
+                {% for error in form.nombre.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="container-form">
+                {{form.apellido}}
+                <label for="{{ form.apellido.id_for_label }}" class="form-label">{{form.apellido.label}}</label>
+                <div class="error display-none" id="apellido_error"></div>
+                {% for error in form.apellido.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <span class="font-roboto">Dirección **</span>
+            <div class="container-form">
+                {{form.calle}}
+                <label for="{{ form.calle.id_for_label }}" class="form-label">{{form.calle.label}}</label>
+                <div class="error display-none" id="calle_error"></div>
+                {% for error in form.calle.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="container-form">
+                {{form.calle_detail}}
+                <label for="{{ form.calle_detail.id_for_label }}" class="form-label">{{form.calle_detail.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.ciudad}}
+                <label for="{{ form.ciudad.id_for_label }}" class="form-label">{{form.ciudad.label}}</label>
+                <div class="error display-none" id="ciudad_error"></div>
+                {% for error in form.ciudad.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <select name="{{ form.provincia.html_name }}" id="{{ form.provincia.id_for_label }}" class="users-select width-100 bloqueable font-roboto" required>
+                <option value="" selected disabled>Provincia *</option>
+                {% for value, label in form.provincia.field.choices %}
+                    {% if value %}
+                        <option value="{{ value }}" {% if form.provincia.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <div class="container-form">
+                {{form.codigo_postal}}
+                <label for="{{ form.codigo_postal.id_for_label }}" class="form-label">{{form.codigo_postal.label}}</label>
+                <div class="error display-none" id="codigo_postal_error"></div>
+                {% for error in form.codigo_postal.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <span class="position-relative email-container font-roboto">Contacto<p class="position-absolute font-roboto email-msg">Email donde enviamos la factura</p></span>
+            <div class="container-form">
+                {{form.email}}
+                <label for="{{ form.email.id_for_label }}" class="form-label">{{form.email.label}}</label>
+            </div>
+            <div class="container-form">
+                {{form.telefono}}
+                <label for="{{ form.telefono.id_for_label }}" class="form-label">{{form.telefono.label}}</label>
+            </div>
+            <div class="container-checkbox font-roboto">
+                {{ terms.aceptar }}
+                <label class="form-check-label" for="{{ terms.aceptar.id_for_label }}">
+                    Acepto los <a href="{% url 'core:terminos-condiciones' %}" class="politicas-link decoration-none" target="_blank">Términos y Condiciones</a>
+                </label>
+                <div class="error display-none" id="terms_aceptar_error"></div>
+                {% for error in terms.aceptar.errors %}
+                    <div class="error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="container-checkbox font-roboto">
+                {{ form.recibir_estado_pedido }}
+                <label class="form-check-label" for="{{ form.recibir_estado_pedido.id_for_label }}">
+                    {{ form.recibir_estado_pedido.label }}
+                </label>
+            </div>
+        </div>
+        <div class="users-perfil-pedido">
+            <h3>Tu pedido</h3>
+            <table class="cart-finish-facturacion font-roboto width-100">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <td>Subtotal</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th colspan="2" class="border-2px"></th>
+                    </tr>
+                    {% if carrito.pedidos.all %}
+                        {% for pedido in carrito.pedidos.all %}
+                        <tr class="cart-finsh-prods">
+                            <th><p>{{pedido.get_cantidad}} x</p> {{pedido.producto.nombre}}</th>
+                            <td>{{pedido.get_total_precio|formato_pesos}}</td>
+                        </tr>
+                        <tr>
+                            <th colspan="2" class="border-1px"></th>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        {% for pedido in carrito %}
+                            <tr class="cart-finsh-prods">
+                                <th><p>{{pedido.cantidad}} x</p> {{pedido.producto.nombre}}</th>
+                                <td>{{pedido.total_precio|formato_pesos}}</td>
+                            </tr>
+                            <tr>
+                                <th colspan="2" class="border-1px"></th>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    
+                </tbody>
+                <tfoot>
+                    <tr class="cart-finsh-prods">
+                        <th>Subtotal</th>
+                        <td>{{total_precio|formato_pesos}}</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="border-1px"></th>
+                    </tr>
+                    <tr class="cart-finsh-prods">
+                        <th>Adicionales</th>
+                        <td id="adicionales-value">$0,00</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="border-1px"></th>
+                    </tr>
+                    <tr class="cart-finsh-prods">
+                        <th>Total</th>
+                        <td id="total-value">{{ total_precio|formato_pesos }}</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="border-2px"></th>
+                    </tr>
+                </tfoot>
+            </table>
+            <a href="{% url 'cart:presupuestar' %}" target="_blank" class="cart-presupuestar bloqueable decoration-none display-block text-center font-bold">Descargar Presupuesto</a>
+            <ul  class="cart-formadepago">
+                <li>
+                    <input type="radio" name="forma_pago" id="efectivo" value="efectivo">
+                    <label for="efectivo">Pago de contado:</label>
+                    <div class="cart-formadepago-details font-roboto">IMPORTANTE: Algunos productos pueden requerir un pago anticipado para asegurar su disponibilidad. En estos casos, la coordinación será gestionada por nuestro staff, quienes te indicarán los pasos a seguir. Este anticipo podrá ser abonado en nuestro punto de retiro o coordinado con el cliente.
+                        <button type="submit" class="cart-finalizarcompra bloqueable cursor-pointer decoration-none display-block text-center font-bold">Realizar Pedido</button>
+                    </div>
+                </li>
+                <li>
+                    <input type="radio" name="forma_pago" id="transferencia" value="transferencia">
+                    <label for="transferencia">Transferencia / Depósito bancario (PAGO EN EL DÍA)</label>
+                    <div class="cart-formadepago-details font-roboto">Hace tu pago en nuestra cuenta bancaria. Usa el identificador de pedido como referencia del pago. La transferencia tiene un plazo de 24hs para ser informada.
+                        <button type="submit" class="cart-finalizarcompra bloqueable cursor-pointer  decoration-none display-block text-center font-bold">Realizar Pedido</button>
+                    </div>
+                </li>
+                <li>
+                    <input type="radio" name="forma_pago" id="mercadopago">
+                    <label for="mercadopago">Pagar con Mercado Pago</label>
+                    <div class="cart-formadepago-details font-roboto">IMPORTANTE: Los pagos realizados con la plataforma de Mercado Pago cuentan con un recargo del 6,29% más IVA.
+                        <div id="box-checkout-pro" class="bloqueable width-100"></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </form>
+    <div id="loading-overlay" class="loading-overlay position-fixed display-none flex-column items-center justify-center">
+        <div class="spinner"></div>
+        <p>Procesando pedido...</p>
+    </div>
+</div>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+    <script src="{% static 'js/tipo_factura.js' %}"></script>
+    <script src="{% static 'js/realizar-pedido.js' %}"></script>
+{% endblock myscripts %}

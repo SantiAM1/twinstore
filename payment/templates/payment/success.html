@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load compress %}
+
+{% block meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock meta %}
+
+{% block head %}
+<title>Compra exitosa - Twinstore</title>
+{% endblock head %}
+{% block headend %}
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
+{% endcompress %}
+{% endblock headend %}
+
+{% block contenidomain %}
+<div class="padding-1rem">
+    <div class="flex font-roboto flex-column users-feedback-box">
+        <h2 class="text-center">¡Gracias por tu compra!</h2>
+        <p>Hemos recibido tu pedido con exito</p>
+        {% if historial.forma_de_pago == 'transferencia' %}
+            <div class="users-facturacion-transferencia font-roboto">
+                <h3>Pago por transferencia bancaria</h3><br>
+                <p><i class="bi bi-clock-history"></i> El pago debe realizarse dentro de las <strong>próximas 24 horas</strong>.</p>
+                <p><i class="bi bi-bank2"></i> Alias: <strong>twinstore.ar</strong>.</p>
+                <p><i class="bi bi-paperclip"></i> Usá el ID de pago como **referencia en tu transferencia**.</p>
+                <p><i class="bi bi-check2"></i><strong> ID de pago:</strong> <code>{{ historial.merchant_order_id }}</code></p>
+
+                {% if user.is_authenticated %}
+                    <p><i class="bi bi-check2"></i> Podés subir el comprobante más tarde desde la sección <strong>"Mis pedidos"</strong>.</p>
+                {% else %}
+                    <p><i class="bi bi-check2"></i> Podés subir tu comprobante más tarde ingresando tu <strong>código de seguimiento</strong></p>
+                {% endif %}
+                <p><i class="bi bi-check2-all"></i> Una vez validado el pago, te notificaremos por correo electrónico.</p><br>
+                <div class="link-comprobante-box">
+                    <a href="{% url 'payment:comprobante' historial.token_consulta %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer link-comprobante-button decoration-none">
+                        Subir comprobante ahora
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+        <div>
+            {% if user.is_authenticated %}
+                <p>🏷️ Puedes ver el estado de tu compra en "Mis Pedidos"</p>
+            {% else %}
+                {% if historial %}
+                    <p>🏷️ Este es tu codigo de seguimiento:<code>{{ historial.token_consulta }}</code></p>
+                {% else %}
+                    <p>🏷️ Tu codigo de seguimiento se esta generando...</code></p>
+                {% endif %}
+            {% endif %}
+            <p>📨 En breve recibirás un correo con todos los detalles.</p>
+            <p>👉 Si tenés dudas, podés contactarnos a <span class="politicas-link">contacto@twinstore.com.ar</span>.</p>
+        </div>
+        <div class="flex justify-between">
+            <a href="{% url 'core:home' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:mispedidos' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Mis pedidos</a>
+            {% else %}
+                {% if historial %}
+                    <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Ver Pedido</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock contenidomain %}

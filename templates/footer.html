@@ -1,0 +1,70 @@
+{% load static %}
+<footer class="flex flex-column items-center justify-center">
+    <input type="checkbox" class="display-none" name="footer-contacto" id="footer-contacto">
+    <label for="footer-contacto" class="footer-contacto font-roboto font-bold flex gap-1rem padding1rem items-center justify-center">Contacto<i class="bi bi-chevron-down"></i></label>
+    <div class="flex contacto-footer gap-1rem items-center">
+        <div style="padding-right: 2rem;">
+            <img src="{% static 'img/footer-logo.webp' %}" alt="Logo Twinstore" height="80">
+        </div>
+        <div class="flex contacto-footer-info">
+            <div class="contacto-footer-item flex flex-column gap-05rem">
+                <h3 class="font-roboto">Atención online</h3>
+                <p>contacto@twinstore.com.ar</p>
+                <a href="https://wa.me/5493412765167" target="_blank" class="decoration-none" rel="noopener noreferrer"><i class="bi bi-whatsapp"></i> +54 9 3412765167</a>
+            </div>
+            <div class="contacto-footer-item flex flex-column gap-05rem">
+                <h3>Atención al cliente</h3>
+                <p>Lunes a viernes de 09:00 a 18:00 hs</p>
+                <p>Sábados de 09:00 a 13:00 hs</p>
+            </div>
+            <div class="contacto-footer-item flex flex-column gap-05rem">
+                <h3>Nuestras redes</h3>
+                <div class="flex width-100 justify-center gap-05rem">
+                    <i class="bi bi-instagram footer-icon"></i>
+                    <i class="bi bi-whatsapp footer-icon"></i>
+                    <i class="bi bi-linkedin footer-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="flex flex-column footer-info width-100 items-center">
+        <input type="checkbox" class="display-none" name="footer-info-box" id="footer-info-box">
+        <label for="footer-info-box" class="footer-info-label font-roboto font-bold flex gap-1rem padding1rem items-center justify-center">Información<i class="bi bi-chevron-down"></i></label>
+        <div class="flex gap-1rem footer-info-top width-100">
+            <div class="footer-info-top-item flex flex-column gap-05rem">
+                <h3>LINKS</h3>
+                <ul class="list-none">
+                    <li><a href="{% url 'core:home' %}" class="decoration-none">INICIO</a></li>
+                    <li><a href="{% url 'core:contacto' %}" class="decoration-none">CONTACTO</a></li>
+                    <li><a href="{% url 'core:faq' %}" class="decoration-none">PREGUNTAS FRECUENTES</a></li>
+                    <li><a href="{% url 'core:faq' %}#faq-pago" class="decoration-none">MEDIOS DE PAGO</a></li>
+                    <li><a href="{% url 'core:politicas-privacidad' %}" class="decoration-none">POLÍTICAS DE PRIVACIDAD</a></li>
+                    <li><a href="{% url 'core:politicas-devolucion' %}" class="decoration-none">POLÍTICAS DE DEVOLUCIÓN</a></li>
+                    <li><a href="{% url 'core:politicas-envios' %}" class="decoration-none">POLÍTICAS DE ENVÍOS</a></li>
+                    <li><a href="{% url 'core:politicas-tecnico' %}" class="decoration-none">POLÍTICAS DE SERVICIO TÉCNICO</a></li>
+                    <li><a href="{% url 'core:terminos-condiciones' %}" class="decoration-none">TÉRMINOS Y CONDICIONES</a></li>
+                    <li><a href="{% url 'core:arrepentimiento' %}" class="decoration-none">BOTÓN DE ARREPENTIMIENTO</a></li>
+                </ul>
+            </div>
+            <div class="footer-info-top-item flex flex-column gap-05rem">
+                <h3>NUESTRO PUNTO DE RETIRO</h3>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6697.595927486162!2d-60.820425444083476!3d-32.92993576950616!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95b64dc8dca9f287%3A0x4311ebbdc02a5ecc!2sTwinstore!5e0!3m2!1ses!2sar!4v1745181627389!5m2!1ses!2sar" width="340" height="150" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <p>Juan Elorza 2906, Funes.</p>
+            </div>
+            <div class="footer-info-top-item flex flex-column gap-05rem items-center">
+                <h3>FORMAS DE PAGO</h3>
+                <div>
+                    <p><img src="{% static 'img/mp-formadepago.webp' %}" alt="Mercado pago" height="13">MERCADO PAGO</p>
+                    <p><i class="bi bi-cash"></i> EFECTIVO</p>
+                    <p><i class="bi bi-bank"></i> TRANSFERENCIA</p>
+                </div>
+                <a href="http://qr.afip.gob.ar/?qr=AmcUsngjrmxLlw3awoFU2w,," target="_F960AFIPInfo"><img src="{% static 'img/DATAWEB.jpg' %}" border="0" height="80" width="50" alt="data fiscal"></a>
+            </div>
+        </div>
+        <div class="width-100 footer-info-bottom">
+            <p>© 2025 Twinstore - Todos los derechos reservados.</p>
+            <p>Powered by T#</p>
+        </div>
+    </div>
+</footer>

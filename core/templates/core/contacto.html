@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load compress %}
+
+{% block meta %}
+<meta name="description" content="Conocé todos los medios de contacto de Twinstore. Nosotros te asesoramos y solucionamos cualquier duda!">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Contacto - Twinstore</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/legales.css' %}">
+<link rel="stylesheet" href="{% static 'css/pedidos.css' %}">
+<link rel="stylesheet" href="{% static 'css/widgets.css' %}">
+{% endcompress %}
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="legales-box users-pedidos-box bg-white contact-box">
+    <h1>¿Necesitás ayuda?</h1>
+    <p>En Twinstore queremos que tu experiencia sea rápida, clara y cercana. Si necesitás ayuda o tenés alguna consulta, podés comunicarte directamente con nosotros:</p>
+    <ul class="contacto-links">
+        <li>
+            <i class="bi bi-envelope" style="color: rgb(0, 140, 255);font-size: 1.2rem;"></i> <span class="font-bold font-roboto">Correo: </span> <a href="mailto:contacto@twinstore.com.ar" class="politicas-link decoration-none">contacto@twinstore.com.ar</a>
+        </li>
+        <li>
+            <i class="bi bi-whatsapp" style="color: rgb(2, 160, 55);font-size: 1.2rem;"></i> <a href="https://wa.me/5493412765167" target="_blank" rel="noopener noreferrer" class="politicas-link decoration-none"> ¡Escribinos por WhatsApp!</a>
+        </li>
+        <li>
+            <i class="bi bi-clock" style="color: rgb(94, 94, 94);font-size: 1.2rem;"></i> <span class="font-bold">Horarios de atención:</span>
+            <p>Lunes a viernes de 09:00 a 18:00 hs. Sábados de 09:00 a 13:00 hs</p>
+        </li>
+    </ul>
+</section>
+{% include 'widgets/contacto.html' %}
+{% endblock contenidomain %}
+
+{% block myscripts %}
+{% include 'widgets/script.html' %}
+{% endblock myscripts %}

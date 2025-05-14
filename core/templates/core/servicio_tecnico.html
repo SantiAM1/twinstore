@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load compress %}
+
+{% block meta %}
+<meta name="description" content="Conocé nuestro servicio técnico, el corazon de nuestra historia. Nos distingimos por nuestra transparencia y honestidad.">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Servicio Técnico - Twinstore</title>
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endcompress %}
+{% endblock head %}
+
+{% block contenidomain %}
+<div class="legales-box">
+    <h1 class="font-roboto">Servicio Técnico</h1>
+    <p>Nuestro servicio técnico no es solo un área más: es el corazón de nuestra historia. Liderado por nuestro padre, quien desde hace décadas nos transmitió su pasión por la tecnología, nos enseñó el valor del trabajo bien hecho, el compromiso y el respeto incondicional por cada cliente.</p>
+    <br>
+    <p>En Twinstore contamos con nuestro propio laboratorio técnico, equipado para realizar desde diagnósticos preventivos hasta reparaciones complejas. Cada equipo que llega a nuestras manos es tratado con dedicación, cuidado y responsabilidad, como si fuera propio.</p>
+    <br>
+    <p style="font-style: italic; text-align: center;font-size: 1.2rem;">"La transparencia es un pilar fundamental para nosotros"</p>
+    <br>
+    <p>Desde el primer contacto te mantenemos informado: sabrás siempre qué falla encontramos, cuáles son las alternativas de reparación, los costos asociados y los tiempos estimados. No hacemos trabajos ocultos ni aplicamos costos innecesarios. Creemos en construir relaciones basadas en la confianza y la honestidad.</p>
+    <br>
+    <p>En Twinstore, tu equipo está en buenas manos: en las de una familia que ama la tecnología tanto como cuida a sus clientes.</p>
+    <div class="width-100 padding-10px border-1px"></div>
+    <div class="width-100 padding-10px"></div>
+    <p>¿Necesitás ayuda con tu equipo? 📲 <a href="#" class="politicas-link decoration-none">¡Escribinos por WhatsApp ahora mismo!</a></p>
+    <p>Estamos para escucharte, asesorarte y resolver cualquier duda que tengas.</p>
+    <div class="width-100 padding-10px border-1px"></div>
+    <div class="width-100 padding-10px"></div>
+    <p>No te olvides de verificar nuestras <a href="{% url 'core:politicas-tecnico' %}" class="politicas-link decoration-none">Políticas de Servicio Técnico</a>.</p>
+</div>
+{% endblock contenidomain %}
+

@@ -1,0 +1,199 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presupuesto</title>
+    <style>
+    @page {
+        size: A4;
+        margin: 0mm;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .hoja {
+        width: 210mm;
+        min-height: 297mm;
+        padding: 20mm;
+        margin: auto;
+        background: white;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    @media print {
+    body {
+        background: none;
+    }
+
+    .hoja {
+        box-shadow: none;
+        margin: 0;
+        page-break-after: always;
+        }
+    }
+    .bloque1 {
+        display: flex;
+        flex-direction: row;
+        align-items: start;
+        justify-content: space-between;
+        border: 1px solid rgb(87, 87, 87);
+    }
+    .bloque1 div {
+        padding: 1rem;
+        font-family: 'Roboto';
+        font-size: 0.8rem;
+    }
+    .logo-informacion img {
+        height: 6rem
+    }
+    .fecha-cuit {
+        font-size: 1rem !important; 
+    }
+    .bloque2 {
+        border: 1px solid rgb(87, 87, 87);
+        padding: 1rem;
+        font-family: 'Roboto';
+        font-size: 0.8rem;
+        color: #494949;
+    }
+    .divider {
+        height: 20px;
+    }
+    .bloque3 {
+        border: 1px solid rgb(87, 87, 87);
+    }
+    table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Roboto';
+    font-size: 0.85rem;
+    color: #494949;
+    }
+    tfoot {
+        background-color: rgb(240, 240, 240);
+    }
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f0f0f0;
+        text-align: center;
+    }
+    td {
+        text-align: end;
+    }
+    td:first-child {
+        text-align: start;
+    }
+
+    tfoot tr td{
+        text-align: end !important;
+    }
+    /* Distribución de columnas */
+    .col-producto {
+        width: 50%;
+    }
+
+    .col-precio {
+        width: 15%;
+    }
+
+    .col-cantidad {
+        width: 15%;
+    }
+
+    .col-total {
+        width: 20%;
+    }
+    .hoja > p {
+        color: red;
+        font-family: 'Roboto';
+        font-size: 0.8rem;
+    }
+    </style>
+</head>
+<body>
+    <div class="hoja">
+        <div class="bloque1">
+            <div class="logo-informacion">
+                <img src="data:image/png;base64,{{ logo_base64 }}" alt="Logo Twinstore">
+                <p>Razon social: Santiago Aguirre Moretto</p>
+                <p>Juan Elorza 2906 (2132) Funes</p>
+                <p>Monotributista</p>
+            </div>
+            <div class="fecha-cuit">
+                <strong>Presupuesto</strong>
+                <span>{{fecha}}</span>
+                <p>CUIT: 20-42926298-5</p>
+            </div>
+        </div>
+        <div class="divider"></div>
+        <div class="bloque2">
+            <p>Apellido y Nombre / Razon social:</p>
+            <p>Email:</p>
+            <p>Telefono</p>
+            <p>Direccion</p>
+            <p>ciudad</p>
+        </div>
+        <div class="divider"></div>
+        <div class="bloque3">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-producto">Producto</th>
+                        <th class="col-precio">Precio</th>
+                        <th class="col-cantidad">Cantidad</th>
+                        <th class="col-total">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if carrito.pedidos.all %}
+                        {% for pedido in carrito.pedidos.all %}
+                            <tr>
+                                <td>{{pedido.producto.nombre}}</td>
+                                <td>{{pedido.producto.precio|formato_pesos}}</td>
+                                <td>{{pedido.get_cantidad}}</td>
+                                <td>{{pedido.get_total_precio|formato_pesos}}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        {% for pedido in carrito %}
+                            <tr>
+                                <td>{{pedido.producto.nombre}}</td>
+                                <td>{{pedido.producto.precio|formato_pesos}}</td>
+                                <td>{{pedido.cantidad}}</td>
+                                <td>{{pedido.total_precio|formato_pesos}}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">Subtotal</td>
+                        <td>{{total_compra|formato_pesos}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Adicional</td>
+                        <td>{{adicional|formato_pesos}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Total</td>
+                        <td>{{total_compra|formato_pesos}}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <p>IMPORTANTE: Este presupuesto es sólo de carácter informativo, el mismo no reserva stock ni asegura el precio</p>
+    </div>
+</body>
+</html>

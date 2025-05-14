@@ -1,0 +1,15 @@
+{% if 'marca' not in request.GET %}
+<div>
+    <span class="filter-title-gaming display-block font-bold width-100">Marcas</span>
+    <ul class="list-none">
+        {% for marca in marcas %}
+            <li>
+                <a class="decoration-none filter-link bloqueable color-fff"
+                    href="?{% for key, val in request.GET.items %}{% if key != 'marca' %}{{ key }}={{ val|urlencode }}&{% endif %}{% endfor %}marca={{ marca.nombre|urlencode }}">
+                    {{ marca.nombre }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

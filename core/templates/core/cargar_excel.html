@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock meta %}
+
+{% block head %}
+    <style>
+        .cargar-excel-admin {
+            padding: 1rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+            max-width: 1024px;
+            margin: auto;
+        }
+    </style>
+    <title>Administracion</title>
+    <link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}">
+{% endblock head %}
+
+{% block contenidomain %}
+<div class="padding-1rem">
+<div class="cargar-excel-admin flex flex-column gap-1rem">
+<h2>Administrar productos</h2>
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="django-msg-{{message.tags}}">
+            {{ message|safe }}
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ excel.as_p }}
+    <button type="submit">Cargar archivo</button>
+</form>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ dolar.as_p }}
+    <button type="submit">Actualizar dolar</button>
+</form>
+</div>
+</div>
+{% endblock contenidomain %}

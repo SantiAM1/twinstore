@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load compress %}
+
+{% block meta %}
+<meta name="description" content="Conocé cómo Twinstore protege tus datos personales. Accedé a nuestra política de privacidad y descubrí cómo usamos y almacenamos tu información.">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Politicas de privacidad - Twinstore</title>
+{% compress css %}
+<link rel="stylesheet" href="{% static 'css/legales.css' %}">
+{% endcompress %}
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="legales-box">
+    <h1>Políticas de privacidad</h1>
+    <p>
+        En Twinstore nos comprometemos a proteger la privacidad de nuestros usuarios y clientes. La presente Política de Privacidad describe cómo recopilamos, utilizamos, almacenamos y protegemos los datos personales que nos proporcionás al utilizar nuestro sitio web y nuestros servicios. Cuando solicitamos información que permite identificarte (como nombre, email, dirección, DNI, entre otros), lo hacemos con el único objetivo de ofrecerte una experiencia de compra segura y personalizada, y siempre en conformidad con los términos de este documento. Esta política puede ser modificada o actualizada en cualquier momento, por lo que recomendamos revisarla periódicamente para asegurarte de estar conforme con cualquier cambio.
+    </p>
+    <h2>Información que recopilamos</h2>
+    <p>
+        En Twinstore recopilamos información personal únicamente cuando es necesaria para brindarte nuestros servicios. Esto puede incluir: nombre completo, dirección de correo electrónico, domicilio, número de documento, teléfono de contacto y datos de facturación. También almacenamos información relacionada a tus pedidos, medios de pago y datos necesarios para realizar envíos.
+    </p>
+    <h2>Finalidad del uso de la información</h2>
+    <p class="flex flex-column">Utilizamos tus datos personales exclusivamente para:
+        <i class="bi bi-dot">Procesar compras, pagos y envíos.</i>
+        <i class="bi bi-dot">Emitir comprobantes fiscales.</i>
+        <i class="bi bi-dot">Mantener registros de historial de pedidos.</i>
+        <i class="bi bi-dot">Mejorar la experiencia de navegación y atención.</i>
+        <i class="bi bi-dot">Enviar promociones u ofertas, únicamente si brindaste tu consentimiento.</i>
+        Podés cancelar en cualquier momento el envío de comunicaciones promocionales ingresando en tu Perfil.
+    </p>
+    <h2>Seguridad de la información</h2>
+    <p>
+        En Twinstore aplicamos medidas técnicas y organizativas adecuadas para proteger tus datos personales frente a accesos no autorizados, pérdida o alteración. Utilizamos conexiones seguras (HTTPS), cifrado de información crítica y actualizaciones constantes de nuestros sistemas para garantizar tu privacidad.
+    </p>
+    <h2>Uso de cookies</h2>
+    <p>
+        Twinstore utiliza cookies técnicas esenciales para el funcionamiento del sitio, como la gestión del carrito de compras a través de sesiones. Estas cookies no recopilan información personal identificable, ni se utilizan con fines publicitarios. Al navegar por nuestro sitio, aceptás el uso de estas cookies necesarias para que la experiencia de compra funcione correctamente. Podés configurar tu navegador para bloquear o eliminar cookies, pero esto podría afectar ciertas funcionalidades, como el guardado del carrito.
+    </p>
+    <h2>Enlaces a terceros</h2>
+    <p>
+        Nuestro sitio puede incluir enlaces a páginas externas, como redes sociales, pasarelas de pago (Mercado Pago) o servicios de envío. Una vez que accedés a estos sitios, ya no tenemos control sobre sus prácticas de privacidad. Te recomendamos revisar las políticas de dichos terceros antes de proporcionar cualquier información personal.
+    </p>
+    <h2>Control sobre tu información personal</h2>
+    <p class="flex flex-column">
+        Como usuario, tenés el derecho de:
+        <i class="bi bi-dot">Acceder a los datos personales que almacenamos sobre vos.</i>
+        <i class="bi bi-dot">Rectificar, actualizar o eliminar dicha información.</i>
+        <i class="bi bi-dot">Solicitar la baja de envíos promocionales en cualquier momento.</i>
+        <p>Podés ejercer estos derechos escribiendo a <span class="politicas-link" style="display: inline;">contacto@twinstore.com.ar</span> con tu solicitud. También podés administrar tu consentimiento desde los formularios del sitio, marcando o desmarcando la opción de recibir comunicaciones.
+            Twinstore no vende, cede ni distribuye los datos personales de sus usuarios sin su consentimiento, salvo obligación legal o requerimiento judicial formal. Nos reservamos el derecho de modificar esta Política de Privacidad en cualquier momento. Cualquier cambio será publicado en esta misma página, y se recomienda revisar periódicamente su contenido para mantenerse informado.</p>
+    </p>
+    <h2>Acceso, modificación y eliminación de datos</h2>
+    <p>
+        De acuerdo con los artículos 14 y 16 de la Ley N.º 25.326 de Protección de Datos Personales, el usuario tiene derecho a acceder a los datos personales que Twinstore posee sobre él y solicitar su actualización, corrección o eliminación. Para ejercer estos derechos, se deberá enviar un correo a <span class="politicas-link" style="display: inline;">contacto@twinstore.com.ar</span>, acreditando identidad de manera fehaciente. Es posible que cierta información residual deba conservarse por motivos legales o administrativos, o para garantizar el cumplimiento de servicios en curso (por ejemplo, pedidos en proceso o facturación ya emitida). En todo momento, el usuario podrá modificar o actualizar los datos proporcionados desde los canales habilitados en el sitio. Los cambios se reflejarán en el menor tiempo posible.
+    </p>
+</section>
+{% endblock contenidomain %}

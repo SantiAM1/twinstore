@@ -1,0 +1,11 @@
+<div class="swiper prodImgView">
+    <div class="swiper-wrapper bg-white">
+        {% for imagen in imagenes %}
+        <div class="swiper-slide">
+            <div class="swiper-zoom-container">
+                <img src="{{ imagen.imagen.url }}" class="swiper-slide-image" alt="Imagen principal de {{ producto.nombre }}"/>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
