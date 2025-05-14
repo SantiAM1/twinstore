@@ -102,7 +102,7 @@ cd twinstore
 ```
 
 - Configurá la base de datos
-*Opcion A - PostgreSLQ (Producción)*
+### Opcion A - `PostgreSLQ` (Producción)
 Configurá las siguientes variables en tu entorno (.env):
 ```bash
 DB_NAME=...
@@ -111,7 +111,8 @@ DB_PASSWORD=...
 ...
 ```
 
-*Opcion B - SQLite (Desarrollo)*
+### Opcion B - `SQLite` (Desarrollo)
+[Documentación oficial de Django](https://docs.djangoproject.com/en/5.2/ref/settings/#databases)
 ```bash
 DATABASES = {
     "default": {
@@ -120,7 +121,6 @@ DATABASES = {
     }
 }
 ```
-[Documentación](https://docs.djangoproject.com/en/5.2/ref/settings/#databases)
 
 - Levantá los contenedores con Docker:
 ```bash
