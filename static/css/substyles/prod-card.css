@@ -15,10 +15,14 @@
 
 .product-card .prod-precio {
     margin-top: 0.5rem;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #2652b3;
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
+    height: 39px;
+    margin-bottom: 0.3rem;
 }
 
 .product-card strong {
@@ -30,7 +34,7 @@
     color: #fff;
     display: block;
     padding: 0.7rem;
-    transform: translateY(50px);
+    transform: translateY(60px);
     transition: transform 0.3s ease ,border-radius 0.3s ease;
 }
 
@@ -79,6 +83,8 @@
     text-align: center;
     margin-top: 0.5rem;
     padding: 0 6px;
+    height: 39px;
+    margin-bottom: 0.3rem;
 }
 
 .precio-anterior.precio-anterior {
@@ -93,7 +99,7 @@
     display: inline-block;
     color: #005dc0;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
 }
 
 .product-card-img img {
