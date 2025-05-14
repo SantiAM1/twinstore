@@ -1,4 +1,5 @@
 # Twinstore
+Este proyecto fue reiniciado el 14/05/2025 para eliminar historial sensible. Desarrollado por Santiago Aguirre desde marzo de 2025.
 
 **E-commerce desarrollado con Django y Django REST Framework.**
 Plataforma para la venta de productos electrónicos con gestión completa de usuarios, pagos, administración y notificaciones.
@@ -94,10 +95,35 @@ App encargada de la gestión de usuarios y autenticación:
 
 ## Cómo desplegar el proyecto en local
 
-- Cloná el repositorio y levantá los contenedores:
+- Cloná el repositorio
 ```bash
 git clone https://github.com/SantiAM1/twinstore.git
 cd twinstore
+```
+
+- Configurá la base de datos
+*Opcion A - PostgreSLQ (Producción)*
+Configurá las siguientes variables en tu entorno (.env):
+```bash
+DB_NAME=...
+DB_USER=...
+DB_PASSWORD=...
+...
+```
+
+*Opcion B - SQLite (Desarrollo)*
+```bash
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "mydatabase",
+    }
+}
+```
+[Documentación](https://docs.djangoproject.com/en/5.2/ref/settings/#databases)
+
+- Levantá los contenedores con Docker:
+```bash
 docker-compose up -d
 ```
 
