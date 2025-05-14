@@ -229,21 +229,20 @@ def verificar_email(request, token):
         return render(request,'users/error_mail.html')
 
 def reenviar_verificacion(request, token):
-    token = token
     perfil = get_object_or_404(PerfilUsuario,token_verificacion=token)
 
-    ultimo_envio = request.session.get('ultimo_envio_verificacion')
-    ahora = timezone.now()
-    if ultimo_envio:
-        hace_cuanto = ahora - timezone.datetime.fromisoformat(ultimo_envio)
-        if hace_cuanto < timedelta(minutes=2):
-            messages.warning(request, "⏳ Por favor, esperá unos minutos antes de volver a reenviar el mail.")
+    tiene_token = TokenUsers.objects.filter(user=perfil.user,tipo="crear").first()
+    if tiene_token:
+        if tiene_token.expirado():
+            tiene_token.delete()
+        else:
+            messages.warning(request, "Por favor, esperá unos minutos antes de volver a reenviar el mail.")
             return redirect('users:email_enviado',token=token)
-
+        
     user = perfil.user
+    token_ticket = TokenUsers.objects.create(user=user,tipo="crear")
     mail_confirm_user_html(user)
-    request.session['ultimo_envio_verificacion'] = ahora.isoformat()
-    messages.success(request, "📧 Te reenviamos el correo de verificación.")
+    messages.success(request, "Te reenviamos el correo de verificación.")
     return redirect('users:email_enviado',token=token)
 
 def recuperar_contraseña(request):

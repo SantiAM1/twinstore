@@ -1,4 +1,5 @@
 [
+    "delete_pedido",
     "change_dolarconfiguracion",
     "view_dolarconfiguracion",
     "change_modomantenimiento",
