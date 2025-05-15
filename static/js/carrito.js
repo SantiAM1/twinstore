@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 actualizarCarrito(total_precio,total_productos)
-                console.log(total_precio)
                 if (parseInt(total_productos) === 0) {
                     mostrarCarritoVacio()
                 }
@@ -70,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 const response = await axios.post(window.api.eliminarPedido, {
-                    pedido_id: parseInt(pedidoId)
+                    pedido_id: pedidoId
                 });
 
                 const { total_productos, total_precio } = response.data;

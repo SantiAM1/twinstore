@@ -160,7 +160,7 @@
                     {% if carrito.pedidos.all %}
                         {% for pedido in carrito.pedidos.all %}
                             <tr>
-                                <td>{{pedido.producto.nombre}}</td>
+                                <td>{{pedido.get_nombre_producto}}</td>
                                 <td>{{pedido.producto.precio|formato_pesos}}</td>
                                 <td>{{pedido.get_cantidad}}</td>
                                 <td>{{pedido.get_total_precio|formato_pesos}}</td>
@@ -169,7 +169,7 @@
                     {% else %}
                         {% for pedido in carrito %}
                             <tr>
-                                <td>{{pedido.producto.nombre}}</td>
+                                <td>{{pedido.nombre_producto}}</td>
                                 <td>{{pedido.producto.precio|formato_pesos}}</td>
                                 <td>{{pedido.cantidad}}</td>
                                 <td>{{pedido.total_precio|formato_pesos}}</td>

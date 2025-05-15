@@ -16,7 +16,7 @@ from django.utils.timezone import now
 
 from .models import HistorialCompras, PagoRecibidoMP,EstadoPedido
 from cart.models import Carrito
-from products.models import Producto
+from products.models import Producto,ColorProducto
 from users.models import DatosFacturacion
 from payment.forms import ComprobanteForm
 from django.db import IntegrityError, transaction
@@ -91,7 +91,7 @@ def notification(request):
 
                     status = pago_info.get("status")
 
-                    logger.info(f"ℹ️ℹ️ Estado de mercado pago{status}!")
+                    logger.info(f"ℹ️ℹ️ Estado de mercado pago {status}!")
 
                     metadata = pago_info.get("metadata", {})
                     if not validar_metadata(metadata):
@@ -103,10 +103,20 @@ def notification(request):
                     productos_metadata = metadata.get('productos','')
                     productos = []
                     for producto_id,cantidad in productos_metadata.items():
-                        producto = get_object_or_404(Producto,id=int(producto_id))
+                        producto_id_str, color_str = producto_id.split('-') 
+                        if color_str != 'null':
+                            try:
+                                color = get_object_or_404(ColorProducto, id=int(color_str))
+                            except ColorProducto.DoesNotExist:
+                                logger.error(f"Color no encontrado: {color_str}")
+                                color = None
+                        else:
+                            color = None
+                        producto = get_object_or_404(Producto,id=int(producto_id_str))
+                        nombre_producto = f"({color.nombre}) {producto.nombre}" if color_str != 'null' else producto.nombre
                         productos.append({
                             'sku': producto.sku,
-                            'nombre':producto.nombre,
+                            'nombre':nombre_producto,
                             'precio_unitario':float(producto.precio),
                             'cantidad':cantidad,
                             'subtotal':float(producto.precio)*cantidad,

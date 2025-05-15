@@ -17,6 +17,8 @@ from payment.models import HistorialCompras
 from payment.templatetags.custom_filters import formato_pesos
 
 from .models import Producto, Carrito, Pedido
+from products.models import ColorProducto
+
 import mercadopago
 
 from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,EliminarPedidoSerializer,ActualizarPedidoSerializer
@@ -65,10 +67,11 @@ class EnviarWtapView(APIView):
             carrito_sesion = request.session.get('carrito', {})
             for pedido_id, cantidad in carrito_sesion.items():
                 try:
-                    producto = Producto.objects.get(id=pedido_id)
+                    producto_id, color_str = pedido_id.split('-') 
+                    producto = Producto.objects.get(id=int(producto_id))
                     productos.append({
                         "nombre": producto.nombre,
-                        "cantidad": cantidad
+                        "cantidad": cantidad,
                     })
                 except Producto.DoesNotExist:
                     continue
@@ -86,7 +89,7 @@ class ActualizarPedidoView(APIView):
 
             if request.user.is_authenticated:
                 carrito = get_object_or_404(Carrito, usuario=request.user)
-                pedido = get_object_or_404(Pedido, id=pedido_id, carrito=carrito)
+                pedido = get_object_or_404(Pedido, id=int(pedido_id), carrito=carrito)
                 #* Si se cambian las cantidad se actualiza
                 if action == "increment":
                     if pedido.cantidad < 5:
@@ -136,10 +139,9 @@ class EliminarPedidoView(APIView):
 
             data = serializer.validated_data
             pedido_id = data['pedido_id']
-
             if request.user.is_authenticated:
                 carrito = get_object_or_404(Carrito,usuario=request.user)
-                pedido = get_object_or_404(Pedido,id=pedido_id,carrito=carrito)
+                pedido = get_object_or_404(Pedido,id=int(pedido_id),carrito=carrito)
                 pedido.delete()
             else:
                 carrito = request.session.get('carrito',{})
@@ -149,7 +151,7 @@ class EliminarPedidoView(APIView):
 
             total_processor = carrito_total(request)
             return Response({
-                'total_precio':total_processor['total_precio'],
+                'total_precio':formato_pesos(total_processor['total_precio']),
                 'total_productos':total_processor['total_productos']
             })
         else:
@@ -163,23 +165,29 @@ class AgregarAlCarritoView(APIView):
         if serializer.is_valid():
 
             data = serializer.validated_data
-
             producto = get_object_or_404(Producto, id=data['producto_id'])
             cantidad = data['cantidad']
+            if data.get('color'):
+                color = get_object_or_404(ColorProducto,id=data['color'])
+            else:
+                color = None
 
             if request.user.is_authenticated:
                 carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
                 #* Creacion de 'Pedido'
-                pedido = carrito.agregar_producto(producto, cantidad)
+                pedido = carrito.agregar_producto(producto, cantidad,color)
                 cantidad = pedido.cantidad
                 subtotal = pedido.get_total_precio()
+                nombre_producto = pedido.get_nombre_producto()
             else:
-                carrito = request.session.get('carrito',{})
-                carrito[str(data['producto_id'])] = carrito.get(str(data['producto_id']),0) + cantidad
-                if carrito[str(data['producto_id'])] > 5:
-                    carrito[str(data['producto_id'])] = 5
-                cantidad = carrito[str(data['producto_id'])]
+                carrito = request.session.get('carrito', {})
+                key = f"{data['producto_id']}-{data.get('color') or 'null'}"
+                carrito[key] = carrito.get(key, 0) + cantidad
+                if carrito[key] > 5:
+                    carrito[key] = 5
+                cantidad = carrito[key]
                 request.session['carrito'] = carrito
+                nombre_producto = f"({color.nombre}) {producto.nombre}" if color else producto.nombre
 
             subtotal = producto.precio * cantidad
 
@@ -189,7 +197,7 @@ class AgregarAlCarritoView(APIView):
             return Response({
                 'total_precio':formato_pesos(total_processor['total_precio']),
                 'total_productos':total_processor['total_productos'],
-                'productoNombre':producto.nombre,
+                'productoNombre':nombre_producto,
                 'imagen_url':imagen_url,
                 'cantidad_pedido':cantidad,
                 'subtotal':formato_pesos(subtotal)
@@ -221,7 +229,7 @@ class CalcularPedidoView(APIView):
                     carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
                     carrito_id = carrito.id
                     for pedido in carrito.pedidos.all():
-                        productos[str(pedido.producto.id)] = pedido.get_cantidad()
+                        productos[str(pedido.dict_type())] = pedido.get_cantidad()
                     usuario = {'user':request.user.email}
                 else:
                     carrito = request.session['carrito']
@@ -245,6 +253,7 @@ class CalcularPedidoView(APIView):
                 tipo_factura = data.get('tipo_factura','')
                 telefono = data.get('telefono', '')
                 recibir_mail = data.get('recibir_mail')
+
                 try:
                     preference = preference_mp(total_compra,carrito_id,dni_cuit,ident_type,email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,recibir_mail,productos,usuario)
                     init_point = preference.get("init_point", "")
@@ -387,7 +396,7 @@ def realizar_pedido(request):
                 for pedido in carrito.pedidos.all():
                     productos.append({
                         'sku': pedido.producto.sku,
-                        'nombre': pedido.producto.nombre,
+                        'nombre': pedido.get_nombre_producto(),
                         'precio_unitario': float(pedido.producto.precio),
                         'cantidad': pedido.cantidad,
                         'subtotal': float(pedido.get_total_precio()),
@@ -405,10 +414,16 @@ def realizar_pedido(request):
                 
                 productos = []
                 for producto_id,cantidad in carrito.items():
-                    producto = get_object_or_404(Producto,id=int(producto_id))
+                    producto_id_str, color_str = producto_id.split('-') 
+                    if color_str != 'null':
+                        color = get_object_or_404(ColorProducto, id=int(color_str))
+                    else:
+                        color = None
+                    producto = get_object_or_404(Producto,id=int(producto_id_str))
+                    nombre_producto = f"({color.nombre}) {producto.nombre}" if color_str != 'null' else producto.nombre
                     productos.append({
                         'sku': producto.sku,
-                        'nombre':producto.nombre,
+                        'nombre':nombre_producto,
                         'precio_unitario':float(producto.precio),
                         'cantidad':cantidad,
                         'subtotal':float(producto.precio)*cantidad,
@@ -505,13 +520,19 @@ def _obtener_carrito(request):
         carrito_session = request.session.get('carrito', {})
         carrito = []
         for producto_id, cantidad in carrito_session.items():
-            producto = get_object_or_404(Producto, id=int(producto_id))
+            producto_id_str, color_id_str = producto_id.split('-')
+            producto_id = int(producto_id_str)
+            if color_id_str != 'null':
+                color = get_object_or_404(ColorProducto, id=int(color_id_str))
+            producto = get_object_or_404(Producto, id=producto_id)
+            nombre_producto = f"({color.nombre}) {producto.nombre}" if color_id_str != 'null' else producto.nombre
             if not producto.inhabilitar:
                 carrito.append({
-                    'id': producto.id,
+                    'id': f"{producto.id}-{color_id_str}",
                     'producto': producto,
                     'cantidad': cantidad,
                     'total_precio': producto.precio * cantidad,
+                    'nombre_producto':nombre_producto
                 })
         return carrito if carrito else None
 
@@ -530,19 +551,10 @@ def ver_carrito(request):
 
 @requiere_carrito
 def generar_presupuesto(request):
+    carrito = _obtener_carrito(request)
     if request.user.is_authenticated:
-        carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
         total_compra = float(carrito.get_total())
     else:
-        carrito_session = request.session.get('carrito',{})
-        carrito = []
-        for producto_id,cantidad in carrito_session.items():
-            producto = get_object_or_404(Producto,id=int(producto_id))
-            carrito.append({
-                'producto':producto,
-                'cantidad':cantidad,
-                'total_precio':producto.precio*cantidad,
-            })
         total_compra = float(sum(item['total_precio'] for item in carrito))
 
     adicional = "0,00"
