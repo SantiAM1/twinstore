@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .forms import EspecificacionTecnicaForm
+from .forms import EspecificacionTecnicaForm,ImagenProductoForm
 from .models import Marca, Categoria, SubCategoria, Producto, ImagenProducto, Atributo, EspecificacionTecnica, CategoriaEspecificacion,Etiquetas,ColorProducto
 from django.utils.html import format_html
 
@@ -11,6 +11,7 @@ class AtributoInline(admin.TabularInline):
 class ImagenProductoInline(admin.StackedInline):
     model = ImagenProducto
     extra = 0
+    form = ImagenProductoForm
     readonly_fields = ['miniatura']
     classes = ['collapse']
 
