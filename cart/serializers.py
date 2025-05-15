@@ -83,10 +83,11 @@ class CalcularPedidoSerializer(serializers.Serializer):
 class AgregarAlCarritoSerializer(serializers.Serializer):
     producto_id = serializers.IntegerField()
     cantidad = serializers.IntegerField()
+    color = serializers.IntegerField(required=False, allow_null=True)
 
 class EliminarPedidoSerializer(serializers.Serializer):
-    pedido_id = serializers.IntegerField()
+    pedido_id = serializers.CharField()
 
 class ActualizarPedidoSerializer(serializers.Serializer):
-    pedido_id = serializers.IntegerField()
+    pedido_id = serializers.CharField()
     action = serializers.ChoiceField(choices=["increment", "decrement"])

@@ -16,11 +16,18 @@ document.addEventListener("DOMContentLoaded", () => {
     
             const producto_id = document.getElementById('producto-id').value;
             const cantidad = document.getElementById('quantity').value;
+            const color = document.querySelector('.color-selector.color-activo');
+            if (color) {
+                color_seleccionado = color.dataset.colorId;
+            } else {
+                color_seleccionado = null;
+            }
     
             try {
                 const response = await axios.post(window.api.agregarAlCarrito, {
                     producto_id: parseInt(producto_id),
                     cantidad: parseInt(cantidad),
+                    color: parseInt(color_seleccionado)
                 });
     
                 const { total_productos, total_precio, productoNombre,imagen_url,cantidad_pedido,subtotal } = response.data;

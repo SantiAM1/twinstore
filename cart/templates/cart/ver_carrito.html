@@ -39,13 +39,13 @@
                                     <div class="cart-prod-responsive flex items-center position-relative gap-05rem">
                                         <a href="#" class="cart-prod-delete bloqueable" data-pedido-id="{{ pedido.id }}"><i class="bi bi-x-circle"></i></a>
                                         {% if pedido.producto.portada %}
-                                            <img src="{{ pedido.producto.portada.url }}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img" loading="lazy">
+                                            <img src="{{ pedido.producto.portada.url }}" alt="{{ pedido.get_nombre_producto }}" class="cart-prod-img" loading="lazy">
                                         {% else %}
                                             <img src="{% static 'img/prod_default.webp' %}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img" loading="lazy">
                                         {% endif %}
                                     </div>
                                     <div class="cart-prod-cantidad flex flex-column">
-                                        <span class="font-roboto">{{ pedido.producto.nombre }}</span>
+                                        <span class="font-roboto">{{ pedido.get_nombre_producto }}</span>
                                         <p class="display-none font-roboto font-bold"><span>{{pedido.get_cantidad}} x </span class="font-roboto">{{pedido.producto.precio|formato_pesos}}</p>
                                     </div>
                                 </td>
@@ -70,13 +70,13 @@
                                     <div class="cart-prod-responsive flex items-center position-relative gap-05rem">
                                         <a href="#" class="cart-prod-delete bloqueable" data-pedido-id="{{ pedido.id }}"><i class="bi bi-x-circle"></i></a>
                                         {% if pedido.producto.portada %}
-                                            <img src="{{ pedido.producto.portada.url }}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img" loading="lazy">
+                                            <img src="{{ pedido.producto.portada.url }}" alt="{{ pedido.nombre_producto }}" class="cart-prod-img" loading="lazy">
                                         {% else %}
-                                            <img src="{% static 'img/prod_default.webp' %}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img" loading="lazy">
+                                            <img src="{% static 'img/prod_default.webp' %}" alt="{{ pedido.nombre_producto }}" class="cart-prod-img" loading="lazy">
                                         {% endif %}
                                     </div>
                                     <div class="cart-prod-cantidad flex flex-column">
-                                        <span>{{ pedido.producto.nombre }}</span>
+                                        <span>{{ pedido.nombre_producto }}</span>
                                         <p class="display-none font-roboto"><span>{{pedido.cantidad}} x </span>{{pedido.producto.precio|formato_pesos}}</p>
                                     </div>
                                 </td>

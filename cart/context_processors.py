@@ -17,9 +17,11 @@ def carrito_total(request,type=None,pedido=None):
         carrito = request.session.get('carrito',{})
         pedidos = []
         for producto_id,cantidad in carrito.items():
-            producto = get_object_or_404(Producto,id=int(producto_id))
+            producto_id_str, color_id_str = producto_id.split('-')
+            producto_id = int(producto_id_str)
+            producto = get_object_or_404(Producto,id=producto_id)
             pedidos.append({
-                'producto_id':producto.id,
+                'producto_id':f"{producto_id}-{color_id_str}",
                 'cantidad' : cantidad,
                 'sub_total' : producto.precio * cantidad
             })
@@ -27,7 +29,7 @@ def carrito_total(request,type=None,pedido=None):
         total_productos = sum(pedido['cantidad'] for pedido in pedidos)
         if type == 'views' and pedido is not None:
             sub_total = next(
-                (item['sub_total'] for item in pedidos if item['producto_id'] == int(pedido)),
+                (item['sub_total'] for item in pedidos if item['producto_id'] == str(pedido)),
                 Decimal('0.00')
             )
         else:
