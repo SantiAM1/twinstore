@@ -1,5 +1,5 @@
 from django import forms
-from .models import EspecificacionTecnica,Producto,ImagenProducto
+from .models import EspecificacionTecnica,Producto,ImagenProducto,ColorProducto
 import json
 
 class EspecificacionTecnicaForm(forms.ModelForm):
@@ -33,3 +33,24 @@ class ImagenProductoForm(forms.ModelForm):
         widgets = {
             'imagen': forms.FileInput(attrs={'class': 'form-admin-control display-none'}),
         }
+
+class ImagenProductoForm(forms.ModelForm):
+    class Meta:
+        model = ImagenProducto
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        producto = None
+
+        if self.initial:
+            producto = self.initial.get('producto')
+
+        if not producto and getattr(self.instance, 'producto', None):
+            producto = self.instance.producto
+
+        if producto:
+            self.fields['color'].queryset = ColorProducto.objects.filter(producto=producto)
+        else:
+            self.fields['color'].queryset = ColorProducto.objects.none()
