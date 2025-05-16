@@ -8,7 +8,8 @@
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="{{producto.nombre}} - Twinstore">
 <meta property="og:description" content="{{producto.description_seo|default:"Los mejores productos al mejor precio en Twinstore. Envíos a todo el país."}}">
-<meta property="og:image" content="{{producto.portada.url}}">
+{% static 'img/mail.webp' as mail_url %}
+<meta property="og:image" content="{% if producto.portada %}{{ producto.portada.url|absolute_url:request }}{% else %}{{ mail_url|absolute_url:request }}{% endif %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 {% endblock meta %}
 

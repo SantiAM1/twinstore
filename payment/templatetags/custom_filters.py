@@ -19,3 +19,10 @@ def formato_pesos(value):
             return f"${valor:,.2f}".replace(",", "_").replace(".", ",").replace("_", ".")
     except (ValueError, TypeError):
         return value
+
+@register.filter
+def absolute_url(relative_url, request):
+    try:
+        return request.build_absolute_uri(relative_url)
+    except:
+        return relative_url  # fallback en caso de error
