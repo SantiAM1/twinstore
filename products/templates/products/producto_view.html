@@ -6,8 +6,8 @@
 {% block meta %}
 <meta name="description" content={{producto.description_seo|default:"Los mejores productos al mejor precio en Twinstore. Envíos a todo el país."}}>
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Twinstore">
-<meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
+<meta property="og:title" content="{{producto.nombre}} - Twinstore">
+<meta property="og:description" content={{producto.description_seo|default:"Los mejores productos al mejor precio en Twinstore. Envíos a todo el país."}}>
 <meta property="og:image" content="{% static 'img/mail.webp' %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 {% endblock meta %}

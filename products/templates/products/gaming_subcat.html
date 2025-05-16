@@ -5,7 +5,7 @@
 {% block meta %}
 <meta name="description" content="{{subcategoria.nombre}}; {{pagina.paginator.count}} resultados.{% if marcas %} Marcas: {{ marcas|join:", " }}.{% endif %}{% for producto in productos|slice:":3" %}{{ producto.nombre }}. {% endfor %}">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Twinstore">
+<meta property="og:title" content="{% if "Gaming" in subcategoria.nombre %}{{ subcategoria.nombre }}{% else %}{{ subcategoria.nombre }} Gaming{% endif %} - Twinstore">
 <meta property="og:description" content="Lo mejor del Gaming en un solo lugar, Twinstore Gaming_.">
 <meta property="og:image" content="{% static 'img/mail.webp' %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
@@ -14,7 +14,7 @@
 {% block theme %}gaming{% endblock theme %}
 
 {% block head %}
-<title>Gaming - Twistore</title>
+<title>{% if "Gaming" in subcategoria.nombre %}{{ subcategoria.nombre }}{% else %}{{ subcategoria.nombre }} Gaming{% endif %} - Twinstore</title>
 {% compress css %}
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
 <link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
