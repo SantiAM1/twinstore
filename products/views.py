@@ -16,6 +16,14 @@ from core.throttling import FiltrosDinamicosThrottle
 
 import json
 
+SECCIONES_LABEL = {
+    'componentes': 'Componentes',
+    'computos': 'PC y Notebooks',
+    'accesorios': 'Accesorios',
+    'moviles': 'Móviles',
+    'impresion': 'Impresión',
+}
+
 # Create your views here.
 # ----- Manejo de filtros ----- #
 def esencials_ajax(request,productos,pagina,filtro,color=None,strong=None):
@@ -94,7 +102,8 @@ def return_supercategoria(request,seccion_id,type='default'):
             'filtro': filtro,
             'pagina':pagina,
             'categorias':categorias,
-            'seccion_id':seccion_id
+            'seccion_id':seccion_id,
+            'seccion_label':SECCIONES_LABEL.get(seccion_id, seccion_id)
         })
     elif type == 'ajax':
         html_productos,html_pagina,html_orden,html_count = esencials_ajax(request,productos,pagina,filtro)

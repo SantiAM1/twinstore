@@ -17,7 +17,7 @@ class Categoria(models.Model):
     ('componentes', 'Componentes'),
     ('computos', 'PC y Notebooks'),
     ('accesorios', 'Accesorios'),
-    ('dispositivos', 'Dispositivos'),
+    ('moviles', 'Móviles'),
     ('impresion', 'Impresión'),
     ]
 

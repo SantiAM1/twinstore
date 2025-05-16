@@ -22,9 +22,9 @@
                 "slug": "toners"
             },
             {
-                "nombre": "Resma",
+                "nombre": "Resmas",
                 "descripcion_seo": "",
-                "slug": "resma"
+                "slug": "resmas"
             }
         ]
     },
@@ -63,161 +63,26 @@
         ]
     },
     {
-        "nombre": "Notebooks",
+        "nombre": "Gaming",
         "descripcion_seo": "",
-        "slug": "notebooks",
-        "seccion_id": "computos",
-        "orden": 2,
+        "slug": "gaming",
+        "seccion_id": null,
+        "orden": 0,
         "subcategorias": [
             {
-                "nombre": "Notebooks Hogar / Oficina",
+                "nombre": "Volantes",
                 "descripcion_seo": "",
-                "slug": "notebooks-hogar-oficina"
+                "slug": "volantes"
             },
             {
-                "nombre": "Notebooks Corporativo",
+                "nombre": "Joysticks",
                 "descripcion_seo": "",
-                "slug": "notebooks-corporativo"
+                "slug": "joysticks"
             },
             {
-                "nombre": "Notebooks Gaming",
+                "nombre": "Sillas",
                 "descripcion_seo": "",
-                "slug": "notebooks-gaming"
-            }
-        ]
-    },
-    {
-        "nombre": "Computadoras",
-        "descripcion_seo": "",
-        "slug": "computadoras",
-        "seccion_id": "computos",
-        "orden": 1,
-        "subcategorias": [
-            {
-                "nombre": "PCs Oficina / Hogar",
-                "descripcion_seo": "",
-                "slug": "pcs-oficina-hogar"
-            },
-            {
-                "nombre": "PCs Estandar",
-                "descripcion_seo": "",
-                "slug": "pcs-estandar"
-            },
-            {
-                "nombre": "PCs Gaming",
-                "descripcion_seo": "",
-                "slug": "pcs-gaming"
-            },
-            {
-                "nombre": "Mini PCs",
-                "descripcion_seo": "",
-                "slug": "mini-pcs"
-            }
-        ]
-    },
-    {
-        "nombre": "Expansiones",
-        "descripcion_seo": "",
-        "slug": "expansiones",
-        "seccion_id": "componentes",
-        "orden": 3,
-        "subcategorias": [
-            {
-                "nombre": "Placas Wi-Fi / Bluetooth",
-                "descripcion_seo": "",
-                "slug": "placas-wi-fi-bluetooth"
-            },
-            {
-                "nombre": "Placas controladoras",
-                "descripcion_seo": "",
-                "slug": "placas-controladoras"
-            },
-            {
-                "nombre": "Adaptadores y cables",
-                "descripcion_seo": "",
-                "slug": "adaptadores-y-cables"
-            }
-        ]
-    },
-    {
-        "nombre": "Hardware",
-        "descripcion_seo": "",
-        "slug": "hardware",
-        "seccion_id": "componentes",
-        "orden": 1,
-        "subcategorias": [
-            {
-                "nombre": "Procesadores",
-                "descripcion_seo": "",
-                "slug": "procesadores"
-            },
-            {
-                "nombre": "Motherboards",
-                "descripcion_seo": "",
-                "slug": "motherboards"
-            },
-            {
-                "nombre": "Memoria RAM",
-                "descripcion_seo": "",
-                "slug": "memoria-ram"
-            },
-            {
-                "nombre": "Placas de video",
-                "descripcion_seo": "",
-                "slug": "placas-de-video"
-            },
-            {
-                "nombre": "Gabinetes",
-                "descripcion_seo": "",
-                "slug": "gabinetes"
-            },
-            {
-                "nombre": "Fuentes",
-                "descripcion_seo": "",
-                "slug": "fuentes"
-            },
-            {
-                "nombre": "Coolers",
-                "descripcion_seo": "",
-                "slug": "coolers"
-            }
-        ]
-    },
-    {
-        "nombre": "Almacenamiento",
-        "descripcion_seo": "",
-        "slug": "almacenamiento",
-        "seccion_id": "componentes",
-        "orden": 2,
-        "subcategorias": [
-            {
-                "nombre": "Discos SSD",
-                "descripcion_seo": "",
-                "slug": "discos-ssd"
-            },
-            {
-                "nombre": "Discos Externos",
-                "descripcion_seo": "",
-                "slug": "discos-externos"
-            },
-            {
-                "nombre": "Discos Rigidos",
-                "descripcion_seo": "",
-                "slug": "discos-rigidos"
-            }
-        ]
-    },
-    {
-        "nombre": "Complementos",
-        "descripcion_seo": "",
-        "slug": "complementos",
-        "seccion_id": "accesorios",
-        "orden": 2,
-        "subcategorias": [
-            {
-                "nombre": "Mouse pad",
-                "descripcion_seo": "",
-                "slug": "mouse-pad"
+                "slug": "sillas"
             }
         ]
     },
@@ -266,10 +131,154 @@
         ]
     },
     {
+        "nombre": "Complementos",
+        "descripcion_seo": "",
+        "slug": "complementos",
+        "seccion_id": "accesorios",
+        "orden": 2,
+        "subcategorias": [
+            {
+                "nombre": "Mouse PAD",
+                "descripcion_seo": "",
+                "slug": "mouse-pad"
+            }
+        ]
+    },
+    {
+        "nombre": "Almacenamiento",
+        "descripcion_seo": "",
+        "slug": "almacenamiento",
+        "seccion_id": "componentes",
+        "orden": 2,
+        "subcategorias": [
+            {
+                "nombre": "Discos Rigidos",
+                "descripcion_seo": "",
+                "slug": "discos-rigidos"
+            },
+            {
+                "nombre": "Discos SSD",
+                "descripcion_seo": "",
+                "slug": "discos-ssd"
+            }
+        ]
+    },
+    {
+        "nombre": "Hardware",
+        "descripcion_seo": "",
+        "slug": "hardware",
+        "seccion_id": "componentes",
+        "orden": 1,
+        "subcategorias": [
+            {
+                "nombre": "Procesadores",
+                "descripcion_seo": "",
+                "slug": "procesadores"
+            },
+            {
+                "nombre": "Motherboards",
+                "descripcion_seo": "",
+                "slug": "motherboards"
+            },
+            {
+                "nombre": "Memoria RAM",
+                "descripcion_seo": "",
+                "slug": "memoria-ram"
+            },
+            {
+                "nombre": "Placas de video",
+                "descripcion_seo": "",
+                "slug": "placas-de-video"
+            },
+            {
+                "nombre": "Gabinetes",
+                "descripcion_seo": "",
+                "slug": "gabinetes"
+            },
+            {
+                "nombre": "Fuentes",
+                "descripcion_seo": "",
+                "slug": "fuentes"
+            },
+            {
+                "nombre": "Coolers",
+                "descripcion_seo": "",
+                "slug": "coolers"
+            }
+        ]
+    },
+    {
+        "nombre": "Expansiones",
+        "descripcion_seo": "",
+        "slug": "expansiones",
+        "seccion_id": "componentes",
+        "orden": 3,
+        "subcategorias": [
+            {
+                "nombre": "Placas Wi-Fi / Bluetooth",
+                "descripcion_seo": "",
+                "slug": "placas-wi-fi-bluetooth"
+            },
+            {
+                "nombre": "Placas controladoras",
+                "descripcion_seo": "",
+                "slug": "placas-controladoras"
+            },
+            {
+                "nombre": "Adaptadores y cables",
+                "descripcion_seo": "",
+                "slug": "adaptadores-y-cables"
+            }
+        ]
+    },
+    {
+        "nombre": "Computadoras",
+        "descripcion_seo": "",
+        "slug": "computadoras",
+        "seccion_id": "computos",
+        "orden": 1,
+        "subcategorias": [
+            {
+                "nombre": "PCs Estandar",
+                "descripcion_seo": "",
+                "slug": "pcs-estandar"
+            },
+            {
+                "nombre": "PCs Gaming",
+                "descripcion_seo": "",
+                "slug": "pcs-gaming"
+            },
+            {
+                "nombre": "Mini PCs",
+                "descripcion_seo": "",
+                "slug": "mini-pcs"
+            }
+        ]
+    },
+    {
+        "nombre": "Notebooks",
+        "descripcion_seo": "",
+        "slug": "notebooks",
+        "seccion_id": "computos",
+        "orden": 2,
+        "subcategorias": [
+            {
+                "nombre": "Notebooks Office",
+                "descripcion_seo": "",
+                "slug": "notebooks-office"
+            },
+            {
+                "nombre": "Notebooks Gaming",
+                "descripcion_seo": "",
+                "slug": "notebooks-gaming"
+            }
+        ]
+    },
+    {
         "nombre": "iOS",
         "descripcion_seo": "",
         "slug": "ios",
-        "seccion_id": "dispositivos",
+        "seccion_id": "moviles",
         "orden": 1,
         "subcategorias": [
             {
@@ -288,7 +297,7 @@
         "nombre": "Android",
         "descripcion_seo": "",
         "slug": "android",
-        "seccion_id": "dispositivos",
+        "seccion_id": "moviles",
         "orden": 2,
         "subcategorias": [
             {
@@ -310,30 +319,6 @@
                 "nombre": "Tablets",
                 "descripcion_seo": "",
                 "slug": "tablets"
-            }
-        ]
-    },
-    {
-        "nombre": "Gaming",
-        "descripcion_seo": "",
-        "slug": "gaming",
-        "seccion_id": null,
-        "orden": 0,
-        "subcategorias": [
-            {
-                "nombre": "Volantes",
-                "descripcion_seo": "",
-                "slug": "volantes"
-            },
-            {
-                "nombre": "Joysticks",
-                "descripcion_seo": "",
-                "slug": "joysticks"
-            },
-            {
-                "nombre": "Sillas",
-                "descripcion_seo": "",
-                "slug": "sillas"
             }
         ]
     }
