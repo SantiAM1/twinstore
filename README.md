@@ -1,5 +1,5 @@
 # Twinstore
-Este proyecto fue reiniciado el 14/05/2025 para eliminar historial sensible. Desarrollado por Santiago Aguirre desde marzo de 2025.
+Este proyecto fue reiniciado el 14/05/2025 para eliminar historial sensible. Desarrollado por Santiago Aguirre desde enero de 2025.
 
 **E-commerce desarrollado con Django y Django REST Framework.**
 Plataforma para la venta de productos electrónicos con gestión completa de usuarios, pagos, administración y notificaciones.
