@@ -1,7 +1,7 @@
 <div class="product-links-box">
     <a href="{% url 'core:home' %}" class="decoration-none product-outside-link bloqueable font-roboto">Inicio</a>
     <i class="bi bi-chevron-right product-outside-link"></i>
-    <a href="{% url 'products:slug_dispatcher' categoria.seccion_id %}" class="decoration-none product-outside-link bloqueable font-roboto">{{categoria.seccion_id|capfirst}}</a>
+    <a href="{% url 'products:slug_dispatcher' categoria.seccion_id %}" class="decoration-none product-outside-link bloqueable font-roboto">{{categoria.get_seccion_id_display|capfirst}}</a>
     <i class="bi bi-chevron-right product-outside-link"></i>
     {% if subcategoria_obj %}
         <a href="{% url 'products:categoria' categoria.seccion_id categoria.slug %}" class="decoration-none product-outside-link bloqueable font-roboto">{{categoria.nombre}}</a>

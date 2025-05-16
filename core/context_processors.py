@@ -16,7 +16,7 @@ def canonical_url(request):
     }
 
 def render_menu(request):
-    ORDEN_SECCIONES = ["componentes", "computos", "accesorios", "dispositivos", "impresion"]
+    ORDEN_SECCIONES = ["componentes", "computos", "accesorios", "moviles", "impresion"]
     data_desk = cache.get('menu_desktop')
     data_mob = cache.get('menu_mobile')
     data_desk = {}

@@ -13,7 +13,7 @@
 {% if subcategoria_obj and not tag == 'gaming' %}{% include 'components/atribute.html' %}{% endif %}
 {% if tag == 'gaming' %}{% include 'components/atribute_gaming.html' %}{% endif %}
 {% if not tag == 'gaming' %}
-    {% if not categoria.seccion_id == 'dispositivos' %} 
+    {% if not categoria.seccion_id == 'moviles' %} 
         {% include 'components/marcas.html' %}
     {% endif %}
 {% else %}
