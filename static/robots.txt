@@ -7,7 +7,6 @@ Disallow: /mantenimiento/
 Disallow: /media/
 Disallow: /static/
 Disallow: /*.json$
-Disallow: /*.xml$
 Disallow: /productos/api
 Disallow: /productos/api/
 Disallow: /api/
