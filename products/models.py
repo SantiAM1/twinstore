@@ -19,6 +19,7 @@ class Categoria(models.Model):
     ('accesorios', 'Accesorios'),
     ('moviles', 'Móviles'),
     ('impresion', 'Impresión'),
+    ('conectividad', 'Conectividad'),
     ]
 
     nombre = models.CharField(max_length=30)

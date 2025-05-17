@@ -16,13 +16,14 @@ def canonical_url(request):
     }
 
 def render_menu(request):
-    ORDEN_SECCIONES = ["Componentes", "PC y Notebooks", "Accesorios", "Móviles", "Impresión"]
+    ORDEN_SECCIONES = ["Componentes", "PC y Notebooks", "Accesorios", "Móviles", "Conectividad","Impresión"]
     SECCIONES_LABEL = {
         'componentes': 'Componentes',
         'computos': 'PC y Notebooks',
         'accesorios': 'Accesorios',
         'moviles': 'Móviles',
         'impresion': 'Impresión',
+        'conectividad': 'Conectividad',
     }
     data_desk = cache.get('menu_desktop')
     data_mob = cache.get('menu_mobile')

@@ -12,10 +12,8 @@
 {% if not tag == 'gaming' %}{% include 'components/sub_categoria.html' %}{% endif %}
 {% if subcategoria_obj and not tag == 'gaming' %}{% include 'components/atribute.html' %}{% endif %}
 {% if tag == 'gaming' %}{% include 'components/atribute_gaming.html' %}{% endif %}
-{% if not tag == 'gaming' %}
-    {% if categoria.seccion_id != 'moviles' and subcategoria_obj.nombre != 'PCs' %}
-        {% include 'components/marcas.html' %}
-    {% endif %}
-{% else %}
-{% include 'components/marcas_gaming.html' %}
+{% if not tag == 'gaming' and categoria.seccion_id != 'moviles' and categoria.nombre != 'Computadoras' %}
+    {% include 'components/marcas.html' %}
+{% elif categoria.nombre != 'Computadoras' %}
+    {% include 'components/marcas_gaming.html' %}
 {% endif %}
