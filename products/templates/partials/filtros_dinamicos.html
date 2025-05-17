@@ -14,6 +14,6 @@
 {% if tag == 'gaming' %}{% include 'components/atribute_gaming.html' %}{% endif %}
 {% if not tag == 'gaming' and categoria.seccion_id != 'moviles' and categoria.nombre != 'Computadoras' %}
     {% include 'components/marcas.html' %}
-{% elif categoria.nombre != 'Computadoras' %}
+{% elif subcategoria_obj.slug != 'pcs' %}
     {% include 'components/marcas_gaming.html' %}
 {% endif %}
