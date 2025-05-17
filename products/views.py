@@ -22,6 +22,7 @@ SECCIONES_LABEL = {
     'accesorios': 'Accesorios',
     'moviles': 'Móviles',
     'impresion': 'Impresión',
+    'conectividad':'Conectividad'
 }
 
 # Create your views here.
