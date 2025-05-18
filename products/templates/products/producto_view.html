@@ -67,10 +67,13 @@
                             <button type="button" class="color-selector cursor-pointer {% if forloop.first %}color-activo{% endif %}" data-color-id="{{ color.id }}"style="background-color: {{ color.hex }};"></button>
                         {% endfor %}
                     </div>
+                    {% if not producto.inhabilitar %}
+                    <p class="font-bold font-roboto colors-msg">Colores sujetos a stock. Algunos pueden no estar disponibles al momento de tu compra.</p>
+                    {% endif %}
                 </div>
                 {% endif %}
                 {% if producto.inhabilitar %}
-                    <p class="font-bold font-roboto" style="font-style: italic;color: rgb(99, 35, 160);">Producto con alta rotacion de stock. Consultar disponibilidad</p>
+                    <p class="font-bold font-roboto" style="font-style: italic;color: rgb(99, 35, 160);">Producto con alta rotacion de stock. Consultar disponibilidad.</p>
                     <a href="#" id="consultar-disponibilidad" data-name="{{producto.nombre}}" class="decoration-none flex items-center text-center cursor-pointer product-cart display-block justify-center" rel="noopener noreferrer">
                         <i class="bi bi-whatsapp"></i> Consultar disponiblidad
                     </a>
