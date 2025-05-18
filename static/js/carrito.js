@@ -18,6 +18,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 container.querySelector('.input-value-cart').value = cantidad
                 const fila = container.closest('tr');
+                const mobileCantidad = fila.querySelector('.prod-mobile-count');
+                if (mobileCantidad) {
+                    mobileCantidad.textContent = `${cantidad} x `;
+                }
                 const precioSubtotal = fila?.querySelector('.cart-total-precio');
                 // const precio = parseFloat(container.dataset.precio);
 
