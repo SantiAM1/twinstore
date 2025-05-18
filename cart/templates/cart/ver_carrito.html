@@ -46,7 +46,7 @@
                                     </div>
                                     <div class="cart-prod-cantidad flex flex-column">
                                         <span class="font-roboto">{{ pedido.get_nombre_producto }}</span>
-                                        <p class="display-none font-roboto font-bold"><span>{{pedido.get_cantidad}} x </span class="font-roboto">{{pedido.producto.precio|formato_pesos}}</p>
+                                        <p class="display-none font-roboto font-bold"><span class="font-roboto prod-mobile-count">{{pedido.get_cantidad}} x </span>{{pedido.producto.precio|formato_pesos}}</p>
                                     </div>
                                 </td>
                                 <td class="cart-price-sub">{{ pedido.producto.precio|formato_pesos }}</td>
@@ -77,7 +77,7 @@
                                     </div>
                                     <div class="cart-prod-cantidad flex flex-column">
                                         <span>{{ pedido.nombre_producto }}</span>
-                                        <p class="display-none font-roboto"><span>{{pedido.cantidad}} x </span>{{pedido.producto.precio|formato_pesos}}</p>
+                                        <p class="display-none font-roboto"><span class="font-roboto prod-mobile-count">{{pedido.cantidad}} x </span>{{pedido.producto.precio|formato_pesos}}</p>
                                     </div>
                                 </td>
                                 <td class="cart-price-sub">{{ pedido.producto.precio|formato_pesos }}</td>
