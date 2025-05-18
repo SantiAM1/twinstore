@@ -281,3 +281,10 @@ input[name="expandir-specs"]:checked ~ .contenedor-tabla {
 .color-selector.color-activo {
     outline: 2px solid #808080;
 }
+
+.colors-msg {
+    margin-top: 0.2rem;
+    font-style: italic;
+    color: rgb(73 73 73);
+    font-size: 0.8rem;
+}
