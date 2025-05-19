@@ -95,15 +95,15 @@ App encargada de la gestión de usuarios y autenticación:
 
 ## Cómo desplegar el proyecto en local
 
-- Cloná el repositorio
+Cloná el repositorio
 ```bash
 git clone https://github.com/SantiAM1/twinstore.git
 cd twinstore
 ```
 
-- Configurá la base de datos
-### Opcion A - `PostgreSLQ` (Producción)
-Configurá las siguientes variables en tu entorno (.env):
+Configurá la base de datos
+- Opcion A - `PostgreSLQ` (Producción)
+*Configurá las siguientes variables en tu entorno (.env):*
 ```bash
 DB_NAME=...
 DB_USER=...
@@ -111,7 +111,7 @@ DB_PASSWORD=...
 ...
 ```
 
-### Opcion B - `SQLite` (Desarrollo)
+- Opcion B - `SQLite` (Desarrollo)
 [Documentación oficial de Django](https://docs.djangoproject.com/en/5.2/ref/settings/#databases)
 ```bash
 DATABASES = {
