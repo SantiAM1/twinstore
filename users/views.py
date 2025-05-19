@@ -156,7 +156,7 @@ def ver_pedido(request,token):
 @login_required
 def cerrar_sesion(request):
     logout(request)
-    messages.info(request,'Sesién cerrada con éxito!')
+    messages.info(request,'Sesión cerrada con éxito!')
     return redirect('core:home')
 
 def iniciar_sesion(request):
