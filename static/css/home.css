@@ -7,6 +7,7 @@
     width: 100vw;
     background-color: transparent;
     z-index: 700;
+    top: 0;
 }
 
 .notification-item {
