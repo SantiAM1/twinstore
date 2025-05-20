@@ -6,7 +6,7 @@
 <meta name="description" content="{{seccion_label}}; {{pagina.paginator.count}} resultados. {% for producto in productos|slice:":5" %}{{ producto.nombre }}. {% endfor %}">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="{{seccion_label}} - Twinstore">
-<meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
+<meta property="og:description" content="{{seccion_label}}; {{pagina.paginator.count}} resultados. {% for producto in productos|slice:":5" %}{{ producto.nombre }}. {% endfor %}">
 <meta property="og:image" content="{% static 'img/mail.webp' %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 {% endblock meta %}
