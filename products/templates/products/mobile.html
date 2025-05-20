@@ -6,7 +6,7 @@
 <meta name="description" content="{% if subcategoria_obj %}{{subcategoria_obj.nombre}}{% else %}{{categoria.nombre}}{% endif %}; {{prod_totales}} resultados.{% if marcas %} Marcas: {{ marcas|join:", " }}.{% endif %}{% for producto in productos|slice:":3" %}{{ producto.nombre }}. {% endfor %}">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="{% if subcategoria_obj %}{{ subcategoria_obj.nombre }} | {{ categoria.nombre }}{% else %}{{ categoria.nombre }}{% endif %} - Twinstore">
-<meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
+<meta property="og:description" content="{% if subcategoria_obj %}{{subcategoria_obj.nombre}}{% else %}{{categoria.nombre}}{% endif %}; {{pagina.paginator.count}} resultados.{% if marcas %} Marcas: {{ marcas|join:", " }}.{% endif %}{% for producto in productos|slice:":3" %}{{ producto.nombre }}. {% endfor %}">
 <meta property="og:image" content="{% static 'img/mail.webp' %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 {% endblock meta %}
