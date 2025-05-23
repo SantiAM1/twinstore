@@ -57,7 +57,7 @@
         <div class="flex flex-column product-info">
             <div>
                 <p class="product-title-marca">{{producto.marca}}</p>
-                <p class="product-title-nombre font-roboto font-bold">{{producto.nombre}}</p>
+                <p class="product-title-nombre font-roboto font-bold wrap-text">{{producto.nombre}}</p>
                 {% if user.is_staff %}
                     <a href="{% url 'products:editar_producto' producto.id %}" class="decoration-none"><i class="bi bi-pencil prod-editar-btn border_none cursor-pointer display-block text-center font-roboto"> Editar el producto</i></a>
                 {% endif %}
