@@ -134,3 +134,10 @@
     border-color: #4a90e2;
     box-shadow: 0 0 0 3px rgb(74 144 226 / 25%);
 }
+
+.wrap-text {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    white-space: normal; 
+}
