@@ -1,6 +1,6 @@
 set -e
 set -o allexport
-source ./env
+source .env
 set +o allexport
 
 DATE=$(date +%F)
@@ -9,7 +9,7 @@ mkdir -p "$BACKUP_DIR"
 
 echo "[$(date +'%Y-%m-%d %H:%M:%S')] Iniciando backup para $DATE..."
 
-docker exec -t "$CONTAINER_NAME" pg_dump -U "$DB_USER" "$DB_NAME" | gzip | openssl enc -aes-256-cbc -e -pass pass:$PASS_PHRASE -out "$BACKUP_DIR/db_$DATE.sql.gz.enc"
+docker exec -t "$CONTAINER_NAME" pg_dump -U "$DB_USER" "$DB_NAME" | gzip | openssl enc -aes-256-cbc -pbkdf2 -e -pass pass:$PASS_PHRASE -out "$BACKUP_DIR/db_$DATE.sql.gz.enc"
 
 if [ $? -eq 0 ]; then
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] Backup de base de datos exitoso: db_$DATE.sql.gz.enc"
@@ -18,7 +18,7 @@ else
     exit 1
 fi
 
-tar -czf - "$MEDIA_PATH" | openssl enc -aes-256-cbc -e -pass pass:$PASS_PHRASE -out "$BACKUP_DIR/media_$DATE.tar.gz.enc"
+tar -czf - "$MEDIA_PATH" | openssl enc -aes-256-cbc -pbkdf2 -e -pass pass:$PASS_PHRASE -out "$BACKUP_DIR/media_$DATE.tar.gz.enc"
 
 if [ $? -eq 0 ]; then
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] Backup de media exitoso: media_$DATE.tar.gz.enc"
