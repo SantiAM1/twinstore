@@ -33,7 +33,7 @@
         <a href="{% url 'core:home' %}" class="decoration-none product-outside-link">Inicio</a>
         <i class="bi bi-chevron-right product-outside-link"></i>
         {% if producto.sub_categoria.categoria.seccion_id %}
-        <a href="{% url 'products:slug_dispatcher' producto.sub_categoria.categoria.seccion_id %}" class="decoration-none product-outside-link">{{producto.sub_categoria.categoria.seccion_id|capfirst}}</a>
+        <a href="{% url 'products:slug_dispatcher' producto.sub_categoria.categoria.seccion_id %}" class="decoration-none product-outside-link">{{producto.sub_categoria.categoria.get_seccion_id_display}}</a>
         <i class="bi bi-chevron-right product-outside-link"></i>
         <a href="{% url 'products:categoria' producto.sub_categoria.categoria.seccion_id producto.sub_categoria.categoria.slug %}" class="decoration-none product-outside-link">{{producto.sub_categoria.categoria}}</a>
         <i class="bi bi-chevron-right product-outside-link"></i>
@@ -57,7 +57,7 @@
         <div class="flex flex-column product-info">
             <div>
                 <p class="product-title-marca">{{producto.marca}}</p>
-                <p class="product-title-nombre font-roboto font-bold wrap-text">{{producto.nombre}}</p>
+                <p class="product-title-nombre font-roboto font-bold">{{producto.nombre}}</p>
                 {% if user.is_staff %}
                     <a href="{% url 'products:editar_producto' producto.id %}" class="decoration-none"><i class="bi bi-pencil prod-editar-btn border_none cursor-pointer display-block text-center font-roboto"> Editar el producto</i></a>
                 {% endif %}
@@ -98,8 +98,9 @@
                 </form>
                 {% endif %}
                 <div>
+                    <p class="politicas-link font-roboto cursor-pointer" id="open-modal"><img src="{% static 'img/mercado_pago.webp' %}" alt="logo mercado pago" width="21"> Conocé nuestras cuotas!</p>
                     <p class="product-title-info font-roboto font-bold"><i class="bi bi-truck product-title-icons"></i> Envíos a todo el país</p>
-                    <p class="product-title-info font-roboto font-bold"><i class="bi bi-geo-alt-fill product-title-icons"></i> Retira en nuestro local</p>
+                    <p class="product-title-info font-roboto font-bold"><i class="bi bi-geo-alt-fill product-title-icons"></i> Retirá en nuestro local</p>
                 </div>
                 <p class="product-title-data">Código SKU:{{producto.sku}}</p>
                 <p class="product-title-data">
@@ -110,7 +111,7 @@
     </div>
     <section class="product-specs">
         {% if producto.especificaciones.all %}
-        <h2 class="font-roboto">Caracteristicas del producto</h2>
+        <h2 class="font-roboto">Características del producto</h2>
         <div class="product-specs-divider"></div>
         <input type="checkbox" class="display-none" name="expandir-specs" id="expandir-specs">
         <label for="expandir-specs" class="flex justify-between bg-white padding1rem font-bold font-roboto label-prod-specs">Descripción<i class="bi bi-arrow-down"></i></label>
@@ -119,7 +120,7 @@
                 {% for especificacion in producto.especificaciones.all %}
                 <thead>
                     <tr>
-                        <th colspan="2" class="font-roboto font-bold">{{ especificacion.categoria.nombre }}</th>
+                        <th colspan="2" class="font-roboto font-bold">{{ especificacion.categoria.nombre|default:"Especificaciones" }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -139,6 +140,30 @@
         </div>
         {% endif %}
     </section>
+</div>
+<div class="prod-modal display-none position-fixed width-100 height-100" id="prod-modal">
+    <div class="prod-modal-content flex flex-column position-relative bg-white">
+        <div class="flex justify-between items-center">
+            <div class="font-bold font-roboto flex items-center gap-05rem">
+                <img src="{% static 'img/mercado_pago.webp' %}" alt="logo mercado pago" height="30px">
+                Nuestras cuotas
+            </div>
+            <span id="close-modal" class="close-modal display-block">
+                <i class="bi bi-x-lg"></i>
+            </span>
+        </div>
+        {% for cuota,info in coutas_resultado.items %}
+            {{item}}
+        <div class="flex justify-between modal-item">
+            <p class="font-roboto flex gap-05rem">
+                <span class="font-roboto">{{cuota}}x</span>{{info.valor_cuota}}
+            </p>
+            <p class="font-roboto">
+                {{info.total}}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock contenidomain %}
 {% block myscripts %}

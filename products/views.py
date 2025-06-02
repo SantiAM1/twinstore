@@ -13,6 +13,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from rest_framework.decorators import throttle_classes
 from core.throttling import FiltrosDinamicosThrottle
+from payment.templatetags.custom_filters import formato_pesos
 
 import json
 
@@ -413,6 +414,8 @@ def producto_view(request,product_slug):
         # imagenes = producto.imagenes.filter(color__isnull=True)
         imagenes = producto.imagenes.all()
     
+    coutas_resultado = cuotas_mp(float(producto.precio))
+
     thumbnails = [img.imagen_100.url for img in imagenes]
     thumbnails_json = json.dumps(thumbnails)
     return render(request,'products/producto_view.html',{
@@ -420,7 +423,30 @@ def producto_view(request,product_slug):
         'imagenes':imagenes,
         'thumbnails':thumbnails_json,
         'colores':colores,
+        'coutas_resultado':coutas_resultado 
         })
+
+def cuotas_mp(precio):
+    coeficientes = {
+        1 : 1.0,
+        2 : 1.18339,
+        3 : 1.2129,
+        6 : 1.34239,
+        9 : 1.4985,
+        12 : 1.64499,
+        18 : 2.05,
+        24 : 2.46494
+    }
+    resultados = {}
+    total_mp = round(precio/0.923891,2)
+    for cuota, coeficiente in coeficientes.items():
+        total = round(total_mp*coeficiente,2)
+        valor_couta = round(total/cuota,2)
+        resultados[cuota] = {
+            "valor_cuota":formato_pesos(valor_couta),
+            "total":formato_pesos(total)
+        }
+    return resultados
 
 def producto_imagenes(request,producto_id,color_id):
     try:
