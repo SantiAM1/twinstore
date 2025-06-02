@@ -6,7 +6,7 @@
     <div class="flex items-center justify-center product-card-img">
         <img src="{{producto.portada.url}}" alt="{{ producto.nombre }}" loading="lazy">
     </div>
-    <span class="display-block width-100 text-center font-bold font-roboto prod-name wrap-text">{{ producto.nombre }}</span>
+    <span class="display-block width-100 text-center font-bold font-roboto prod-name">{{ producto.nombre }}</span>
     {% if producto.descuento > 0 %}
         <div class="product-descount-box">
             <p class="precio-anterior">{{ producto.precio_anterior|formato_pesos }}</p>

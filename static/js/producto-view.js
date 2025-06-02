@@ -1,4 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const openModal = document.getElementById("open-modal");
+    const modalBox = document.getElementById("prod-modal");
+    const modalContent = document.querySelector(".prod-modal-content");
+    const modalClose = document.getElementById("close-modal")
+
+    openModal.addEventListener("click", () => {
+        modalBox.classList.remove("display-none")
+        modalContent.classList.add("fadeinup")
+    })
+
+    modalClose.addEventListener("click", () => {
+        modalContent.classList.remove("fadeinup");
+        modalContent.classList.add("fadeoutdown");
+        modalContent.addEventListener("animationend", function handleAnimEnd() {
+            modalBox.classList.add("display-none");
+            modalContent.classList.remove("fadeoutdown");
+            modalContent.removeEventListener("animationend", handleAnimEnd);
+        })
+    })
+
     const consultarDisponibilidad = document.getElementById('consultar-disponibilidad');
     if (consultarDisponibilidad) {
         consultarDisponibilidad.addEventListener('click', function() {
