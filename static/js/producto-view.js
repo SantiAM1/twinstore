@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const nombre = consultarDisponibilidad.dataset.name
             let mensaje = `Hola Twistore! Me gustaría conocer si cuentan con la disponibilidad de ${nombre}`
         
-            const url = `https://wa.me/5493412765167?text=${encodeURIComponent(mensaje)}`;
+            const url = `https://wa.me/5493413491911?text=${encodeURIComponent(mensaje)}`;
             window.open(url, '_blank');
         });
     }
