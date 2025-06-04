@@ -160,6 +160,8 @@ def cerrar_sesion(request):
     return redirect('core:home')
 
 def iniciar_sesion(request):
+    if request.user.is_authenticated:
+        return redirect('core:home')
     form = LoginForm()
     if request.method == "POST":
         form = LoginForm(request.POST)
@@ -188,6 +190,8 @@ def iniciar_sesion(request):
     return render(request,'users/login.html',{'form':form})
 
 def registarse(request):
+    if request.user.is_authenticated:
+        return redirect('core:home')
     form = RegistrarForm()
     if request.method == "POST":
         form = RegistrarForm(request.POST)
