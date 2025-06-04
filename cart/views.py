@@ -304,6 +304,8 @@ class CalcularPedidoView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ValidarCuponView(APIView):
+    permission_classes = [TieneCarrito,BloquearSiMantenimiento]
+    throttle_classes = [CalcularPedidoThrottle]
     def post(self,request):
         serializer = CuponSerializer(data=request.data)
         if not serializer.is_valid():
