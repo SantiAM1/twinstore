@@ -14,7 +14,7 @@
 {% block theme %}gaming{% endblock theme %}
 
 {% block head %}
-<title>{% if "Gaming" in subcategoria.nombre %}{{ subcategoria.nombre }}{% else %}{{ subcategoria.nombre }} Gaming{% endif %} - Twinstore</title>
+<title>{% if "Gaming" in subcategoria.nombre or subcategoria.slug == "consolas" %}{{ subcategoria.nombre }}{% else %}{{ subcategoria.nombre }} Gaming{% endif %} - Twinstore</title>
 {% compress css %}
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}" />
 <link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
@@ -33,7 +33,7 @@
                 <i class="bi bi-chevron-right product-outside-link"></i>
                 <span class="font-roboto font-bold color-fff">{{subcategoria.nombre}}</span>
             </div>
-            <h1 class="prods-dinamic-title gaming font-roboto font-bold">{{ subcategoria.nombre|cut:"Gaming" }} Gaming</h1>
+            <h1 class="prods-dinamic-title gaming font-roboto font-bold">{% if "Gaming" in subcategoria.nombre or subcategoria.slug == "consolas" %}{{ subcategoria.nombre }}{% else %}{{ subcategoria.nombre }} Gaming{% endif %}</h1>
             <div id="productos-count">
                 {% include 'partials/productos_count.html' with color='color-fff' %}
             </div>
