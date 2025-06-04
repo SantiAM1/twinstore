@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.templatetags.static import static
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.core import signing
 
 from users.forms import UsuarioForm,TerminosYCondiciones
 from users.models import PerfilUsuario,DatosFacturacion
@@ -13,7 +14,7 @@ from core.permissions import BloquearSiMantenimiento
 from core.decorators import bloquear_si_mantenimiento
 from core.throttling import EnviarWtapThrottle,CarritoThrottle,CalcularPedidoThrottle
 
-from payment.models import HistorialCompras
+from payment.models import HistorialCompras,Cupon,EstadoPedido
 from payment.templatetags.custom_filters import formato_pesos
 
 from .models import Producto, Carrito, Pedido
@@ -21,7 +22,7 @@ from products.models import ColorProducto
 
 import mercadopago
 
-from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,EliminarPedidoSerializer,ActualizarPedidoSerializer
+from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,EliminarPedidoSerializer,ActualizarPedidoSerializer,CuponSerializer
 from .context_processors import carrito_total
 from .permissions import TieneCarrito
 from .decorators import requiere_carrito
@@ -42,7 +43,6 @@ import random
 import string
 from datetime import datetime
 from datetime import date
-
 
 # ----- APIS ----- #
 class EnviarWtapView(APIView):
@@ -213,8 +213,10 @@ class CalcularPedidoView(APIView):
         serializer = CalcularPedidoSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
-            total_processor = float(carrito_total(request).get('total_precio'))
 
+            processor = carrito_total(request,type="api")
+            total_processor = float(processor['total_precio'])
+            
             if data['metodo_pago'] == 'mercado_pago':
 
                 total_compra = round(total_processor/0.923891,2)
@@ -230,12 +232,12 @@ class CalcularPedidoView(APIView):
                     carrito_id = carrito.id
                     for pedido in carrito.pedidos.all():
                         productos[str(pedido.dict_type())] = pedido.get_cantidad()
-                    usuario = {'user':request.user.email}
+                    usuario = {'id':request.user.id}
                 else:
                     carrito = request.session['carrito']
                     productos = carrito
                     carrito_id = request.session['anon_cart_id']
-                    usuario = {'session':request.session.session_key}
+                    usuario = {'key':request.session.session_key}
 
                 direccion = data['calle']
                 match = re.match(r'^(.*?)(?:\s+(\d+))?$', direccion.strip())
@@ -254,8 +256,29 @@ class CalcularPedidoView(APIView):
                 telefono = data.get('telefono', '')
                 recibir_mail = data.get('recibir_mail')
 
+                metadata = {
+                    "dni_cuit": dni_cuit,
+                    "email": email,
+                    "nombre": nombre,
+                    "apellido": apellido,
+                    "codigo_postal": codigo_postal,
+                    "calle": f"{calle_nombre} {calle_altura}",
+                    "razon_social":razon_social,
+                    "tipo_factura":tipo_factura,
+                    "telefono":telefono,
+                    "recibir_mail":recibir_mail,
+                    "productos":productos,
+                    'usuario':usuario,
+                }
+
+                if request.session.get('cupon',''):
+                    cupon = request.session.get('cupon').get('id')
+                    metadata['cupon'] = cupon
+
+                firma = {"firma":signing.dumps(metadata)}
+
                 try:
-                    preference = preference_mp(total_compra,carrito_id,dni_cuit,ident_type,email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,recibir_mail,productos,usuario)
+                    preference = preference_mp(total_compra,carrito_id,dni_cuit,ident_type,email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,firma)
                     init_point = preference.get("init_point", "")
                 except ValueError as e:
                     return Response({'error': str(e)}, status=500)
@@ -280,10 +303,36 @@ class CalcularPedidoView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class ValidarCuponView(APIView):
+    def post(self,request):
+        serializer = CuponSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors,status=400)
+        
+        codigo = serializer.validated_data.get("codigo").upper()
+
+        try:
+            cupon = Cupon.objects.get(codigo=codigo, activo=True)
+            request.session['cupon'] = {"descuento":float(cupon.descuento),"id":int(cupon.id)}
+            processor = carrito_total(request,type="api")
+
+            return Response({
+                "porcentaje": float(cupon.descuento),
+                "descuento":formato_pesos(processor['descuento']),
+                "nuevo_total":formato_pesos(processor['total_precio'])
+            })
+        
+        except Cupon.DoesNotExist:
+            if request.session.get('cupon',''):
+                del request.session['cupon']
+                request.session.modified = True
+
+            return Response({"error": "Cupón inválido o inactivo."}, status=404)
+
 # Create your views here.
 # ----- Preferencias de MP ----- #
 
-def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,razon_social,tipo_factura,telefono,recibir_mail,productos,usuario):
+def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,firma):
     site_url = f'{settings.SITE_URL}'
 
     argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
@@ -329,22 +378,10 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
         "expires": True,
         "expiration_date_from": expiration_from,
         "expiration_date_to": expiration_to,
-        "metadata": {
-            "dni_cuit": dni_cuit,
-            "email": email,
-            "nombre": nombre,
-            "apellido": apellido,
-            "codigo_postal": codigo_postal,
-            "calle": f"{calle_nombre} {calle_altura}",
-            "razon_social":razon_social,
-            "tipo_factura":tipo_factura,
-            "telefono":telefono,
-            "recibir_mail":recibir_mail,
-            "productos":productos,
-            "usuario":usuario,
-            "carrito_id":carrito_id
-        },
+        "metadata": firma,
     }
+
+    print(preference_data)
 
     sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
@@ -387,9 +424,10 @@ def realizar_pedido(request):
                 merchant_order_id = _generar_identificador_unico('E')
                 status = 'confirmado'
 
+            total_carrito = carrito_total(request,type="api").get('total_precio')
+
             if request.user.is_authenticated:
                 carrito = get_object_or_404(Carrito, usuario=request.user)
-                total_carrito = carrito.get_total()
 
                 # * Armamos el detalle de productos
                 productos = []
@@ -429,13 +467,11 @@ def realizar_pedido(request):
                         'subtotal':float(producto.precio)*cantidad,
                         'proveedor':producto.proveedor
                     })
-                
-                total_carrito = sum(producto['subtotal'] for producto in productos)
 
                 # * Borrar el carrito
                 del request.session['carrito']
                 request.session.modified = True
-                
+
             historial = HistorialCompras.objects.create(
             usuario=carrito.usuario if request.user.is_authenticated else None,
             productos=productos,
@@ -445,6 +481,23 @@ def realizar_pedido(request):
             merchant_order_id=merchant_order_id,
             recibir_mail=data['recibir_estado_pedido']
             )
+
+            if request.session.get('cupon',''):
+                cupon_id = request.session['cupon'].get('id')
+                try:
+                    cupon = Cupon.objects.get(id=int(cupon_id))
+                    EstadoPedido.objects.create(
+                        historial=historial,
+                        estado="Cupón Aplicado (Servidor)",
+                        comentario=f"Cupón CÓDIGO #{cupon.codigo} del %{cupon.descuento} Aplicado en la compra"
+                    )
+                    cupon.delete()
+                except Cupon.DoesNotExist:
+                    EstadoPedido.objects.create(
+                        historial=historial,
+                        estado="Cupón Duplicado! (Servidor)",
+                        comentario=f"El cupón ingresado no fue encontrado. \nAccion requerida: RECHAZAR el historial y contactar con el cliente."
+                    )
 
             DatosFacturacion.objects.create(
                 historial=historial,

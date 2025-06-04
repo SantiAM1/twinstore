@@ -91,3 +91,6 @@ class EliminarPedidoSerializer(serializers.Serializer):
 class ActualizarPedidoSerializer(serializers.Serializer):
     pedido_id = serializers.CharField()
     action = serializers.ChoiceField(choices=["increment", "decrement"])
+
+class CuponSerializer(serializers.Serializer):
+    codigo = serializers.CharField(max_length=10)

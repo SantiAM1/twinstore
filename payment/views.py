@@ -8,13 +8,14 @@ import hmac
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.core import signing
 
 import requests
 
 from decimal import Decimal
 from django.utils.timezone import now
 
-from .models import HistorialCompras, PagoRecibidoMP,EstadoPedido
+from .models import HistorialCompras, PagoRecibidoMP,EstadoPedido,Cupon
 from cart.models import Carrito
 from products.models import Producto,ColorProducto
 from users.models import DatosFacturacion
@@ -70,7 +71,7 @@ def notification(request):
 
         if sha == hash_value:
 
-            logger.info("✅ HMAC validado correctamente")
+            logger.info("HMAC validado correctamente")
 
             payment_id = request.GET.get("data.id") or request.GET.get("id")
             topic = request.GET.get("topic") or request.GET.get("type")
@@ -83,57 +84,42 @@ def notification(request):
                 response = requests.get(url, headers=headers)
                 pago_info = response.json()
 
-                logger.info(f"📦 Procesando pago ID: {payment_id}, estado: {response.status_code}")
+                logger.info(f"Procesando pago ID: {payment_id}, estado: {response.status_code}")
 
                 if response.status_code == 200:
 
-                    logger.info("✅✅ Respuesta exitosa!")
+                    logger.info("Respuesta exitosa!")
 
                     status = pago_info.get("status")
 
-                    logger.info(f"ℹ️ℹ️ Estado de mercado pago {status}!")
+                    logger.info(f"Estado de mercado pago {status}!")
 
-                    metadata = pago_info.get("metadata", {})
-                    if not validar_metadata(metadata):
-                        logger.warning("❌ Metadata inválida")
+                    _firma = pago_info.get("metadata", {})
+
+                    if not _firma:
+                        logger.warning("Metadata vacia")
                         return HttpResponse(status=400)
-                    logger.info("✅✅ Metadata correcta!")
+                    
+                    firmado = _firma.get("firma")
+                    try:
+                        metadata = signing.loads(firmado)
+                    except signing.BadSignature:
+                        logger.warning("Firma inválida o manipulada")
+                        return HttpResponseBadRequest("Firma inválida")
 
                     # * Lista de productos!
-                    productos_metadata = metadata.get('productos','')
-                    productos = []
-                    for producto_id,cantidad in productos_metadata.items():
-                        producto_id_str, color_str = producto_id.split('-') 
-                        if color_str != 'null':
-                            try:
-                                color = get_object_or_404(ColorProducto, id=int(color_str))
-                            except ColorProducto.DoesNotExist:
-                                logger.error(f"Color no encontrado: {color_str}")
-                                color = None
-                        else:
-                            color = None
-                        producto = get_object_or_404(Producto,id=int(producto_id_str))
-                        nombre_producto = f"({color.nombre}) {producto.nombre}" if color_str != 'null' else producto.nombre
-                        productos.append({
-                            'sku': producto.sku,
-                            'nombre':nombre_producto,
-                            'precio_unitario':float(producto.precio),
-                            'cantidad':cantidad,
-                            'subtotal':float(producto.precio)*cantidad,
-                            'proveedor':producto.proveedor
-                        })
+                    productos = generar_productos(metadata.get('productos'))
 
                     # * Obtener el usuario
-                    if metadata['usuario'].get('user'):
+                    user_data = metadata['usuario']
+                    if user_data.get('id',''):
                         User = get_user_model()
-                        email = metadata['usuario'].get('user')
-                        usuario = User.objects.get(email=email)
-                        flag = True
-                        key = metadata['carrito_id']
+                        id =  user_data.get('id')
+                        usuario = User.objects.get(id=int(id))
+                        key = None
                     else:
                         usuario = None
-                        flag = False
-                        key = metadata['usuario'].get('session')
+                        key = user_data.get('key')
 
                     # * Obtenemos el total de la compra
                     merchant_order_id = pago_info.get("order", {}).get("id")
@@ -155,7 +141,7 @@ def notification(request):
                                 'total_compra': total_real,
                                 'estado': 'pendiente',
                                 'forma_de_pago': 'mercado pago',
-                                'recibir_mail': metadata.get('recibir_mail', False),
+                                'recibir_mail': metadata.get('recibir_mail',False),
                             }
                         )
                     except IntegrityError:
@@ -194,12 +180,13 @@ def notification(request):
                             'external_reference': pago_info.get("external_reference"),
                         }
                     )
-                    procesar_pago_y_estado(pago,key,flag)
+                    cupon = metadata.get('cupon',None)
+                    procesar_pago_y_estado(pago,usuario,cupon,key)
                 else:
-                    logger.error("❌ Error al obtener datos de Mercado Pago")
+                    logger.error("Error al obtener datos de Mercado Pago")
         return HttpResponse(status=200)
 
-def procesar_pago_y_estado(pago: PagoRecibidoMP,key,flag):
+def procesar_pago_y_estado(pago: PagoRecibidoMP,usuario,cupon=None,key=None):
     if not pago.merchant_order_id:
         return
     try:
@@ -235,61 +222,63 @@ def procesar_pago_y_estado(pago: PagoRecibidoMP,key,flag):
         logger.info(f"Estado final del historial: {historial.estado}")
 
         if (pago.payment_type == 'ticket' and historial.estado == 'pendiente') or historial.estado == 'confirmado':
-            if vaciar_carrito(flag,key):
-                logger.info(f"🧹 Carrito vaciado ({'usuario' if flag else 'sesión'}) → {key}")
+            if vaciar_carrito(usuario,key):
+                logger.info(f"Carrito vaciado ({'usuario' if usuario else 'sesión'})")
+            if cupon:
+                try:
+                    cupon = Cupon.objects.get(id=int(cupon))
+                    EstadoPedido.objects.create(
+                        historial=historial,
+                        estado="Cupón Aplicado (Servidor)",
+                        comentario=f"Cupón CÓDIGO #{cupon.codigo} del %{cupon.descuento} Aplicado en la compra"
+                    )
+                    cupon.delete()
+                    logger.info(f"Cupon eliminado")
+                except Cupon.DoesNotExist:
+                    logger.error(f"El cupon enviado no existe")
 
     except HistorialCompras.DoesNotExist:
         return None
 
-def vaciar_carrito(flag,key):
-    if flag:
-        carrito = Carrito.objects.filter(id=key).first()
-        if carrito:
-            carrito.pedidos.all().delete()
-            carrito.delete()
-            return True
-    else:
+def vaciar_carrito(usuario,key=None):
+    if key:
         store = SessionStore(session_key=key)
         if 'carrito' in store:
             del store['carrito']
             store.save()
             return True
+    else:
+        carrito = Carrito.objects.filter(usuario=usuario).first()
+        if carrito:
+            carrito.pedidos.all().delete()
+            carrito.delete()
+            return True
     return False
 
-def validar_metadata(metadata: dict) -> bool:
-    if not isinstance(metadata, dict):
-        return False
-
-    campos_requeridos = [
-        'dni_cuit',
-        'email',
-        'nombre',
-        'apellido',
-        'codigo_postal',
-        'calle',
-        'razon_social',
-        'tipo_factura',
-        'telefono',
-        'recibir_mail',
-        'productos',
-        'usuario',
-        'carrito_id'
-    ]
-
-    for campo in campos_requeridos:
-        if campo not in metadata:
-            return False
-        if metadata[campo] in [None, '', []] and campo not in ['razon_social', 'telefono']:
-            return False
-
-    if not isinstance(metadata['productos'], dict):
-        return False
-    if not isinstance(metadata['usuario'], dict):
-        return False
-    if not isinstance(metadata['recibir_mail'], bool):
-        return False
-
-    return True
+def generar_productos(data:dict) -> list:
+    productos = []
+    for producto_id,cantidad in data.items():
+        producto_id_str, color_str = producto_id.split('-') 
+        if color_str != 'null':
+            try:
+                color = get_object_or_404(ColorProducto, id=int(color_str))
+            except ColorProducto.DoesNotExist:
+                logger.error(f"Color no encontrado: {color_str}")
+                color_str = 'null'
+                color = None
+        else:
+            color = None
+        producto = get_object_or_404(Producto,id=int(producto_id_str))
+        nombre_producto = f"({color.nombre}) {producto.nombre}" if color_str != 'null' else producto.nombre
+        productos.append({
+            'sku': producto.sku,
+            'nombre':nombre_producto,
+            'precio_unitario':float(producto.precio),
+            'cantidad':cantidad,
+            'subtotal':float(producto.precio)*cantidad,
+            'proveedor':producto.proveedor
+        })
+    return productos
 
 def payment_success(request):
     merchant_order_id = request.GET.get('merchant_order_id','')

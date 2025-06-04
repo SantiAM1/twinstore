@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 import uuid
 from django.utils import timezone
 from datetime import timedelta
+import string
+import secrets
 
 class HistorialCompras(models.Model):
     ESTADOS = [
@@ -107,3 +109,26 @@ class ComprobanteTransferencia(models.Model):
 
     def __str__(self):
         return f"Comprobante de {self.historial.merchant_order_id}"
+
+class Cupon(models.Model):
+    codigo = models.CharField(unique=True,max_length=6,blank=True)
+    descuento = models.DecimalField(max_digits=5,decimal_places=2)
+    activo = models.BooleanField(default=True)
+    creado = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            self.codigo = self.generar_codigo()
+        else:
+            self.codigo = self.codigo.upper()
+        super().save(*args, **kwargs)
+
+    def generar_codigo(self,longitud=6):
+        letras = string.ascii_uppercase
+        while True:
+            nuevo_codigo = ''.join(secrets.choice(letras) for _ in range(longitud))
+            if not Cupon.objects.filter(codigo=nuevo_codigo).exists():
+                return nuevo_codigo
+
+    def __str__(self):
+        return f"{self.codigo} - %{self.descuento}"
