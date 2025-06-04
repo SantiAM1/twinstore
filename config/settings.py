@@ -186,7 +186,13 @@ REST_FRAMEWORK = {
     'enviar_wtap': '10/day',
     'filtros_dinamicos': '30/minute',
     'prediccion_busqueda': '60/minute',
-    }
+    },
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ] if not DEBUG else [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ]
 }
 
 # Database
