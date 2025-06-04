@@ -381,8 +381,6 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
         "metadata": firma,
     }
 
-    print(preference_data)
-
     sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
     try:

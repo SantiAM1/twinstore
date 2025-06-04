@@ -10,7 +10,6 @@ def canonical_url(request):
     scheme = "https" if request.is_secure() else "http"
     domain = request.get_host()
     path = request.path
-    print(f"{scheme}://{domain}{path}")
     return {
         "canonical_url": f"{scheme}://{domain}{path}"
     }
