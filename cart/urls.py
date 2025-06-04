@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ver_carrito,realizar_pedido,CalcularPedidoView,AgregarAlCarritoView,EliminarPedidoView,ActualizarPedidoView,generar_presupuesto,EnviarWtapView
+from .views import ver_carrito,realizar_pedido,CalcularPedidoView,AgregarAlCarritoView,EliminarPedidoView,ActualizarPedidoView,generar_presupuesto,EnviarWtapView,ValidarCuponView
 
 app_name = 'cart'
 
@@ -12,4 +12,5 @@ urlpatterns = [
     path('api/actualizar_pedido/',ActualizarPedidoView.as_view(),name="api_actualizar_pedido"),
     path('presupuestar/',generar_presupuesto,name="presupuestar"),
     path("api/enviar_wtap/", EnviarWtapView.as_view(), name="enviar_wtap"),
+    path("api/validar-cupon/",ValidarCuponView.as_view(),name="validar-cupon")
 ]

@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from products.models import Producto
 from .models import Carrito
 
-def carrito_total(request,type=None,pedido=None):
+def carrito_total(request,type=None,pedido=None,descuento=0):
     if request.user.is_authenticated:
         carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
         pedidos = list(carrito.pedidos.all()) if carrito else []
@@ -35,9 +35,18 @@ def carrito_total(request,type=None,pedido=None):
         else:
             sub_total = None
 
+    if type== "api" and request.session.get('cupon',''):
+        cupon = request.session['cupon']
+        cupon_descuento = cupon.get('descuento')
+
+        descuento = Decimal(total_precio)*Decimal(cupon_descuento)/100
+        total_precio -= descuento
+    elif request.session.get('cupon',''):
+        del request.session['cupon']
+        request.session.modified = True
 
     if request.session.get('adicional_mp',{}):
         del request.session['adicional_mp']
         request.session.modified = True
 
-    return {'total_precio': total_precio,'total_productos':total_productos,'sub_total':sub_total}
+    return {'total_precio': total_precio,'total_productos':total_productos,'sub_total':sub_total,'descuento':descuento}

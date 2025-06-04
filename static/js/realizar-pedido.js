@@ -1,9 +1,65 @@
 document.addEventListener("DOMContentLoaded", () => {
-    termCondiciones = document.getElementById('id_aceptar');
+    
+    const termCondiciones = document.getElementById('id_aceptar');
     termCondiciones.addEventListener('change',function() {
-        document.querySelectorAll('input[name="forma_pago"]').forEach(radio => {
-            radio.checked = false;
-        });
+        resetRadio()
+    })
+
+    const btnAplicar = document.querySelector(".btn-aplicar");
+    const inputCupon = document.getElementById("codigo-descuento");
+    const msgError = document.querySelector(".cupon-error");
+    const msgSuccess = document.querySelector(".cupon-success");
+    const cuponTr = document.getElementById("cupon-tr")
+    const cuponDivider = document.getElementById("cupon-divider")
+    btnAplicar.addEventListener("click", async () => {
+        msgError.textContent = ""
+        msgSuccess.textContent = ""
+        inputCupon.classList.remove("success")
+        inputCupon.classList.remove("errors")
+
+        resetRadio()
+
+        const codigo = inputCupon.value.trim();
+        if (!codigo) {
+            msgError.textContent = "Ingresá un código"
+            inputCupon.classList.add("errors")
+            return
+        }
+
+        toggleDisableItems(true);
+
+        try {
+            const response = await axios.post("/carro/api/validar-cupon/", {
+                codigo:codigo
+            })
+
+            const data = response.data
+
+            msgSuccess.textContent = "Cupón validado correctamente!"
+            inputCupon.classList.add("success")
+            btnAplicar.classList.add("btn-success")
+            setTimeout(() => btnAplicar.classList.remove("btn-success"), 2000)
+            
+            cuponTr.children[0].textContent = `Cupón %${data.porcentaje}`
+            cuponTr.children[1].textContent = `-${data.descuento}`
+            cuponTr.classList.add("cart-finsh-prods")
+
+            cuponDivider.innerHTML = `<th colspan="2" class="border-1px"></th>`
+
+            document.getElementById('total-value').textContent = data.nuevo_total
+
+        } catch (error) {
+            const mensaje = error.response?.data?.error || "Ocurrió un error inesperado";
+            msgError.textContent = mensaje
+            inputCupon.classList.add("errors")
+            btnAplicar.classList.add("btn-error")
+            cuponTr.innerHTML = `<th></th><td></td>`
+            cuponTr.classList.remove("cart-finsh-prods")
+            cuponDivider.innerHTML = ""
+            setTimeout(() => btnAplicar.classList.remove("btn-error"), 2000)
+        } finally {
+            toggleDisableItems(false);
+        }
     })
 
     document.querySelectorAll('input[name="forma_pago"]').forEach((radio) => {
@@ -61,9 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             } catch (error) {
                 window.scrollTo({ top: 0, behavior: "smooth" });
-                document.querySelectorAll('input[name="forma_pago"]').forEach(radio => {
-                    radio.checked = false;
-                });
+                resetRadio()
                 const errors = error.response?.data;
                 if (errors) {
                     Object.keys(errors).forEach(key => {
@@ -83,3 +137,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+function resetRadio() {
+    document.querySelectorAll('input[name="forma_pago"]').forEach(radio => {
+        radio.checked = false;
+    });
+}

@@ -20,7 +20,7 @@
     <form class="users-perfil flex font-roboto width-100" method="post" action="{% url 'cart:realizar_pedido' %}">
         {% csrf_token %}
         <div class="users-perfil-facturacion flex flex-column gap-1rem">
-            <h2 class="font-roboto">Detalles de facturacion</h2>
+            <h2 class="font-roboto">Detalles de facturación</h2>
             <span class="font-roboto">Personales **</span>
             <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select bloqueable font-roboto" required>
                 <option value="" selected disabled>Tipo de factura *</option>
@@ -176,6 +176,11 @@
                     <tr>
                         <th colspan="2" class="border-1px"></th>
                     </tr>
+                    <tr class="cart-cupon" id="cupon-tr">
+                        <th></th>
+                        <td></td>
+                    </tr>
+                    <tr id="cupon-divider"></tr>
                     <tr class="cart-finsh-prods">
                         <th>Total</th>
                         <td id="total-value">{{ total_precio|formato_pesos }}</td>
@@ -186,6 +191,15 @@
                 </tfoot>
             </table>
             <a href="{% url 'cart:presupuestar' %}" target="_blank" class="cart-presupuestar bloqueable decoration-none display-block text-center font-bold">Descargar Presupuesto</a>
+            <div class="cupon-box width-100">
+                <label for="codigo-descuento" class="cupon-label display-block font-bold font-roboto">Tengo un cupón de descuento</label>
+                <div class="flex gap-05rem cupon-input-wrapper">
+                    <input type="text" id="codigo-descuento" placeholder="Ingresa el código">
+                    <button type="button" class="btn-aplicar font-bold cursor-pointer border-none">Aplicar</button>
+                </div>
+                <p class="cupon-error"></p>
+                <p class="cupon-success"></p>
+            </div>
             <ul  class="cart-formadepago">
                 <li>
                     <input type="radio" name="forma_pago" id="efectivo" value="efectivo">

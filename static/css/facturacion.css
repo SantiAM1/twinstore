@@ -132,3 +132,110 @@ input[type="radio"]:checked + label + .cart-formadepago-details {
 .email-msg {
     top:25px;font-style: italic;color: #414141;font-size: 0.9rem;
 }
+
+.cupon-box {
+    border: 1px solid #ddd;
+    padding: 0.8rem;
+    border-radius: 10px;
+}
+
+.cupon-label {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #111;
+}
+
+.cupon-input-wrapper {
+    margin-bottom: 0.3rem;
+}
+
+.cupon-input-wrapper input {
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    max-width: 180px;
+}
+
+.cupon-input-wrapper input.errors {
+    border: 1px solid crimson;
+}
+
+.cupon-input-wrapper input.success {
+    border: 1px solid rgb(20 220 87);
+}
+
+.btn-aplicar {
+    padding: 0.6rem;
+    background-color: #007bff;
+    color: white;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.btn-aplicar:hover {
+    background-color: #0056b3;
+}
+
+.cupon-error {
+    color: crimson;
+    font-style: italic;
+    font-size: 0.8rem;
+}
+
+.cupon-success {
+    color: rgb(62 190 50);
+    font-size: 0.8rem;
+}
+
+@keyframes successpop {
+    0% {
+        transform: scale(1);
+        background-color: #007bff;
+    }
+
+    30% {
+        transform: scale(1.1);
+        background-color: #28a745;
+    }
+
+    60% {
+        transform: scale(0.98);
+    }
+
+    100% {
+        transform: scale(1);
+        background-color: #007bff;
+    }
+}
+
+@keyframes errorpop {
+    0% {
+        background-color: #007bff;
+    }
+
+    30% {
+        transform: rotate(8deg);
+        background-color: #a72828;
+    }
+
+    60% {
+        transform: rotate(-3deg);
+    }
+
+    100% {
+        background-color: #007bff;
+    }
+}
+
+.btn-success {
+    animation: successpop 0.8s ease;
+}
+
+.btn-error {
+    animation: errorpop 0.8s ease;
+}
+
+.cart-cupon {
+    color: #0056b3;
+}
