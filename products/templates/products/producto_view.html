@@ -141,19 +141,19 @@
         {% endif %}
     </section>
 </div>
-<div class="prod-modal display-none position-fixed width-100 height-100" id="prod-modal">
+<section class="prod-modal display-none position-fixed width-100 height-100" id="prod-modal">
     <div class="prod-modal-content flex flex-column position-relative bg-white">
-        <div class="flex justify-between items-center">
-            <div class="font-bold font-roboto flex items-center gap-05rem">
+        <header class="flex justify-between items-center">
+            <picture class="font-bold font-roboto flex items-center gap-05rem">
                 <img src="{% static 'img/mercado_pago.webp' %}" alt="logo mercado pago" height="30px">
                 Nuestras cuotas
-            </div>
+            </picture>
             <span id="close-modal" class="close-modal display-block">
                 <i class="bi bi-x-lg"></i>
             </span>
-        </div>
+        </header>
         {% for cuota,info in coutas_resultado.items %}
-            {{item}}
+        {{item}}
         <div class="flex justify-between modal-item">
             <p class="font-roboto flex gap-05rem">
                 <span class="font-roboto">{{cuota}}x</span>{{info.valor_cuota}}
@@ -162,9 +162,11 @@
                 {{info.total}}
             </p>
         </div>
+        
         {% endfor %}
+        <p class="font-roboto modal-item text-center">Estos valores son aproximados</p>
     </div>
-</div>
+</section>
 {% endblock contenidomain %}
 {% block myscripts %}
 <script src="{% static 'js/producto-view.js' %}"></script>
