@@ -331,6 +331,10 @@ input[name="expandir-specs"]:checked ~ .contenedor-tabla {
     font-weight: 600;
 }
 
+.prod-modal-content picture {
+    margin-left: 0.5rem;
+}
+
 .fadeinup {
     animation: fadeinup 0.4s ease-out;
 }
