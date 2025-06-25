@@ -267,6 +267,12 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# Amazon SES
+AWS_SES_ACCESS_KEY_ID = env("AWS_SES_ACCESS_KEY_ID")
+AWS_SES_SECRET_ACCESS_KEY = env("AWS_SES_SECRET_ACCESS_KEY")
+AWS_SES_REGION_NAME = env("AWS_SES_REGION_NAME")
+AWS_SES_SOURCE_EMAIL = env("AWS_SES_SOURCE_EMAIL")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
