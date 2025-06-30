@@ -158,7 +158,7 @@ def notification(request):
                                 apellido=metadata['apellido'],
                                 razon_social=metadata.get('razon_social', ''),
                                 dni_cuit=metadata['dni_cuit'],
-                                tipo_factura=metadata['tipo_factura'],
+                                condicion_iva=metadata['condicion_iva'],
                                 telefono=metadata.get('telefono', ''),
                                 email=metadata['email'],
                                 codigo_postal=metadata['codigo_postal'],

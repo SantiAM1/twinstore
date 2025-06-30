@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const tipoFactura = document.getElementById('id_tipo_factura');
+    const tipoFactura = document.getElementById('id_condicion_iva');
     const dniCuitContainer = document.getElementById('dni_cuit_container');
     const razonSocialContainer = document.getElementById('razon_social_container');
     const dniCuitInput = document.getElementById('id_dni_cuit');

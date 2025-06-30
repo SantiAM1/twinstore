@@ -6,7 +6,7 @@ from django import forms
 import re
 
 class UsuarioForm(forms.Form):
-    TIPO_FACTURA_CHOICES = [
+    CONDICION_IVA_CHOICES = [
         ('A', 'IVA Responsable Inscripto'),
         ('B', 'Consumidor Final'),
         ('C', 'Monotributista')
@@ -40,8 +40,8 @@ class UsuarioForm(forms.Form):
     SELECT_ATTRS = forms.Select(attrs={'class': 'users-select bloqueable'})
     INPUT_ATTRS = forms.TextInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100','autocomplete':'off','placeholder':' '})
 
-    tipo_factura = forms.ChoiceField(
-        choices=TIPO_FACTURA_CHOICES,
+    condicion_iva = forms.ChoiceField(
+        choices=CONDICION_IVA_CHOICES,
         required=True,
         widget=SELECT_ATTRS
     )

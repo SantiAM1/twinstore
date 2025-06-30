@@ -82,7 +82,7 @@ class HistorialComprasAdmin(admin.ModelAdmin):
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">DNI/CUIT</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Email</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Dirección</th>'
-            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Tipo de factura</th>'
+            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Condición frente al IVA</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Telefono</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Razon social</th>'
             '</tr>'
@@ -91,7 +91,7 @@ class HistorialComprasAdmin(admin.ModelAdmin):
             f'<td style="padding: 6px;">{f.dni_cuit}</td>'
             f'<td style="padding: 6px;">{f.email}</td>'
             f"<td style='padding: 6px;'>{f.calle} {f.calle_detail or ''}, {f.ciudad or '-'} CP({f.codigo_postal or '-'}), {f.get_provincia_display()}</td>"
-            f'<td style="padding: 6px;">{f.get_tipo_factura_display()}</td>'
+            f'<td style="padding: 6px;">{f.get_condicion_iva_display()}</td>'
             f"<td style='padding: 6px;'>{f.telefono or '-'}</td>"
             f"<td style='padding: 6px;'>{f.razon_social or '-'}</td>"
             f'</tr>'
