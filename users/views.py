@@ -206,7 +206,8 @@ def registarse(request):
 
             mail_confirm_user_html(user)
 
-            return redirect('users:email_enviado',token = user.perfil.token_verificacion)
+            request.session['token_verificacion'] = str(user.perfil.token_verificacion)
+            return redirect('users:email_enviado')
         else:
             if form.errors.get('email'):
                 for error in form.errors.get('email'):
@@ -218,21 +219,27 @@ def registarse(request):
             return redirect('users:singup')
     return render(request, 'users/registro.html', {'form': form})
 
-def email_enviado(request,token):
-    return render(request,'users/confirmar_mail.html',{'token':token})
+def email_enviado(request):
+    return render(request,'users/confirmar_mail.html')
 
-def verificar_email(request, token):
+def verificar_email(request,token):
     try:
         perfil = get_object_or_404(PerfilUsuario, token_verificacion=token)
         perfil.email_verificado = True
         perfil.token_verificacion = None
+        if request.session.get('token_verificacion',''):
+            del request.session['token_verificacion']
         perfil.save()
         messages.success(request,'Usuario confirmado con éxito!')
         return redirect('users:login')
     except:
         return render(request,'users/error_mail.html')
 
-def reenviar_verificacion(request, token):
+def reenviar_verificacion(request):
+    token = request.session.get('token_verificacion','')
+    if not token:
+        messages.warning(request, "Hubo un problema, intente mas tarde.")
+        return redirect('users:email_enviado')
     perfil = get_object_or_404(PerfilUsuario,token_verificacion=token)
 
     tiene_token = TokenUsers.objects.filter(user=perfil.user,tipo="crear").first()
@@ -241,13 +248,13 @@ def reenviar_verificacion(request, token):
             tiene_token.delete()
         else:
             messages.warning(request, "Por favor, esperá unos minutos antes de volver a reenviar el mail.")
-            return redirect('users:email_enviado',token=token)
+            return redirect('users:email_enviado')
         
     user = perfil.user
     token_ticket = TokenUsers.objects.create(user=user,tipo="crear")
     mail_confirm_user_html(user)
     messages.success(request, "Te reenviamos el correo de verificación.")
-    return redirect('users:email_enviado',token=token)
+    return redirect('users:email_enviado')
 
 def recuperar_contraseña(request):
     if request.method == "POST":
