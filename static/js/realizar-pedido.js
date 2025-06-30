@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 apellido: document.getElementById('id_apellido').value,
                 email: document.getElementById('id_email').value,
                 dni_cuit: document.getElementById('id_dni_cuit').value || '00000000',
-                tipo_factura: document.getElementById('id_tipo_factura').value || 'B',
+                condicion_iva: document.getElementById('id_condicion_iva').value || 'B',
                 calle: document.getElementById('id_calle').value,
                 ciudad: document.getElementById('id_ciudad').value,
                 codigo_postal: document.getElementById('id_codigo_postal').value,

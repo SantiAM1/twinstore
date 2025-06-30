@@ -37,10 +37,11 @@ SECRET_KEY = DJANGO_SECRET_KEY
 DEBUG = env("DEBUG").lower() == "true"
 
 # * Host
-SITE_URL = "twinstore.com.ar"
+SITE_URL = "ccb7-152-168-88-237.ngrok-free.app"
 
 # ! Actualizar el HOST con el dominio
 ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(",")
+ALLOWED_HOSTS = ["ccb7-152-168-88-237.ngrok-free.app"]
 
 # ! Verificar las correspondencias
 CSRF_TRUSTED_ORIGINS = [

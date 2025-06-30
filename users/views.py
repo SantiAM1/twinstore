@@ -92,7 +92,7 @@ def mi_perfil(request):
         form = UsuarioForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            perfil.tipo_factura = data['tipo_factura']
+            perfil.condicion_iva = data['condicion_iva']
             perfil.dni_cuit = data['dni_cuit']
             perfil.razon_social = data['razon_social']
             perfil.nombre = data['nombre']
@@ -107,7 +107,7 @@ def mi_perfil(request):
             perfil.save()
             messages.success(request,'Usuario actualizado con éxito!')
     form = UsuarioForm(initial={
-            'tipo_factura': perfil.tipo_factura,
+            'condicion_iva': perfil.condicion_iva,
             'dni_cuit': perfil.dni_cuit,
             'razon_social': perfil.razon_social,
             'nombre': perfil.nombre,

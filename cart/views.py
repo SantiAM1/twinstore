@@ -246,13 +246,13 @@ class CalcularPedidoView(APIView):
                     calle_altura = match.group(2) if match.group(2) else ''
 
                 dni_cuit = data['dni_cuit']
-                ident_type = "DNI" if data['tipo_factura'] == 'B' else 'CUIT'
+                ident_type = "DNI" if data['condicion_iva'] == 'B' else 'CUIT'
                 email = data['email']
                 nombre = data['nombre']
                 apellido = data['apellido']
                 codigo_postal = data['codigo_postal']
                 razon_social = data.get('razon_social','')
-                tipo_factura = data.get('tipo_factura','')
+                condicion_iva = data.get('condicion_iva','')
                 telefono = data.get('telefono', '')
                 recibir_mail = data.get('recibir_mail')
 
@@ -264,7 +264,7 @@ class CalcularPedidoView(APIView):
                     "codigo_postal": codigo_postal,
                     "calle": f"{calle_nombre} {calle_altura}",
                     "razon_social":razon_social,
-                    "tipo_factura":tipo_factura,
+                    "condicion_iva":condicion_iva,
                     "telefono":telefono,
                     "recibir_mail":recibir_mail,
                     "productos":productos,
@@ -505,7 +505,7 @@ def realizar_pedido(request):
                 apellido=data['apellido'],
                 razon_social=data['razon_social'],
                 dni_cuit=data['dni_cuit'],
-                tipo_factura=data['tipo_factura'],
+                condicion_iva=data['condicion_iva'],
                 telefono=data['telefono'],
                 email=data['email'],
                 codigo_postal=data['codigo_postal'],
@@ -520,7 +520,7 @@ def realizar_pedido(request):
         if request.user.is_authenticated:
             perfil, create = PerfilUsuario.objects.get_or_create(user = request.user)
             form = UsuarioForm(initial={
-                    'tipo_factura': perfil.tipo_factura,
+                    'condicion_iva': perfil.condicion_iva,
                     'dni_cuit': perfil.dni_cuit,
                     'razon_social': perfil.razon_social,
                     'nombre': perfil.nombre,

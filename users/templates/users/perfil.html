@@ -29,11 +29,11 @@
             {% endif %}
             <h2 class="font-roboto">Datos de Usuario</h2>
             <span>Personales **</span>
-            <select name="{{ form.tipo_factura.html_name }}" id="{{ form.tipo_factura.id_for_label }}" class="users-select width-100 border-none font-roboto" required>
-                <option value="" selected disabled>Tipo de factura *</option>
-                {% for value, label in form.tipo_factura.field.choices %}
+            <select name="{{ form.condicion_iva.html_name }}" id="{{ form.condicion_iva.id_for_label }}" class="users-select width-100 border-none font-roboto" required>
+                <option value="" selected disabled>Condición frente al IVA *</option>
+                {% for value, label in form.condicion_iva.field.choices %}
                     {% if value %}
-                        <option value="{{ value }}" {% if form.tipo_factura.value == value %}selected{% endif %}>{{ label }}</option>
+                        <option value="{{ value }}" {% if form.condicion_iva.value == value %}selected{% endif %}>{{ label }}</option>
                     {% endif %}
                 {% endfor %}
             </select>

@@ -8,7 +8,7 @@ class CalcularPedidoSerializer(serializers.Serializer):
     dni_cuit = serializers.CharField()
     razon_social = serializers.CharField(required=False,allow_blank=True)
     telefono = serializers.CharField(required=False,allow_blank=True)
-    tipo_factura = serializers.CharField()
+    condicion_iva = serializers.CharField()
     calle = serializers.CharField()
     ciudad = serializers.CharField()
     codigo_postal = serializers.CharField()
