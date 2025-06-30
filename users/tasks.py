@@ -2,22 +2,31 @@ from celery import shared_task
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
-from sendgrid.helpers.mail import Mail
-from sendgrid import SendGridAPIClient
+import boto3
+from botocore.exceptions import ClientError
 
-def master_mail(user_email,subject,html_content):
-    message = Mail(
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to_emails=user_email,
-        subject=subject,
-        html_content=html_content
+def master_mail(user_email, subject, html_content):
+    ses_client = boto3.client(
+        'ses',
+        aws_access_key_id=settings.AWS_SES_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SES_SECRET_ACCESS_KEY,
+        region_name=settings.AWS_SES_REGION_NAME
     )
+
     try:
-        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-        response = sg.send(message)
-        return response.status_code
-    except Exception as e:
-        print("❌ Error al enviar mail de confirmación:", e)
+        response = ses_client.send_email(
+            Source=settings.AWS_SES_SOURCE_EMAIL,
+            Destination={'ToAddresses': [user_email]},
+            Message={
+                'Subject': {'Data': subject, 'Charset': 'UTF-8'},
+                'Body': {
+                    'Html': {'Data': html_content, 'Charset': 'UTF-8'}
+                }
+            }
+        )
+        return response['ResponseMetadata']['HTTPStatusCode']
+    except ClientError as e:
+        print(f"❌ Error al enviar mail: {e.response['Error']['Message']}")
         return None
 
 @shared_task
