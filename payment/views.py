@@ -196,6 +196,8 @@ def procesar_pago_y_estado(pago: PagoRecibidoMP,usuario,cupon=None,key=None):
         pagos = historial.pagos.all()
         total_pagado = sum((p.transaction_amount or 0 for p in pagos if p.status == "approved"), Decimal('0.00'))
 
+        estado_anterior = historial.estado
+
         comentario_extra = ""
         if all(p.status == "approved" for p in pagos):
             if total_pagado >= historial.total_compra:
@@ -209,14 +211,16 @@ def procesar_pago_y_estado(pago: PagoRecibidoMP,usuario,cupon=None,key=None):
         else:
             historial.estado = "pendiente"
 
-        historial.requiere_revision = True
-        historial.save(update_fields=["requiere_revision","estado"])
+        if estado_anterior != historial.estado:
+            historial.requiere_revision = True
+            historial.save(update_fields=["requiere_revision","estado"])
 
         EstadoPedido.objects.create(
             historial=historial,
             estado='Pago de mercado pago recibido (Servidor)',
             comentario=f'Total recibido: {pago.transaction_amount}.\nEstado del pago: {pago.status}.\nForma de pago: {pago.payment_type}.\n{comentario_extra}.\nEstado final del historial: {historial.estado}.'
         )
+        
         logger.info(f"Forma de pago: {pago.payment_type}")
         logger.info(f"Total pagado: {total_pagado} / Total esperado: {historial.total_compra}")
         logger.info(f"Estado final del historial: {historial.estado}")
