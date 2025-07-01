@@ -252,11 +252,6 @@ CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
-# Configuración de SMTP para enviar emails con Gmail
-SENDGRID_API_KEY = env("SENDGRID_API_KEY")
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
-
 # Configurar la URL de login
 LOGIN_URL = "/usuario/login/"
 
