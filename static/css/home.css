@@ -95,6 +95,9 @@ font-size: 20px;
 .landing-section {
     background-color: var(--black-theme-color);
     padding: 1rem 0;
+    margin: auto;
+    max-width: 1200px;
+    border-radius: 12px;
 }
 
 h2 {
@@ -132,40 +135,41 @@ border-radius: 10px;
 .landing-box {
     padding: 3px;
     border-radius: 20px;
-    background: linear-gradient(135deg, #6139f1, #a648cc);
+    background: #003166;
     width: 200px;
     height: 200px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background 1s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     box-shadow: 0 0 0 transparent;
 }
 
 .landing-box:hover {
     transform: scale(1.03);
-    box-shadow: 0 8px 16px rgb(97 57 241 /  20%);
-    background: linear-gradient(315deg, #6139f1, #a648cc);
+    box-shadow: 0 8px 16px rgb(119 119 119);
+    background: #636363;
 }
 
 .landing-content {
-    background-color: #06072e;
     border-radius: 16px;
-    transition: background 0.3s ease;
     color: #fff;
     font-size: 1.3rem;
+    align-items: center;
+    justify-content: end;
+    padding-bottom: 2rem;
+    gap: 1.5rem;
+    background-size: 200px;
+    background-position: center;
+    transition: all ease 0.3s;
 }
 
-.landing-box:hover .landing-content {
-    background: #fafafa;
-}
+.landing-content[data-type="computadoras"] {background-image: url("/static/img/landing/pc-armadas.webp");}
 
-.langing-icons {
-    font-size: 4rem;
-    color: #fff;
-}
+.landing-content[data-type="componentes"] {background-image: url("/static/img/landing/componentes.webp");}
 
-.landing-box:hover .langing-icons,
-.landing-box:hover .landing-content {
-    color: var(--black-theme-color);
-}
+.landing-content[data-type="servicios"] {background-image: url("/static/img/landing/servicio.webp");}
+
+.landing-content[data-type="celulares"] {background-image: url("/static/img/landing/celulares.webp");}
+
+.landing-content:hover {background-size: 230px;}
 
 .myCarousel {
     width: 100%;
