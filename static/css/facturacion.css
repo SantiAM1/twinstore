@@ -239,3 +239,9 @@ input[type="radio"]:checked + label + .cart-formadepago-details {
 .cart-cupon {
     color: #0056b3;
 }
+
+.feature-new {
+    font-size: 1rem;
+    color: #1b8dd8;
+    font-weight: normal;
+}

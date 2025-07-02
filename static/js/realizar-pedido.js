@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
         resetRadio()
     })
 
-    const btnAplicar = document.querySelector(".btn-aplicar");
+    const btnAplicar = document.getElementById("btn-cupon");
     const inputCupon = document.getElementById("codigo-descuento");
     const msgError = document.querySelector(".cupon-error");
     const msgSuccess = document.querySelector(".cupon-success");

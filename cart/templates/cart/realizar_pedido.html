@@ -195,7 +195,7 @@
                 <label for="codigo-descuento" class="cupon-label display-block font-bold font-roboto">Tengo un cupón de descuento</label>
                 <div class="flex gap-05rem cupon-input-wrapper">
                     <input type="text" id="codigo-descuento" placeholder="Ingresa el código">
-                    <button type="button" class="btn-aplicar font-bold cursor-pointer border-none">Aplicar</button>
+                    <button type="button" class="btn-aplicar font-bold cursor-pointer border-none" id="btn-cupon">Aplicar</button>
                 </div>
                 <p class="cupon-error"></p>
                 <p class="cupon-success"></p>
@@ -217,9 +217,25 @@
                 </li>
                 <li>
                     <input type="radio" name="forma_pago" id="mercadopago">
-                    <label for="mercadopago">Pagar con Mercado Pago</label>
+                    <label for="mercadopago">Pagar con Tarjeta (Mercado Pago)</label>
                     <div class="cart-formadepago-details font-roboto">IMPORTANTE: Los pagos realizados con la plataforma de Mercado Pago cuentan con un recargo del 6,29% más IVA.
                         <div id="box-checkout-pro" class="bloqueable width-100"></div>
+                    </div>
+                </li>
+                <li>
+                    <input type="radio" name="forma_pago" id="mixto">
+                    <label for="mixto"><span class="feature-new font-roboto">(Nuevo) </span>Pago Mixto (Transferencia + Mercado Pago)</label>
+                    <div class="cart-formadepago-details font-roboto">
+                        IMPORTANTE: Ahora en Twinstore puedes dividir tus pagos! El pago parcial abonado mediante Mercado Pago cuentan con un recargo del 6,29% más IVA. El importe a transferir no aplica un adicional.
+                        <div class="container-form mixto-transferencia-box">
+                            <input placeholder=" " autocomplete="off" maxlength="20" class="form-input bloqueable font-roboto position-absolute width-100 height-100" type="number" name="mixto_transferencia" id="id_mixto_transferencia">
+                            <label for="id_mixto_transferencia" class="form-label">Importe a Transferir</label>
+                            <div class="error display-none" id="mixto_transferencia_error"></div>
+                            {% for error in form.codigo_postal.errors %}
+                                <div class="error">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn-aplicar font-bold cursor-pointer border-none">Aplicar</button>
                     </div>
                 </li>
             </ul>

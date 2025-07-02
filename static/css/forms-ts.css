@@ -27,6 +27,14 @@
     padding-left: 1em;
 }
 
+.form-input[name="mixto_transferencia"] {
+    border-color: rgb(92 231 115);
+}
+
+.mixto-transferencia-box {
+    margin-top: 1rem;
+}
+
 .form-label {
     position: absolute;
     background-color: #ededed;
@@ -48,6 +56,7 @@
 
 input[type="text"]:focus ~ .form-label,
 input[type="email"]:focus ~ .form-label,
+input[type="number"]:focus ~ .form-label,
 .form-input:not(:placeholder-shown) ~ .form-label {
     top: -0.5em;
     font-size: 0.75rem;
