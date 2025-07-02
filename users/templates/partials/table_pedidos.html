@@ -1,3 +1,5 @@
+{% load custom_filters %}
+
 <table class="users-pedidos-table width-100 text-center">
     <thead>
         <tr>
@@ -36,14 +38,14 @@
                             <a href="{% url 'payment:comprobante' pedido.token_consulta %}" class="link-subir-comprobante decoration-none font-roboto"><i class="bi bi-paperclip"></i> Subir comprobante</a>
                         {% endif %}
                     {% elif pedido.check_arrepentimiento %}
-                        <button class="border-none bg-transparent btn-arrepentimiento font-roboto cursor-pointer" data-modal-id="modal-arrepentimiento-{{pedido.id}}">Solicitar Arrepentimiento</button>
+                        <button class="border-none bg-transparent btn-modal-open font-roboto cursor-pointer" data-modal-id="modal-arrepentimiento-{{pedido.id}}">Solicitar Arrepentimiento</button>
                     {% endif %}
                 </ul>
                 <p class="users-pedidos-hide-id display-none width-100 font-roboto">ID de pago: <span>#{{pedido.merchant_order_id}}</span></p>
             </td>
             <td class="users-pedidos-id users-pedidos-hide font-bold">#{{pedido.merchant_order_id}}</td>
             <td class="users-pedidos-hide">{{pedido.fecha_compra|date:"d/m/y"}}</td>
-            <td>
+            <td class="position-relative">
                 {% if pedido.estado == 'confirmado' %}
                     <div style="background-color: #9dfca1;color: #196b00;" class="users-pedidos-status">
                         <span>{{pedido.estado|capfirst}}</span>
@@ -77,6 +79,7 @@
                     <span>{{pedido.estado|capfirst}}</span>
                 </div>
                 {% endif %}
+                <i class="bi bi-info-circle position-absolute users-pedido-info btn-modal-open" data-modal-id="modal-info-{{pedido.id}}"></i>
             </td>
         </tr>
         <tr>
@@ -89,8 +92,18 @@
                 <form method="POST" action="{% url 'users:arrepentimiento_post' historial_id=pedido.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Sí, confirmar</button>
-                    <button type="button" class="cancelar-arrepentimiento btn btn-secondary" data-modal-id="modal-arrepentimiento-{{pedido.id}}">Cancelar</button>
+                    <button type="button" class="btn-modal-close btn btn-secondary" data-modal-id="modal-arrepentimiento-{{pedido.id}}">Cancelar</button>
                 </form>
+            </div>
+        </div>
+        <div id="modal-info-{{pedido.id}}" class="modal">
+            <div class="modal-content">
+                <header class="font-roboto flex justify-between items-center"><div>Información pedido: <span class="modal-span">{{pedido.merchant_order_id}}</span></div><button type="button" class="modal-cerrar btn-modal-close border-none cursor-pointer" data-modal-id="modal-info-{{pedido.id}}"><i class="bi bi-x-lg"></i></button></header>
+                <br>
+                <p class="font-roboto">Total abonado: <span class="modal-span">{{pedido.total_compra|formato_pesos}}</span></p>
+                <p class="font-roboto">Cantidad de productos: <span class="modal-span">{{pedido.productos|length}}</span></p>
+                <p class="font-roboto">Forma de pago: <span class="modal-span">{{pedido.forma_de_pago|capfirst}}</span></p>
+                <p class="font-roboto">Token de consulta: <span class="modal-span">{{pedido.token_consulta}}</span></p>
             </div>
         </div>
         {% endfor %}
