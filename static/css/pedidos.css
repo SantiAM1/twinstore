@@ -127,23 +127,43 @@
 .modal-content {
     background-color: #fff;
     margin: 10% auto;
-    padding: 2rem;
+    padding: 1rem;
     border: 1px solid #ccc;
     width: 90%;
     max-width: 400px; /* Máximo ancho */
     border-radius: 10px;
     box-shadow: 0 5px 15px rgb(0 0 0 / 30%);
     animation: animarmodal 0.3s ease-out;
-    text-align: center;
 }
 
-.modal-content button {
+.modal-content h2 {
+    font-size: 1.2rem;
+    color: #555;
+}
+
+.modal-span {
+    font-weight: bold;
+}
+
+.modal-content form button {
     margin: 1rem 0.5rem 0;
     padding: 0.7rem 1.5rem;
     font-size: 1rem;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.modal-cerrar {
+    padding: 0.5rem;
+    font-size: 1.3rem;
+    border-radius: 5px;
+    color: #000;
+    transition: background-color 0.3s ease;
+}
+
+.modal-cerrar:hover {
+    background-color: #a0a0a0;
 }
 
 .modal-content button.btn-danger {
@@ -162,4 +182,12 @@
 
     to { transform: translateY(0);
         opacity: 1; }
+}
+
+.users-pedido-info {
+    top: -7px;
+    right: 0;
+    color: #005dc0;
+    font-size: 1.4rem;
+    cursor: help;
 }

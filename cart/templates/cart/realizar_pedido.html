@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
+{% load compress %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
@@ -8,9 +9,11 @@
 
 {% block head %}
     <title>Facturacion - Twinstore</title>
+    {% compress css %}
     <link rel="stylesheet" href="{% static 'css/facturacion.css' %}">
     <link rel="stylesheet" href="{% static 'css/forms-ts.css' %}">
     <link rel="stylesheet" href="{% static 'css/substyles/mp-button.css' %}">
+    {% endcompress %}
 {% endblock head %}
 
 {% block theme %}black{% endblock theme %}

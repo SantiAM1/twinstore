@@ -1,12 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('.btn-arrepentimiento').forEach(btn => {
+    document.querySelectorAll('.btn-modal-open').forEach(btn => {
         btn.addEventListener('click', function() {
             const modalId = this.getAttribute('data-modal-id');
             document.getElementById(modalId).style.display = 'block';
         });
     });
     
-    document.querySelectorAll('.cancelar-arrepentimiento').forEach(btn => {
+    document.querySelectorAll('.btn-modal-close').forEach(btn => {
         btn.addEventListener('click', function() {
             const modalId = this.getAttribute('data-modal-id');
             document.getElementById(modalId).style.display = 'none';

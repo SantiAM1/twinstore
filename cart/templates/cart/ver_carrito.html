@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
+{% load compress %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
@@ -8,8 +9,10 @@
 
 {% block head %}
     <title>Carrito - Twinstore</title>
+    {% compress css %}
     <link rel="stylesheet" href="{% static 'css/carrito.css' %}" />
     <link rel="stylesheet" href="{% static 'css/substyles/quantity.css' %}" />
+    {% endcompress %}
 {% endblock head %}
 
 {% block theme %}black{% endblock theme %}
