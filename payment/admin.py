@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import HistorialCompras,PagoRecibidoMP,ComprobanteTransferencia,EstadoPedido,Cupon
+from .models import HistorialCompras,PagoRecibidoMP,ComprobanteTransferencia,EstadoPedido,Cupon,PagoMixtoTicket
 from django.utils.html import format_html, format_html_join
 from django.urls import reverse
 from django.utils.timezone import localtime
@@ -10,6 +10,7 @@ from .forms import EstadoPedidoForm
 
 admin.site.register(PagoRecibidoMP)
 admin.site.register(Cupon)
+admin.site.register(PagoMixtoTicket)
 
 class ComprobanteTransferenciaInline(admin.StackedInline):
     model = ComprobanteTransferencia

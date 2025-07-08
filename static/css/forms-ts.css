@@ -27,12 +27,8 @@
     padding-left: 1em;
 }
 
-.form-input[name="mixto_transferencia"] {
-    border-color: rgb(92 231 115);
-}
-
 .mixto-transferencia-box {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
 }
 
 .form-label {

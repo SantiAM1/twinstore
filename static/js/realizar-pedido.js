@@ -5,15 +5,58 @@ document.addEventListener("DOMContentLoaded", () => {
         resetRadio()
     })
 
+    const btnPagoMixto = document.getElementById("btn-mixto");
+    const inputPagoMixto = document.getElementById("importe-transferir");
+    const msgErrorMixto = document.getElementById("mixto-error");
+    const msgSuccessMixto = document.getElementById("mixto-success");
+    const inputMixto = document.getElementById("importe-transferir");
+    const btnMixto = document.getElementById("btn-mixto");
+    const btnPedidoMixto = document.getElementById("realizar-pedido-mixto");
+    btnPagoMixto.addEventListener("click",async () => {
+        const numero = inputPagoMixto.value
+        msgErrorMixto.textContent = ""
+        msgSuccessMixto.textContent = ""
+        inputMixto.classList.remove("success", "errors");
+        btnPedidoMixto.disabled = true;
+        btnPedidoMixto.setAttribute("type", "button");
+
+        if (!numero || parseFloat(numero) <= 0) {
+            msgErrorMixto.textContent = "Por favor, ingresá un valor mayor a 0.";
+            inputMixto.classList.add("errors");
+            return;
+        }
+
+        try {
+            const response = await axios.post("/carro/api/pagomixto/",{
+                numero:numero
+            })
+            if (response.status === 200) {
+                inputMixto.classList.add("success");
+                btnMixto.classList.add("btn-success");
+                btnPedidoMixto.setAttribute("type", "submit");
+                btnPedidoMixto.disabled = false;
+                btnPedidoMixto.classList.add("cursor-pointer")
+                msgSuccessMixto.textContent = "¡Validado correctamente!";
+                setTimeout(() => btnMixto.classList.remove("btn-success"), 2000);
+            }
+        } catch (error) {
+            const mensaje = error.response?.data?.error || "Ocurrió un error inesperado";
+            msgErrorMixto.textContent = mensaje;
+            inputMixto.classList.add("errors")
+            btnMixto.classList.add("btn-error")
+            setTimeout(() => btnMixto.classList.remove("btn-error"), 2000)
+        }
+    })
+
     const btnAplicar = document.getElementById("btn-cupon");
     const inputCupon = document.getElementById("codigo-descuento");
-    const msgError = document.querySelector(".cupon-error");
-    const msgSuccess = document.querySelector(".cupon-success");
+    const msgErrorCupon = document.getElementById("cupon-error");
+    const msgSuccessCupon = document.getElementById("cupon-success");
     const cuponTr = document.getElementById("cupon-tr")
     const cuponDivider = document.getElementById("cupon-divider")
     btnAplicar.addEventListener("click", async () => {
-        msgError.textContent = ""
-        msgSuccess.textContent = ""
+        msgErrorCupon.textContent = ""
+        msgSuccessCupon.textContent = ""
         inputCupon.classList.remove("success")
         inputCupon.classList.remove("errors")
 
@@ -21,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const codigo = inputCupon.value.trim();
         if (!codigo) {
-            msgError.textContent = "Ingresá un código"
+            msgErrorCupon.textContent = "Ingresá un código"
             inputCupon.classList.add("errors")
             return
         }
@@ -35,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const data = response.data
 
-            msgSuccess.textContent = "Cupón validado correctamente!"
+            msgSuccessCupon.textContent = "Cupón validado correctamente!"
             inputCupon.classList.add("success")
             btnAplicar.classList.add("btn-success")
             setTimeout(() => btnAplicar.classList.remove("btn-success"), 2000)
@@ -50,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
             const mensaje = error.response?.data?.error || "Ocurrió un error inesperado";
-            msgError.textContent = mensaje
+            msgErrorCupon.textContent = mensaje
             inputCupon.classList.add("errors")
             btnAplicar.classList.add("btn-error")
             cuponTr.innerHTML = `<th></th><td></td>`

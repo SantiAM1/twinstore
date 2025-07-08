@@ -94,3 +94,6 @@ class ActualizarPedidoSerializer(serializers.Serializer):
 
 class CuponSerializer(serializers.Serializer):
     codigo = serializers.CharField(max_length=10)
+
+class PagoMixtoSerializer(serializers.Serializer):
+    numero = serializers.DecimalField(decimal_places=2,max_digits=10)

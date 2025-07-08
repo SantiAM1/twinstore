@@ -14,7 +14,7 @@ from core.permissions import BloquearSiMantenimiento
 from core.decorators import bloquear_si_mantenimiento
 from core.throttling import EnviarWtapThrottle,CarritoThrottle,CalcularPedidoThrottle
 
-from payment.models import HistorialCompras,Cupon,EstadoPedido
+from payment.models import HistorialCompras,Cupon,EstadoPedido,PagoMixtoTicket
 from payment.templatetags.custom_filters import formato_pesos
 
 from .models import Producto, Carrito, Pedido
@@ -22,7 +22,7 @@ from products.models import ColorProducto
 
 import mercadopago
 
-from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,EliminarPedidoSerializer,ActualizarPedidoSerializer,CuponSerializer
+from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,EliminarPedidoSerializer,ActualizarPedidoSerializer,CuponSerializer,PagoMixtoSerializer
 from .context_processors import carrito_total
 from .permissions import TieneCarrito
 from .decorators import requiere_carrito
@@ -31,6 +31,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from decimal import Decimal
 import re
 from weasyprint import HTML
 import datetime
@@ -331,6 +332,21 @@ class ValidarCuponView(APIView):
 
             return Response({"error": "Cupón inválido o inactivo."}, status=404)
 
+class ValidarPagoMixtoView(APIView):
+    permission_classes = [TieneCarrito,BloquearSiMantenimiento]
+    throttle_classes = [CalcularPedidoThrottle]
+    def post(self,request):
+        serializer = PagoMixtoSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors,status=400)
+        carrito = carrito_total(request,type="api").get('total_precio')
+        numero = serializer.validated_data.get('numero')
+        if numero >= carrito:
+            return Response({"error":"El valor ingresado no es válido."},status=404)
+        request.session['pago-mixto'] = float(numero)
+        return Response(status=200)
+
+
 # Create your views here.
 # ----- Preferencias de MP ----- #
 
@@ -415,16 +431,22 @@ def realizar_pedido(request):
             data = form.cleaned_data
             forma_pago = request.POST.get('forma_pago')
 
-            if forma_pago not in ['efectivo', 'transferencia']:
+            if forma_pago not in ['efectivo', 'transferencia','mixto']:
                 raise Http404("Medios de pago no validos")
+            
+            total_carrito = carrito_total(request,type="api").get('total_precio')
+
+            if forma_pago == 'mixto':
+                merchant_order_id = _generar_identificador_unico('M')
+                status = 'pendiente'
+                pago_transferencia = Decimal(request.session['pago-mixto'])
+                pago_mercadopago = total_carrito-pago_transferencia
             elif forma_pago == 'transferencia':
                 merchant_order_id = _generar_identificador_unico('T')
                 status = 'pendiente'
             else:
                 merchant_order_id = _generar_identificador_unico('E')
                 status = 'confirmado'
-
-            total_carrito = carrito_total(request,type="api").get('total_precio')
 
             if request.user.is_authenticated:
                 carrito = get_object_or_404(Carrito, usuario=request.user)
@@ -481,6 +503,18 @@ def realizar_pedido(request):
             merchant_order_id=merchant_order_id,
             recibir_mail=data['recibir_estado_pedido']
             )
+
+            if forma_pago == 'mixto':
+                PagoMixtoTicket.objects.create(
+                    historial=historial,
+                    monto=pago_transferencia,
+                    tipo='transferencia'
+                )
+                PagoMixtoTicket.objects.create(
+                    historial=historial,
+                    monto=pago_mercadopago,
+                    tipo='mercadopago'
+                )
 
             if request.session.get('cupon',''):
                 cupon_id = request.session['cupon'].get('id')

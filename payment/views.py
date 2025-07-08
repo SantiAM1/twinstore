@@ -291,6 +291,8 @@ def payment_success(request):
 
 def subir_comprobante(request, token):
     historial = get_object_or_404(HistorialCompras, token_consulta=token)
+    if historial.forma_de_pago not in ['mixto','transferencia']:
+        return HttpResponse(status=404)
     if request.method == 'POST':
 
         form = ComprobanteForm(request.POST, request.FILES)

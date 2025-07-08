@@ -22,7 +22,8 @@ class HistorialCompras(models.Model):
     FORMA_DE_PAGO = [
         ('efectivo','Efectivo'),
         ('mercado pago','Mercado Pago'),
-        ('transferencia','Transferencia')
+        ('transferencia','Transferencia'),
+        ('mixto','Mixto')
     ]
 
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -64,7 +65,7 @@ class HistorialCompras(models.Model):
         return True if not self.estado in ['arrepentido','finalizado','rechazado'] else False
 
     def check_comprobante(self):
-        return True if (self.forma_de_pago == 'transferencia' and not self.estado in ['finalizado','arrepentido']) else False
+        return True if (self.forma_de_pago in ['transferencia','mixto']  and not self.estado in ['finalizado','arrepentido']) else False
 
     def check_arrepentimiento(self):
         if self.fecha_finalizado and self.estado == 'finalizado':
@@ -132,3 +133,18 @@ class Cupon(models.Model):
 
     def __str__(self):
         return f"{self.codigo} - %{self.descuento}"
+
+class PagoMixtoTicket(models.Model):
+    ESTADOS = [
+        ('aprobado','Aprobado'),
+        ('rechazado','Rechazado'),
+        ('pendiente','Pendiente'),
+    ]
+    TYPES = [
+        ('transferencia','Transferencia'),
+        ('mercadopago','Mercado pago'),
+    ]
+    historial = models.ForeignKey(HistorialCompras,on_delete=models.CASCADE,related_name='tickets')
+    estado = models.CharField(max_length=20,choices=ESTADOS,default='pendiente')
+    monto = models.DecimalField(max_digits=10,decimal_places=2)
+    tipo = models.CharField(max_length=20,choices=TYPES,default='transferencia')
