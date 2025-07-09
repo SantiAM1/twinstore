@@ -74,9 +74,13 @@ def aprobar_historial_transferencia(sender, instance, created, **kwargs):
         )
         return
     # * 2 Si el comprobante es aprobado se confirma el historial
-    if instance.estado == 'aprobado':
+    if instance.estado == 'aprobado' and historial.forma_de_pago == 'transferencia':
         historial.estado = 'confirmado'
         historial.save(update_fields=["estado"])
+    elif historial.forma_de_pago == 'mixto' and instance.estado == 'aprobado':
+        instance.ticket.estado = 'aprobado'
+        instance.ticket.save()
+        historial.check_tickets()
     # * 3 Cuando el comprobante se rechaza se envia un mail
     elif instance.estado == 'rechazado':
         if instance.observaciones:

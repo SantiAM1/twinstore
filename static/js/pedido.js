@@ -1,4 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+    const link = document.getElementById("generar-link");
+    const texto = document.getElementById("texto-link");
+    const spinner = document.getElementById("spinner");
+
+    link.addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        // Mostrar animación
+        texto.textContent = "Generando...";
+        spinner.classList.remove("hidden");
+        link.classList.add("disabled"); // Opcional para evitar doble clic
+
+    });
+
     document.querySelectorAll('.btn-modal-open').forEach(btn => {
         btn.addEventListener('click', function() {
             const modalId = this.getAttribute('data-modal-id');

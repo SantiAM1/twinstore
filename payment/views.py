@@ -15,7 +15,7 @@ import requests
 from decimal import Decimal
 from django.utils.timezone import now
 
-from .models import HistorialCompras, PagoRecibidoMP,EstadoPedido,Cupon
+from .models import HistorialCompras, PagoRecibidoMP,EstadoPedido,Cupon,PagoMixtoTicket
 from cart.models import Carrito
 from products.models import Producto,ColorProducto
 from users.models import DatosFacturacion
@@ -299,6 +299,9 @@ def subir_comprobante(request, token):
         if form.is_valid():
             comprobante = form.save(commit=False)
             comprobante.historial = historial
+            if historial.forma_de_pago == 'mixto':
+                ticket = historial.tickets.filter(tipo='transferencia').first()
+                comprobante.ticket = ticket
             comprobante.save()
             messages.success(request, "Comprobante subido correctamente. Lo revisaremos a la brevedad.")
             if request.user.is_authenticated:

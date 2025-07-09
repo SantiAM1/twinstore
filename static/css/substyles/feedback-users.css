@@ -27,18 +27,34 @@
     width: max-content;
 }
 
-.link-subir-comprobante {
+.link-subir-ticket {
     color: #fff;
     padding: 0.3rem 0.5rem;
     background-color: #292929;
     border-radius: 5px;
-    display: block;
     width: max-content;
     margin-top: 0.5rem;
 }
 
-.link-subir-comprobante.subido {
-    background-color: #005dc0;
+.link-subir-ticket.subido {
+    background-color: #006d43;
+}
+
+.link-subir-ticket.mercadopago {
+    background-color: #007bff;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+.hidden {
+    display: none;
 }
 
 .input-subir-comprobante {

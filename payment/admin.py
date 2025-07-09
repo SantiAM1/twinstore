@@ -11,6 +11,7 @@ from .forms import EstadoPedidoForm
 admin.site.register(PagoRecibidoMP)
 admin.site.register(Cupon)
 admin.site.register(PagoMixtoTicket)
+admin.site.register(ComprobanteTransferencia)
 
 class ComprobanteTransferenciaInline(admin.StackedInline):
     model = ComprobanteTransferencia
@@ -62,7 +63,7 @@ class HistorialComprasAdmin(admin.ModelAdmin):
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
         inline_instances.append(EstadoPedidoInline(self.model, self.admin_site))
-        if obj and obj.forma_de_pago == 'transferencia':
+        if obj and obj.forma_de_pago in ['transferencia','mixto']:
             inline_instances.append(ComprobanteTransferenciaInline(self.model, self.admin_site))
         return inline_instances
 

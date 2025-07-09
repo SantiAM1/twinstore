@@ -1,4 +1,4 @@
-{% load custom_filters %}
+{% load custom_filters static %}
 
 <table class="users-pedidos-table width-100 text-center">
     <thead>
@@ -33,9 +33,16 @@
                     </div>
                     {% if pedido.check_comprobante %}
                         {% if pedido.comprobante %}
-                            <p class="link-subir-comprobante decoration-none font-roboto subido"><i class="bi bi-paperclip"></i> Comprobante adjunto</p>
+                            <p class="link-subir-ticket decoration-none font-roboto subido"><i class="bi bi-paperclip"></i> Comprobante adjunto</p>
                         {% else %}
                             <a href="{% url 'payment:comprobante' pedido.token_consulta %}" class="link-subir-comprobante decoration-none font-roboto"><i class="bi bi-paperclip"></i> Subir comprobante</a>
+                        {% endif %}
+                        {% if pedido.check_mp_ticket %}
+                            <a href="#" id="generar-link" class="link-subir-ticket decoration-none font-roboto mercadopago flex items-center justify-center gap-05rem">
+                                <img src="{% static 'img/mp-formadepago.webp' %}" alt="Logo mercado pago" height="20"> 
+                                <span id="texto-link" class="font-roboto">Generar link de pago</span>
+                                <span id="spinner" class="spinner hidden"></span>
+                            </a>
                         {% endif %}
                     {% elif pedido.check_arrepentimiento %}
                         <button class="border-none bg-transparent btn-modal-open font-roboto cursor-pointer" data-modal-id="modal-arrepentimiento-{{pedido.id}}">Solicitar Arrepentimiento</button>

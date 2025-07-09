@@ -39,6 +39,21 @@ class HistorialCompras(models.Model):
     fecha_finalizado = models.DateTimeField(null=True,blank=True)
     requiere_revision = models.BooleanField(default=True)
 
+    def check_tickets(self):
+        tickets = self.tickets.all()
+        if tickets.exists() and all(t.estado == 'aprobado' for t in tickets) and self.estado != 'confirmado':
+            self.estado = 'confirmado'
+            self.save()
+
+    def check_mp_ticket(self):
+        return True if self.forma_de_pago == 'mixto' else False
+
+    def monto_tranferir(self):
+        if self.forma_de_pago == 'transferencia':
+            return self.total_compra
+        transferencia = self.tickets.filter(tipo='transferencia').first()
+        return transferencia.monto if transferencia else 0
+
     def __str__(self):
         if self.usuario:
             nombre = self.usuario
@@ -94,6 +109,24 @@ class PagoRecibidoMP(models.Model):
     def __str__(self):
         return f"Pago {self.payment_id} - {self.status}"
 
+class PagoMixtoTicket(models.Model):
+    ESTADOS = [
+        ('aprobado','Aprobado'),
+        ('rechazado','Rechazado'),
+        ('pendiente','Pendiente'),
+    ]
+    TYPES = [
+        ('transferencia','Transferencia'),
+        ('mercadopago','Mercado pago'),
+    ]
+    historial = models.ForeignKey(HistorialCompras,on_delete=models.CASCADE,related_name='tickets')
+    estado = models.CharField(max_length=20,choices=ESTADOS,default='pendiente')
+    monto = models.DecimalField(max_digits=10,decimal_places=2)
+    tipo = models.CharField(max_length=20,choices=TYPES,default='transferencia')
+
+    def __str__(self):
+        return f"Tipo: {self.tipo} | Monto a depositar: {self.monto}"
+
 class ComprobanteTransferencia(models.Model):
 
     ESTADOS = [
@@ -103,6 +136,7 @@ class ComprobanteTransferencia(models.Model):
     ]
 
     historial = models.OneToOneField("HistorialCompras", on_delete=models.CASCADE, related_name="comprobante")
+    ticket = models.ForeignKey(PagoMixtoTicket,on_delete=models.CASCADE,related_name="comprobante",null=True,blank=True)
     file = models.FileField(upload_to="comprobantes/")
     fecha_subida = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20,choices=ESTADOS,default='no verificado')
@@ -133,18 +167,3 @@ class Cupon(models.Model):
 
     def __str__(self):
         return f"{self.codigo} - %{self.descuento}"
-
-class PagoMixtoTicket(models.Model):
-    ESTADOS = [
-        ('aprobado','Aprobado'),
-        ('rechazado','Rechazado'),
-        ('pendiente','Pendiente'),
-    ]
-    TYPES = [
-        ('transferencia','Transferencia'),
-        ('mercadopago','Mercado pago'),
-    ]
-    historial = models.ForeignKey(HistorialCompras,on_delete=models.CASCADE,related_name='tickets')
-    estado = models.CharField(max_length=20,choices=ESTADOS,default='pendiente')
-    monto = models.DecimalField(max_digits=10,decimal_places=2)
-    tipo = models.CharField(max_length=20,choices=TYPES,default='transferencia')
