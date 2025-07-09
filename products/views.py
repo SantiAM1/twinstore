@@ -14,6 +14,7 @@ from django.contrib import messages
 from rest_framework.decorators import throttle_classes
 from core.throttling import FiltrosDinamicosThrottle
 from payment.templatetags.custom_filters import formato_pesos
+from django.conf import settings
 
 import json
 
@@ -438,7 +439,7 @@ def cuotas_mp(precio):
         24 : 2.46494
     }
     resultados = {}
-    total_mp = round(precio/0.923891,2)
+    total_mp = round(precio*settings.MERCADOPAGO_PERCENTAJE,2)
     for cuota, coeficiente in coeficientes.items():
         total = round(total_mp*coeficiente,2)
         valor_couta = round(total/cuota,2)
