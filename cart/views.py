@@ -219,7 +219,7 @@ class CalcularPedidoView(APIView):
             
             if data['metodo_pago'] == 'mercado_pago':
 
-                total_compra = round(total_processor/0.923891,2)
+                total_compra = round(total_processor*settings.MERCADOPAGO_PERCENTAJE,2)
                 adicional = round(total_compra - total_processor,2)
 
                 request.session['adicional_mp'] = adicional
