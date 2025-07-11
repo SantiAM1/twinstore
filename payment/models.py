@@ -6,6 +6,8 @@ from django.utils import timezone
 from datetime import timedelta
 import string
 import secrets
+import re
+from django.core import signing
 
 class HistorialCompras(models.Model):
     ESTADOS = [
@@ -22,7 +24,8 @@ class HistorialCompras(models.Model):
     FORMA_DE_PAGO = [
         ('efectivo','Efectivo'),
         ('mercado pago','Mercado Pago'),
-        ('transferencia','Transferencia')
+        ('transferencia','Transferencia'),
+        ('mixto','Mixto')
     ]
 
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -37,6 +40,37 @@ class HistorialCompras(models.Model):
     recibir_mail = models.BooleanField(default=False)
     fecha_finalizado = models.DateTimeField(null=True,blank=True)
     requiere_revision = models.BooleanField(default=True)
+
+    def check_tickets(self):
+        tickets = self.tickets.all()
+        if tickets.exists() and all(t.estado == 'aprobado' for t in tickets) and self.estado != 'confirmado':
+            self.estado = 'confirmado'
+            self.save()
+
+    def check_mixto(self):
+        return True if self.forma_de_pago == 'mixto' else False
+    
+    def check_ticket_mp(self):
+        ticket = self.tickets.filter(tipo='mercadopago').first()
+        if ticket:
+            if ticket.merchant_order_id:
+                return True
+        return False
+
+    def ticket_mp(self):
+        return self.tickets.filter(tipo='mercadopago').first()
+
+    def mp_ticket_id_signed(self):
+        mercadopago = self.tickets.filter(tipo='mercadopago').first()
+        if mercadopago:
+            return signing.dumps(mercadopago.id)
+        return None
+
+    def monto_tranferir(self):
+        if self.forma_de_pago == 'transferencia':
+            return self.total_compra
+        transferencia = self.tickets.filter(tipo='transferencia').first()
+        return transferencia.monto if transferencia else 0
 
     def __str__(self):
         if self.usuario:
@@ -64,7 +98,7 @@ class HistorialCompras(models.Model):
         return True if not self.estado in ['arrepentido','finalizado','rechazado'] else False
 
     def check_comprobante(self):
-        return True if (self.forma_de_pago == 'transferencia' and not self.estado in ['finalizado','arrepentido']) else False
+        return True if (self.forma_de_pago in ['transferencia','mixto']  and not self.estado in ['finalizado','arrepentido']) else False
 
     def check_arrepentimiento(self):
         if self.fecha_finalizado and self.estado == 'finalizado':
@@ -93,6 +127,47 @@ class PagoRecibidoMP(models.Model):
     def __str__(self):
         return f"Pago {self.payment_id} - {self.status}"
 
+class PagoMixtoTicket(models.Model):
+    ESTADOS = [
+        ('aprobado','Aprobado'),
+        ('rechazado','Rechazado'),
+        ('pendiente','Pendiente'),
+    ]
+    TYPES = [
+        ('transferencia','Transferencia'),
+        ('mercadopago','Mercado pago'),
+    ]
+    historial = models.ForeignKey(HistorialCompras,on_delete=models.CASCADE,related_name='tickets')
+    estado = models.CharField(max_length=20,choices=ESTADOS,default='pendiente')
+    monto = models.DecimalField(max_digits=10,decimal_places=2)
+    tipo = models.CharField(max_length=20,choices=TYPES,default='transferencia')
+    merchant_order_id = models.CharField(max_length=100, blank=True, null=True)
+
+    def get_preference_data(self) -> dict:
+        data = self.historial.facturacion
+        match = re.match(r'^(.*?)(?:\s+(\d+))?$', data.calle.strip())
+        if match:
+            calle_nombre = match.group(1).strip()
+            calle_altura = match.group(2) if match.group(2) else ''
+        metadata = {
+            'nombre':data.nombre,
+            'apellido':data.apellido,
+            'dni_cuit':data.dni_cuit,
+            'ident_type':'DNI' if data.condicion_iva == 'B' else 'CUIT',
+            'email':data.email,
+            'codigo_postal':data.codigo_postal,
+            'ticket_id':self.id,
+            'numero':self.monto,
+            'metadata':{'ticket':self.id},
+            'calle_nombre':calle_nombre,
+            'calle_altura':calle_altura,
+            'backurl':f"usuario/ver_pedido/{self.historial.token_consulta}"
+        }
+        return metadata
+
+    def __str__(self):
+        return f"Tipo: {self.tipo} | Monto a depositar: {self.monto}"
+
 class ComprobanteTransferencia(models.Model):
 
     ESTADOS = [
@@ -102,6 +177,7 @@ class ComprobanteTransferencia(models.Model):
     ]
 
     historial = models.OneToOneField("HistorialCompras", on_delete=models.CASCADE, related_name="comprobante")
+    ticket = models.ForeignKey(PagoMixtoTicket,on_delete=models.CASCADE,related_name="comprobante",null=True,blank=True)
     file = models.FileField(upload_to="comprobantes/")
     fecha_subida = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20,choices=ESTADOS,default='no verificado')

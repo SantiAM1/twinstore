@@ -439,7 +439,7 @@ def cuotas_mp(precio):
         24 : 2.46494
     }
     resultados = {}
-    total_mp = round(precio*settings.MERCADOPAGO_PERCENTAJE,2)
+    total_mp = round(precio*settings.MERCADOPAGO_COMMISSION,2)
     for cuota, coeficiente in coeficientes.items():
         total = round(total_mp*coeficiente,2)
         valor_couta = round(total/cuota,2)

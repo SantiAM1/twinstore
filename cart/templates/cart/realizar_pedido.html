@@ -198,10 +198,10 @@
                 <label for="codigo-descuento" class="cupon-label display-block font-bold font-roboto">Tengo un cupón de descuento</label>
                 <div class="flex gap-05rem cupon-input-wrapper">
                     <input type="text" id="codigo-descuento" placeholder="Ingresa el código">
-                    <button type="button" class="btn-aplicar font-bold cursor-pointer border-none">Aplicar</button>
+                    <button type="button" class="btn-aplicar font-bold cursor-pointer border-none" id="btn-cupon">Aplicar</button>
                 </div>
-                <p class="cupon-error"></p>
-                <p class="cupon-success"></p>
+                <p class="cupon-error" id="cupon-error"></p>
+                <p class="cupon-success" id="cupon-success"></p>
             </div>
             <ul  class="cart-formadepago">
                 <li>
@@ -220,9 +220,33 @@
                 </li>
                 <li>
                     <input type="radio" name="forma_pago" id="mercadopago">
-                    <label for="mercadopago">Pagar con Mercado Pago</label>
-                    <div class="cart-formadepago-details font-roboto">IMPORTANTE: Los pagos realizados con la plataforma de Mercado Pago cuentan con un recargo del 6,29% más IVA.
+                    <label for="mercadopago">Pagar con Tarjeta (Mercado Pago)</label>
+                    <div class="cart-formadepago-details font-roboto">IMPORTANTE: Los pagos realizados con la plataforma de Mercado Pago cuentan con un recargo del 6,42% más IVA.
                         <div id="box-checkout-pro" class="bloqueable width-100"></div>
+                    </div>
+                </li>
+                <li>
+                    <input type="radio" name="forma_pago" id="mixto" value="mixto">
+                    <label for="mixto"><span class="feature-new font-roboto">(Nuevo) </span>Pago Mixto (Transferencia + Mercado Pago)</label>
+                    <div class="cart-formadepago-details font-roboto flex flex-column">
+                        IMPORTANTE: Ahora en Twinstore puedes dividir tus pagos! El pago parcial abonado mediante Mercado Pago cuentan con un recargo del 6,42% más IVA. El importe a transferir no aplica un adicional.
+                        <div class="flex gap-05rem cupon-input-wrapper mixto-transferencia-box">
+                            <div class="input-prefix position-relative flex width-100">
+                                <span class="prefix position-absolute">$</span>
+                                <input type="number" step="0.01" id="importe-transferir" placeholder="Importe a transferir">
+                            </div>
+                            <button type="button" class="btn-aplicar font-bold cursor-pointer border-none" id="btn-mixto">Aplicar</button>
+                        </div>
+                        <p class="cupon-error" id="mixto-error"></p>
+                        <p class="cupon-success" id="mixto-success"></p>
+                        <div class="flex flex-column cupon-input-wrapper importe-mercadopago mixto-transferencia-box display-none">
+                            <p class="font-roboto email-msg font-bold">Importe a pagar con Mercado Pago:</p>
+                            <div class="input-prefix position-relative flex width-100">
+                                <span class="prefix position-absolute">$</span>
+                                <input type="number" step="0.01" id="importe-mp" readonly>
+                            </div>
+                        </div>
+                        <button type="button" disabled class="cart-finalizarcompra bloqueable decoration-none display-block text-center font-bold block" id="realizar-pedido-mixto">Realizar Pedido</button>
                     </div>
                 </li>
             </ul>

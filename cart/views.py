@@ -1,4 +1,4 @@
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpRequest
 from django.shortcuts import redirect, get_object_or_404,render
 from django.conf import settings
 from django.utils import timezone
@@ -6,6 +6,7 @@ from django.templatetags.static import static
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.core import signing
+from django.core.signing import BadSignature
 
 from users.forms import UsuarioForm,TerminosYCondiciones
 from users.models import PerfilUsuario,DatosFacturacion
@@ -14,7 +15,7 @@ from core.permissions import BloquearSiMantenimiento
 from core.decorators import bloquear_si_mantenimiento
 from core.throttling import EnviarWtapThrottle,CarritoThrottle,CalcularPedidoThrottle
 
-from payment.models import HistorialCompras,Cupon,EstadoPedido
+from payment.models import HistorialCompras,Cupon,EstadoPedido,PagoMixtoTicket
 from payment.templatetags.custom_filters import formato_pesos
 
 from .models import Producto, Carrito, Pedido
@@ -22,7 +23,7 @@ from products.models import ColorProducto
 
 import mercadopago
 
-from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,EliminarPedidoSerializer,ActualizarPedidoSerializer,CuponSerializer
+from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,EliminarPedidoSerializer,ActualizarPedidoSerializer,CuponSerializer,PagoMixtoSerializer,PagoMixtoInitSerializer
 from .context_processors import carrito_total
 from .permissions import TieneCarrito
 from .decorators import requiere_carrito
@@ -31,6 +32,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from decimal import Decimal
 import re
 from weasyprint import HTML
 import datetime
@@ -219,7 +221,7 @@ class CalcularPedidoView(APIView):
             
             if data['metodo_pago'] == 'mercado_pago':
 
-                total_compra = round(total_processor*settings.MERCADOPAGO_PERCENTAJE,2)
+                total_compra = round(total_processor*settings.MERCADOPAGO_COMMISSION,2)
                 adicional = round(total_compra - total_processor,2)
 
                 request.session['adicional_mp'] = adicional
@@ -331,10 +333,70 @@ class ValidarCuponView(APIView):
 
             return Response({"error": "Cupón inválido o inactivo."}, status=404)
 
+class ValidarPagoMixtoView(APIView):
+    permission_classes = [TieneCarrito,BloquearSiMantenimiento]
+    throttle_classes = [CalcularPedidoThrottle]
+    def post(self,request):
+        serializer = PagoMixtoSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors,status=400)
+        
+        total_carrito = carrito_total(request,type="api").get('total_precio')
+        pago_transferencia = serializer.validated_data.get('numero')
+
+        if pago_transferencia >= total_carrito:
+            return Response({"error":"El valor ingresado no es válido."},status=404)
+
+        if pago_transferencia/total_carrito > 0.95:
+            return Response({"error":f"El valor de mercado pago no puede ser menor al 5% de la compra"},status=404)
+        
+        pago_mp = round((total_carrito-pago_transferencia)*Decimal(settings.MERCADOPAGO_COMMISSION),2)
+
+        request.session['pago-mixto'] = {
+            'transferencia':float(pago_transferencia),
+            'mercadopago':float(pago_mp)
+        }
+
+        return Response({"mercadopago":float(pago_mp)},status=200)
+
+class PagoMixtoInitPointMPView(APIView):
+    permission_classes = [BloquearSiMantenimiento]
+    throttle_classes = [CalcularPedidoThrottle]
+    def post(self,request):
+        serializer = PagoMixtoInitSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors,status=400)
+        
+        numero_firmado = serializer.validated_data.get('numero_firmado')
+
+        try:
+            ticket_id = signing.loads(numero_firmado)
+        except BadSignature:
+            return Response({'error': 'Firma inválida'}, status=400)
+
+        try:
+            ticket = PagoMixtoTicket.objects.get(id=ticket_id)
+            if ticket.tipo != 'mercadopago' or ticket.estado == 'aprobado':
+                return Response(status=400)
+            data = ticket.get_preference_data()
+            metadata = data.get('metadata')
+            firma = {"firma":signing.dumps(metadata)}
+
+            try:
+                preference = preference_mp(data['numero'],data['ticket_id'],data['dni_cuit'],data['ident_type'],data['email'],data['nombre'],data['apellido'],data['codigo_postal'],data['calle_nombre'],data['calle_altura'],firma,backurl=data['backurl'])
+                init_point = preference.get("init_point", "")
+                return Response({'init_point':init_point},status=200)
+            except ValueError as e:
+                return Response({'error': str(e)}, status=500)
+            
+        except PagoMixtoTicket.DoesNotExist:
+            return Response(status=404)
+
+
 # Create your views here.
 # ----- Preferencias de MP ----- #
 
-def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,firma):
+def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,firma,backurl="payment/success/"):
     site_url = f'{settings.SITE_URL}'
 
     argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
@@ -369,7 +431,7 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
             }
         },
         "back_urls": {
-            "success": f"https://{site_url}/payment/success/",
+            "success": f"https://{site_url}/{backurl}",
             "failure": f"https://{site_url}/payment/failure/",
             "pending": f"https://{site_url}/payment/pendings/"
         },
@@ -381,7 +443,10 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
         "expiration_date_from": expiration_from,
         "expiration_date_to": expiration_to,
         "metadata": firma,
+        "binary_mode": True,
     }
+
+    print(preference_data)
 
     sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
@@ -415,16 +480,27 @@ def realizar_pedido(request):
             data = form.cleaned_data
             forma_pago = request.POST.get('forma_pago')
 
-            if forma_pago not in ['efectivo', 'transferencia']:
-                raise Http404("Medios de pago no validos")
+            if forma_pago not in ['efectivo', 'transferencia','mixto']:
+                raise Http404("Medios de pago no válidos")
+            
+            total_carrito = carrito_total(request,type="api").get('total_precio')
+
+            if forma_pago == 'mixto':
+                merchant_order_id = _generar_identificador_unico('M')
+                status = 'pendiente'
+                pago_mixto = request.session.get('pago-mixto','')
+                if not pago_mixto:
+                    raise Http404("Petición incompleta")
+                total_carrito = pago_mixto['transferencia'] + pago_mixto['mercadopago']
+                del request.session['pago-mixto']
+                request.session.modified = True
+                
             elif forma_pago == 'transferencia':
                 merchant_order_id = _generar_identificador_unico('T')
                 status = 'pendiente'
             else:
                 merchant_order_id = _generar_identificador_unico('E')
                 status = 'confirmado'
-
-            total_carrito = carrito_total(request,type="api").get('total_precio')
 
             if request.user.is_authenticated:
                 carrito = get_object_or_404(Carrito, usuario=request.user)
@@ -481,6 +557,19 @@ def realizar_pedido(request):
             merchant_order_id=merchant_order_id,
             recibir_mail=data['recibir_estado_pedido']
             )
+
+            if forma_pago == 'mixto':
+
+                PagoMixtoTicket.objects.create(
+                    historial=historial,
+                    monto=pago_mixto['transferencia'],
+                    tipo='transferencia'
+                )
+                PagoMixtoTicket.objects.create(
+                    historial=historial,
+                    monto=pago_mixto['mercadopago'],
+                    tipo='mercadopago'
+                )
 
             if request.session.get('cupon',''):
                 cupon_id = request.session['cupon'].get('id')

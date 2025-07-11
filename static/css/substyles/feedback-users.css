@@ -1,7 +1,9 @@
 .users-feedback-box h2 {
     color: #2e2e2e;
 }
-.users-feedback-box p {color: #5f5f5f;}
+
+.users-feedback-box p {color: #5f5f5f;line-height: 1.3rem;max-width: 400px;
+}
 
 .users-feedback-box {
     background-color: #fff;
@@ -25,18 +27,51 @@
     width: max-content;
 }
 
-.link-subir-comprobante {
+.link-subir-ticket {
     color: #fff;
     padding: 0.3rem 0.5rem;
     background-color: #292929;
     border-radius: 5px;
-    display: block;
     width: max-content;
     margin-top: 0.5rem;
 }
 
-.link-subir-comprobante.subido {
-    background-color: #005dc0;
+.link-subir-ticket.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.link-subir-ticket.subido {
+    background-color: #fff;
+    border: 1px solid #a3a3a3;
+    color: #7e7e7e
+}
+
+.link-subir-ticket.mercadopago {
+    background-color: #007bff;
+}
+
+.link-subir-ticket.aprobado {
+    background-color: #00c04a;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.link-subir-ticket.rechazado {
+    background-color: #b3c000;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+.hidden {
+    display: none;
 }
 
 .input-subir-comprobante {

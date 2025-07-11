@@ -1,4 +1,4 @@
-{% load custom_filters %}
+{% load custom_filters static %}
 
 <table class="users-pedidos-table width-100 text-center">
     <thead>
@@ -33,9 +33,24 @@
                     </div>
                     {% if pedido.check_comprobante %}
                         {% if pedido.comprobante %}
-                            <p class="link-subir-comprobante decoration-none font-roboto subido"><i class="bi bi-paperclip"></i> Comprobante adjunto</p>
+                            <p class="link-subir-ticket decoration-none font-roboto subido"><i class="bi bi-paperclip"></i> Comprobante adjunto</p>
                         {% else %}
-                            <a href="{% url 'payment:comprobante' pedido.token_consulta %}" class="link-subir-comprobante decoration-none font-roboto"><i class="bi bi-paperclip"></i> Subir comprobante</a>
+                            <a href="{% url 'payment:comprobante' pedido.token_consulta %}" class="link-subir-ticket display-block decoration-none font-roboto"><i class="bi bi-paperclip"></i> Subir comprobante</a>
+                        {% endif %}
+                        {% if pedido.check_mixto %}
+                            {% if pedido.check_ticket_mp %}
+                                <a class="link-subir-ticket mercadopago decoration-none font-roboto flex items-center justify-center gap-05rem {% if pedido.ticket_mp.estado == 'aprobado' %}aprobado{% else %}rechazado{% endif %}" data-pedido-id="{{pedido.mp_ticket_id_signed}}">
+                                    <img src="{% static 'img/mp-formadepago.webp' %}" alt="Logo mercado pago" height="20"> 
+                                    <span class="texto-link font-roboto">Pago: {{pedido.ticket_mp.estado|capfirst}}</span>
+                                    <span class="spinner hidden"></span>
+                                </a>
+                            {% else %}
+                                <a href="#" class="link-subir-ticket decoration-none font-roboto mercadopago flex items-center justify-center gap-05rem" data-pedido-id="{{pedido.mp_ticket_id_signed}}">
+                                    <img src="{% static 'img/mp-formadepago.webp' %}" alt="Logo mercado pago" height="20"> 
+                                    <span class="texto-link font-roboto">Generar link de pago</span>
+                                    <span class="spinner hidden"></span>
+                                </a>
+                            {% endif %}
                         {% endif %}
                     {% elif pedido.check_arrepentimiento %}
                         <button class="border-none bg-transparent btn-modal-open font-roboto cursor-pointer" data-modal-id="modal-arrepentimiento-{{pedido.id}}">Solicitar Arrepentimiento</button>
@@ -103,6 +118,7 @@
                 <p class="font-roboto">Total abonado: <span class="modal-span">{{pedido.total_compra|formato_pesos}}</span></p>
                 <p class="font-roboto">Cantidad de productos: <span class="modal-span">{{pedido.productos|length}}</span></p>
                 <p class="font-roboto">Forma de pago: <span class="modal-span">{{pedido.forma_de_pago|capfirst}}</span></p>
+                <p class="font-roboto">Notificaciones: <span class="modal-span">{% if pedido.recibir_mail %}Sí{% else %}No{% endif %}</span></p>
                 <p class="font-roboto">Token de consulta: <span class="modal-span">{{pedido.token_consulta}}</span></p>
             </div>
         </div>

@@ -91,6 +91,19 @@
     width: 100%;
     margin: 0.5rem 0;
     border: none;
+    transition: background-color 0.3s ease;
+}
+
+.cart-finalizarcompra[type="button"] {
+    background-color: #a5a5a5;
+}
+
+.cart-finalizarcompra[type="button"]:hover {
+    background-color: #a5a5a5;
+}
+
+.cart-finalizarcompra[type="submit"]:hover {
+    background-color: #0d4972;
 }
 
 .cart-formadepago-details {
@@ -104,7 +117,7 @@
 }
 
 input[type="radio"]:checked + label + .cart-formadepago-details {
-    max-height: 300px;
+    max-height: 350px;
     opacity: 1;
 }
 
@@ -150,10 +163,35 @@ input[type="radio"]:checked + label + .cart-formadepago-details {
 }
 
 .cupon-input-wrapper input {
+    flex: 1;
+    min-width: 0;
     padding: 0.6rem;
     border: 1px solid #ccc;
     border-radius: 6px;
-    max-width: 180px;
+}
+
+.mixto-transferencia-box {
+    margin-top: 0.5rem;
+}
+
+.input-prefix .prefix {
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.cupon-input-wrapper .input-prefix input{
+    padding-left: 1.1rem;
+    color: #555;
+}
+
+.importe-mercadopago {
+    background-color: #ebebeb;
+    padding: 0.7rem;
+    border-radius: 12px;
 }
 
 .cupon-input-wrapper input.errors {
@@ -171,6 +209,8 @@ input[type="radio"]:checked + label + .cart-formadepago-details {
     border-radius: 6px;
     font-size: 1rem;
     transition: background-color 0.3s ease;
+    white-space: nowrap; /* evita que el texto se corte o haga wrap */
+    flex-shrink: 0; 
 }
 
 .btn-aplicar:hover {
@@ -238,4 +278,10 @@ input[type="radio"]:checked + label + .cart-formadepago-details {
 
 .cart-cupon {
     color: #0056b3;
+}
+
+.feature-new {
+    font-size: 1rem;
+    color: #1b8dd8;
+    font-weight: normal;
 }
