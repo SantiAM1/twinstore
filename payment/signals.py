@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
-from .models import PagoRecibidoMP, HistorialCompras,ComprobanteTransferencia,EstadoPedido
+from .models import PagoRecibidoMP, HistorialCompras,ComprobanteTransferencia,EstadoPedido,PagoMixtoTicket
 from users.emails import mail_estado_pedido_html,mail_obs_comprobante_html
 from django.utils import timezone
 from threading import local
@@ -80,7 +80,6 @@ def aprobar_historial_transferencia(sender, instance, created, **kwargs):
     elif historial.forma_de_pago == 'mixto' and instance.estado == 'aprobado':
         instance.ticket.estado = 'aprobado'
         instance.ticket.save()
-        historial.check_tickets()
     # * 3 Cuando el comprobante se rechaza se envia un mail
     elif instance.estado == 'rechazado':
         if instance.observaciones:
@@ -91,3 +90,9 @@ def aprobar_historial_transferencia(sender, instance, created, **kwargs):
             )
             mail_obs_comprobante_html(historial, instance.observaciones)
         instance.delete()
+
+@receiver(post_save,sender=PagoMixtoTicket)
+def actualizar_historial(sender, instance:PagoMixtoTicket, created, **kwargs):
+    if instance.estado != "aprobado":
+        return
+    instance.historial.check_tickets()

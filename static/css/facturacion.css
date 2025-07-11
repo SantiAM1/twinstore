@@ -117,7 +117,7 @@
 }
 
 input[type="radio"]:checked + label + .cart-formadepago-details {
-    max-height: 300px;
+    max-height: 350px;
     opacity: 1;
 }
 
@@ -168,6 +168,30 @@ input[type="radio"]:checked + label + .cart-formadepago-details {
     padding: 0.6rem;
     border: 1px solid #ccc;
     border-radius: 6px;
+}
+
+.mixto-transferencia-box {
+    margin-top: 0.5rem;
+}
+
+.input-prefix .prefix {
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.cupon-input-wrapper .input-prefix input{
+    padding-left: 1.1rem;
+    color: #555;
+}
+
+.importe-mercadopago {
+    background-color: #ebebeb;
+    padding: 0.7rem;
+    border-radius: 12px;
 }
 
 .cupon-input-wrapper input.errors {

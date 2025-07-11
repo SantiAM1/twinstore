@@ -20,14 +20,14 @@
 <div class="padding-1rem">
     <div class="flex font-roboto flex-column users-feedback-box">
         <h2 class="text-center">¡Gracias por tu compra!</h2>
-        <p>Hemos recibido tu pedido con exito</p>
+        <p class="text-center">🎉 ¡Hemos recibido tu pedido con exito! 🎉</p>
         {% if historial.forma_de_pago == 'transferencia' %}
             <div class="users-facturacion-transferencia font-roboto">
                 <h3>Pago por transferencia bancaria</h3><br>
                 {% if user.is_authenticated %}
-                    <p><i class="bi bi-check2"></i> Podés subir el comprobante más tarde desde la sección <strong>"Mis pedidos"</strong>.</p>
+                    <p><i class="bi bi-check2"></i> Subí tu comprobante desde la sección <strong>"Mis pedidos"</strong>.</p>
                 {% else %}
-                    <p><i class="bi bi-check2"></i> Podés subir tu comprobante más tarde ingresando tu <strong>código de seguimiento</strong></p>
+                    <p><i class="bi bi-check2"></i> Subí tu comprobante ingresando en tu <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="politicas-link">Pedido</a>.</p>
                 {% endif %}
                 <p><i class="bi bi-check2-all"></i> Una vez validado el pago, te notificaremos por correo electrónico.</p><br>
                 <div class="link-comprobante-box">
@@ -37,18 +37,65 @@
                 </div>
             </div>
         {% endif %}
+        {% if historial.forma_de_pago == 'mixto' %}
+            <div class="users-facturacion-transferencia font-roboto">
+                <h3 class="font-roboto">Pago mixto (Transferencia + MP)</h3><br>
+                {% if user.is_authenticated %}
+                    <p><i class="bi bi-check2"></i> Subí tu comprobante y generá el link de pago desde la sección <strong>"Mis pedidos"</strong>.</p>
+                {% else %}
+                    <p><i class="bi bi-check2"></i> Subí tu comprobante y generá el link de pago desde la vista de tu <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="politicas-link">Pedido</a>.</p>
+                {% endif %}
+                <p><i class="bi bi-check2-all"></i> Una vez validado los pagos, te notificaremos por correo electrónico.</p><br>
+                {% if user.is_authenticated %}
+                    <div class="link-comprobante-box">
+                        <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer link-comprobante-button decoration-none">
+                            Ver pedido
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        {% if historial.forma_de_pago == 'efectivo' %}
+            <div class="users-facturacion-transferencia font-roboto">
+                <h3 class="font-roboto">Pago de contado</h3><br>
+                {% if user.is_authenticated %}
+                    <p><i class="bi bi-check2"></i> Puedes ver el estado de tu pedido en la sección <strong>"Mis pedidos"</strong>.</p>
+                {% else %}
+                    <p><i class="bi bi-check2"></i> Puedes ver el estado de tu pedido desde la sección <strong>"Pedidos"</strong> ingresando tu código de seguimiento.</p>
+                {% endif %}
+                <p><i class="bi bi-check2-all"></i> Algunos productos pueden requerir un pago anticipado para asegurar su disponibilidad. En estos casos, se coordinará con el staff.</p><br>
+                {% if user.is_authenticated %}
+                    <div class="link-comprobante-box">
+                        <a href="{% url 'users:ver_pedidos' historial.token_consulta %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer link-comprobante-button decoration-none">
+                            Ver pedido
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        {% if historial.forma_de_pago == 'mercado pago' %}
+            <div class="users-facturacion-transferencia font-roboto">
+                <h3 class="font-roboto">Pago con Mercado Pago</h3><br>
+                {% if user.is_authenticated %}
+                    <p><i class="bi bi-check2"></i> Puedes ver el estado de tu pedido en la sección <strong>"Mis pedidos"</strong>.</p>
+                {% else %}
+                    <p><i class="bi bi-check2"></i> Puedes ver el estado de tu pedido desde la sección <strong>"Pedidos"</strong> ingresando tu código de seguimiento.</p>
+                {% endif %}
+            </div>
+        {% endif %}
         <div>
             {% if user.is_authenticated %}
                 <p>🏷️ Puedes ver el estado de tu compra en "Mis Pedidos"</p>
             {% else %}
                 {% if historial %}
-                    <p>🏷️ Este es tu codigo de seguimiento:<code>{{ historial.token_consulta }}</code></p>
+                    <p>🏷️ Este es tu codigo de seguimiento:</p>
+                    <p><strong>{{ historial.token_consulta }}</strong></p>
                 {% else %}
-                    <p>🏷️ Tu codigo de seguimiento se esta generando...</code></p>
+                    <p>🏷️ Tu codigo de seguimiento se está generando...</code></p>
                 {% endif %}
             {% endif %}
             <p>📨 En breve recibirás un correo con todos los detalles.</p>
-            <p>👉 Si tenés dudas, podés contactarnos a <span class="politicas-link">contacto@twinstore.com.ar</span>.</p>
+            <p>👉 Si tenés dudas, podés <a href="{% url 'core:contacto' %}" class="decoration-none politicas-link">contactarnos</a>.</p>
         </div>
         <div class="flex justify-between">
             <a href="{% url 'core:home' %}" class="tw-hover-button border-none font-roboto font-bold cursor-pointer users-confirm-links">Volver a la tienda</a>

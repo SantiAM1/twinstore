@@ -13,6 +13,13 @@ admin.site.register(Cupon)
 admin.site.register(PagoMixtoTicket)
 admin.site.register(ComprobanteTransferencia)
 
+class TicketPagoMixtoInline(admin.StackedInline):
+    model = PagoMixtoTicket
+    can_delete = False
+    extra = 0
+    classes = ['collapse']
+    readonly_fields = ['estado','monto','tipo']
+
 class ComprobanteTransferenciaInline(admin.StackedInline):
     model = ComprobanteTransferencia
     can_delete = False
@@ -65,6 +72,8 @@ class HistorialComprasAdmin(admin.ModelAdmin):
         inline_instances.append(EstadoPedidoInline(self.model, self.admin_site))
         if obj and obj.forma_de_pago in ['transferencia','mixto']:
             inline_instances.append(ComprobanteTransferenciaInline(self.model, self.admin_site))
+            if obj and obj.forma_de_pago == 'mixto':
+                inline_instances.append(TicketPagoMixtoInline(self.model, self.admin_site))
         return inline_instances
 
     def mostrar_nombre_apellido(self, obj):

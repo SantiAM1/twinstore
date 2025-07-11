@@ -6,6 +6,8 @@ from django.utils import timezone
 from datetime import timedelta
 import string
 import secrets
+import re
+from django.core import signing
 
 class HistorialCompras(models.Model):
     ESTADOS = [
@@ -45,8 +47,24 @@ class HistorialCompras(models.Model):
             self.estado = 'confirmado'
             self.save()
 
-    def check_mp_ticket(self):
+    def check_mixto(self):
         return True if self.forma_de_pago == 'mixto' else False
+    
+    def check_ticket_mp(self):
+        ticket = self.tickets.filter(tipo='mercadopago').first()
+        if ticket:
+            if ticket.merchant_order_id:
+                return True
+        return False
+
+    def ticket_mp(self):
+        return self.tickets.filter(tipo='mercadopago').first()
+
+    def mp_ticket_id_signed(self):
+        mercadopago = self.tickets.filter(tipo='mercadopago').first()
+        if mercadopago:
+            return signing.dumps(mercadopago.id)
+        return None
 
     def monto_tranferir(self):
         if self.forma_de_pago == 'transferencia':
@@ -123,6 +141,29 @@ class PagoMixtoTicket(models.Model):
     estado = models.CharField(max_length=20,choices=ESTADOS,default='pendiente')
     monto = models.DecimalField(max_digits=10,decimal_places=2)
     tipo = models.CharField(max_length=20,choices=TYPES,default='transferencia')
+    merchant_order_id = models.CharField(max_length=100, blank=True, null=True)
+
+    def get_preference_data(self) -> dict:
+        data = self.historial.facturacion
+        match = re.match(r'^(.*?)(?:\s+(\d+))?$', data.calle.strip())
+        if match:
+            calle_nombre = match.group(1).strip()
+            calle_altura = match.group(2) if match.group(2) else ''
+        metadata = {
+            'nombre':data.nombre,
+            'apellido':data.apellido,
+            'dni_cuit':data.dni_cuit,
+            'ident_type':'DNI' if data.condicion_iva == 'B' else 'CUIT',
+            'email':data.email,
+            'codigo_postal':data.codigo_postal,
+            'ticket_id':self.id,
+            'numero':self.monto,
+            'metadata':{'ticket':self.id},
+            'calle_nombre':calle_nombre,
+            'calle_altura':calle_altura,
+            'backurl':f"usuario/ver_pedido/{self.historial.token_consulta}"
+        }
+        return metadata
 
     def __str__(self):
         return f"Tipo: {self.tipo} | Monto a depositar: {self.monto}"

@@ -12,13 +12,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputMixto = document.getElementById("importe-transferir");
     const btnMixto = document.getElementById("btn-mixto");
     const btnPedidoMixto = document.getElementById("realizar-pedido-mixto");
+    const inputMp = document.getElementById("importe-mp");
+    const mpBox = document.querySelector(".importe-mercadopago");
     btnPagoMixto.addEventListener("click",async () => {
         const numero = inputPagoMixto.value
-        msgErrorMixto.textContent = ""
-        msgSuccessMixto.textContent = ""
-        inputMixto.classList.remove("success", "errors");
-        btnPedidoMixto.disabled = true;
-        btnPedidoMixto.setAttribute("type", "button");
+        resetMixto(false)
 
         if (!numero || parseFloat(numero) <= 0) {
             msgErrorMixto.textContent = "Por favor, ingresá un valor mayor a 0.";
@@ -37,8 +35,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 btnPedidoMixto.disabled = false;
                 btnPedidoMixto.classList.add("cursor-pointer")
                 msgSuccessMixto.textContent = "¡Validado correctamente!";
+                inputMp.value = response.data.mercadopago;
+                mpBox.classList.remove("display-none");
                 setTimeout(() => btnMixto.classList.remove("btn-success"), 2000);
             }
+
         } catch (error) {
             const mensaje = error.response?.data?.error || "Ocurrió un error inesperado";
             msgErrorMixto.textContent = mensaje;
@@ -113,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 e.target.checked = false;
                 return;
             }
-
+            resetMixto(true)
             toggleDisableItems(true);
 
             const datos = {
@@ -179,10 +180,21 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+    function resetRadio() {
+        document.querySelectorAll('input[name="forma_pago"]').forEach(radio => {
+            radio.checked = false;
+        });
+        resetMixto(true)
+    }
+    function resetMixto(flag) {
+        msgErrorMixto.textContent = ""
+        msgSuccessMixto.textContent = ""
+        inputMixto.classList.remove("success", "errors");
+        btnPedidoMixto.disabled = true;
+        btnPedidoMixto.setAttribute("type", "button");
+        mpBox.classList.add("display-none");
+        if (flag) {
+            inputMixto.value = "";
+        }
+    }
 });
-
-function resetRadio() {
-    document.querySelectorAll('input[name="forma_pago"]').forEach(radio => {
-        radio.checked = false;
-    });
-}

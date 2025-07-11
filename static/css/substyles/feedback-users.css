@@ -2,7 +2,7 @@
     color: #2e2e2e;
 }
 
-.users-feedback-box p {color: #5f5f5f;line-height: 1.3rem;
+.users-feedback-box p {color: #5f5f5f;line-height: 1.3rem;max-width: 400px;
 }
 
 .users-feedback-box {
@@ -36,12 +36,29 @@
     margin-top: 0.5rem;
 }
 
+.link-subir-ticket.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
 .link-subir-ticket.subido {
-    background-color: #006d43;
+    background-color: #fff;
+    border: 1px solid #a3a3a3;
+    color: #7e7e7e
 }
 
 .link-subir-ticket.mercadopago {
     background-color: #007bff;
+}
+
+.link-subir-ticket.aprobado {
+    background-color: #00c04a;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.link-subir-ticket.rechazado {
+    background-color: #b3c000;
 }
 
 .spinner {

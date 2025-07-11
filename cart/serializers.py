@@ -97,3 +97,6 @@ class CuponSerializer(serializers.Serializer):
 
 class PagoMixtoSerializer(serializers.Serializer):
     numero = serializers.DecimalField(decimal_places=2,max_digits=10)
+
+class PagoMixtoInitSerializer(serializers.Serializer):
+    numero_firmado = serializers.CharField()
