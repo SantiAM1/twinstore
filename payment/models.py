@@ -41,6 +41,9 @@ class HistorialCompras(models.Model):
     fecha_finalizado = models.DateTimeField(null=True,blank=True)
     requiere_revision = models.BooleanField(default=True)
 
+    def check_comprobante_subido(self):
+        return hasattr(self, 'comprobante')
+
     def check_tickets(self):
         tickets = self.tickets.all()
         if tickets.exists() and all(t.estado == 'aprobado' for t in tickets) and self.estado != 'confirmado':
