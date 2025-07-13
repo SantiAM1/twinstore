@@ -1,4 +1,5 @@
 from django import template
+from django.core import signing
 
 register = template.Library()
 
@@ -26,3 +27,7 @@ def absolute_url(relative_url, request):
         return request.build_absolute_uri(relative_url)
     except:
         return relative_url  # fallback en caso de error
+
+@register.filter
+def signing_data(input):
+    return signing.dumps(input)

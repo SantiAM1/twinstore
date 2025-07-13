@@ -16,7 +16,7 @@ urlpatterns = [
     path('reenviar_mail/',reenviar_verificacion,name="reenviar_mail"),
     path('api/recibir_mail/',RecibirMailView.as_view(),name="recibir_mail"),
     path('asociar_pedido/',asociar_pedido,name="asociar_pedido"),
-    path('arrepentimiento/<int:historial_id>/',arrepentimiento_post,name="arrepentimiento_post"),
+    path('arrepentimiento/<str:historial_signed>/',arrepentimiento_post,name="arrepentimiento_post"),
     path('recuperar/',recuperar_contraseña,name="recuperar"),
     path('restablecer/<str:token>/',restablecer_contraseña,name="restablecer")
 ]

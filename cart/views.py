@@ -87,7 +87,7 @@ class ActualizarPedidoView(APIView):
         if serializer.is_valid():
             data = serializer.validated_data
             action = data['action']
-            pedido_id = data['pedido_id']
+            pedido_id = signing.loads(data.get('pedido_id'))
 
             if request.user.is_authenticated:
                 carrito = get_object_or_404(Carrito, usuario=request.user)
@@ -140,7 +140,8 @@ class EliminarPedidoView(APIView):
         if serializer.is_valid():
 
             data = serializer.validated_data
-            pedido_id = data['pedido_id']
+            pedido_id = signing.loads(data.get('pedido_id'))
+
             if request.user.is_authenticated:
                 carrito = get_object_or_404(Carrito,usuario=request.user)
                 pedido = get_object_or_404(Pedido,id=int(pedido_id),carrito=carrito)
@@ -167,10 +168,12 @@ class AgregarAlCarritoView(APIView):
         if serializer.is_valid():
 
             data = serializer.validated_data
-            producto = get_object_or_404(Producto, id=data['producto_id'])
+            producto_id = signing.loads(data.get('producto_id'))
+            producto = get_object_or_404(Producto, id=producto_id)
             cantidad = data['cantidad']
             if data.get('color'):
-                color = get_object_or_404(ColorProducto,id=data['color'])
+                color_id = signing.loads(data.get('color'))
+                color = get_object_or_404(ColorProducto,id=color_id)
             else:
                 color = None
 

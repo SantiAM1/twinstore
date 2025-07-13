@@ -17,7 +17,8 @@ from .forms import EmailUsuarioRecuperacion,RestablecerContraseña
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import PasswordResetForm
 from django.utils.translation import gettext_lazy as _
-from django import forms
+from django.core import signing
+
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -38,8 +39,8 @@ class RecibirMailView(APIView):
         serializer = RecibirMailSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
-            token = data['token']
-            historial = HistorialCompras.objects.filter(token_consulta = token).first()
+            historial_id = signing.loads(data.get('id'))
+            historial = HistorialCompras.objects.get(id=historial_id)
             historial.recibir_mail = not historial.recibir_mail
             historial.save()
             html = render_to_string('partials/notificacion.html',{
@@ -51,7 +52,8 @@ class RecibirMailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @require_POST
-def arrepentimiento_post(request, historial_id):
+def arrepentimiento_post(request, historial_signed):
+    historial_id = signing.loads(historial_signed)
     historial = get_object_or_404(HistorialCompras,id=historial_id)
     if not historial.check_arrepentimiento():
         messages.error(request,'Hubo un error al solicitar el Arrepentimiento')

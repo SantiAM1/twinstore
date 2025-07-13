@@ -40,7 +40,7 @@
                             <tr class="items-center">
                                 <td class="cart-prod flex items-center">
                                     <div class="cart-prod-responsive flex items-center position-relative gap-05rem">
-                                        <a href="#" class="cart-prod-delete bloqueable" data-pedido-id="{{ pedido.id }}"><i class="bi bi-x-circle"></i></a>
+                                        <a href="#" class="cart-prod-delete bloqueable" data-pedido-id="{{ pedido.id|signing_data }}"><i class="bi bi-x-circle"></i></a>
                                         {% if pedido.producto.portada %}
                                             <img src="{{ pedido.producto.portada.url }}" alt="{{ pedido.get_nombre_producto }}" class="cart-prod-img" loading="lazy">
                                         {% else %}
@@ -54,7 +54,7 @@
                                 </td>
                                 <td class="cart-price-sub">{{ pedido.producto.precio|formato_pesos }}</td>
                                 <td>
-                                    <div class="flex items-center justify-center quantity-container bloqueable" data-pedido-id="{{ pedido.id }}" data-precio="{{ pedido.producto.precio }}">
+                                    <div class="flex items-center justify-center quantity-container bloqueable" data-pedido-id="{{ pedido.id|signing_data }}">
                                         <button type="button" name="action" data-action="decrement" class="btn-cantidad"><i class="bi bi-dash"></i></button>
                                         <input type="text" class="input-value-cart" name="cantidad" value="{{ pedido.cantidad }}" readonly>
                                         <button type="button" name="action" data-action="increment" class="btn-cantidad"><i class="bi bi-plus"></i></button>
@@ -71,7 +71,7 @@
                             <tr class="items-center">
                                 <td class="cart-prod flex items-center">
                                     <div class="cart-prod-responsive flex items-center position-relative gap-05rem">
-                                        <a href="#" class="cart-prod-delete bloqueable" data-pedido-id="{{ pedido.id }}"><i class="bi bi-x-circle"></i></a>
+                                        <a href="#" class="cart-prod-delete bloqueable" data-pedido-id="{{ pedido.id|signing_data }}"><i class="bi bi-x-circle"></i></a>
                                         {% if pedido.producto.portada %}
                                             <img src="{{ pedido.producto.portada.url }}" alt="{{ pedido.nombre_producto }}" class="cart-prod-img" loading="lazy">
                                         {% else %}
@@ -85,7 +85,7 @@
                                 </td>
                                 <td class="cart-price-sub">{{ pedido.producto.precio|formato_pesos }}</td>
                                 <td>
-                                    <div class="flex items-center justify-center quantity-container bloqueable" data-pedido-id="{{ pedido.id }}" data-precio="{{ pedido.producto.precio }}">
+                                    <div class="flex items-center justify-center quantity-container bloqueable" data-pedido-id="{{ pedido.id|signing_data }}">
                                         <button type="button" name="action" data-action="decrement" class="btn-cantidad"><i class="bi bi-dash"></i></button>
                                         <input type="text" class="input-value-cart" name="cantidad" value="{{ pedido.cantidad }}" readonly>
                                         <button type="button" name="action" data-action="increment" class="btn-cantidad"><i class="bi bi-plus"></i></button>

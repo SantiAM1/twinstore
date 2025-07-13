@@ -15,6 +15,7 @@ from rest_framework.decorators import throttle_classes
 from core.throttling import FiltrosDinamicosThrottle
 from payment.templatetags.custom_filters import formato_pesos
 from django.conf import settings
+from django.core import signing
 
 import json
 
@@ -449,13 +450,15 @@ def cuotas_mp(precio):
         }
     return resultados
 
-def producto_imagenes(request,producto_id,color_id):
+def producto_imagenes(request,producto_signed,color_signed):
     try:
+        producto_id = signing.loads(producto_signed)
         producto = get_object_or_404(Producto,id=producto_id)
     except Producto.DoesNotExist:
         return Http404('No existe ese producto')
     
     try:
+        color_id = signing.loads(color_signed)
         color = ColorProducto.objects.get(id=color_id, producto=producto)
     except ColorProducto.DoesNotExist:
         raise Http404("Color no válido para este producto.")
@@ -471,7 +474,6 @@ def producto_imagenes(request,producto_id,color_id):
         'carousel':carousel_html,
         'thumbnails': thumbnails,
     })
-
 
 def slug_dispatcher(request, slug):
     producto = Producto.objects.filter(slug=slug).first()

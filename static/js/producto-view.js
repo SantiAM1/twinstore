@@ -45,9 +45,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
             try {
                 const response = await axios.post(window.api.agregarAlCarrito, {
-                    producto_id: parseInt(producto_id),
+                    producto_id: producto_id,
                     cantidad: parseInt(cantidad),
-                    color: parseInt(color_seleccionado)
+                    color: color_seleccionado
                 });
     
                 const { total_productos, total_precio, productoNombre,imagen_url,cantidad_pedido,subtotal } = response.data;
