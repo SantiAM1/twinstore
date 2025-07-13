@@ -45,11 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const btn = e.target.closest('.button-notification');
         
             if (btn) {
-                const token = btn.dataset.token;
+                const id = btn.dataset.id;
                 toggleDisableItems(true);
                 try {
                     const response = await axios.post(window.api.recibirMail, {
-                        token: token
+                        id: id
                     });
         
                     const { html } = response.data;

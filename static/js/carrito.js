@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     mobileCantidad.textContent = `${cantidad} x `;
                 }
                 const precioSubtotal = fila?.querySelector('.cart-total-precio');
-                // const precio = parseFloat(container.dataset.precio);
 
                 if (precioSubtotal) {
                     precioSubtotal.textContent = `${sub_total}`;

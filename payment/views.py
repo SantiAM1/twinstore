@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from django.core import signing
 
 from .models import HistorialCompras
 from .forms import ComprobanteForm
@@ -88,7 +89,7 @@ def subir_comprobante(request, token):
     if historial.forma_de_pago not in ['mixto','transferencia']:
         return HttpResponse(status=404)
     if request.method == 'POST':
-
+        print(token)
         form = ComprobanteForm(request.POST, request.FILES)
         if form.is_valid():
             comprobante = form.save(commit=False)

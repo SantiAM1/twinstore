@@ -81,9 +81,9 @@ class CalcularPedidoSerializer(serializers.Serializer):
             return False
 
 class AgregarAlCarritoSerializer(serializers.Serializer):
-    producto_id = serializers.IntegerField()
+    producto_id = serializers.CharField()
     cantidad = serializers.IntegerField()
-    color = serializers.IntegerField(required=False, allow_null=True)
+    color = serializers.CharField(required=False, allow_null=True)
 
 class EliminarPedidoSerializer(serializers.Serializer):
     pedido_id = serializers.CharField()
