@@ -194,7 +194,6 @@ class AgregarAlCarritoView(APIView):
                 cantidad = carrito[key]
                 request.session['carrito'] = carrito
                 nombre_producto = f"({color.nombre}) {producto.nombre}" if color else producto.nombre
-                print(carrito)
                 
             subtotal = producto.precio * cantidad
 
