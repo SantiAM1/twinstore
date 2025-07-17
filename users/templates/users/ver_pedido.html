@@ -36,6 +36,9 @@
         <div class="spinner"></div>
         <p>Procesando...</p>
     </div>
+    {% for pedido in historial %}
+        {% include 'partials/success-modal.html' %}
+    {% endfor %}
 </div>
 {% include 'widgets/usuario.html' %}
 {% endblock contenidomain %}

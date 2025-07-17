@@ -37,22 +37,23 @@
                         {% else %}
                             <a href="{% url 'payment:comprobante' pedido.token_consulta %}" class="link-subir-ticket display-block decoration-none font-roboto"><i class="bi bi-paperclip"></i> Subir comprobante</a>
                         {% endif %}
-                        {% if pedido.check_mixto %}
-                            {% if pedido.check_ticket_mp %}
-                                <a class="link-subir-ticket mercadopago decoration-none font-roboto flex items-center justify-center gap-05rem {% if pedido.ticket_mp.estado == 'aprobado' %}aprobado{% else %}rechazado{% endif %}" data-pedido-id="{{pedido.mp_ticket_id_signed}}">
-                                    <img src="{% static 'img/mp-formadepago.webp' %}" alt="Logo mercado pago" height="20"> 
-                                    <span class="texto-link font-roboto">Pago: {{pedido.ticket_mp.estado|capfirst}}</span>
-                                    <span class="spinner hidden"></span>
-                                </a>
-                            {% else %}
-                                <a href="#" class="link-subir-ticket decoration-none font-roboto mercadopago flex items-center justify-center gap-05rem" data-pedido-id="{{pedido.mp_ticket_id_signed}}">
-                                    <img src="{% static 'img/mp-formadepago.webp' %}" alt="Logo mercado pago" height="20"> 
-                                    <span class="texto-link font-roboto">Generar link de pago</span>
-                                    <span class="spinner hidden"></span>
-                                </a>
-                            {% endif %}
+                    {% endif %}
+                    {% if pedido.check_link_pago %}
+                        {% if pedido.check_ticket_mp %}
+                            <a class="link-subir-ticket mercadopago decoration-none font-roboto flex items-center justify-center gap-05rem {% if pedido.ticket_mp.estado == 'aprobado' %}aprobado{% else %}rechazado{% endif %}" data-pedido-id="{{pedido.mp_ticket_id_signed}}">
+                                <img src="{% static 'img/mp-formadepago.webp' %}" alt="Logo mercado pago" height="20"> 
+                                <span class="texto-link font-roboto">Pago: {{pedido.ticket_mp.estado|capfirst}}</span>
+                                <span class="spinner hidden"></span>
+                            </a>
+                        {% else %}
+                            <a href="#" class="link-subir-ticket decoration-none font-roboto mercadopago flex items-center justify-center gap-05rem" data-pedido-id="{{pedido.mp_ticket_id_signed}}">
+                                <img src="{% static 'img/mp-formadepago.webp' %}" alt="Logo mercado pago" height="20"> 
+                                <span class="texto-link font-roboto">Generar link de pago</span>
+                                <span class="spinner hidden"></span>
+                            </a>
                         {% endif %}
-                    {% elif pedido.check_arrepentimiento %}
+                    {% endif %}
+                    {% if pedido.check_arrepentimiento %}
                         <button class="border-none bg-transparent btn-arrepentimiento btn-modal-open font-roboto cursor-pointer" data-modal-id="modal-arrepentimiento-{{pedido.merchant_order_id}}">Solicitar Arrepentimiento</button>
                     {% endif %}
                 </ul>
@@ -115,7 +116,14 @@
         </div>
         <div id="modal-info-{{pedido.merchant_order_id}}" class="modal">
             <div class="modal-content">
-                <header class="font-roboto flex justify-between items-center"><div>Información pedido: <span class="modal-span">{{pedido.merchant_order_id}}</span></div><button type="button" class="modal-cerrar btn-modal-close border-none cursor-pointer" data-modal-id="modal-info-{{pedido.merchant_order_id}}"><i class="bi bi-x-lg"></i></button></header>
+                <header class="font-roboto flex justify-between items-center">
+                    <div>Información pedido:
+                        <span class="modal-span">{{pedido.merchant_order_id}}</span>
+                    </div>
+                    <button type="button" class="modal-cerrar btn-modal-close border-none cursor-pointer" data-modal-id="modal-info-{{pedido.merchant_order_id}}">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </header>
                 <br>
                 <p class="font-roboto">Total abonado: <span class="modal-span">{{pedido.total_compra|formato_pesos}}</span></p>
                 <p class="font-roboto">Cantidad de productos: <span class="modal-span">{{pedido.productos|length}}</span></p>

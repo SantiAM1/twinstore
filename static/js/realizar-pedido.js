@@ -135,29 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 const response = await axios.post(window.api.calcularPedido, datos);
-                const { total, adicional, init_point,metodoPagoSeleccionado } = response.data;
+                const { total, adicional } = response.data;
+                
                 document.getElementById('adicionales-value').textContent = adicional
                 document.getElementById('total-value').textContent = total
 
-                const boxCheckout = document.getElementById('box-checkout-pro');
-                boxCheckout.innerHTML = "";
-                    
-                if (init_point && metodoPagoSeleccionado === 'mercado_pago') {
-                    const a = document.createElement("a");
-                    a.href = init_point;
-                    a.rel = "noopener noreferrer";
-                    a.className = "boton-checkout-pro flex font-roboto items-center decoration-none font-bold gap-05rem";
-                    
-                    const img = document.createElement("img");
-                    img.src = window.api.imgMP;
-                    img.alt = "Pagar con Mercado Pago";
-                    img.loading = "lazy";
-                    
-                    a.appendChild(img);
-                    a.appendChild(document.createTextNode(" Pagar con Mercado Pago"));
-                    
-                    boxCheckout.appendChild(a);
-                }
+
 
             } catch (error) {
                 window.scrollTo({ top: 0, behavior: "smooth" });

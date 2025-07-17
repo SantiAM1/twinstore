@@ -9,21 +9,22 @@ from django.core import signing
 from django.core.signing import BadSignature
 
 from users.forms import UsuarioForm,TerminosYCondiciones
-from users.models import PerfilUsuario,DatosFacturacion
+from users.models import PerfilUsuario
 
 from core.permissions import BloquearSiMantenimiento
 from core.decorators import bloquear_si_mantenimiento
 from core.throttling import EnviarWtapThrottle,CarritoThrottle,CalcularPedidoThrottle
 
-from payment.models import HistorialCompras,Cupon,EstadoPedido,PagoMixtoTicket
+from payment.models import HistorialCompras,Cupon,TicketDePago
 from payment.templatetags.custom_filters import formato_pesos
 
+from .utils import json_productos,borrar_cupon,crear_facturacion
 from .models import Producto, Carrito, Pedido
 from products.models import ColorProducto
 
 import mercadopago
 
-from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,EliminarPedidoSerializer,ActualizarPedidoSerializer,CuponSerializer,PagoMixtoSerializer,PagoMixtoInitSerializer
+from .serializers import CalcularPedidoSerializer,AgregarAlCarritoSerializer,EliminarPedidoSerializer,ActualizarPedidoSerializer,CuponSerializer,PagoMixtoSerializer,InitPointIDSerializer
 from .context_processors import carrito_total
 from .permissions import TieneCarrito
 from .decorators import requiere_carrito
@@ -33,9 +34,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from decimal import Decimal
-import re
 from weasyprint import HTML
-import datetime
 import os
 import base64
 import pytz
@@ -43,7 +42,6 @@ import uuid
 from datetime import timedelta
 import random
 import string
-from datetime import datetime
 from datetime import date
 
 # ----- APIS ----- #
@@ -230,68 +228,9 @@ class CalcularPedidoView(APIView):
                 request.session['adicional_mp'] = adicional
                 request.session.modified = True
 
-                productos = {}
-                
-                if request.user.is_authenticated:
-                    carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
-                    carrito_id = carrito.id
-                    for pedido in carrito.pedidos.all():
-                        productos[str(pedido.dict_type())] = pedido.get_cantidad()
-                    usuario = {'id':request.user.id}
-                else:
-                    carrito = request.session['carrito']
-                    productos = carrito
-                    carrito_id = request.session['anon_cart_id']
-                    usuario = {'key':request.session.session_key}
-
-                direccion = data['calle']
-                match = re.match(r'^(.*?)(?:\s+(\d+))?$', direccion.strip())
-                if match:
-                    calle_nombre = match.group(1).strip()
-                    calle_altura = match.group(2) if match.group(2) else ''
-
-                dni_cuit = data['dni_cuit']
-                ident_type = "DNI" if data['condicion_iva'] == 'B' else 'CUIT'
-                email = data['email']
-                nombre = data['nombre']
-                apellido = data['apellido']
-                codigo_postal = data['codigo_postal']
-                razon_social = data.get('razon_social','')
-                condicion_iva = data.get('condicion_iva','')
-                telefono = data.get('telefono', '')
-                recibir_mail = data.get('recibir_mail')
-
-                metadata = {
-                    "dni_cuit": dni_cuit,
-                    "email": email,
-                    "nombre": nombre,
-                    "apellido": apellido,
-                    "codigo_postal": codigo_postal,
-                    "calle": f"{calle_nombre} {calle_altura}",
-                    "razon_social":razon_social,
-                    "condicion_iva":condicion_iva,
-                    "telefono":telefono,
-                    "recibir_mail":recibir_mail,
-                    "productos":productos,
-                    'usuario':usuario,
-                }
-
-                if request.session.get('cupon',''):
-                    cupon = request.session.get('cupon').get('id')
-                    metadata['cupon'] = cupon
-
-                firma = {"firma":signing.dumps(metadata)}
-
-                try:
-                    preference = preference_mp(total_compra,carrito_id,dni_cuit,ident_type,email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,firma)
-                    init_point = preference.get("init_point", "")
-                except ValueError as e:
-                    return Response({'error': str(e)}, status=500)
-
             else:
                 total_compra = total_processor
                 adicional = 0
-                init_point = ''
                 if request.session.get('adicional_mp',{}):
                     del request.session['adicional_mp']
                     request.session.modified = True
@@ -302,8 +241,6 @@ class CalcularPedidoView(APIView):
             return Response({
                 'total': formato_pesos(total_compra),
                 'adicional': formato_pesos(adicional) if adicional != 0 else '$0,00',
-                'init_point': init_point,
-                'metodoPagoSeleccionado':data['metodo_pago'],
             })
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -362,11 +299,11 @@ class ValidarPagoMixtoView(APIView):
 
         return Response({"mercadopago":float(pago_mp)},status=200)
 
-class PagoMixtoInitPointMPView(APIView):
+class InitPointMPView(APIView):
     permission_classes = [BloquearSiMantenimiento]
     throttle_classes = [CalcularPedidoThrottle]
     def post(self,request):
-        serializer = PagoMixtoInitSerializer(data=request.data)
+        serializer = InitPointIDSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors,status=400)
         
@@ -378,8 +315,8 @@ class PagoMixtoInitPointMPView(APIView):
             return Response({'error': 'Firma inválida'}, status=400)
 
         try:
-            ticket = PagoMixtoTicket.objects.get(id=ticket_id)
-            if ticket.tipo != 'mercadopago' or ticket.estado == 'aprobado':
+            ticket = TicketDePago.objects.get(id=ticket_id)
+            if ticket.estado == 'aprobado':
                 return Response(status=400)
             data = ticket.get_preference_data()
             metadata = data.get('metadata')
@@ -392,7 +329,7 @@ class PagoMixtoInitPointMPView(APIView):
             except ValueError as e:
                 return Response({'error': str(e)}, status=500)
             
-        except PagoMixtoTicket.DoesNotExist:
+        except TicketDePago.DoesNotExist:
             return Response(status=404)
 
 
@@ -449,8 +386,6 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
         "binary_mode": True,
     }
 
-    print(preference_data)
-
     sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
     try:
@@ -469,7 +404,7 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
 # ----- Realizar pedido -----#
 @bloquear_si_mantenimiento
 @requiere_carrito
-def realizar_pedido(request):
+def realizar_pedido(request: HttpRequest):
     if request.method == "POST":
         terms = TerminosYCondiciones(request.POST)
         form = UsuarioForm(request.POST)
@@ -483,131 +418,48 @@ def realizar_pedido(request):
             data = form.cleaned_data
             forma_pago = request.POST.get('forma_pago')
 
-            if forma_pago not in ['efectivo', 'transferencia','mixto']:
+            if forma_pago not in ['efectivo', 'transferencia','mixto','mercadopago']:
                 raise Http404("Medios de pago no válidos")
             
-            total_carrito = carrito_total(request,type="api").get('total_precio')
-
-            if forma_pago == 'mixto':
-                merchant_order_id = _generar_identificador_unico('M')
-                status = 'pendiente'
+            total_carrito = float(carrito_total(request,type="api").get('total_precio'))
+            if forma_pago == 'mercadopago':
+                adicional_mp = request.session.get('adicional_mp','')
+                if not adicional_mp:
+                    raise Http404("Faltan datos")
+                total_carrito += adicional_mp
+            elif forma_pago == 'mixto':
                 pago_mixto = request.session.get('pago-mixto','')
                 if not pago_mixto:
                     raise Http404("Petición incompleta")
                 total_carrito = pago_mixto['transferencia'] + pago_mixto['mercadopago']
                 del request.session['pago-mixto']
                 request.session.modified = True
-                
-            elif forma_pago == 'transferencia':
-                merchant_order_id = _generar_identificador_unico('T')
-                status = 'pendiente'
-            else:
-                merchant_order_id = _generar_identificador_unico('E')
-                status = 'confirmado'
 
-            if request.user.is_authenticated:
-                carrito = get_object_or_404(Carrito, usuario=request.user)
-
-                # * Armamos el detalle de productos
-                productos = []
-                for pedido in carrito.pedidos.all():
-                    productos.append({
-                        'sku': pedido.producto.sku,
-                        'nombre': pedido.get_nombre_producto(),
-                        'precio_unitario': float(pedido.producto.precio),
-                        'cantidad': pedido.cantidad,
-                        'subtotal': float(pedido.get_total_precio()),
-                        'proveedor':pedido.producto.proveedor
-                    })
-
-                # * Borramos el carrito y pedidos
-                carrito.pedidos.all().delete()
-                carrito.delete()
-
-            else:
-                carrito = request.session['carrito']
-                if not carrito:
-                    raise Http404("Carrito vacio")
-                
-                productos = []
-                for producto_id,cantidad in carrito.items():
-                    producto_id_str, color_str = producto_id.split('-') 
-                    if color_str != 'null':
-                        color = get_object_or_404(ColorProducto, id=int(color_str))
-                    else:
-                        color = None
-                    producto = get_object_or_404(Producto,id=int(producto_id_str))
-                    nombre_producto = f"({color.nombre}) {producto.nombre}" if color_str != 'null' else producto.nombre
-                    productos.append({
-                        'sku': producto.sku,
-                        'nombre':nombre_producto,
-                        'precio_unitario':float(producto.precio),
-                        'cantidad':cantidad,
-                        'subtotal':float(producto.precio)*cantidad,
-                        'proveedor':producto.proveedor
-                    })
-
-                # * Borrar el carrito
-                del request.session['carrito']
-                request.session.modified = True
+            productos = json_productos(request)
+            merchant_order_id=_generar_identificador_unico()
 
             historial = HistorialCompras.objects.create(
-            usuario=carrito.usuario if request.user.is_authenticated else None,
-            productos=productos,
-            total_compra=total_carrito,
-            estado=status,
-            forma_de_pago=forma_pago,
-            merchant_order_id=merchant_order_id,
-            recibir_mail=data['recibir_estado_pedido']
+                usuario=request.user if request.user.is_authenticated else None,
+                productos=productos,
+                total_compra=total_carrito,
+                estado='pendiente' if forma_pago in ['mixto','mercadopago','transferencia'] else 'confirmado',
+                forma_de_pago=forma_pago,
+                merchant_order_id=merchant_order_id,
+                recibir_mail=data['recibir_estado_pedido']
             )
 
-            if forma_pago == 'mixto':
+            borrar_cupon(request,historial)
 
-                PagoMixtoTicket.objects.create(
+            if forma_pago in ['mercadopago','mixto']:
+                TicketDePago.objects.create(
                     historial=historial,
-                    monto=pago_mixto['transferencia'],
-                    tipo='transferencia'
-                )
-                PagoMixtoTicket.objects.create(
-                    historial=historial,
-                    monto=pago_mixto['mercadopago'],
-                    tipo='mercadopago'
+                    monto=pago_mixto['mercadopago'] if forma_pago == 'mixto' else total_carrito,
                 )
 
-            if request.session.get('cupon',''):
-                cupon_id = request.session['cupon'].get('id')
-                try:
-                    cupon = Cupon.objects.get(id=int(cupon_id))
-                    EstadoPedido.objects.create(
-                        historial=historial,
-                        estado="Cupón Aplicado (Servidor)",
-                        comentario=f"Cupón CÓDIGO #{cupon.codigo} del %{cupon.descuento} Aplicado en la compra"
-                    )
-                    cupon.delete()
-                except Cupon.DoesNotExist:
-                    EstadoPedido.objects.create(
-                        historial=historial,
-                        estado="Cupón Duplicado! (Servidor)",
-                        comentario=f"El cupón ingresado no fue encontrado. \nAccion requerida: RECHAZAR el historial y contactar con el cliente."
-                    )
+            crear_facturacion(data,historial)
+            
+            return redirect(f"{reverse('users:ver_pedidos', args=[historial.token_consulta])}?compra=exitosa")
 
-            DatosFacturacion.objects.create(
-                historial=historial,
-                nombre=data['nombre'],
-                apellido=data['apellido'],
-                razon_social=data['razon_social'],
-                dni_cuit=data['dni_cuit'],
-                condicion_iva=data['condicion_iva'],
-                telefono=data['telefono'],
-                email=data['email'],
-                codigo_postal=data['codigo_postal'],
-                provincia=data['provincia'],
-                calle=data['calle'],
-                ciudad=data['ciudad'],
-                calle_detail=data['calle_detail'],
-            )
-
-            return redirect(f"{reverse('payment:success')}?merchant_order_id={merchant_order_id}")
     else:
         if request.user.is_authenticated:
             perfil, create = PerfilUsuario.objects.get_or_create(user = request.user)
@@ -638,14 +490,12 @@ def realizar_pedido(request):
                 'terms':terms
             })
 
-def _generar_identificador_pago(letra):
-    fecha = datetime.now().strftime('%d%m%y')
-    sufijo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
-    return f"{letra}-{fecha}-{sufijo}"
+def _generar_identificador_pago():
+    return ''.join(random.choices(string.digits, k=11))
 
-def _generar_identificador_unico(letra):
+def _generar_identificador_unico():
     while True:
-        nuevo_id = _generar_identificador_pago(letra)
+        nuevo_id = _generar_identificador_pago()
         if not HistorialCompras.objects.filter(merchant_order_id=nuevo_id).exists():
             return nuevo_id
 

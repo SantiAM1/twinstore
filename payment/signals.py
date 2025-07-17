@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
-from .models import PagoRecibidoMP, HistorialCompras,ComprobanteTransferencia,EstadoPedido,PagoMixtoTicket
+from .models import PagoRecibidoMP, HistorialCompras,ComprobanteTransferencia,EstadoPedido,TicketDePago
 from users.emails import mail_estado_pedido_html,mail_obs_comprobante_html
 from django.utils import timezone
 from threading import local
@@ -55,15 +55,15 @@ def manejar_actualizaciones_historial(sender, instance, created, **kwargs):
         estado_valido = (
             (instance.forma_de_pago == "transferencia" and instance.estado != "pendiente") or 
             (instance.forma_de_pago == "efectivo" and instance.estado != "confirmado") or 
-            (instance.forma_de_pago == "mercado pago" and instance.estado != "pendiente")
+            (instance.forma_de_pago == "mercadopago" and instance.estado != "pendiente")
         )
         if estado_valido:
             mail_estado_pedido_html(instance, instance.facturacion.email)
 
 @receiver(post_save, sender=ComprobanteTransferencia)
-def aprobar_historial_transferencia(sender, instance, created, **kwargs):
+def aprobar_historial_transferencia(sender, instance: ComprobanteTransferencia, created, **kwargs):
     # * 1 Notifica al staff cuando se recibe una transferencia
-    historial = instance.historial
+    historial: HistorialCompras = instance.historial
     if created:
         historial.requiere_revision = True
         historial.save(update_fields=["requiere_revision"])
@@ -73,15 +73,8 @@ def aprobar_historial_transferencia(sender, instance, created, **kwargs):
             comentario='Subida por el cliente automáticamente.'
         )
         return
-    # * 2 Si el comprobante es aprobado se confirma el historial
-    if instance.estado == 'aprobado' and historial.forma_de_pago == 'transferencia':
-        historial.estado = 'confirmado'
-        historial.save(update_fields=["estado"])
-    elif historial.forma_de_pago == 'mixto' and instance.estado == 'aprobado':
-        instance.ticket.estado = 'aprobado'
-        instance.ticket.save()
-    # * 3 Cuando el comprobante se rechaza se envia un mail
-    elif instance.estado == 'rechazado':
+    # * 2 Cuando el comprobante se rechaza se envia un mail
+    if instance.estado == 'rechazado':
         if instance.observaciones:
             EstadoPedido.objects.create(
                 historial=historial,
@@ -91,8 +84,11 @@ def aprobar_historial_transferencia(sender, instance, created, **kwargs):
             mail_obs_comprobante_html(historial, instance.observaciones)
         instance.delete()
 
-@receiver(post_save,sender=PagoMixtoTicket)
-def actualizar_historial(sender, instance:PagoMixtoTicket, created, **kwargs):
-    if instance.estado != "aprobado":
-        return
-    instance.historial.check_tickets()
+    # * 3 Si el comprobante es aprobado se confirma el historial
+    if instance.estado == 'aprobado':
+        historial.check_historial()
+
+@receiver(post_save,sender=TicketDePago)
+def actualizar_historial(sender, instance:TicketDePago, created, **kwargs):
+    if instance.estado == "aprobado":
+        instance.historial.check_historial()

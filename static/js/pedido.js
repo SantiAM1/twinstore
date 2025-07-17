@@ -11,11 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const spinner = anchor.querySelector(".spinner");
             texto.textContent = "Generando...";
             spinner.classList.remove("hidden");
-            // link.classList.add("disabled");
+            link.classList.add("disabled");
 
             const numero_firmado = anchor.dataset.pedidoId;
             try {
-                const response = await axios.post('/carro/api/initpagomixto/', {
+                const response = await axios.post('/carro/api/initpointmp/', {
                     numero_firmado: numero_firmado
                 });
         
@@ -26,6 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     })
+
+    const successModal = document.getElementById("success-modal")
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("compra") === "exitosa") {
+        setTimeout(() =>{successModal.style.display = 'block'},300)
+        document.getElementById("close-success-modal").addEventListener("click", () => {
+        successModal.style.display = 'none';
+        })
+    }
 
     document.querySelectorAll('.btn-modal-open').forEach(btn => {
         btn.addEventListener('click', function() {

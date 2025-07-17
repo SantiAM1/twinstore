@@ -10,11 +10,7 @@ from .webhook import (
     check_hmac_signature,
     requests_header,
     metadata_signed,
-    generar_productos,
-    user_key,
     total_merchant,
-    crear_historial,
-    procesar_pago_y_estado,
     crear_pago_mp,
     obtener_ticket,
     validar_ticket)
@@ -45,35 +41,18 @@ def webhook_mercadopago(request):
                 return HttpResponse(status=400)
             
             # * Obtenemos el total de la compra y el id
-            total_real,merchant_order_id = total_merchant(pago_info,headers)
+            merchant_order_id = total_merchant(pago_info,headers)
 
             # * Creamos el pago de mercado pago
-            pago = crear_pago_mp(payment_id,pago_info,status,merchant_order_id)
+            crear_pago_mp(payment_id,pago_info,status,merchant_order_id)
 
-            if metadata.get('productos'):
-                # * Lista de productos
-                productos = generar_productos(metadata.get('productos'))
-
-                # * Usuario | Session key
-                usuario,key = user_key(metadata)
-
-                # * Creacion de historial y datos de facturacion
-                crear_historial(merchant_order_id,usuario,productos,total_real,metadata)
-
-                # * Obtenemos el cupon (Si fue utilizado)
-                cupon = metadata.get('cupon',None)
-
-                # * Analisis final del la compra
-                procesar_pago_y_estado(pago,usuario,cupon,key)
-
-            elif metadata.get('ticket'):
-                # * Obtenemos el ticket
-                ticket = obtener_ticket(metadata.get('ticket'), merchant_order_id)
-                if ticket:
-                    # * Validamos el ticket!
-                    validar_ticket(ticket, merchant_order_id)
-                else:
-                    logger.warning(f"Intento de validar ticket inválido: {metadata.get('ticket')}")
+            # * Obtenemos el ticket
+            ticket = obtener_ticket(metadata.get('ticket'), merchant_order_id)
+            if ticket:
+                # * Validamos el ticket
+                validar_ticket(ticket, merchant_order_id)
+            else:
+                logger.warning(f"Intento de validar ticket inválido: {metadata.get('ticket')}")
         else:
             logger.error("Error al obtener datos de Mercado Pago")
 
@@ -93,9 +72,6 @@ def subir_comprobante(request, token):
         if form.is_valid():
             comprobante = form.save(commit=False)
             comprobante.historial = historial
-            if historial.forma_de_pago == 'mixto':
-                ticket = historial.tickets.filter(tipo='transferencia').first()
-                comprobante.ticket = ticket
             comprobante.save()
             messages.success(request, "Comprobante subido correctamente. Lo revisaremos a la brevedad.")
             if request.user.is_authenticated:
