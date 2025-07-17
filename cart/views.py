@@ -186,14 +186,14 @@ class AgregarAlCarritoView(APIView):
                 nombre_producto = pedido.get_nombre_producto()
             else:
                 carrito = request.session.get('carrito', {})
-                key = f"{data['producto_id']}-{data.get('color') or 'null'}"
+                key = f"{producto_id}-{data.get('color') or 'null'}"
                 carrito[key] = carrito.get(key, 0) + cantidad
                 if carrito[key] > 5:
                     carrito[key] = 5
                 cantidad = carrito[key]
                 request.session['carrito'] = carrito
                 nombre_producto = f"({color.nombre}) {producto.nombre}" if color else producto.nombre
-
+                
             subtotal = producto.precio * cantidad
 
             total_processor = carrito_total(request)
