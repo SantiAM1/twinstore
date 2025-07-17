@@ -187,7 +187,6 @@ class AgregarAlCarritoView(APIView):
             else:
                 carrito = request.session.get('carrito', {})
                 key = f"{producto_id}-{color.id if color else 'null'}"
-                print(key)
                 carrito[key] = carrito.get(key, 0) + cantidad
                 if carrito[key] > 5:
                     carrito[key] = 5
