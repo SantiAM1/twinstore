@@ -18,6 +18,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import PasswordResetForm
 from django.utils.translation import gettext_lazy as _
 from django.core import signing
+from django.core.signing import BadSignature
 
 
 from rest_framework.views import APIView
@@ -39,7 +40,10 @@ class RecibirMailView(APIView):
         serializer = HistorialIdSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
-            historial_id = signing.loads(data.get('id'))
+            try:
+                historial_id = signing.loads(data.get('id'))
+            except BadSignature:
+                return Response({'error': 'Firma inválida en el ID'}, status=status.HTTP_400_BAD_REQUEST)
             historial = HistorialCompras.objects.get(id=historial_id)
             historial.recibir_mail = not historial.recibir_mail
             historial.save()
