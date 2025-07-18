@@ -35,7 +35,10 @@
                         {% if pedido.comprobante %}
                             <p class="link-subir-ticket decoration-none font-roboto subido"><i class="bi bi-paperclip"></i> Comprobante adjunto</p>
                         {% else %}
-                            <a href="{% url 'payment:comprobante' pedido.token_consulta %}" class="link-subir-ticket display-block decoration-none font-roboto"><i class="bi bi-paperclip"></i> Subir comprobante</a>
+                            <a data-pedido-id="{{pedido.id|signing_data}}" href="#" class="link-subir-ticket gen-comprobante display-block decoration-none font-roboto">
+                                <i class="bi bi-paperclip"></i> 
+                                Subir comprobante
+                            </a>
                         {% endif %}
                     {% endif %}
                     {% if pedido.check_link_pago %}
@@ -133,5 +136,6 @@
             </div>
         </div>
         {% endfor %}
+        <div id="modal-comprobante" class="modal"></div>
     </tbody>
 </table>

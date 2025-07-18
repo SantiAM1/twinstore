@@ -58,8 +58,8 @@ class HistorialCompras(models.Model):
 
         elif self.forma_de_pago == 'mixto':
             ticket = self.tickets.first()
-            if self.check_comprobante() and ticket:
-                if all(self.comprobante.estado == 'aprobado' and ticket.estado == 'aprobado'):
+            if self.check_comprobante_subido() and ticket:
+                if self.comprobante.estado == 'aprobado' and ticket.estado == 'aprobado':
                     self.estado = 'confirmado'
         
         if self.estado == 'confirmado':
@@ -76,7 +76,7 @@ class HistorialCompras(models.Model):
         return False
 
     def ticket_mp(self):
-        return self.tickets.filter(tipo='mercadopago').first()
+        return self.tickets.first()
 
     def mp_ticket_id_signed(self):
         mercadopago = self.tickets.first()
@@ -87,8 +87,8 @@ class HistorialCompras(models.Model):
     def monto_tranferir(self):
         if self.forma_de_pago == 'transferencia':
             return self.total_compra
-        transferencia = self.tickets.filter(tipo='transferencia').first()
-        return transferencia.monto if transferencia else 0
+        ticket = self.tickets.first()
+        return self.total_compra - ticket.monto
 
     def __str__(self):
         if self.usuario:
@@ -173,12 +173,13 @@ class TicketDePago(models.Model):
             'metadata':{'ticket':self.id},
             'calle_nombre':calle_nombre,
             'calle_altura':calle_altura,
-            'backurl':f"usuario/ver_pedido/{self.historial.token_consulta}"
+            'backurl_success':f"usuario/ver_pedido/{self.historial.token_consulta}",
+            'backurl_fail':f"usuario/ver_pedido/{self.historial.token_consulta}?compra=fallida"
         }
         return metadata
 
     def __str__(self):
-        return f"Tipo: {self.tipo} | Monto a depositar: {self.monto}"
+        return f"Monto a depositar: {self.monto}"
 
 class ComprobanteTransferencia(models.Model):
     ESTADOS = [

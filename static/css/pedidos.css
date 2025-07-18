@@ -111,7 +111,6 @@
     border-radius: 8px;
 }
 
-/* Fondo oscuro detrás del modal */
 .modal {
     display: none;
     position: fixed;
@@ -126,7 +125,7 @@
 
 .modal-content {
     background-color: #fff;
-    margin: 10% auto;
+    margin: 5% auto;
     padding: 1rem;
     border: 1px solid #ccc;
     width: 90%;
@@ -151,8 +150,6 @@
     font-size: 1rem;
     border: none;
     border-radius: 5px;
-    cursor: pointer;
-    background-color: #d4d4d4;
 }
 
 .modal-cerrar {

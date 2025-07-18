@@ -17,3 +17,6 @@ class FiltrosDinamicosThrottle(AnonRateThrottle):
 
 class PrediccionBusquedaThrottle(AnonRateThrottle):
     scope = 'prediccion_busqueda'
+
+class SolicitarComprobante(AnonRateThrottle):
+    scope = 'solicitar_comprobante'

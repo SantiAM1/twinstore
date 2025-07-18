@@ -1,4 +1,4 @@
 from rest_framework import serializers
 
-class RecibirMailSerializer(serializers.Serializer):
+class HistorialIdSerializer(serializers.Serializer):
     id = serializers.CharField()

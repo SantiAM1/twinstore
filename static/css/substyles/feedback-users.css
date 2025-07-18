@@ -2,15 +2,15 @@
     color: #2e2e2e;
 }
 
-.users-feedback-box p {color: #5f5f5f;line-height: 1.3rem;max-width: 450px;
+.users-feedback-box p {color: #5f5f5f;line-height: 1.3rem;max-width: 475px;
 }
 
 .users-feedback-box {
     gap: 2rem;
-    max-width: 450px;
+    max-width: 475px;
 }
 
-.asdasd {
+.btn-absolute {
     right: 0;
     top: 0;
 }

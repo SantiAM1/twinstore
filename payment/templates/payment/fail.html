@@ -13,12 +13,13 @@
 {% block headend %}
 {% compress css %}
 <link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
+<link rel="stylesheet" href="{% static 'css/pedidos.css' %}">
 {% endcompress %}
 {% endblock headend %}
 
 {% block contenidomain %}
 <div class="padding-1rem">
-    <div class="flex font-roboto flex-column users-feedback-box">
+    <div class="flex font-roboto flex-column users-feedback-box modal-content">
         <h2 class="text-center">❌ ¡Ups! Algo salió mal. ❌</h2>
         <p>No pudimos procesar tu pago o el mismo fue rechazado.</p>
         <div>

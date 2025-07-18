@@ -18,7 +18,7 @@ class TicketPagoMixtoInline(admin.StackedInline):
     can_delete = False
     extra = 0
     classes = ['collapse']
-    readonly_fields = ['estado','monto','tipo']
+    readonly_fields = ['estado','monto']
 
 class ComprobanteTransferenciaInline(admin.StackedInline):
     model = ComprobanteTransferencia

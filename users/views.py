@@ -23,7 +23,7 @@ from django.core import signing
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import RecibirMailSerializer
+from .serializers import HistorialIdSerializer
 
 from core.permissions import BloquearSiMantenimiento
 
@@ -36,7 +36,7 @@ class RecibirMailView(APIView):
     permission_classes = [BloquearSiMantenimiento]
     throttle_classes = [ToggleNotificacionesThrottle]
     def post(self,request):
-        serializer = RecibirMailSerializer(data=request.data)
+        serializer = HistorialIdSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
             historial_id = signing.loads(data.get('id'))

@@ -256,7 +256,7 @@ class ValidarCuponView(APIView):
         codigo = serializer.validated_data.get("codigo").upper()
 
         try:
-            cupon = Cupon.objects.get(codigo=codigo, activo=True)
+            cupon = Cupon.objects.get(codigo=codigo)
             request.session['cupon'] = {"descuento":float(cupon.descuento),"id":int(cupon.id)}
             processor = carrito_total(request,type="api")
 
@@ -323,7 +323,7 @@ class InitPointMPView(APIView):
             firma = {"firma":signing.dumps(metadata)}
 
             try:
-                preference = preference_mp(data['numero'],data['ticket_id'],data['dni_cuit'],data['ident_type'],data['email'],data['nombre'],data['apellido'],data['codigo_postal'],data['calle_nombre'],data['calle_altura'],firma,backurl=data['backurl'])
+                preference = preference_mp(data['numero'],data['ticket_id'],data['dni_cuit'],data['ident_type'],data['email'],data['nombre'],data['apellido'],data['codigo_postal'],data['calle_nombre'],data['calle_altura'],firma,backurl_success=data['backurl_success'],backurl_fail=data['backurl_fail'])
                 init_point = preference.get("init_point", "")
                 return Response({'init_point':init_point},status=200)
             except ValueError as e:
@@ -336,7 +336,7 @@ class InitPointMPView(APIView):
 # Create your views here.
 # ----- Preferencias de MP ----- #
 
-def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,firma,backurl="payment/success/"):
+def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellido,codigo_postal,calle_nombre,calle_altura,firma,backurl_success="payment/success/",backurl_fail="payment/failure/"):
     site_url = f'{settings.SITE_URL}'
 
     argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
@@ -371,8 +371,8 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
             }
         },
         "back_urls": {
-            "success": f"https://{site_url}/{backurl}",
-            "failure": f"https://{site_url}/payment/failure/",
+            "success": f"https://{site_url}/{backurl_success}",
+            "failure": f"https://{site_url}/{backurl_fail}",
             "pending": f"https://{site_url}/payment/pendings/"
         },
         "auto_return": "approved",

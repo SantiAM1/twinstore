@@ -98,14 +98,6 @@ def metadata_signed(pago_info):
         logger.warning("Firma inválida o manipulada")
         return
 
-def total_merchant(pago_info,headers):
-    merchant_order_id = pago_info.get("order", {}).get("id")
-    order_url = f"https://api.mercadopago.com/merchant_orders/{merchant_order_id}"
-    order_response = requests.get(order_url, headers=headers)
-    order_info = order_response.json()
-    total_real = order_info.get("total_amount")
-    return total_real,merchant_order_id
-
 def crear_pago_mp(payment_id,pago_info,status,merchant_order_id):
     pago, _ = PagoRecibidoMP.objects.update_or_create(
         payment_id=payment_id,
