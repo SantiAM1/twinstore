@@ -184,6 +184,7 @@ REST_FRAMEWORK = {
 
     'carrito': '30/minute',
     'calcular_pedido': '10/minute',
+    'solicitar_comprobante': '10/minute',
     'toggle_notificaciones': '10/hour',
     'enviar_wtap': '10/day',
     'filtros_dinamicos': '30/minute',

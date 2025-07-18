@@ -45,7 +45,7 @@ def carrito_total(request,type=None,pedido=None,descuento=0):
         del request.session['cupon']
         request.session.modified = True
 
-    if request.session.get('adicional_mp',{}):
+    if request.session.get('adicional_mp',{}) and type != "api":
         del request.session['adicional_mp']
         request.session.modified = True
 

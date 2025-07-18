@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import HistorialCompras,PagoRecibidoMP,ComprobanteTransferencia,EstadoPedido,Cupon,PagoMixtoTicket
+from .models import HistorialCompras,PagoRecibidoMP,ComprobanteTransferencia,EstadoPedido,Cupon,TicketDePago
 from django.utils.html import format_html, format_html_join
 from django.urls import reverse
 from django.utils.timezone import localtime
@@ -10,15 +10,15 @@ from .forms import EstadoPedidoForm
 
 admin.site.register(PagoRecibidoMP)
 admin.site.register(Cupon)
-admin.site.register(PagoMixtoTicket)
+admin.site.register(TicketDePago)
 admin.site.register(ComprobanteTransferencia)
 
 class TicketPagoMixtoInline(admin.StackedInline):
-    model = PagoMixtoTicket
+    model = TicketDePago
     can_delete = False
     extra = 0
     classes = ['collapse']
-    readonly_fields = ['estado','monto','tipo']
+    readonly_fields = ['estado','monto']
 
 class ComprobanteTransferenciaInline(admin.StackedInline):
     model = ComprobanteTransferencia
@@ -87,7 +87,8 @@ class HistorialComprasAdmin(admin.ModelAdmin):
         
         f = obj.facturacion
         html = (
-            '<table style="border-collapse: collapse; width: 100%;">'
+            '<div style="overflow-x: auto; max-width: 100%;">'
+            '<table style="border-collapse: collapse; width: 100%; min-width: 800px;>'
             '<tr>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Nombre</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">DNI/CUIT</th>'
@@ -107,6 +108,7 @@ class HistorialComprasAdmin(admin.ModelAdmin):
             f"<td style='padding: 6px;'>{f.razon_social or '-'}</td>"
             f'</tr>'
             '</table>'
+            '</div>'
             )
         return format_html(html)
 

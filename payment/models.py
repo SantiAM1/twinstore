@@ -23,7 +23,7 @@ class HistorialCompras(models.Model):
 
     FORMA_DE_PAGO = [
         ('efectivo','Efectivo'),
-        ('mercado pago','Mercado Pago'),
+        ('mercadopago','Mercado Pago'),
         ('transferencia','Transferencia'),
         ('mixto','Mixto')
     ]
@@ -44,27 +44,42 @@ class HistorialCompras(models.Model):
     def check_comprobante_subido(self):
         return hasattr(self, 'comprobante')
 
-    def check_tickets(self):
-        tickets = self.tickets.all()
-        if tickets.exists() and all(t.estado == 'aprobado' for t in tickets) and self.estado != 'confirmado':
-            self.estado = 'confirmado'
-            self.save()
+    def check_historial(self):
+        if self.estado == 'confirmado':
+            return
 
-    def check_mixto(self):
-        return True if self.forma_de_pago == 'mixto' else False
+        if self.forma_de_pago == 'transferencia':
+            self.estado = 'confirmado'
+
+        elif self.forma_de_pago == 'mercadopago':
+            ticket = self.tickets.first()
+            if ticket and ticket.estado == 'aprobado':
+                self.estado = 'confirmado'
+
+        elif self.forma_de_pago == 'mixto':
+            ticket = self.tickets.first()
+            if self.check_comprobante_subido() and ticket:
+                if self.comprobante.estado == 'aprobado' and ticket.estado == 'aprobado':
+                    self.estado = 'confirmado'
+        
+        if self.estado == 'confirmado':
+            self.save(update_fields=["estado"])
+
+    def check_link_pago(self):
+        return True if self.forma_de_pago in ['mixto','mercadopago']  else False
     
     def check_ticket_mp(self):
-        ticket = self.tickets.filter(tipo='mercadopago').first()
+        ticket = self.tickets.first()
         if ticket:
             if ticket.merchant_order_id:
                 return True
         return False
 
     def ticket_mp(self):
-        return self.tickets.filter(tipo='mercadopago').first()
+        return self.tickets.first()
 
     def mp_ticket_id_signed(self):
-        mercadopago = self.tickets.filter(tipo='mercadopago').first()
+        mercadopago = self.tickets.first()
         if mercadopago:
             return signing.dumps(mercadopago.id)
         return None
@@ -72,8 +87,8 @@ class HistorialCompras(models.Model):
     def monto_tranferir(self):
         if self.forma_de_pago == 'transferencia':
             return self.total_compra
-        transferencia = self.tickets.filter(tipo='transferencia').first()
-        return transferencia.monto if transferencia else 0
+        ticket = self.tickets.first()
+        return self.total_compra - ticket.monto
 
     def __str__(self):
         if self.usuario:
@@ -89,7 +104,7 @@ class HistorialCompras(models.Model):
         return all(p.status == "approved" for p in self.pagos.all())
 
     def get_adicional(self):
-        if self.forma_de_pago != "mercado pago":
+        if self.forma_de_pago != "mercadopago":
             return 0
         
         subtotal = sum(Decimal(str(p['subtotal'])) for p in self.productos)
@@ -130,20 +145,14 @@ class PagoRecibidoMP(models.Model):
     def __str__(self):
         return f"Pago {self.payment_id} - {self.status}"
 
-class PagoMixtoTicket(models.Model):
+class TicketDePago(models.Model):
     ESTADOS = [
         ('aprobado','Aprobado'),
         ('rechazado','Rechazado'),
-        ('pendiente','Pendiente'),
-    ]
-    TYPES = [
-        ('transferencia','Transferencia'),
-        ('mercadopago','Mercado pago'),
     ]
     historial = models.ForeignKey(HistorialCompras,on_delete=models.CASCADE,related_name='tickets')
     estado = models.CharField(max_length=20,choices=ESTADOS,default='pendiente')
     monto = models.DecimalField(max_digits=10,decimal_places=2)
-    tipo = models.CharField(max_length=20,choices=TYPES,default='transferencia')
     merchant_order_id = models.CharField(max_length=100, blank=True, null=True)
 
     def get_preference_data(self) -> dict:
@@ -164,15 +173,15 @@ class PagoMixtoTicket(models.Model):
             'metadata':{'ticket':self.id},
             'calle_nombre':calle_nombre,
             'calle_altura':calle_altura,
-            'backurl':f"usuario/ver_pedido/{self.historial.token_consulta}"
+            'backurl_success':f"usuario/ver_pedido/{self.historial.token_consulta}",
+            'backurl_fail':f"usuario/ver_pedido/{self.historial.token_consulta}?compra=fallida"
         }
         return metadata
 
     def __str__(self):
-        return f"Tipo: {self.tipo} | Monto a depositar: {self.monto}"
+        return f"Monto a depositar: {self.monto}"
 
 class ComprobanteTransferencia(models.Model):
-
     ESTADOS = [
         ('aprobado','Aprobado'),
         ('rechazado','Rechazado'),
@@ -180,7 +189,6 @@ class ComprobanteTransferencia(models.Model):
     ]
 
     historial = models.OneToOneField("HistorialCompras", on_delete=models.CASCADE, related_name="comprobante")
-    ticket = models.ForeignKey(PagoMixtoTicket,on_delete=models.CASCADE,related_name="comprobante",null=True,blank=True)
     file = models.FileField(upload_to="comprobantes/")
     fecha_subida = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20,choices=ESTADOS,default='no verificado')
@@ -192,7 +200,6 @@ class ComprobanteTransferencia(models.Model):
 class Cupon(models.Model):
     codigo = models.CharField(unique=True,max_length=6,blank=True)
     descuento = models.DecimalField(max_digits=5,decimal_places=2)
-    activo = models.BooleanField(default=True)
     creado = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):

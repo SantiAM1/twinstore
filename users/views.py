@@ -18,12 +18,13 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import PasswordResetForm
 from django.utils.translation import gettext_lazy as _
 from django.core import signing
+from django.core.signing import BadSignature
 
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import RecibirMailSerializer
+from .serializers import HistorialIdSerializer
 
 from core.permissions import BloquearSiMantenimiento
 
@@ -36,10 +37,13 @@ class RecibirMailView(APIView):
     permission_classes = [BloquearSiMantenimiento]
     throttle_classes = [ToggleNotificacionesThrottle]
     def post(self,request):
-        serializer = RecibirMailSerializer(data=request.data)
+        serializer = HistorialIdSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
-            historial_id = signing.loads(data.get('id'))
+            try:
+                historial_id = signing.loads(data.get('id'))
+            except BadSignature:
+                return Response({'error': 'Firma inválida en el ID'}, status=status.HTTP_400_BAD_REQUEST)
             historial = HistorialCompras.objects.get(id=historial_id)
             historial.recibir_mail = not historial.recibir_mail
             historial.save()

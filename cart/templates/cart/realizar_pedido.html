@@ -206,28 +206,28 @@
             <ul  class="cart-formadepago">
                 <li>
                     <input type="radio" name="forma_pago" id="efectivo" value="efectivo">
-                    <label for="efectivo">Pago de contado:</label>
-                    <div class="cart-formadepago-details font-roboto">IMPORTANTE: Algunos productos pueden requerir un pago anticipado para asegurar su disponibilidad. En estos casos, la coordinación será gestionada por nuestro staff, quienes te indicarán los pasos a seguir. Este anticipo podrá ser abonado en nuestro punto de retiro o coordinado con el cliente.
+                    <label for="efectivo" class="font-bold font-roboto">Pago de contado:</label>
+                    <div class="cart-formadepago-details font-roboto"><span class="text-underline">IMPORTANTE:</span> Algunos productos pueden requerir un pago anticipado para asegurar su disponibilidad. En estos casos, la coordinación será gestionada por nuestro staff, quienes te indicarán los pasos a seguir. Este anticipo podrá ser abonado en nuestro punto de retiro o coordinado con el cliente.
                         <button type="submit" class="cart-finalizarcompra bloqueable cursor-pointer decoration-none display-block text-center font-bold">Realizar Pedido</button>
                     </div>
                 </li>
                 <li>
                     <input type="radio" name="forma_pago" id="transferencia" value="transferencia">
-                    <label for="transferencia">Transferencia / Depósito bancario (PAGO EN EL DÍA)</label>
-                    <div class="cart-formadepago-details font-roboto">Hace tu pago en nuestra cuenta bancaria. Usa el identificador de pedido como referencia del pago. La transferencia tiene un plazo de 24hs para ser informada.
+                    <label for="transferencia" class="font-bold font-roboto">Transferencia / Depósito bancario</label>
+                    <div class="cart-formadepago-details font-roboto"><span class="text-underline">IMPORTANTE:</span> Hace tu pago en nuestra cuenta bancaria. Usa el identificador de pedido como referencia del pago. La transferencia tiene un plazo de 24hs para ser informada.
                         <button type="submit" class="cart-finalizarcompra bloqueable cursor-pointer  decoration-none display-block text-center font-bold">Realizar Pedido</button>
                     </div>
                 </li>
                 <li>
-                    <input type="radio" name="forma_pago" id="mercadopago">
-                    <label for="mercadopago">Pagar con Tarjeta (Mercado Pago)</label>
+                    <input type="radio" name="forma_pago" id="mercadopago" value="mercadopago">
+                    <label for="mercadopago" class="font-bold font-roboto">Pagar con Mercado Pago</label>
                     <div class="cart-formadepago-details font-roboto">IMPORTANTE: Los pagos realizados con la plataforma de Mercado Pago cuentan con un recargo del 6,42% más IVA.
-                        <div id="box-checkout-pro" class="bloqueable width-100"></div>
+                        <button type="submit" class="cart-finalizarcompra bloqueable cursor-pointer decoration-none display-block text-center font-bold">Realizar Pedido</button>
                     </div>
                 </li>
                 <li>
                     <input type="radio" name="forma_pago" id="mixto" value="mixto">
-                    <label for="mixto"><span class="feature-new font-roboto">(Nuevo) </span>Pago Mixto (Transferencia + Mercado Pago)</label>
+                    <label for="mixto" class="font-bold font-roboto"><span class="feature-new font-roboto">(Nuevo) </span>Pago Mixto (Transferencia + Mercado Pago)</label>
                     <div class="cart-formadepago-details font-roboto flex flex-column">
                         IMPORTANTE: Ahora en Twinstore puedes dividir tus pagos! El pago parcial abonado mediante Mercado Pago cuentan con un recargo del 6,42% más IVA. El importe a transferir no aplica un adicional.
                         <div class="flex gap-05rem cupon-input-wrapper mixto-transferencia-box">
