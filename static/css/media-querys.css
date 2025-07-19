@@ -180,6 +180,8 @@
 
 @media screen and (width <= 570px) {
 
+    .link-subir-ticket{font-size: 0.9rem}
+
     .prod-name {font-size: 0.9rem;}
 
     .header {max-width: 100vw;}
