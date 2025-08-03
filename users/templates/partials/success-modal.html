@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <div class="modal" id="success-modal">
     <section class="flex font-roboto flex-column modal-content users-feedback-box position-relative">
         <button id="close-success-modal" type="button" class="modal-cerrar border-none cursor-pointer position-absolute btn-absolute">
@@ -8,15 +9,22 @@
         {% if pedido.forma_de_pago == 'transferencia' %}
             <div class="users-facturacion-transferencia font-roboto">
                 <h3>Pago por transferencia bancaria</h3><br>
-                <p><i class="bi bi-check2"></i> Subí tu comprobante siguendo las instrucciones.</p>
-                <p><i class="bi bi-check2-all"></i> Una vez validada la transferencia, se impactará en el estado del pedido.</p><br>
+                <p><strong>Datos para realizar la transferencia:</strong></p>
+                <p><i class="bi bi-bank2"></i> Alias: <strong>twinstore.ar</strong> (Santiago Aguirre Moretto - Mercado Pago)</p>
+                <p><i class="bi bi-cash-stack"></i> Monto a transferir: <strong>{{ pedido.monto_tranferir|formato_pesos }}</strong></p>
+                <p><i class="bi bi-paperclip"></i> Luego, subí el comprobante haciendo clic en <strong>"Subir comprobante"</strong> desde la tabla de pedidos.</p>
             </div>
         {% endif %}
         {% if pedido.forma_de_pago == 'mixto' %}
             <div class="users-facturacion-transferencia font-roboto">
                 <h3 class="font-roboto">Pago mixto (Transferencia + MP)</h3><br>
-                <p><i class="bi bi-check2"></i> Subí tu comprobante y generá el link de pago.</p>
-                <p><i class="bi bi-check2-all"></i> Una vez validado los pagos, se impactará en el estado del pedido.</p><br>
+                <p><strong>Datos para realizar la transferencia:</strong></p>
+                <p><i class="bi bi-bank2"></i> Alias: <strong>twinstore.ar</strong> (Santiago Aguirre Moretto - Mercado Pago)</p>
+                <p><i class="bi bi-cash-stack"></i> Monto a transferir: <strong>{{ pedido.monto_tranferir|formato_pesos }}</strong></p>
+                <p><i class="bi bi-paperclip"></i> Luego, subí el comprobante haciendo clic en <strong>"Subir comprobante"</strong> desde la tabla de pedidos.</p>
+                <br>
+                <p><i class="bi bi-check2"></i> Hace click en "Generar link de pago" y aboná.</p>
+                <p><i class="bi bi-cash-stack"></i> Monto a pagar: <strong>{{ pedido.ticket_mp.monto|formato_pesos }}</strong></p>
             </div>
         {% endif %}
         {% if pedido.forma_de_pago == 'efectivo' %}
@@ -28,7 +36,8 @@
         {% if pedido.forma_de_pago == 'mercadopago' %}
             <div class="users-facturacion-transferencia font-roboto">
                 <h3 class="font-roboto">Pago con Mercado Pago</h3><br>
-                <p><i class="bi bi-check2"></i> Generá el link de pago y aboná.</p>
+                <p><i class="bi bi-check2"></i> Hace click en "Generar link de pago" y aboná.</p>
+                <p><i class="bi bi-cash-stack"></i> Monto a pagar: <strong>{{ pedido.ticket_mp.monto|formato_pesos }}</strong></p>
                 <p><i class="bi bi-check2-all"></i> Una vez validado el pago, se impactará en el estado del pedido.</p><br>
             </div>
         {% endif %}

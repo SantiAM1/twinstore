@@ -128,7 +128,7 @@
                     </button>
                 </header>
                 <br>
-                <p class="font-roboto">Total abonado: <span class="modal-span">{{pedido.total_compra|formato_pesos}}</span></p>
+                <p class="font-roboto">Total de compra: <span class="modal-span">{{pedido.total_compra|formato_pesos}}</span></p>
                 <p class="font-roboto">Cantidad de productos: <span class="modal-span">{{pedido.productos|length}}</span></p>
                 <p class="font-roboto">Forma de pago: <span class="modal-span">{{pedido.forma_de_pago|capfirst}}</span></p>
                 <p class="font-roboto">Notificaciones: <span class="modal-span">{% if pedido.recibir_mail %}Sí{% else %}No{% endif %}</span></p>

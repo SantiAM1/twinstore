@@ -100,11 +100,8 @@ class HistorialCompras(models.Model):
 
         return f"{self.merchant_order_id} - {self.estado} - {nombre}"
 
-    def pagos_completos(self):
-        return all(p.status == "approved" for p in self.pagos.all())
-
     def get_adicional(self):
-        if self.forma_de_pago != "mercadopago":
+        if self.forma_de_pago not in ['mixto','mercadopago']:
             return 0
         
         subtotal = sum(Decimal(str(p['subtotal'])) for p in self.productos)
