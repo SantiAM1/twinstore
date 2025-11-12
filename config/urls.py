@@ -3,7 +3,7 @@ from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
 from core.views import pagina_mantenimiento
-from .sitemaps import StaticViewSitemap,CategoriaSitemap,SubCategoriaSitemap,ProductoSitemap
+from .sitemaps import StaticViewSitemap,CategoriaSitemap,SubCategoriaSitemap,ProductoSitemap,MarcaSitemap
 from django.contrib.sitemaps.views import sitemap
 from django.contrib.sitemaps.views import sitemap as sitemap_view
 
@@ -12,6 +12,7 @@ sitemaps = {
     'categorias': CategoriaSitemap,
     'subcategorias': SubCategoriaSitemap,
     'productos': ProductoSitemap,
+    'marcas': MarcaSitemap,
 }
 
 def sitemap_view(request):
@@ -30,3 +31,8 @@ urlpatterns = [
     path('mantenimiento/',pagina_mantenimiento,name="pagina_mantenimiento"),
     path("sitemap.xml", sitemap_view, name="django.contrib.sitemaps.views.sitemap"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += [
+        path('__debug__/', include('debug_toolbar.urls')),
+    ]

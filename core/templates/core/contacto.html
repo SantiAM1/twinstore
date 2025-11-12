@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load compress %}
 
 {% block meta %}
 <meta name="description" content="Conocé todos los medios de contacto de Twinstore. Nosotros te asesoramos y solucionamos cualquier duda!">
@@ -9,34 +8,38 @@
 
 {% block head %}
 <title>Contacto - Twinstore</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-{% compress css %}
-<link rel="stylesheet" href="{% static 'css/legales.css' %}">
-<link rel="stylesheet" href="{% static 'css/pedidos.css' %}">
-<link rel="stylesheet" href="{% static 'css/widgets.css' %}">
-{% endcompress %}
 {% endblock head %}
 
 {% block contenidomain %}
-<section class="legales-box users-pedidos-box bg-white contact-box">
-    <h1>¿Necesitás ayuda?</h1>
-    <p>En Twinstore queremos que tu experiencia sea rápida, clara y cercana. Si necesitás ayuda o tenés alguna consulta, podés comunicarte directamente con nosotros:</p>
-    <ul class="contacto-links">
-        <li>
-            <i class="bi bi-envelope" style="color: rgb(0, 140, 255);font-size: 1.2rem;"></i> <span class="font-bold font-roboto">Correo: </span> <a href="mailto:contacto@twinstore.com.ar" class="politicas-link decoration-none">contacto@twinstore.com.ar</a>
-        </li>
-        <li>
-            <i class="bi bi-whatsapp" style="color: rgb(2, 160, 55);font-size: 1.2rem;"></i> <a href="https://wa.me/5493413491911" target="_blank" rel="noopener noreferrer" class="politicas-link decoration-none"> ¡Escribinos por WhatsApp!</a>
-        </li>
-        <li>
-            <i class="bi bi-clock" style="color: rgb(94, 94, 94);font-size: 1.2rem;"></i> <span class="font-bold">Horarios de atención:</span>
-            <p>Lunes a viernes de 09:00 a 18:00 hs. Sábados de 09:00 a 13:00 hs</p>
-        </li>
-    </ul>
+<section class="generic-box">
+    {% include 'partials/generic-header.html' with title="Contacto" %}
+    <section class="generic-data contacto">
+        <div class="generic-item contacto">
+            <h1>¿Necesitás ayuda?</h1>
+            <p>En Twinstore queremos que tu experiencia sea rápida, clara y cercana. Si necesitás ayuda o tenés alguna consulta, podés comunicarte directamente con nosotros:</p>
+            <ul class="contacto-links">
+                <li>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail correo"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>
+                    <span class="font-bold font-roboto">Correo: </span> <a href="mailto:contacto@twinstore.com.ar" class="generic-link">contacto@twinstore.com.ar</a>
+                </li>
+                <li>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-brand-whatsapp wtap"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" /><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" /></svg>
+                    <a href="https://wa.me/5493413491911" target="_blank" rel="noopener noreferrer" class="generic-link wtap"> ¡Escribinos por WhatsApp!</a>
+                </li>
+                <li>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-clock clock"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /><path d="M12 7v5l3 3" /></svg>
+                    <span >Horarios de atención:</span>
+                    <p>Lunes a viernes de 09:00 a 18:00 hs. Sábados de 09:00 a 13:00 hs</p>
+                </li>
+            </ul>
+        </div>
+        <div class="generic-item contacto">
+            <h2>Nuestro punto de retiro</h2>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3348.850630012117!2d-60.817850523575366!3d-32.92854447097575!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95b64dc8dca9f287%3A0x4311ebbdc02a5ecc!2sTwinstore!5e0!3m2!1ses!2sar!4v1762615381993!5m2!1ses!2sar"  allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </section>
 </section>
-{% include 'widgets/contacto.html' %}
 {% endblock contenidomain %}
 
 {% block myscripts %}
-{% include 'widgets/script.html' %}
 {% endblock myscripts %}

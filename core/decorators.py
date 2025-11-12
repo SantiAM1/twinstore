@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.core.cache import cache
-from core.models import ModoMantenimiento  # Ajustá la ruta a tu modelo
+from core.models import ModoMantenimiento
 
 def bloquear_si_mantenimiento(view_func):
     """

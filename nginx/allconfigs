@@ -14,48 +14,86 @@ server {
 
 # * PRODUCCION
 server {
-    listen 80;
+    listen 443 ssl;
+
+    set_real_ip_from 173.245.48.0/20;
+    set_real_ip_from 103.21.244.0/22;
+    set_real_ip_from 103.22.200.0/22;
+    set_real_ip_from 103.31.4.0/22;
+    set_real_ip_from 141.101.64.0/18;
+    set_real_ip_from 108.162.192.0/18;
+    set_real_ip_from 190.93.240.0/20;
+    set_real_ip_from 188.114.96.0/20;
+    set_real_ip_from 197.234.240.0/22;
+    set_real_ip_from 198.41.128.0/17;
+    set_real_ip_from 162.158.0.0/15;
+    set_real_ip_from 104.16.0.0/13;
+    set_real_ip_from 104.24.0.0/14;
+    set_real_ip_from 172.64.0.0/13;
+    set_real_ip_from 131.0.72.0/22;
+    real_ip_header CF-Connecting-IP;
+
+    if ($remote_addr !~* "(173\.245\.|103\.21\.|103\.22\.|103\.31\.|141\.101\.|108\.162\.|190\.93\.|188\.114\.|197\.234\.|198\.41\.|162\.158\.|104\.16\.|104\.24\.|172\.64\.|131\.0\.)") {
+        return 444;
+    }
+
     server_name twinstore.com.ar www.twinstore.com.ar;
+
+    ssl_certificate /etc/ssl/certs/origin.pem;
+    ssl_certificate_key /etc/ssl/private/origin.key;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
 
     client_max_body_size 20M;
 
     add_header Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+
+    location / {
+        proxy_pass http://web:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 60s;
+    }
 
     location ^~ /payment/webhook/ {
         proxy_pass http://web:8000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_read_timeout 60s;
     }
 
-    location / {
+    location /static/ {
+        alias /app/staticfiles/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        add_header Vary "Accept-Encoding";
+        access_log off;
+        log_not_found off;
+    }
 
-        if ($host = "www.twinstore.com.ar") {
-            return 301 https://twinstore.com.ar$request_uri;
-        }
-
-        if ($http_x_forwarded_proto != "https") {
-            return 301 https://$host$request_uri;
-        }
-
-        proxy_pass http://web:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+    location /media/ {
+        alias /app/media/;
+        expires 30d;
+        add_header Cache-Control "public";
+        add_header Vary "Accept-Encoding";
+        access_log off;
+        log_not_found off;
     }
 
     location = /robots.txt {
         alias /app/staticfiles/robots.txt;
         access_log off;
         log_not_found off;
-    }
-
-    location /static/ {
-        alias /app/staticfiles/;
-    }
-
-    location /media/ {
-        alias /app/media/;
     }
 
     location = /favicon.ico {
@@ -66,6 +104,12 @@ server {
     location ~ /\.(?!well-known).* {
         deny all;
     }
+}
+
+server {
+    listen 80;
+    server_name twinstore.com.ar www.twinstore.com.ar;
+    return 301 https://twinstore.com.ar$request_uri;
 }
 
 # * Desarrollo local

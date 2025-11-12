@@ -1,9 +1,0 @@
-{% for producto in productos %}
-    <div class="flex flex-column items-center justify-center product-card bg-white position-relative bloqueable">
-        {% if producto.portada %}
-            {% include 'components/cards_dinamic.html' %}
-        {% else %}
-            {% include 'components/cards_static.html' %}
-        {% endif %}
-    </div>
-{% endfor %}

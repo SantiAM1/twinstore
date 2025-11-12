@@ -1,22 +1,35 @@
 from django.urls import path
-from .views import iniciar_sesion,registarse,cerrar_sesion,buscar_pedidos,mi_perfil,verificar_email,email_enviado,reenviar_verificacion,users_pedidos,ver_pedido,RecibirMailView,asociar_pedido,arrepentimiento_post,recuperar_contraseña,restablecer_contraseña
+from .views import (
+    cerrar_sesion,
+    mi_perfil,
+    LoginAPIView,
+    RegisterView,
+    MiCuentaView,
+    check_auth,
+    RecuperarCuentaView,
+    VerificarTokenView,
+    NuevaContraseñaView,
+    ver_pedido,
+    VerPedidoAPIView,
+    review_pedido,
+    CrearReseñaView
+    )
 
 app_name = "users"
 
 urlpatterns = [
-    path('login/',iniciar_sesion,name="login"),
-    path('singup/',registarse,name="singup"),
     path('logout/',cerrar_sesion,name="logout"),
-    path('buscar_pedidos/',buscar_pedidos,name="buscar_pedidos"),
-    path('ver_pedido/<str:token>',ver_pedido,name="ver_pedidos"),
-    path('mispedidos/',users_pedidos,name="mispedidos"),
-    path('miperfil/',mi_perfil,name="perfil"),
-    path('verificar/<str:token>',verificar_email,name="verificar"),
-    path('email_enviado/',email_enviado,name="email_enviado"),
-    path('reenviar_mail/',reenviar_verificacion,name="reenviar_mail"),
-    path('api/recibir_mail/',RecibirMailView.as_view(),name="recibir_mail"),
-    path('asociar_pedido/',asociar_pedido,name="asociar_pedido"),
-    path('arrepentimiento/<str:historial_signed>/',arrepentimiento_post,name="arrepentimiento_post"),
-    path('recuperar/',recuperar_contraseña,name="recuperar"),
-    path('restablecer/<str:token>/',restablecer_contraseña,name="restablecer")
+    path('micuenta/',mi_perfil,name="perfil"),
+    path('api/login/', LoginAPIView.as_view(), name='api_login'),
+    path('api/register/',RegisterView.as_view(),name='api_register'),
+    path('api/micuenta/',MiCuentaView.as_view(),name="api_micuenta"),
+    path('api/check_auth/',check_auth,name="api_check_auth"),
+    path('api/recuperar-cuenta/',RecuperarCuentaView.as_view(),name="api_recuperar_cuenta"),
+    path('api/verificar-token/',VerificarTokenView.as_view(),name="api_verificar_token"),
+    path('api/nueva-contraseña/',NuevaContraseñaView.as_view(),name="api_nueva_contraseña"),
+    path('pedido/<str:order_id>/',ver_pedido,name="ver_pedido"),
+    path('api/ver-pedido/',VerPedidoAPIView.as_view(),name="api_ver_pedido"),
+    path('reviews/<str:token>/',review_pedido,name="review_pedido"),
+    path('api/crear-reseña/',CrearReseñaView.as_view(),name="api_crear_reseña"),
+    
 ]

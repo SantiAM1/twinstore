@@ -1,86 +1,89 @@
 from django.conf import settings
-from .tasks import enviar_mail_compra,enviar_mail_confirm_user,enviar_mail_estado_pedido,enviar_mail_comprobante_obs
-import base64
-import os
+from django.contrib.auth.models import User
+from .tasks import enviar_mail_compra,enviar_mail_confirm_user,enviar_mail_estado_pedido,enviar_mail_comprobante_obs,enviar_mail_recuperar_cuenta,enviar_reseña_token_html
+from .decorators import debug_pass
 
-def mail_confirm_user_html(usuario):
-    """Envía el mail de confirmación de cuenta"""
-    perfil = usuario.perfil
-    token = perfil.token_verificacion
-    site_url = f'{settings.SITE_URL}'
+@debug_pass
+def mail_confirm_user_html(usuario:User) -> None:
+    """
+    Envía el mail de confirmación de cuenta
+    """
+    token = usuario.token_usuario.latest('creado')
     mail_data = {
-        'url' : f"{site_url}/usuario/verificar/{token}",
-        'img' : get_img_logo_url()
+        'codigo' : token.codigo,
+        'username': usuario.perfil.nombre
     }
     enviar_mail_confirm_user.delay(mail_data,user_email=usuario.email)
 
+@debug_pass
+def mail_recuperar_cuenta_html(usuario:User) -> None:
+    """
+    Envía el mail de recuperación de cuenta
+    """
+    token = usuario.token_usuario.latest('creado')
+    mail_data = {
+        'codigo' : token.codigo,
+        'username': usuario.perfil.nombre
+    }
+    enviar_mail_recuperar_cuenta.delay(mail_data,user_email=usuario.email)
+
+@debug_pass
 def mail_buy_send_html(historial,user_email):
-    """Envía el mail de compra exitosa"""
-    token = historial.token_consulta
+    """
+    Envía el mail de compra exitosa
+    """
+    codigo = historial.merchant_order_id
     site_url = f'{settings.SITE_URL}'
-    productos = historial.productos
+    compra = historial.productos
     adicional = historial.get_adicional()
     total = historial.total_compra
     historial_data = {
-    'url': f"{site_url}/usuario/ver_pedido/{token}",
-    'img': get_img_logo_url(),
-    'token': token,
-    'productos':productos,
+    'url': f"{site_url}/usuario/pedido/{codigo}",
+    'codigo': codigo,
+    'compra':compra,
     'adicional':adicional,
     'total':total
     }
     enviar_mail_compra.delay(historial_data, user_email)
 
+@debug_pass
 def mail_estado_pedido_html(historial,user_email):
     """Envía el mail cuando hay un cambio en el estado del pedido"""
-    token = historial.token_consulta
+    codigo = historial.merchant_order_id
     site_url = f'{settings.SITE_URL}'
-
-    finalizado = False
-    if historial.estado == "confirmado":
-        mensaje = "Tu pago fue confirmado con éxito. ¡Gracias por tu compra! Pronto comenzaremos a preparar tu pedido."
-    elif historial.estado == "rechazado":
-        mensaje = "Hubo un problema con el pago. Te recomendamos volver a intentarlo o escribirnos si necesitás ayuda."
-    elif historial.estado == "preparando pedido":
-        mensaje = "Estamos preparando tu pedido! En breve recibiras noticias."
-    elif historial.estado == "enviado":
-        mensaje = "¡Tu pedido ha sido enviado! En las próximas horas te compartiremos más detalles del seguimiento."
-    elif historial.estado == "finalizado":
-        mensaje = "	¡Gracias por confiar en Twinstore! Tu pedido ha sido entregado y finalizado exitosamente. Esperamos volver a verte pronto."
-        finalizado = True
-    elif historial.estado == "arrepentido":
-        mensaje = "	Pedido cancelado, arrepentido"
-    elif historial.estado == "listo para retirar":
-        mensaje = "Tu pedido ya se encuentra en nuestro punto de retiro. Te esperamos!"
-    else:
-        mensaje = "Estamos esperando la confirmación del pago. Te notificaremos apenas se acredite."
-
-    template = 'emails/estado_pedido_finalizado.html' if finalizado else 'emails/estado_pedido.html'
 
     estado = historial.estado
     estado = estado.capitalize()
 
     mail_data = {
-        'url': f"{site_url}/usuario/ver_pedido/{token}",
-        'img': get_img_logo_url(),
-        'pedido_id': historial.merchant_order_id,
+        'url': f"{site_url}/usuario/pedido/{codigo}",
+        'codigo': codigo,
         'estado': estado,
-        'mensaje': mensaje
     }
-    enviar_mail_estado_pedido.delay(mail_data, user_email,template)
+    enviar_mail_estado_pedido.delay(mail_data, user_email,'emails/estado_pedido.html')
 
+@debug_pass
+def reseña_token_html(token_usuario,user_email):
+    """Envía el mail con el token para dejar una reseña"""
+    site_url = f'{settings.SITE_URL}'
+
+    mail_data = {
+        'url': f"{site_url}/usuario/reviews/{token_usuario.token}",
+        'producto': token_usuario.producto.nombre,
+        'username': token_usuario.usuario.nombre,
+        'img_prod': f"{settings.SITE_URL}{token_usuario.producto.get_portada_600()}",
+    }
+    enviar_reseña_token_html.delay(mail_data, user_email,'emails/review.html')
+
+@debug_pass
 def mail_obs_comprobante_html(historial,observaciones):
-    token = historial.token_consulta
+    token = historial.merchant_order_id
     user_email = historial.facturacion.email
     pedido_id = historial.merchant_order_id
     site_url = f'{settings.SITE_URL}'
     mail_data = {
         'url': f"{site_url}/usuario/ver_pedido/{token}",
-        'img' : get_img_logo_url(),
         'observaciones':observaciones,
         'pedido_id':pedido_id
     }
     enviar_mail_comprobante_obs.delay(mail_data,user_email)
-
-def get_img_logo_url():
-    return f"{settings.SITE_URL}/static/img/mail.png"

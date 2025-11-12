@@ -1,245 +1,151 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
-{% load compress %}
 
 {% block meta %}
-<meta name="description" content="{{producto.description_seo|default:"Los mejores productos al mejor precio en Twinstore. Envíos a todo el país."}}">
-<meta name="robots" content="index, follow">
-<meta property="og:title" content="{{producto.nombre}} - Twinstore">
-<meta property="og:description" content="{{producto.description_seo|default:"Los mejores productos al mejor precio en Twinstore. Envíos a todo el país."}}">
-{% static 'img/mail.webp' as mail_url %}
-<meta property="og:image" content="{% if producto.portada %}{{ producto.portada.url|absolute_url:request }}{% else %}{{ mail_url|absolute_url:request }}{% endif %}">
-<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta name="description" content="{{ meta.description }}">
+<meta name="robots" content="{{ meta.robots }}">
+<link rel="canonical" href="{{ meta.url }}">
+
+<!-- Open Graph -->
+<meta property="og:type" content="product">
+<meta property="og:title" content="{{ meta.og.title }}">
+<meta property="og:description" content="{{ meta.og.description }}">
+<meta property="og:url" content="{{ meta.og.url }}">
+<meta property="og:site_name" content="Twinstore">
+<meta property="og:image" content="{{ meta.og.image }}">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ meta.twitter.title }}">
+<meta name="twitter:description" content="{{ meta.twitter.description }}">
+<meta name="twitter:image" content="{{ meta.twitter.image }}">
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{{ meta.schema|safe }}
+</script>
 {% endblock meta %}
+
 
 {% block head %}
 <title>{{producto.nombre}} - Twinstore</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-{% compress css %}
-<link rel="stylesheet" href="{% static 'css/prod-grid.css' %}" />
-<link rel="stylesheet" href="{% static 'css/substyles/quantity.css' %}" />
-<link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}" />
-<link rel="stylesheet" href="{% static 'css/prod-view.css' %}" />
-{% endcompress %}
 {% endblock head %}
 
-{% block theme %}black{% endblock theme %}
+{% block theme %}product{% endblock theme %}
 
 {% block contenidomain %}
-<h1 class="display-none">{{producto.nombre}}</h1>
-<div class="product-box main-box prod-box-style">
-    <nav>
-        <a href="{% url 'core:home' %}" class="decoration-none product-outside-link">Inicio</a>
-        <i class="bi bi-chevron-right product-outside-link"></i>
-        {% if producto.sub_categoria.categoria.seccion_id %}
-        <a href="{% url 'products:slug_dispatcher' producto.sub_categoria.categoria.seccion_id %}" class="decoration-none product-outside-link">{{producto.sub_categoria.categoria.get_seccion_id_display}}</a>
-        <i class="bi bi-chevron-right product-outside-link"></i>
-        <a href="{% url 'products:categoria' producto.sub_categoria.categoria.seccion_id producto.sub_categoria.categoria.slug %}" class="decoration-none product-outside-link">{{producto.sub_categoria.categoria}}</a>
-        <i class="bi bi-chevron-right product-outside-link"></i>
-        <a href="{% url 'products:categoria_subcategoria' producto.sub_categoria.categoria.seccion_id producto.sub_categoria.categoria.slug producto.sub_categoria.slug %}"class="decoration-none product-outside-link">{{producto.sub_categoria}}</a>
-        <i class="bi bi-chevron-right product-outside-link"></i>
-        <span class="prod-title-name font-bold font-roboto"> {{producto.nombre}} </span>
-        {% else %}
-        <a href="{% url 'products:gaming' %}"class="decoration-none product-outside-link">Gaming</a>
-        <i class="bi bi-chevron-right product-outside-link"></i>
-        <a href="{% url 'products:gaming_subcategoria' producto.sub_categoria.slug %}"class="decoration-none product-outside-link">{{producto.sub_categoria}}</a>
-        <i class="bi bi-chevron-right product-outside-link"></i>
-        <span class="prod-title-name font-bold font-roboto"> {{producto.nombre}} </span>
-        {% endif %}
-    </nav>
-    <div class="thum-divider {% if  imagenes|length > 1 %}prod-top-margin{% endif %}"></div>
-    <div class="flex gap-1rem product-view bg-white"> 
-        <div class="position-relative">
-            {% include 'partials/product_carousel.html' %}
-            <div class="swiper-pagination flex flex-column justify-center items-center position-absolute gap-05rem"></div>
+<div class="grid-center">
+    <section class="product-view">
+        <div class="product-gallery">
+            {% include 'components/prod-swipers.html' %}
         </div>
-        <div class="flex flex-column product-info">
-            <div>
-                <p class="product-title-marca">{{producto.marca}}</p>
-                <p class="product-title-nombre font-roboto font-bold">{{producto.nombre}}</p>
-                {% if user.is_staff %}
-                    <a href="{% url 'products:editar_producto' producto.id %}" class="decoration-none"><i class="bi bi-pencil prod-editar-btn border_none cursor-pointer display-block text-center font-roboto"> Editar el producto</i></a>
-                {% endif %}
+        <div class="product-info">
+            <h1>{{producto.nombre}}</h1>
+            {% if user.is_staff %}
+                <a href="{% url 'products:editar_producto' producto.id %}" class="generic-button btn-2">Editar producto</a>
+            {% endif %}
+            <p class="product-description">{{producto.descripcion_seo}}</p>
+            <div class="product-prices">
+                {% if producto.descuento > 0 %}<p>{{producto.precio_anterior|formato_pesos}}</p><span>-{{producto.descuento}}%</span>{% endif %}
+                <h2>{{producto.precio|formato_pesos}}</h2>
+                <aside>Precio s/imp. nac. {{producto.precio|imp_nac|formato_pesos}}</aside>
             </div>
-            <div class="flex flex-column gap-1rem">
-                <div>
-                    {% if producto.descuento > 0 %}<p class="product-title-precio-desc font-roboto font-bold">{{producto.precio_anterior|formato_pesos}}</p>{% endif %}
-                    <p class="product-title-precio font-roboto font-bold">{{producto.precio|formato_pesos}}</p>
-                </div>
-                {% if colores %}
-                <div class="flex flex-column">
-                    <p class="font-roboto product-title-info">Colores:</p>
-                    <div class="flex gap-05rem" id="colores-items">
-                        {% for color in colores %}
-                            <button type="button" class="color-selector cursor-pointer {% if forloop.first %}color-activo{% endif %}" data-color-id="{{ color.id|signing_data }}"style="background-color: {{ color.hex }};"></button>
-                        {% endfor %}
-                    </div>
-                    {% if not producto.inhabilitar %}
-                    <p class="font-bold font-roboto colors-msg">Colores sujetos a stock. Algunos pueden no estar disponibles al momento de tu compra.</p>
-                    {% endif %}
-                </div>
-                {% endif %}
-                {% if producto.inhabilitar %}
-                    <p class="font-bold font-roboto" style="font-style: italic;color: rgb(99, 35, 160);">Producto con alta rotacion de stock. Consultar disponibilidad.</p>
-                    <a href="#" id="consultar-disponibilidad" data-name="{{producto.nombre}}" class="decoration-none flex items-center text-center cursor-pointer product-cart display-block justify-center" rel="noopener noreferrer">
-                        <i class="bi bi-whatsapp"></i> Consultar disponiblidad
-                    </a>
-                    <input type="hidden" name="producto_id" value="{{ producto.id|signing_data }}" id="producto-id" />
-                {% else %}
-                <form id="add-to-cart-form" class="flex items-center gap-1rem" style="height: 40px">
-                    <div class="flex items-center justify-center quantity-container">
-                        <button type="button" class="btn-cantidad-view" data-action="decrement" ><i class="bi bi-dash"></i></button>
-                        <input type="text" id="quantity" name="cantidad" value="1" readonly/>
-                        <button type="button" class="btn-cantidad-view" data-action="increment"><i class="bi bi-plus"></i></button>
-                    </div>
-                    <input type="hidden" name="producto_id" value="{{ producto.id|signing_data }}" id="producto-id" />
-                    <button type="submit" class="decoration-none flex items-center text-center border-none cursor-pointer product-cart "> Agregar al Carrito<i class="bi bi-cart"></i></button>
-                </form>
-                {% endif %}
-                <div>
-                    <p class="politicas-link font-roboto cursor-pointer" id="open-modal"><img src="{% static 'img/mercado_pago.webp' %}" alt="logo mercado pago" width="21"> Conocé nuestras cuotas!</p>
-                    <p class="product-title-info font-roboto font-bold"><i class="bi bi-truck product-title-icons"></i> Envíos a todo el país</p>
-                    <p class="product-title-info font-roboto font-bold"><i class="bi bi-geo-alt-fill product-title-icons"></i> Retirá en nuestro local</p>
-                </div>
-                <p class="product-title-data">Código SKU:{{producto.sku}}</p>
-                <p class="product-title-data">
-                    Categoría:{{producto.sub_categoria}}
-                </p>
-            </div>
-        </div>
-    </div>
-    <section class="product-specs">
-        {% if producto.especificaciones.all %}
-        <h2 class="font-roboto">Características del producto</h2>
-        <div class="product-specs-divider"></div>
-        <input type="checkbox" class="display-none" name="expandir-specs" id="expandir-specs">
-        <label for="expandir-specs" class="flex justify-between bg-white padding1rem font-bold font-roboto label-prod-specs">Descripción<i class="bi bi-arrow-down"></i></label>
-        <div class="contenedor-tabla">
-            <table class="ficha-especificaciones width-100">
-                {% for especificacion in producto.especificaciones.all %}
-                <thead>
-                    <tr>
-                        <th colspan="2" class="font-roboto font-bold">{{ especificacion.categoria.nombre|default:"Especificaciones" }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for key, value in especificacion.datos.items %}
-                    <tr>
-                        <td class="font-roboto">{{ key }}</td>
-                        <td class="font-roboto">{{ value }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
+            <div class="product-colors">
+            {% if producto.colores.exists %}
+                {% for color_id,data in imagenes_dict.items %}
+                <div class="dot-ring {% if forloop.first %}selected{% endif %}" data-index="{{forloop.counter}}" data-colorId="{{color_id|signing_data}}"><div class="dot" style="background-color: {{data.hex}}"></div></div>
                 {% endfor %}
-            </table>
+            {% endif %}
+            </div>
+            <button type="button" class="product-pay-method generic-modal-open" data-modalId="prodSpecs">Conocé nuestros medios de pago</button>
+            <button type="button" class="product-add-cart" data-productoId="{{producto.id|signing_data}}">
+                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17h-11v-14h-2" /><path d="M6 5l14 1l-1 7h-13" /></svg>
+                Agregar al carrito
+            </button>
+            {% include 'components/prod-warranty.html' %}
         </div>
-        {% else %}
-        <div>
-            <h2>No hay especificaciones disponibles :/</h2>
-        </div>
-        {% endif %}
     </section>
-</div>
-<section class="prod-modal display-none position-fixed width-100 height-100" id="prod-modal">
-    <div class="prod-modal-content flex flex-column position-relative bg-white">
-        <header class="flex justify-between items-center">
-            <picture class="font-bold font-roboto flex items-center gap-05rem">
-                <img src="{% static 'img/mercado_pago.webp' %}" alt="logo mercado pago" height="30px">
-                Nuestras cuotas
-            </picture>
-            <span id="close-modal" class="close-modal display-block">
-                <i class="bi bi-x-lg"></i>
-            </span>
-        </header>
-        {% for cuota,info in coutas_resultado.items %}
-        {{item}}
-        <div class="flex justify-between modal-item">
-            <p class="font-roboto flex gap-05rem">
-                <span class="font-roboto">{{cuota}}x</span>{{info.valor_cuota}}
-            </p>
-            <p class="font-roboto">
-                {{info.total}}
-            </p>
+    <section class="product-view specs">
+        <div class="product-specs">
+            {% include 'components/prod-specs.html' %}
         </div>
-        
-        {% endfor %}
-        <p class="font-roboto modal-item text-center">Estos valores son aproximados</p>
-    </div>
-</section>
+        <div class="product-clients">
+            <h3>Reseñas de clientes</h3>
+            <div class="review-summary">
+                <div class="review-avg">
+                    <span>{{reviews.promedio}}</span>
+                    <div class="stars">
+                    {% for _ in "12345" %}
+                        {% if reviews.promedio >= forloop.counter %}
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="#1987ee"  class="icon icon-tabler icons-tabler-filled icon-tabler-star"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z" /></svg>
+                        {% elif reviews.promedio > forloop.counter|sub:0.5 %}
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="#1987ee"  class="icon icon-tabler icons-tabler-filled icon-tabler-star-half"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 1a.993 .993 0 0 1 .823 .443l.067 .116l2.852 5.781l6.38 .925c.741 .108 1.08 .94 .703 1.526l-.07 .095l-.078 .086l-4.624 4.499l1.09 6.355a1.001 1.001 0 0 1 -1.249 1.135l-.101 -.035l-.101 -.046l-5.693 -3l-5.706 3c-.105 .055 -.212 .09 -.32 .106l-.106 .01a1.003 1.003 0 0 1 -1.038 -1.06l.013 -.11l1.09 -6.355l-4.623 -4.5a1.001 1.001 0 0 1 .328 -1.647l.113 -.036l.114 -.023l6.379 -.925l2.853 -5.78a.968 .968 0 0 1 .904 -.56zm0 3.274v12.476a1 1 0 0 1 .239 .029l.115 .036l.112 .05l4.363 2.299l-.836 -4.873a1 1 0 0 1 .136 -.696l.07 -.099l.082 -.09l3.546 -3.453l-4.891 -.708a1 1 0 0 1 -.62 -.344l-.073 -.097l-.06 -.106l-2.183 -4.424z" /></svg>
+                        {% else %}
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="#ccc"  class="icon icon-tabler icons-tabler-filled icon-tabler-star"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z" /></svg>
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                    <p>Basado en {{reviews.total}} reseña/s</p>
+                </div>
+                <ul class="review-bars">
+                    {% for star,number in porcentajes.items %}
+                    <li class="bar">
+                        <span class="bar__label">{{star}}</span>
+                        <div class="bar__track">
+                            <div class="bar__fill" style="--pct:{{number}}"></div>
+                        </div>
+                        <span class="bar__pct">{{number}}%</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% for review in reviews.usuarios %}
+            <article class="review-customers">
+                <strong>{{review.nombre}}</strong>
+                <span>Hace {{review.creado_en|timesince_simple}}</span>
+                <div class="stars">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= review.calificacion %}
+                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="#1987ee"  class="icon icon-tabler icons-tabler-filled icon-tabler-star"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z" /></svg>
+                    {% else %}
+                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="#cccccc"  class="icon icon-tabler icons-tabler-filled icon-tabler-star"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z" /></svg>
+                    {% endif %}
+                {% endfor %}
+                </div>
+                <p>{{review.comentario}}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% include 'components/medios-pago.html' %}
+</div>
 {% endblock contenidomain %}
+
 {% block myscripts %}
-<script src="{% static 'js/producto-view.js' %}"></script>
+<script src="{% static 'js/prodView.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script nonce="{{ request.csp_nonce }}">
-    window.thumbnails = JSON.parse('{{ thumbnails|escapejs }}');
+    const thumbsConf = {
+    spaceBetween: 8,
+    slidesPerView: 'auto',
+    freeMode: true,
+    watchSlidesProgress: true,
+    watchSlidesVisibility: true,
+  }
 
-    window.swiper = new Swiper(".prodImgView", {
-        zoom: {
-            maxRatio: 2,
-        },
-        pagination: {
-            el: ".swiper-pagination",
-            clickable: true,
-            renderBullet: function (index, className) {
-                return `<span class="${className}">
-                    <img src="${window.thumbnails[index]}" class="thumbnail-swiper" alt="Miniatura ${index + 1}" />
-                </span>`;
-            },
-        },
-    });
+document.querySelectorAll(".thumbs-swiper").forEach((thumb) => {
+  const thumbsSwiper = new Swiper(thumb, thumbsConf);
 
-    document.querySelectorAll('.color-selector').forEach(btn => {
-        btn.addEventListener('click', () => {
+  const index = thumb.dataset.index;
+  const main = document.querySelector(`.img-color-${index}`);
 
-            document.querySelectorAll('.color-selector').forEach(b => b.classList.remove('color-activo'));
-
-            btn.classList.add('color-activo')
-
-            const colorId = btn.dataset.colorId;
-            const productoId = document.getElementById('producto-id').value;
-            const url = `/productos/api/imagenes/${productoId}/${colorId}`
-            axios.get(url)
-                .then(response => {
-                    const data = response.data;
-
-                    const thumDivider = document.querySelector('.thum-divider');
-                    if (thumDivider) {
-                        if (data.thumbnails.length > 1) {
-                            thumDivider.classList.add('prod-top-margin');
-                        } else {
-                            thumDivider.classList.remove('prod-top-margin');
-                        }
-                    }
-                    // Destruir swiper anterior
-                    if (window.swiper) window.swiper.destroy(true, true);
-
-                    const viejo = document.querySelector('.prodImgView');
-                    const wrapper = document.createElement('div');
-                    wrapper.innerHTML = data.carousel;
-                    viejo.replaceWith(wrapper.firstElementChild);
-
-                    window.thumbnails = data.thumbnails;
-
-                    window.swiper = new Swiper(".prodImgView", {
-                        zoom: {
-                            maxRatio: 2,
-                        },
-                        pagination: {
-                            el: ".swiper-pagination",
-                            clickable: true,
-                            renderBullet: function (index, className) {
-                                return `<span class="${className}">
-                                    <img src="${window.thumbnails[index]}" class="thumbnail-swiper" alt="Miniatura ${index + 1}" />
-                                </span>`;
-                            },
-                        },
-                    });
-                })
-                .catch(error => {
-                    console.error("Error al cargar imágenes por color:", error);
-                });
-        });
-    });
+  const mainSwiper = new Swiper(main, {
+    spaceBetween: 16,
+    zoom: true,
+    thumbs: { swiper: thumbsSwiper },
+  });
+});
 </script>
 {% endblock myscripts %}

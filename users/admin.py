@@ -5,3 +5,4 @@ from .models import PerfilUsuario, DatosFacturacion,TokenUsers
 
 admin.site.register(PerfilUsuario)
 admin.site.register(TokenUsers)
+admin.site.register(DatosFacturacion)

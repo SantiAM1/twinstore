@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<meta name="description" content="Ejercé tu derecho de arrepentimiento como consumidor. Iniciá tu solicitud fácilmente si te arrepentiste de una compra en Twinstore.">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Botón de arrepentimiento - Twinstore</title>
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="generic-box">
+    {% include "partials/generic-header.html" with title="Botón de arrepentimiento" %}
+    <section class="generic-data">
+        {% include 'components/politicas-navbar.html' with arren="selected" %}
+        <div class="generic-item faq">
+            <h1>Botón de arrepentimiento</h1>
+            <p class="faq__description">
+                En cumplimiento de la Ley 24.240 de Defensa del Consumidor ponemos a disposición el Botón de arrepentimiento. Para mas información consulta nuestas <a href="{% url 'core:politicas-devolucion' %}" class="generic-link">Políticas de devolución</a>.
+            </p>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">¿Qué debo hacer para solicitar la devolución?</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Debes ingresar al apartado "Mi cuenta", si cumples con las condiciones para el arrepentimiento, encontrarás habilitado el Botón de Arrepentimiento, el cual te permitirá iniciar la solicitud de devolución de forma rápida y sencilla.
+                </p>
+            </details>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">¿Cuánto tiempo tengo para usar el botón de arrepentimiento?</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Tienes hasta 10 días corridos desde que recibiste el producto para solicitar la devolución mediante el Botón de Arrepentimiento.<br>Pasado ese plazo, la opción dejará de estar disponible.
+                </p>
+            </details>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">¿Dónde encuentro mi código de orden?</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    El código de orden te será enviado por correo electrónico una vez que confirmemos tu compra. Si no encuentras el correo, puedes comunicarte con nuestro staff. Para proteger la seguridad de nuestros clientes, será obligatorio que demuestres, más allá de toda duda razonable, que eres el titular del pedido.
+                </p>
+            </details>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">¿Qué condiciones debo cumplir para solicitar el arrepentimiento de compra?</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Para gestionar la devolución, el producto debe estar en las mismas condiciones en las que fue entregado: cerrado, sin signos de uso, con su empaque original, manuales, accesorios y factura de compra. Podés acercarlo personalmente a nuestra sucursal o enviarlo por el medio de tu preferencia. Los gastos de envío corren por cuenta del cliente.
+                </p>
+            </details>
+        </div>
+    </section>
+</section>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+{% endblock myscripts %}

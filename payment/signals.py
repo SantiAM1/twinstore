@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
-from .models import PagoRecibidoMP, HistorialCompras,ComprobanteTransferencia,EstadoPedido,TicketDePago
-from users.emails import mail_estado_pedido_html,mail_obs_comprobante_html
+from .models import HistorialCompras,ComprobanteTransferencia,EstadoPedido,TicketDePago
+from users.emails import mail_estado_pedido_html
 from django.utils import timezone
 from threading import local
 _signal_flags = local()
@@ -24,7 +24,7 @@ def detectar_cambio_a_arrepentido(sender, instance, **kwargs):
         instance._cambio_a_arrepentido = True
 
 @receiver(post_save, sender=HistorialCompras)
-def manejar_actualizaciones_historial(sender, instance, created, **kwargs):
+def manejar_actualizaciones_historial(sender, instance:HistorialCompras, created, **kwargs):
     if getattr(_signal_flags, 'skip', False):
         return
     # * 1 Cuando un pedido es arrepentido, quita la verificacion
@@ -46,19 +46,19 @@ def manejar_actualizaciones_historial(sender, instance, created, **kwargs):
     # * 2 Se crea la fecha finalizado de cuando el producto es entregado/recibido
     if instance.estado == "finalizado" and not instance.fecha_finalizado:
         instance.fecha_finalizado = timezone.now()
+        instance.token_reseñas()
         _signal_flags.skip = True
         instance.save(update_fields=["fecha_finalizado"])
         _signal_flags.skip = False
 
-    # * 3 Se envia un mail al actualizar el historial de compras.
-    if instance.recibir_mail:
-        estado_valido = (
-            (instance.forma_de_pago == "transferencia" and instance.estado != "pendiente") or 
-            (instance.forma_de_pago == "efectivo" and instance.estado != "confirmado") or 
-            (instance.forma_de_pago == "mercadopago" and instance.estado != "pendiente")
-        )
-        if estado_valido:
-            mail_estado_pedido_html(instance, instance.facturacion.email)
+    # * 3 Se envía un mail al actualizar el historial de compras.
+    estado_valido = (
+        (instance.forma_de_pago == "transferencia" and instance.estado != "pendiente") or 
+        (instance.forma_de_pago == "efectivo" and instance.estado != "confirmado") or 
+        (instance.forma_de_pago == "mercadopago" and instance.estado != "pendiente")
+    )
+    if estado_valido:
+        mail_estado_pedido_html(instance, instance.facturacion.email)
 
 @receiver(post_save, sender=ComprobanteTransferencia)
 def aprobar_historial_transferencia(sender, instance: ComprobanteTransferencia, created, **kwargs):
@@ -81,7 +81,7 @@ def aprobar_historial_transferencia(sender, instance: ComprobanteTransferencia, 
                 estado='Comprobante rechazado (Servidor)',
                 comentario='Esperando que el cliente vuelva a enviarlo'
             )
-            mail_obs_comprobante_html(historial, instance.observaciones)
+            # mail_obs_comprobante_html(historial, instance.observaciones)
         instance.delete()
 
     # * 3 Si el comprobante es aprobado se confirma el historial

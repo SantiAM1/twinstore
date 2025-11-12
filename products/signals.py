@@ -1,8 +1,8 @@
 from django.db.models.signals import pre_save,post_save
 from django.dispatch import receiver
-from .models import Producto, ImagenProducto
-from decimal import Decimal
+from .models import Producto, ImagenProducto,TokenReseña
 from core.utils import obtener_valor_dolar,actualizar_precio_final
+from users.emails import reseña_token_html
 
 from PIL import Image
 from io import BytesIO
@@ -21,7 +21,7 @@ def resize_to_size(image_field, size=(200, 200)):
         img = Image.open(image_field)
         if img.mode in ('RGBA', 'LA'):
             fondo = Image.new('RGB', img.size, (255, 255, 255))
-            fondo.paste(img, mask=img.split()[-1])  # Pega con máscara alfa
+            fondo.paste(img, mask=img.split()[-1])
             img = fondo
         else:
             img = img.convert('RGB')
@@ -41,21 +41,10 @@ def calcular_precio_final(sender, instance, **kwargs):
     valor_dolar = obtener_valor_dolar()
     actualizar_precio_final(instance, valor_dolar)
 
-@receiver(pre_save, sender=Producto)
-def applys_portada(sender, instance, **kwargs):
-    # * Redimensionar portada si fue modificada
-    if instance.pk:
-        try:
-            old = Producto.objects.get(pk=instance.pk)
-            portada_cambiada = instance.portada != old.portada
-        except Producto.DoesNotExist:
-            portada_cambiada = True
-    else:
-        portada_cambiada = True
-    if instance.portada and portada_cambiada:
-        nueva_imagen = resize_to_size(instance.portada, size=(200, 200))
-        if nueva_imagen:
-            instance.portada.save(f"portadas_200_{instance.pk or 'temp'}.webp", nueva_imagen, save=False)
+@receiver(post_save, sender=TokenReseña)
+def notificar_token_reseña(sender, instance, created, **kwargs):
+    if created:
+        reseña_token_html(instance, instance.usuario.user.email)
 
 @receiver(post_save, sender=ImagenProducto)
 def generar_thumbnail(sender, instance, created, **kwargs):
@@ -65,9 +54,9 @@ def generar_thumbnail(sender, instance, created, **kwargs):
         if nueva_imagen:
             instance.imagen.save(f"img600_{instance.pk}.webp", nueva_imagen, save=False)
 
-        # Redimensionar miniatura a 100x100
-        mini = resize_to_size(instance.imagen, size=(100, 100))
+        # Redimensionar miniatura a 200x200
+        mini = resize_to_size(instance.imagen, size=(200, 200))
         if mini:
-            filename = f"thumb100_{instance.pk}.webp"
-            instance.imagen_100.save(filename, mini, save=False)
+            filename = f"thumb200_{instance.pk}.webp"
+            instance.imagen_200.save(filename, mini, save=False)
             instance.save()

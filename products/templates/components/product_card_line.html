@@ -1,0 +1,32 @@
+{% load static %}
+{% load custom_filters %}
+<article class="card-product line">
+    {% if producto.descuento > 0 %}<span>-{{ producto.descuento }}%</span>{% endif %}
+    <a href="{% url 'products:slug_dispatcher' producto.slug %}">
+        <header class="card-product__media">
+            {% if producto.colores.exists %}
+            {% for color in producto.get_portada_color_200 %}
+                <img src="{{ color.url }}" alt="{{ producto.nombre }}" data-hex="{{ color.hex }}" class="{% if not forloop.first %}hide{% endif %}">
+            {% endfor %}
+            {% else %}
+                <img src="{{producto.get_portada_200}}" alt="{{producto.nombre}}">
+            {% endif %}
+        </header>
+        <div>
+            <h3 class="card-product__name">{{producto.nombre}}</h3>
+            <div class="card-product-colors">
+            {% if producto.colores.exists %}
+                {% for color in producto.colores.all %}
+                    <button type="button" aria-label="Seleccionar color" class="card-color-dot {% if forloop.first %}selected{% endif %} btn-card" style="background-color: {{ color.hex }};" data-hex="{{color.hex}}" data-colorId="{{color.id|signing_data}}"></button>
+                {% endfor %}
+            {% endif %}
+            </div>
+            <footer class="card-product__footer">
+            <div class="card-product__prices">
+                <span class="price--current">{{producto.precio|formato_pesos}}</span>
+                {% if producto.descuento > 0 %}<span class="price--old">{{producto.precio_dolar|mul:valor_dolar|formato_pesos }}</span>{% endif %}
+            </div>
+            </footer>
+        </div>
+    </a>
+</article>

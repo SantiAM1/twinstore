@@ -1,6 +1,0 @@
-<li class="dropdown-mobile">
-    <span class="toggle">{{categoria}}<i class="bi bi-chevron-down"></i></span>
-    <ul class="submenu">{% for sub in categoria.subcategorias.all %}
-        <li><span><a href="{% url 'products:categoria_subcategoria' categoria.seccion_id categoria.slug sub.slug %}">{{sub.nombre}}</a></span></li>{% endfor %}
-    </ul>
-</li>

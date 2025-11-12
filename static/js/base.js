@@ -1,206 +1,254 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const temas = {
-        white: '#ededed',
-        black: getComputedStyle(document.documentElement).getPropertyValue('--black-theme-color'),
-        gaming: '#2d63aa',
-    };
-    
-    const currentTheme = document.body.dataset.theme;
-    const lastTheme = sessionStorage.getItem('ultimaTheme');
-    
-    if (lastTheme && lastTheme !== currentTheme) {
-        const fromBg = temas[lastTheme] || '#ededed';
-        const toBg = temas[currentTheme] || '#ededed';
-    
-        document.body.style.setProperty('--from-bg', fromBg);
-        document.body.style.setProperty('--to-bg', toBg);
-        document.body.style.animation = 'cambiarfondo 0.8s forwards';
-    }
-    
-    sessionStorage.setItem('ultimaTheme', currentTheme);
-    
-    document.body.addEventListener('animationend', () => {
-        document.body.style.animation = '';
-    });
-    
-    // ----- Menu desktop mobile ------ //
-    const categorias = JSON.parse(document.getElementById('menu-json').textContent);
-    const botonProductos = document.getElementById("boton-productos");
-    const boxProdDisplay = document.getElementById("box-productos-display");
-    const resultProdDisplay = document.getElementById("result-productos-display");
-
-    if (!resultProdDisplay.innerHTML.trim()) {
-        resultProdDisplay.innerHTML = DOMPurify.sanitize(categorias["componentes"].join(""));
-    }
-
-    botonProductos.addEventListener("click", (event) => {
-        event.stopPropagation();
-        boxProdDisplay.classList.toggle("display-none");
-
-        document.addEventListener("click", (event) => {
-            if (!boxProdDisplay.contains(event.target) && event.target !== botonProductos) {
-                boxProdDisplay.classList.add("display-none");
-            }
-        }, { once: true });
-    });
-
-    const navItems = document.querySelectorAll(".nav-productos-items");
-
-    navItems.forEach(item => {
-        item.addEventListener("mouseenter", () => {
-            navItems.forEach(navItem => navItem.classList.remove("categoria-selec"));
-            item.classList.add("categoria-selec");
-            let columna = categorias[item.id]
-            if (columna) {
-                columna = columna.join("")
-            } else {
-                columna = '<div class="result-productos-column flex">No hay contenido disponible</div>'
-            }
-            resultProdDisplay.innerHTML = DOMPurify.sanitize(columna);
-        });
-    });
-
-    const toggles = document.querySelectorAll(".toggle");
-    toggles.forEach(toggle => {
-        toggle.addEventListener("click", function() {
-            toggle.querySelector("i").classList.toggle("rotated");
-            let submenu = this.nextElementSibling;
-            if (submenu) {
-                submenu.style.display = submenu.style.display === "block" ? "none" : "block";
-            }
-        });
-    });
-
-    const menu = document.querySelector(".menu");
-    const closeBtn = document.querySelector(".menu-title i");
-    const openBtn = document.getElementById("open-menu");
-
-    openBtn.addEventListener("click", function () {
-        menu.classList.add("active");
-    });
-
-    closeBtn.addEventListener("click", function () {
-        menu.classList.remove("active");
-    });
-
-    // ----- Usuario toggle ------ //
-    const userMenu = document.querySelector(".user-menu");
-    const dropdown = document.getElementById("userDropdown");
-
-    userMenu.addEventListener("click", function(event) {
-        event.stopPropagation();
-        dropdown.classList.toggle("show");
-    });
-
-    document.addEventListener("click", function(event) {
-        if (!userMenu.contains(event.target)) {
-            dropdown.classList.remove("show");
-        }
-    });
-
-    // ----- Header ------ //
-    let lastScrollTop = 0;
-    const header = document.querySelector('.header-tag');
-    const lowerHeader = document.querySelectorAll('.header-item')[1];
-
-    window.addEventListener('scroll', function() {
-        let currentScroll = window.scrollY || document.documentElement.scrollTop;
-        if (currentScroll > lastScrollTop && currentScroll > 50) {
-            // Scroll hacia abajo: animamos
-            lowerHeader.classList.add('hide-on-scroll');
-            header.classList.add('shrink');
-            // Luego de la transición, aplicamos display none
-            setTimeout(() => {
-                if (lowerHeader.classList.contains('hide-on-scroll')) {
-                    lowerHeader.classList.add('hidden');
-                }
-            }, 400); // mismo tiempo que la transición
-        } else {
-            // Volver a mostrar
-            lowerHeader.classList.remove('hidden'); // quitamos display none
-            setTimeout(() => {
-                lowerHeader.classList.remove('hide-on-scroll');
-            }, 10); // pequeño delay para que el navegador registre el cambio
-            header.classList.remove('shrink');
-        }
-        lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
-    });
-
-    // ----- Carousel ------ //
-    const track = document.querySelector(".carousel-track");
-    if (track) {
-        const slides = Array.from(track.children);
-        const totalSlides = slides.length;
-
-        let index = 0;
-
-        slides.forEach(slide => {
-            const clone = slide.cloneNode(true);
-            track.appendChild(clone);
-        });
-
-        const move = () => {
-            index++;
-            track.style.transition = "transform 0.5s ease-in-out";
-            track.style.transform = `translateX(-${index * 100}vw)`;
-
-            if (index >= totalSlides) {
-                setTimeout(() => {
-                    track.style.transition = "none";
-                    track.style.transform = `translateX(0vw)`;
-                    index = 0;
-                }, 500);
-            }
-        };
-
-        setInterval(move, 8000); // cada 8 segundos
-    }
-    
-    // ----- Prediccion de busqueda ------ //
-    function autocompletar(inputId, sugerenciasId) {
-        const input = document.getElementById(inputId);
-        const sugerenciasBox = document.getElementById(sugerenciasId);
-        let timeout = null;
-    
-        input.addEventListener("input", () => {
-            clearTimeout(timeout);
-            const query = input.value.trim();
-    
-            if (query.length < 2) {
-                sugerenciasBox.style.display = "none";
-                return;
-            }
-    
-            timeout = setTimeout(() => {
-                fetch(`/api/buscar-productos/?q=${encodeURIComponent(query)}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        sugerenciasBox.innerHTML = "";
-                        if (data.length === 0) {
-                            sugerenciasBox.style.display = "none";
-                            return;
-                        }
-    
-                        data.forEach(producto => {
-                            const div = document.createElement("div");
-                            div.textContent = producto.nombre;
-                            div.className = "sugerencia-item";
-                            div.addEventListener("click", () => {
-                                window.location.href = `/productos/${producto.slug}/`;
-                            });
-                            sugerenciasBox.appendChild(div);
-                        });
-                        sugerenciasBox.style.display = "block";
-                    });
-            }, 300);
-        });
-    
-        document.addEventListener("click", e => {
-            if (!e.target.closest(`#${inputId}`) && !e.target.closest(`#${sugerenciasId}`)) {
-                sugerenciasBox.style.display = "none";
-            }
-        });
-    }
-    autocompletar("busqueda-input-arriba", "sugerencias-arriba");
-    autocompletar("busqueda-input-abajo", "sugerencias-abajo");
+const btnMenu = document.getElementById("menu-toggle");
+const navbarButtom = document.querySelector(".navbar-buttom");
+const navbarTop = document.querySelector(".navbar-top");
+const searchButtom = document.getElementById("search-toggle");
+const navbatSearch = document.querySelector(".navbar-search");
+btnMenu.addEventListener("click", () => {
+  navbarButtom.classList.toggle("show");
 });
+searchButtom.addEventListener("click", () => {
+  navbatSearch.classList.toggle("show");
+  searchButtom.classList.toggle("active");
+  const input = navbatSearch.querySelector("input");
+  input.focus();
+});
+
+let lastScrollTop = 0;
+
+window.addEventListener("scroll", () => {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+
+  if (scrollTop > lastScrollTop) {
+    navbarButtom.classList.add("scroll");
+    navbarTop.classList.add("scroll");
+  } else {
+    navbarButtom.classList.remove("scroll");
+    navbarTop.classList.remove("scroll");
+  }
+
+  lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+});
+
+document.querySelectorAll(".password-toggle").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const input = btn.parentElement.querySelector(".api-required");
+    btn.querySelectorAll("svg").forEach((svg) => {
+      svg.classList.toggle("hide");
+    });
+    if (input.type === "password") {
+      input.type = "text";
+    } else {
+      input.type = "password";
+    }
+  });
+});
+
+const modalUsers = document.querySelector(".generic-modal[data-modalId=users]");
+
+modalUsers?.querySelectorAll(".generic-box").forEach((form) => {
+  genericApiPost(form, {
+    onSuccess: (response, form, btnSubmit) => {
+      if (response.data.verificar)
+        return userVerificar(form, response.data.modal);
+    },
+    onError: (err, form, btnSubmit) => {
+      if (err.response?.data?.verificar) {
+        userVerificar(form, err.response?.data?.modal, err);
+      } else {
+        usersError(form, btnSubmit, err);
+      }
+    },
+  });
+});
+
+const pedidoView = document.querySelector(
+  ".generic-modal[data-modalId=pedidos]"
+);
+
+genericApiPost(pedidoView.querySelector(".generic-box"), {
+  onSuccess: (response, form, btnSubmit) => {
+    if (response.data.redirect)
+      return (window.location.href = response.data.redirect);
+  },
+  onError: (err, form, btnSubmit) => {
+    usersError(form, btnSubmit, err);
+  },
+});
+
+function genericApiPost(form, { onSuccess, onError, onProcess } = {}) {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btnSubmit = form.querySelector("button[type=submit]");
+    btnSubmit.classList.add("loading");
+
+    const url = form.getAttribute("data-api");
+    const data = new FormData(form);
+
+    if (onProcess) onProcess(form, btnSubmit);
+
+    try {
+      const response = await axios.post(url, data);
+
+      if (response.data.redirect)
+        return (window.location.href = decodeURIComponent(
+          response.data.redirect
+        ));
+      if (response.data.reload) return window.location.reload();
+
+      if (onSuccess) onSuccess(response, form, btnSubmit);
+    } catch (err) {
+      if (onError) onError(err, form, btnSubmit);
+    }
+  });
+}
+
+function userVerificar(form, modal = null, err = null) {
+  form.classList.add("hide");
+  const box = modalUsers.querySelector(`.generic-box[data-modal=${modal}]`);
+  box.classList.remove("hide");
+  if (err) usersError(box, null, err);
+}
+
+function usersError(form, btn, err) {
+  const errorData = err.response?.data;
+  const errorMsg = form.querySelector(".msg-required-2");
+  btn?.classList.remove("loading");
+
+  form
+    .querySelectorAll(".generic-input-2")
+    .forEach((input) => input.classList.add("error"));
+
+  let messages = [];
+
+  if (typeof errorData === "object" && errorData !== null) {
+    for (const [field, value] of Object.entries(errorData)) {
+      if (field === "modal") continue;
+      if (Array.isArray(value)) {
+        messages.push(...value);
+      } else if (typeof value === "string") {
+        messages.push(value);
+      }
+    }
+  } else {
+    messages.push("Error de conexión.");
+  }
+
+  errorMsg.classList.add("show");
+  errorMsg.innerHTML = messages.map((m) => `• ${m}`).join("<br>");
+}
+
+const params = new URLSearchParams(window.location.search);
+if (params.get("login") === "required") {
+  const modal = document.querySelector('.generic-modal[data-modalId="users"]');
+  if (modal) {
+    modal.classList.add("open");
+    modal
+      .querySelectorAll(".generic-box")
+      .forEach((box) => box.classList.add("hide"));
+    modal.querySelector('[data-modal="signin"]')?.classList.remove("hide");
+    modal.querySelector("#id_login_email")?.focus();
+  }
+}
+
+const inputSearch = document.querySelector("#search");
+const resultSearch = document.querySelector("#search-results-list");
+const resultBox = document.querySelector(".navbar-search-results");
+
+let cancelToken;
+
+function debounce(func, delay) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), delay);
+  };
+}
+
+function formatoPesos(value) {
+  if (value == null || isNaN(value)) return value;
+
+  const valor = parseFloat(value);
+  const entero = Math.floor(valor);
+  const decimales = Math.round((valor - entero) * 100) / 100;
+
+  if (decimales === 0) {
+    return `$${entero.toLocaleString("es-AR")}`;
+  } else {
+    return `$${valor.toLocaleString("es-AR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+}
+
+function resetResultBox() {
+  resultSearch.innerHTML = "";
+  resultBox.classList.remove("active");
+}
+
+async function buscarProductos(query) {
+  if (query.length < 2) {
+    resetResultBox();
+    return;
+  }
+
+  if (cancelToken) cancelToken.cancel("Nueva búsqueda iniciada");
+  cancelToken = axios.CancelToken.source();
+
+  try {
+    const res = await axios.get(`/api/busqueda_predictiva/`, {
+      params: { q: query },
+      cancelToken: cancelToken.token,
+    });
+
+    const data = res.data;
+    if (!data.length) {
+      resetResultBox();
+      return;
+    }
+
+    resultBox.classList.add("active");
+    resultSearch.innerHTML = data
+      .map(
+        (p) => `
+          <li>
+            ${p.descuento ? `<strong>-${p.descuento}%</strong>` : ""}
+              <a href="/productos/${p.slug}/">
+                  <header>
+                      <img src="${
+                        p.imagenes_producto__imagen_200 ||
+                        "/static/img/prod_default.webp"
+                      }" alt="${p.nombre}">
+                  </header>
+                  <h3>${p.nombre}</h3>
+                  <div class="search-results-prices">
+                      <span>${formatoPesos(p.precio)}</span>
+                  </div>
+              </a>
+          </li>
+        `
+      )
+      .join("");
+  } catch (error) {
+    if (!axios.isCancel(error)) console.error("Error:", error);
+    resetResultBox();
+  }
+}
+
+const buscarDebounce = debounce(buscarProductos, 1000);
+
+inputSearch.addEventListener("input", (e) => {
+  const query = e.target.value.trim();
+  buscarDebounce(query);
+});
+
+const backBtn = document.getElementById("generic-header-back");
+if (backBtn && window.location.pathname !== "/carro/finalizar-compra/") {
+  backBtn.addEventListener("click", () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = "/";
+    }
+  });
+}

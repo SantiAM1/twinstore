@@ -1,17 +1,7 @@
-
 from django.conf import settings
 from django.core import signing
-from django.db import IntegrityError, transaction
-from django.contrib.sessions.models import Session
-from django.contrib.sessions.backends.db import SessionStore
-from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user_model
 
-from .models import HistorialCompras,PagoRecibidoMP,EstadoPedido,Cupon,TicketDePago
-
-from users.models import DatosFacturacion
-from cart.models import Carrito
-from products.models import Producto,ColorProducto
+from .models import PagoRecibidoMP,EstadoPedido,TicketDePago
 
 from decimal import Decimal
 import hmac

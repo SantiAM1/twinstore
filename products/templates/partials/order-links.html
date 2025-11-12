@@ -1,0 +1,3 @@
+<li><a href="?{% for key, val in request.GET.items %}{% if key != 'ordenby' %}{{ key|urlencode }}={{ val|urlencode }}&{% endif %}{% endfor %}ordenby=date" class="generic-list-item prodGrid-filters">Los ultimos</a></li>
+<li><a href="?{% for key, val in request.GET.items %}{% if key != 'ordenby' %}{{ key|urlencode }}={{ val|urlencode }}&{% endif %}{% endfor %}ordenby=price_higher" class="generic-list-item prodGrid-filters">Mayor precio</a></li>
+<li><a href="?{% for key, val in request.GET.items %}{% if key != 'ordenby' %}{{ key|urlencode }}={{ val|urlencode }}&{% endif %}{% endfor %}ordenby=price_lower" class="generic-list-item prodGrid-filters">Menor precio</a></li>

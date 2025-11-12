@@ -21,3 +21,16 @@ class ModoMantenimiento(models.Model):
     class Meta:
         verbose_name = "Modo de mantenimiento"
         verbose_name_plural = "⚙️ Configuración · Mantenimiento"
+
+class ConfiguracionTienda(models.Model):
+    """
+    Configuración general de la tienda.
+    Unificar ModoMantenimiento y DolarConfiguracion en esta clase.
+    Campos:
+    - modo_stock: Define si la tienda opera con control de stock o sin control de stock.
+    - mostrar_stock_en_front: Indica si se muestra la cantidad de stock disponible en el sitio web.
+    - borrar_cupon: Indica si se debe borrar el cupón después de su uso.
+
+    """
+    modo_stock = models.CharField(max_length=20, choices=[('libre', 'Sin control de stock'), ('estricto', 'Control de stock')], default='libre')
+    mostrar_stock_en_front = models.BooleanField(default=True, help_text="Mostrar cantidad de stock en el sitio.")

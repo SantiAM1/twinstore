@@ -1,6 +1,0 @@
-{% load custom_filters %}
-{% if pedido.recibir_mail %}
-<button class="border-none bg-transparent button-notification bloqueable" data-id="{{pedido.id|signing_data}}"><i class="bi bi-bell-fill users-notificacion-on"></i></button>
-{% else %}
-<button class="border-none bg-transparent button-notification bloqueable" data-id="{{pedido.id|signing_data}}"><i class="bi bi-bell users-notificacion-off"></i></button>
-{% endif %}

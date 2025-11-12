@@ -1,151 +1,103 @@
-document.addEventListener("DOMContentLoaded", () => {
+const cartTotal = document.querySelector(".cart-total");
+const cartSubTotal = document.querySelector(".cart-subtotal");
+const cartDescuento = document.querySelector(".cart-descuento");
+const cartTotalProds = document.querySelector(".cart-totalProds");
+const totalCarro = document.getElementById("carritoTotal");
+const genericBox = document.querySelector(".generic-data");
 
-    document.querySelectorAll('.btn-cantidad').forEach(btn => {
-        btn.addEventListener('click', async function() {
-            const container = this.closest('.quantity-container');
-            const pedidoId = container.dataset.pedidoId;
-            const action = this.dataset.action
+const navBox = document.querySelectorAll(".cart-navbox");
+navBox.forEach((nav) => {
+  nav.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const pedidoId = nav.getAttribute("data-pedidoId");
+      const url = btn.getAttribute("data-api");
+      const action = btn.getAttribute("data-action");
 
-            toggleDisableItems(true);
+      const itemBox = nav.closest(".cart-item");
+      const itemPriceNow = itemBox.querySelector(".cart-item-price-now");
+      const itemPriceOld = itemBox.querySelector(".cart-item-price-old");
 
-            try {
-                const response = await axios.post(window.api.actualizarPedido,{
-                    pedido_id:pedidoId,
-                    action:action,
-                });
+      const data = { pedido_id: pedidoId };
+      if (action) data["action"] = action;
 
-                const { total_productos, total_precio, cantidad,sub_total } = response.data;
+      try {
+        const response = await axios.post(url, data);
 
-                container.querySelector('.input-value-cart').value = cantidad
-                const fila = container.closest('tr');
-                const mobileCantidad = fila.querySelector('.prod-mobile-count');
-                if (mobileCantidad) {
-                    mobileCantidad.textContent = `${cantidad} x `;
-                }
-                const precioSubtotal = fila?.querySelector('.cart-total-precio');
+        const {
+          totalPrecio,
+          subTotal,
+          totalProductos,
+          descuento,
+          cantidad,
+          precio,
+          precioAnterior,
+        } = response.data;
 
-                if (precioSubtotal) {
-                    precioSubtotal.textContent = `${sub_total}`;
+        if (response.data.totalProductos === 0) {
+          resetCart();
+          return;
+        }
 
-                    // Animación suave
-                    precioSubtotal.classList.remove('animate-flash'); // reset
-                    void precioSubtotal.offsetWidth; // reflow trick
-                    precioSubtotal.classList.add('animate-flash');
-                }
+        if (cantidad !== undefined) {
+          if (cantidad == 0) {
+            itemBox.remove();
+            refreshCart(totalPrecio, subTotal, totalProductos, descuento);
+            return;
+          } else {
+            nav.querySelector(".cart-item-cantidad").textContent = cantidad;
+          }
+        }
 
-                actualizarCarrito(total_precio,total_productos)
-                if (parseInt(total_productos) === 0) {
-                    mostrarCarritoVacio()
-                }
+        if (precio) itemPriceNow.textContent = precio;
+        if (precioAnterior) itemPriceOld.textContent = precioAnterior;
 
-                if (parseInt(cantidad) === 0) {
-                    const fila = this.closest('tr');
-                    fila?.nextElementSibling?.remove();
-                    fila?.remove();
-                }
-
-                actualizarPreciosCarrito(total_precio)
-
-            } catch (error) {
-                console.error("Error al eliminar el producto:", error);
-            } finally {
-                toggleDisableItems(false);
-            }
-        });
+        refreshCart(totalPrecio, subTotal, totalProductos, descuento);
+      } catch (err) {
+        console.warn(err);
+      }
     });
+  });
+});
 
-    function actualizarPreciosCarrito(total_precio) {
-        const subTotal = document.getElementById('cart-subtotal');
-        const total = document.getElementById('cart-total');
-        if (subTotal && total) {
-            subTotal.textContent = `${total_precio}`;
-            total.textContent = `${total_precio}`
-        }
-    }
+function refreshCart(totalPrecio, subTotal, totalProductos, descuento) {
+  cartTotal.textContent = totalPrecio;
+  cartSubTotal.textContent = subTotal;
+  cartTotalProds.textContent = `${totalProductos} producto(s)`;
+  cartDescuento.textContent = `-${descuento}`;
+  totalCarro.textContent = totalProductos;
+}
 
-    document.querySelectorAll('.cart-prod-delete').forEach(btn => {
-        btn.addEventListener('click', async function(e) {
-            e.preventDefault();
-            const pedidoId = this.dataset.pedidoId;
-    
-            toggleDisableItems(true);
+function resetCart() {
+  totalCarro.classList.remove("active");
+  totalCarro.textContent = "";
+  genericBox.textContent = "";
+  genericBox.innerHTML = `
+    <div class="generic-item cart-empty">
+      <h3>Tu carrito esta vacío<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 19a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M13 17h-7v-14h-2" /><path d="M6 5l14 1l-1 7h-13" /><path d="M22 22l-5 -5" /><path d="M17 22l5 -5" /></svg></h3>
+      <a href="/productos/" class="generic-button btn-1">Volver a la tienda</a>
+    </div>
+  `;
+}
 
-            try {
-                const response = await axios.post(window.api.eliminarPedido, {
-                    pedido_id: pedidoId
-                });
+const iniciarCompraBtn = document.querySelector(".check-auth");
+iniciarCompraBtn?.addEventListener("click", (e) => {
+  e.preventDefault();
+  const apiUrl = iniciarCompraBtn.getAttribute("data-api");
 
-                const { total_productos, total_precio } = response.data;
-
-                actualizarCarrito(total_precio,total_productos)
-                
-                if (parseInt(total_productos) === 0) {
-                    mostrarCarritoVacio()
-                } else  {
-                    const fila = this.closest('tr');
-                    fila?.nextElementSibling?.remove();
-                    fila?.remove();
-                }
-
-                actualizarPreciosCarrito(total_precio)
-
-            } catch (error) {
-                console.error("Error al eliminar el producto:", error);
-            } finally {
-                toggleDisableItems(false);
-            }
-        });
-    });  
-
-    const cotizarEnvio = document.getElementById('cotizar-envio');
-    if (cotizarEnvio) {
-        cotizarEnvio.addEventListener('click', () => {
-            enviarWhatsApp()
-        })
-    }
-    function enviarWhatsApp() {
-        axios.get(window.api.enviarWtap)
-        .then(response => {
-            const {productos,direccion,codigo_postal} = response.data;
-    
-            if (productos.length === 0) {
-                alert("Tu carrito está vacío.");
-                return;
-            }
-    
-            let mensaje = "Hola Twistore! Me gustaría cotizar un envío de:\n";
-            productos.forEach(p => {
-                mensaje += `- ${p.nombre} (x${p.cantidad})\n`;
-            });
-    
-            mensaje += `\nCódigo Postal:${codigo_postal}\nDirección:${direccion}`;
-
-            const url = `https://wa.me/5493413491911?text=${encodeURIComponent(mensaje)}`;
-            window.open(url, '_blank');
-        })
-        .catch(error => {
-            console.error("Error al obtener productos del carrito:", error);
-            alert("Hubo un problema al generar el mensaje de WhatsApp.");
-        });
-    }
-    function mostrarCarritoVacio() {
-        const carritoBox = document.getElementById('carrito-box');
-        if (carritoBox) {
-            carritoBox.innerHTML = `
-            <p class="cart-empty-msg font-roboto">Tu carrito esta vacío</p>
-            <a href="/" class="decoration-none cart-volver-tienda font-roboto color-fff font-bold text-center padding1rem">Volver a la tienda</a>
-            `
-        }
-    }
-    function actualizarCarrito(total_precio,total_productos) {
-        const cantidadCarrito = document.getElementById('carrito-cantidad');
-        if (cantidadCarrito) {
-            cantidadCarrito.textContent = total_productos;
-            }
-                    
-        const precioCarrito = document.querySelector('.carrito-total-precio');
-        if (precioCarrito) {
-            precioCarrito.textContent = `Carrito / ${total_precio}`;
-        }
-    }
-})
+  axios
+    .get(apiUrl)
+    .then((response) => {
+      if (response.data.is_authenticated) {
+        window.location.href = iniciarCompraBtn.href;
+      } else {
+        modalUsers.classList.add("open");
+        modalUsers.querySelector(".next-login").value = iniciarCompraBtn.href;
+        modalUsers.querySelector(".next-login-validar").value =
+          iniciarCompraBtn.href;
+        modalUsers.querySelector("#id_login_email").focus();
+      }
+    })
+    .catch((error) => {
+      console.error("Error checking authentication:", error);
+    });
+});

@@ -20,8 +20,6 @@ class Command(BaseCommand):
                 'nombre': cat.nombre,
                 'descripcion_seo': cat.descripcion_seo,
                 'slug': cat.slug,
-                'seccion_id': cat.seccion_id,
-                'orden': cat.orden,
                 'subcategorias': list(subcats)
             })
 

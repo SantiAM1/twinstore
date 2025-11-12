@@ -1,11 +1,35 @@
 from celery import shared_task
-from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
 import boto3
 from botocore.exceptions import ClientError
 
+def get_mail_imgs() -> dict:
+    """
+    Construye un diccionario con las URLs de las imágenes utilizadas en los correos electrónicos.
+
+    ```json 
+    {
+        'insta': 'URL de la imagen de Instagram',
+        'tiktok': 'URL de la imagen de TikTok',
+        'link': 'URL de la imagen de LinkedIn',
+        'success': 'URL de la imagen de éxito',
+        'star': 'URL de la imagen de estrella',
+    }
+    """
+    images = {
+        'insta': f"{settings.SITE_URL}/static/img/mails/insta-64.png",
+        'tiktok': f"{settings.SITE_URL}/static/img/mails/tiktok-64.png",
+        'link': f"{settings.SITE_URL}/static/img/mails/link-64.png",
+        'success': f"{settings.SITE_URL}/static/img/mails/check-64.png",
+        'star': f"{settings.SITE_URL}/static/img/mails/star.png",
+    }
+    return images
+
 def master_mail(user_email, subject, html_content):
+    """
+    Función maestra para enviar correos electrónicos utilizando AWS SES
+    """
     ses_client = boto3.client(
         'ses',
         aws_access_key_id=settings.AWS_SES_ACCESS_KEY_ID,
@@ -33,14 +57,16 @@ def master_mail(user_email, subject, html_content):
 def enviar_mail_compra(historial_data, user_email):
     context = {
         'url': historial_data['url'],
-        'img': historial_data['img'],
-        'token': historial_data['token'],
-        'productos':historial_data['productos'],
+        'codigo': historial_data['codigo'],
+        'compra':historial_data['compra'],
         'adicional':historial_data['adicional'],
         'total':historial_data['total']
     }
 
-    html_content = render_to_string('emails/compra_exitosa.html', context)
+    images = get_mail_imgs()
+    context.update(images)
+
+    html_content = render_to_string('emails/compra.html', context)
     subject = 'Compra recibida - Twinstore'
 
     return master_mail(user_email,subject,html_content)
@@ -48,12 +74,30 @@ def enviar_mail_compra(historial_data, user_email):
 @shared_task
 def enviar_mail_confirm_user(mail_data,user_email):
     context = {
-        'url' : mail_data['url'],
-        'img' : mail_data['img']
+        'codigo' : mail_data['codigo'],
+        'username': mail_data['username']
     }
 
-    html_content = render_to_string('emails/bienvenida_usuario.html', context)
+    images = get_mail_imgs()
+    context.update(images)
+
+    html_content = render_to_string('emails/welcome.html', context)
     subject="Confirmá tu cuenta en Twinstore"
+
+    return master_mail(user_email,subject,html_content)
+
+@shared_task
+def enviar_mail_recuperar_cuenta(mail_data,user_email):
+    context = {
+        'codigo' : mail_data['codigo'],
+        'username': mail_data['username']
+    }
+
+    images = get_mail_imgs()
+    context.update(images)
+
+    html_content = render_to_string('emails/recuperar.html', context)
+    subject="Recuperá tu cuenta en Twinstore"
 
     return master_mail(user_email,subject,html_content)
 
@@ -61,14 +105,15 @@ def enviar_mail_confirm_user(mail_data,user_email):
 def enviar_mail_estado_pedido(mail_data,user_email,template):
     context = {
         'url' : mail_data['url'],
-        'img' : mail_data['img'],
-        'pedido_id': mail_data['pedido_id'],
+        'codigo': mail_data['codigo'],
         'estado': mail_data['estado'],
-        'mensaje': mail_data['mensaje'],
     }
 
+    images = get_mail_imgs()
+    context.update(images)
+
     html_content = render_to_string(template, context)
-    subject='Estado de tu pedido - Twinstore'
+    subject=f'#{context["codigo"]} - Twinstore'
 
     return master_mail(user_email,subject,html_content)
 
@@ -83,6 +128,23 @@ def enviar_mail_comprobante_obs(mail_data,user_email):
 
     html_content = render_to_string('emails/comprobantes_obs.html', context)
     subject='Observaciones Comprobante - Twinstore'
+
+    return master_mail(user_email,subject,html_content)
+
+@shared_task
+def enviar_reseña_token_html(mail_data,user_email,template):
+    context = {
+        'url' : mail_data['url'],
+        'producto': mail_data['producto'],
+        'username': mail_data['username'],
+        'img_prod': mail_data['img_prod'],
+    }
+
+    images = get_mail_imgs()
+    context.update(images)
+
+    html_content = render_to_string(template, context)
+    subject='Dejanos tu reseña - Twinstore'
 
     return master_mail(user_email,subject,html_content)
 

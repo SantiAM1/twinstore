@@ -1,0 +1,182 @@
+{% if not user.is_authenticated %}
+<section class="generic-modal" data-modalId="users">
+    <form class="generic-box users" data-modal="signin" data-api="{% url 'users:api_login' %}" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}" class="api-required next-login">
+        <button type="button" class="generic-modal-close-2" data-modalId="users">
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
+        </button>
+        <div class="generic-item users">
+            <h2>Iniciar Sesión</h2>
+            <span>Ingresá tus datos para continuar</span>
+            <div class="generic-input-2">
+                <input type="email" name="email" id="id_login_email" maxlength="50" class="api-required" placeholder="" required>
+                <span class="focus-input"></span>
+                <label for="id_login_email">Email*</label>
+            </div>
+            <div class="generic-input-2">
+                <div class="password-toggle">
+                    <svg data-type="close" xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye hide"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                    <svg data-type="show" xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye-off"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" /></svg>
+                </div>
+                <input type="password" name="password" id="id_login_password" maxlength="20" class="api-required" placeholder="" required>
+                <span class="focus-input"></span>
+                <label for="id_login_password">Contraseña*</label>
+            </div>
+            <p class="msg-required-2"></p>
+            <button type="submit" class="generic-button btn-1 margin"><code>Ingresar</code><div class="btn-loader"></div></button>
+            <button type="button" class="generic-modal-navegator generic-button btn-2" data-nav="signup">Crear cuenta</button>
+            <p>¿Olvidaste tu contraseña? hace click <a href="" class="generic-modal-navegator" data-nav="recuperar-usuario">aca</a>.</p>
+        </div>
+    </form>
+    <form class="generic-box users hide" data-modal="recuperar-usuario" data-api="{% url 'users:api_recuperar_cuenta' %}">
+        <button type="button" class="generic-modal-close-2" data-modalId="users">
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
+        </button>
+        <div class="generic-item users">
+            <h2>Recuperar cuenta</h2>
+            <span>Para comenzar ingresá tu email</span>
+            <div class="generic-input-2">
+                <input id="id_recuperar_email" type="email" placeholder="" name="email" maxlength="50" class="api-required" required>
+                <span class="focus-input"></span>
+                <label for="id_recuperar_email">Email*</label>
+            </div>
+            <p class="msg-required-2"></p>
+            <button type="submit" class="generic-button btn-1 margin"><code>Enviar Email</code><div class="btn-loader"></div></button>
+            <button type="button" class="generic-modal-navegator generic-button btn-2" data-nav="signin">Volver</button>
+        </div>
+    </form>
+    <form class="generic-box users hide" data-modal="nueva-contraseña" data-api="{% url 'users:api_nueva_contraseña' %}">
+        <button type="button" class="generic-modal-close-2" data-modalId="users">
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
+        </button>
+        <div class="generic-item users">
+            <h2>Recuperar cuenta</h2>
+            <span>ingresá tu nueva contraseña</span>
+            <div class="generic-input-2">
+                <div class="password-toggle">
+                    <svg data-type="close" xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye hide"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                    <svg  data-type="show" xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye-off"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" /></svg>
+                </div>
+                <input id="id_nueva_password" type="password" name="password" placeholder="" maxlength="20" required class="api-required">
+                <span class="focus-input"></span>
+                <label for="id_nueva_password">Contraseña*</label>
+            </div>
+            <div class="generic-input-2">
+                <div class="password-toggle">
+                    <svg data-type="close" xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye hide"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                    <svg  data-type="show" xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye-off"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" /></svg>
+                </div>
+                <input id="id_nueva_password_repeat" type="password" name="password_repeat" placeholder="" maxlength="20" required class="api-required">
+                <span class="focus-input"></span>
+                <label for="id_nueva_password_repeat">Repetir contraseña*</label>
+            </div>
+            <p class="msg-required-2"></p>
+            <button type="submit" class="generic-button btn-1"><code>Confirmar</code><div class="btn-loader"></div></button>
+        </div>
+    </form>
+    <form class="generic-box users hide" data-modal="recuperar-cuenta" data-api="{% url 'users:api_verificar_token' %}">
+        <button type="button" class="generic-modal-close-2" data-modalId="users">
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
+        </button>
+        <div class="generic-item users">
+            <h2>Recuperar cuenta</h2>
+            <span>Verificá tu correo e ingresá el codigo</span>
+            <div class="generic-input-2">
+                <input id="input10" type="text" name="codigo" inputmode="numeric" placeholder="" maxlength="50" class="api-required" required>
+                <span class="focus-input"></span>
+                <label for="input10">Código*</label>
+            </div>
+            <p class="msg-required-2"></p>
+            <button type="submit" class="generic-button btn-1"><code>Validar</code><div class="btn-loader"></div></button>
+        </div>
+    </form>
+    <form class="generic-box users hide" data-modal="verificar-cuenta" data-api="{% url 'users:api_verificar_token' %}">
+        <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}" class="api-required next-login-validar">
+        <button type="button" class="generic-modal-close-2" data-modalId="users">
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
+        </button>
+        <div class="generic-item users">
+            <h2>Verificar cuenta</h2>
+            <span>Revisá tu correo e ingresá el codigo</span>
+            <div class="generic-input-2">
+                <input id="id_ver_codigo" type="text" name="codigo" inputmode="numeric" placeholder="" maxlength="50" class="api-required" required>
+                <span class="focus-input"></span>
+                <label for="id_ver_codigo">Código*</label>
+            </div>
+            <p class="msg-required-2"></p>
+            <button type="submit" class="generic-button btn-1"><code>Validar</code><div class="btn-loader"></div></button>
+        </div>
+    </form>
+    <form class="generic-box users hide" data-modal="signup" data-api="{% url 'users:api_register' %}">
+        <button type="button" class="generic-modal-close-2" data-modalId="users">
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
+        </button>
+        <div class="generic-item users">
+            <h2>Registarse</h2>
+            <span>Completá tus datos</span>
+            <div class="generic-input-2">
+                <input id="id_reg_email" type="email" name="email" placeholder="" maxlength="50" class="api-required" required>
+                <span class="focus-input"></span>
+                <label for="id_reg_email">Email*</label>
+            </div>
+            <div class="generic-row">
+                <div class="generic-input-2">
+                    <input id="id_reg_nombre" type="text" name="nombre" placeholder="" maxlength="30" class="api-required" required>
+                    <span class="focus-input"></span>
+                    <label for="id_reg_nombre">Nombre*</label>
+                </div>
+                <div class="generic-input-2">
+                    <input id="id_reg_apellido" type="text" name="apellido" placeholder="" maxlength="30" class="api-required" required>
+                    <span class="focus-input"></span>
+                    <label for="id_reg_apellido">Apellido*</label>
+                </div>
+            </div>
+            <div class="generic-input-2">
+                <input id="id_reg_telefono" type="text" inputmode="numeric" name="telefono" placeholder="" maxlength="20" class="api-required" required>
+                <span class="focus-input"></span>
+                <label for="id_reg_telefono">Telefono*</label>
+            </div>
+            <div class="generic-input-2">
+                <div class="password-toggle">
+                    <svg data-type="close" xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye hide"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                    <svg  data-type="show" xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye-off"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" /></svg>
+                </div>
+                <input id="id_reg_password" type="password" name="password" placeholder="" maxlength="20" required class="api-required">
+                <span class="focus-input"></span>
+                <label for="id_reg_password">Contraseña*</label>
+            </div>
+            <div class="generic-input-2">
+                <div class="password-toggle">
+                    <svg data-type="close" xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye hide"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                    <svg  data-type="show" xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye-off"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" /></svg>
+                </div>
+                <input id="id_reg_password_repeat" type="password" name="password_repeat" placeholder="" maxlength="20" required class="api-required">
+                <span class="focus-input"></span>
+                <label for="id_reg_password_repeat">Repetir contraseña*</label>
+            </div>
+            <p class="msg-required-2"></p>
+            <button type="submit" class="generic-button btn-1"><code>Registrarme</code><div class="btn-loader"></div></button>
+            <p>¿Ya tenés cuenta? Inicia sesión <a href="" class="generic-modal-navegator" data-nav="signin">aca</a>.</p>
+        </div>
+    </form>
+</section>
+{% endif %}
+<section class="generic-modal" data-modalId="pedidos">
+    <form class="generic-box users animate-modal" data-api="{% url 'users:api_ver_pedido' %}"> 
+        <button type="button" class="generic-modal-close-2" data-modalId="pedidos">
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
+        </button>
+        <div class="generic-item users">
+            <h2>Buscar un pedido</h2>
+            <span></span>
+            <div class="generic-input-2">
+                <input id="id_buscar_pedido" type="text" name="order_id" placeholder="" inputmode="numeric" maxlength="50" class="api-required" required>
+                <span class="focus-input"></span>
+                <label for="id_buscar_pedido">ID del pedido *</label>
+            </div>
+            <p class="msg-required-2"></p>
+            <button type="submit" class="generic-button btn-1 margin"><code>Buscar Pedido</code><div class="btn-loader"></div></button>
+        </div>
+    </form>
+</section>

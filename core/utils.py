@@ -1,7 +1,9 @@
 from decimal import Decimal
-from .models import DolarConfiguracion
+from .models import DolarConfiguracion,ConfiguracionTienda
+from django.core.cache import cache
+from django.conf import settings
 
-def actualizar_precio_final(producto, valor_dolar):
+def actualizar_precio_final(producto, valor_dolar) -> None:
     """
     Calcula el precio final en ARS a partir del precio en USD y el descuento.
     """
@@ -16,6 +18,29 @@ def actualizar_precio_final(producto, valor_dolar):
     else:
         producto.precio = precio_base
 
-def obtener_valor_dolar():
+def obtener_valor_dolar() -> Decimal:
+    """
+    Obtiene el valor actual del dólar desde la configuración.
+    """
     dolar = DolarConfiguracion.objects.first()
     return dolar.valor
+
+CACHE_KEY_CONFIG = "configuracion_tienda"
+
+def get_configuracion_tienda() -> ConfiguracionTienda:
+    """
+    Obtiene la configuración general de la tienda desde caché.
+    Si no existe, la crea o la guarda automáticamente.
+    """
+    config = cache.get(CACHE_KEY_CONFIG)
+    if config:
+        return config
+
+    config = ConfiguracionTienda.objects.first()
+    if not config:
+        config = ConfiguracionTienda.objects.create()
+
+    time = 43200 if not settings.DEBUG else 5
+
+    cache.set(CACHE_KEY_CONFIG, config, timeout=time)
+    return config

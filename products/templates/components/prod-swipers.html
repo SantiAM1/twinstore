@@ -1,0 +1,46 @@
+{% load static %}
+{% if producto.colores.exists %}
+    {% for color_id,data in imagenes_dict.items %}
+        <div class="swiper main-swiper img-color-{{forloop.counter}} {% if not forloop.first %}hide{% endif %}"  data-index="{{forloop.counter}}">
+            <div class="swiper-wrapper">
+                {% for img in data.imagenes %}
+                <div class="swiper-slide">
+                    <div class="swiper-zoom-container">
+                        <img src="{{img.imagen.url}}" alt="{{producto.nombre}} - {{data.nombre}}">
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="swiper thumbs-swiper thumbs-color-{{forloop.counter}} {% if not forloop.first %}hide{% endif %}" data-index="{{forloop.counter}}" aria-label="Miniaturas del producto">
+            <div class="swiper-wrapper">
+                {% for thumb in data.imagenes %}
+                    <div class="swiper-slide">
+                        <img src="{{thumb.imagen_200.url}}" alt="Miniatura {{producto.nombre}} - {{data.nombre}}">
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="swiper main-swiper img-color-0">
+        <div class="swiper-wrapper">
+            {% for img in imagenes_dict.imagenes %}
+            <div class="swiper-slide">
+                <div class="swiper-zoom-container">
+                    <img src="{{img.imagen.url}}" alt="{{producto.nombre}} - {{data.nombre}}">
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="swiper thumbs-swiper" aria-label="Miniaturas del producto" data-index="0">
+        <div class="swiper-wrapper">
+            {% for img in imagenes_dict.imagenes %}
+            <div class="swiper-slide">
+                <img src="{{img.imagen_200.url}}" alt="Miniatura {{producto.nombre}} - {{data.nombre}}">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

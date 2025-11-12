@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     libpangocairo-1.0-0 \
     libcairo2 \
     pango1.0-tools \
-    libgdk-pixbuf2.0-0 \
+    libgdk-pixbuf-2.0-0 \
     libffi-dev \
     shared-mime-info \
     && apt-get clean
@@ -15,8 +15,9 @@ RUN apt-get update && apt-get install -y \
 # EntryPoints primero (evita sobrescribir si el proyecto tiene archivos con mismo nombre)
 COPY entrypoint.sh /entrypoint.sh
 COPY entrypoint-celery.sh /entrypoint-celery.sh
+COPY entrypoint-beat.sh /entrypoint-beat.sh
 
-RUN chmod +x /entrypoint.sh /entrypoint-celery.sh
+RUN chmod +x /entrypoint.sh /entrypoint-celery.sh /entrypoint-beat.sh
 # * Copiar requirements e instalarlos
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt

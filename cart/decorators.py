@@ -1,21 +1,14 @@
 from django.shortcuts import redirect
-from cart.models import Carrito
-
+from cart.utils import obtener_carrito
 
 def requiere_carrito(view_func):
     """
-    Decorador para verificar que el usuario (autenticado o anónimo) tenga carrito activo.
-    Si no lo tiene, lo redirige a 'core:home'.
+    Decorador para verificar que el usuario tenga carrito no nulo
     """
     def wrapper(request, *args, **kwargs):
-        if request.user.is_authenticated:
-            carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
-            if not carrito.pedidos.exists():
-                return redirect('core:home')
-        else:
-            carrito = request.session.get('carrito', {})
-            if not carrito:
-                return redirect('core:home')
+        carrito = obtener_carrito(request)
+        if not carrito:
+            return redirect('products:grid')
         return view_func(request, *args, **kwargs)
     return wrapper
         

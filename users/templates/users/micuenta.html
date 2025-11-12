@@ -1,0 +1,333 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock meta %}
+
+{% block head %}
+<title>Mi cuenta</title>
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="generic-box">
+    {% include 'partials/generic-header.html' with title="Mi cuenta" %}
+    <section class="generic-data">
+        <div class="userdata-box">
+            <nav class="users-navbar">
+                <a href="" class="generic-hover active users-navbar-a" data-section="userdata">Datos del usuario</a>
+                <!-- <a href="" class="generic-hover users-navbar-a" data-section="shipping">Dirección de envio</a> -->
+                <a href="" class="generic-hover users-navbar-a" data-section="orders">Mis pedidos</a>
+            </nav>
+            <form id="userdata" data-api="/usuario/api/micuenta/">
+                <input type="hidden" name="type" value="userdata">
+                <h2>Datos del usuario</h2>
+                <div class="generic-row">
+                    <div class="generic-input">
+                        <label for="id_nombre">Nombre*</label>
+                        <input type="text" id="id_nombre" name="nombre" readonly>
+                    </div>
+                    <div class="generic-input">
+                        <label for="id_apellido">Apellido*</label>
+                        <input type="text" id="id_apellido" name="apellido" readonly>
+                    </div>
+                </div>
+                <div class="generic-row-50">
+                    <div class="generic-input">
+                        <label for="id_email">Email*</label>
+                        <input type="text" readonly id="id_email" name="email">
+                    </div>
+                    <div class="generic-input">
+                        <label for="id_telefono">Telefono*</label>
+                        <input type="text" id="id_telefono" name="telefono" readonly>
+                    </div>
+                </div>
+                <h3>Datos de facturación</h3>
+                <div class="generic-row">
+                    <div class="generic-input">
+                        <label for="id_condicion_iva">Condición frente al IVA</label>
+                        <select class="api-required" id="id_condicion_iva" name="condicion_iva">
+                            <option value="" selected disabled>Condición frente al IVA*</option>
+                            <option value="A">Responsable Inscripto</option>
+                            <option value="B">Consumidor Final</option>
+                            <option value="C">Monotributista</option>
+                        </select>
+                    </div>
+                    <div class="generic-input">
+                        <label for="id_dni_cuit">DNI/CUIT*</label>
+                        <input type="text" maxlength="30" placeholder="12345678" inputmode="numeric" id="id_dni_cuit" name="dni_cuit" class="api-required">
+                        <p class="msg-required"></p>
+                    </div>
+                </div>
+                <div class="generic-input">
+                    <label for="id_razon_social">Razón social (Si aplica)</label>
+                    <input type="text" maxlength="30" placeholder="" id="id_razon_social" name="razon_social" class="api-required">
+                    <p class="msg-required"></p>
+                </div>
+                <div class="generic-row-50">
+                    <div class="generic-input">
+                        <label for="id_direccion">Dirección (calle,altura y piso)*</label>
+                        <input type="text" maxlength="50" placeholder="Av. Cabildo 1111 Piso 5B" id="id_direccion" name="direccion" class="api-required">
+                        <p class="msg-required"></p>
+                    </div>
+                    <div class="generic-input">
+                        <label for="id_codigo_postal">Código Postal*</label>
+                        <input type="text" maxlength="30" placeholder="1111" inputmode="numeric" id="id_codigo_postal" name="codigo_postal" class="api-required">
+                        <p class="msg-required"></p>
+                    </div>
+                </div>
+                <div class="generic-row-50">
+                    <div class="generic-input">
+                        <label for="id_localidad">Localidad*</label>
+                        <input type="text" maxlength="30" placeholder="CABA" id="id_localidad" name="localidad" class="api-required">
+                        <p class="msg-required"></p>
+                    </div>
+                    <div class="generic-input">
+                        <label for="id_provincia">Provincia*</label>
+                        <select class="api-required" id="id_provincia" name="provincia">
+                            <option value="" selected disabled>Provincia*</option>
+                            <option value="A">Ciudad Autónoma de Buenos Aires</option>
+                            <option value="B">Buenos Aires</option>
+                            <option value="C">Catamarca</option>
+                            <option value="D">Chaco</option>
+                            <option value="E">Chubut</option>
+                            <option value="F">Córdoba</option>
+                            <option value="G">Corrientes</option>
+                            <option value="H">Entre Ríos</option>
+                            <option value="I">Formosa</option>
+                            <option value="J">Jujuy</option>
+                            <option value="K">La Pampa</option>
+                            <option value="L">La Rioja</option>
+                            <option value="M">Mendoza</option>
+                            <option value="N">Misiones</option>
+                            <option value="O">Neuquén</option>
+                            <option value="P">Río Negro</option>
+                            <option value="Q">Salta</option>
+                            <option value="R">San Juan</option>
+                            <option value="S">San Luis</option>
+                            <option value="T">Santa Cruz</option>
+                            <option value="U">Santa Fe</option>
+                            <option value="V">Santiago del Estero</option>
+                            <option value="W">Tierra del Fuego</option>
+                            <option value="X">Tucumán</option>
+                        </select>
+                        <p class="msg-required"></p>
+                    </div>
+                </div>
+                <button type="submit" class="generic-button btn-2 margin left"><code>Guardar cambios</code><div class="btn-loader"></div></button>
+            </form>
+            <!-- <form id="shipping" class="hide">
+                <h2>Dirección de envío</h2>
+                <div class="generic-row-50">
+                    <div class="generic-input">
+                        <label for="id_name">Dirección (calle,altura y piso)*</label>
+                        <input type="text" maxlength="30" placeholder="Av. Cabildo 1111 Piso 5B" id="id_name" name="name" required class="element-required">
+                        <p class="msg-required">Este campo es requerido.</p>
+                    </div>
+                    <div class="generic-input">
+                        <label for="id_name">Código Postal*</label>
+                        <input type="text" maxlength="30" inputmode="numeric" placeholder="1111" id="id_name" name="name" required class="element-required">
+                        <p class="msg-required">Este campo es requerido.</p>
+                    </div>
+                </div>
+                <div class="generic-row-50">
+                    <div class="generic-input">
+                        <label for="id_name">Localidad*</label>
+                        <input type="text" maxlength="30" placeholder="CABA" id="id_name" name="name" required class="element-required">
+                        <p class="msg-required">Este campo es requerido.</p>
+                    </div>
+                    <div class="generic-input">
+                        <label for="id_provincia">Provincia*</label>
+                        <select required class="element-required" id="id_provincia" name="provincia">
+                            <option value="" selected disabled>Provincia*</option>
+                            <option value="A">Santa Fe</option>
+                        </select>
+                        <p class="msg-required">Este campo es requerido.</p>
+                    </div>
+                </div>
+                <div class="generic-input">
+                    <label for="id_name">Consideraciones generales</label>
+                    <input type="text" maxlength="30" placeholder="No funciona el timbre" id="id_name" name="name" required class="element-required">
+                </div>
+                <button type="submit" class="generic-button btn-2 margin left">Guardar cambios</button>
+            </form> -->
+            <div id="orders" class="generic-data orders hide">
+                <h2>Mis pedidos</h2>
+                {% if historial %}
+                {% for pedido in historial %}
+                <article class="generic-item orders">
+                    <div class="orders-main">
+                        <div class="circle-stack">
+                            {% for prod in pedido.productos %}
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= prod.cantidad %}
+                                    <img src="{{ prod.imagen }}" alt="Producto">
+                                {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <h3>Pedido #{{pedido.merchant_order_id}}</h3>
+                            <p>Fecha: {{pedido.fecha_compra|date:"j \\d\\e F \\d\\e Y"}}</p>
+                            {% if pedido.estado == 'confirmado' %}
+                                <span style="font-size: 0.9rem; color: #0f5718; background-color: #b7fcc0;">Confirmado</span>
+                            {% elif pedido.estado == 'pendiente' %}
+                                <span style="font-size: 0.9rem; color: #969600; background-color: #f0f0b7;">Pendiente</span>
+                            {% elif pedido.estado == 'rechazado' %}
+                                <span style="font-size: 0.9rem; color: #8b0000; background-color: #f4b7b7;">Rechazado</span>
+                            {% elif pedido.estado == 'listo para retirar' %}
+                                <span style="font-size: 0.9rem; color: #004d40; background-color: #a2f0e1;">Listo para retirar</span>
+                            {% elif pedido.estado == 'enviado' %}
+                                <span style="font-size: 0.9rem; color: #311b92; background-color: #cbb7f4;">Enviado</span>
+                            {% elif pedido.estado == 'finalizado' %}
+                                <span style="font-size: 0.9rem; color: #263238; background-color: #b7c4c9;">Finalizado</span>
+                            {% elif pedido.estado == 'arrepentido' %}
+                                <span style="font-size: 0.9rem; color: #5c0000; background-color: #fd9898;">Arrepentido</span>
+                            {% endif %}
+                            {% with buttons=pedido.manage_buttons %}
+                            <div class="orders-manage">
+                                {% if buttons.solicitar_arrepentimiento %}
+                                <button type="button" class="arrepentimiento" data-pedidoId="{{pedido.id|signing_data}}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-cancel"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M18.364 5.636l-12.728 12.728" /></svg>
+                                    Solicitar arrepentimiento
+                                </button>
+                                {% endif %}    
+                                {% if buttons.generar_link_pago %}
+                                <button type="button" class="mercadopago" data-ticketId="{{pedido.mp_ticket_id_signed}}">
+                                    <img height="24" src="{% static 'img/mp-formadepago.webp' %}" alt="logo mercado pago">
+                                    <code>Generar link de pago</code>
+                                </button>
+                                {% endif %}
+                                {% if buttons.subir_comprobante %}
+                                <button type="button" class="comprobante" data-pedidoId="{{pedido.id|signing_data}}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-file"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /></svg>
+                                    Transferencia Bancaria
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="orders-btns">
+                        <a href="https://wa.me/5493413491911?text=Hola%21%20Necesito%20ayuda%20con%20mi%20pedido%20%23{{pedido.merchant_order_id}}" target="_blank" class="help-btn generic-hover" title="¿Necesitas ayuda con tu pedido?">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-help"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 17l0 .01" /><path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4" /></svg>
+                        </a>
+                        <button type="button" class="orders-info-btn" title="Mas información sobre tu pedido">
+                            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-down"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg>
+                        </button>
+                    </div>
+                    <div class="generic-expand orders-info">
+                        <dl class="methods-list">
+                            <div class="methods-item middle">
+                                <dt class="methods-term">Total de compra:</dt>
+                                <dd class="methods-desc">{{pedido.total_compra|formato_pesos}}</dd>
+                            </div>
+                            <div class="methods-item middle">
+                                <dt class="methods-term">Productos:</dt>
+                                <dd class="methods-desc">
+                                    {% for item in pedido.productos %}
+                                        {{ item.cantidad }} x {{ item.producto }}
+                                        <br>
+                                    {% endfor %}
+                                </dd>
+                            </div>
+                            <div class="methods-item middle">
+                                <dt class="methods-term">Forma de pago:</dt>
+                                <dd class="methods-desc">{{pedido.get_forma_de_pago_display}}</dd>
+                            </div>
+                            <div class="methods-item middle">
+                                <dt class="methods-term">ID del pedido:</dt>
+                                <dd class="methods-desc token">{{pedido.merchant_order_id}}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </article>
+                {% endfor %}
+                {% else %}
+                <article class="generic-item orders empty">
+                    <svg style="color: rgb(31, 122, 226);" xmlns="http://www.w3.org/2000/svg"  width="48"  height="48"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.5"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-mood-sad-squint"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M14.5 16.05a3.5 3.5 0 0 0 -5 0" /><path d="M8.5 11.5l1.5 -1.5l-1.5 -1.5" /><path d="M15.5 11.5l-1.5 -1.5l1.5 -1.5" /></svg>
+                    <h3>Parece que no hay nada por aqui.</h3>
+                </article>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</section>
+<section class="generic-modal comprobante-modal">
+    <form class="generic-box users" id="comprobante-form" data-api="{% url 'payment:subir_comprobante' %}">
+        <div class="generic-item details comprobante">
+            <h4>Realizá tu pago</h4>
+            <span>Completa los siguientes datos para aprobar tu compra.</span>
+            <strong>Datos bancarios</strong>
+            <ul>
+                <li><code>Banco:</code><p>Santander Río</p></li>
+                <li><code>CBU:</code><p>0720000730000001234567</p></li>
+                <li><code>Alias:</code><p>twinstore.ar</p></li>
+                <li><code>Titular:</code><p>Aguirre Moretto Santiago</p></li>
+                <li><code>Importe:</code><p class="importe-transferencia"></p></li>
+            </ul>
+            <p class="comprobante-format">Subí el comprobante de tu pago (formato PDF, JPG o PNG)</p>
+            <input type="hidden" name="historial_id">
+            <input type="file" id="id_comprobante" name="comprobante" accept=".pdf,.jpg,.jpeg,.png," class="api-required">
+            <label for="id_comprobante">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-file-upload"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M12 11v6" /><path d="M9.5 13.5l2.5 -2.5l2.5 2.5" /></svg>
+                    <p id="file_name">Subir comprobante</p>
+                </div>
+            </label>
+            <button type="submit" class="generic-button btn-1 margin not-ready" id="submitComprobante" data-pedidoId=""><code>Subir comprobante</code><div class="btn-loader"></div></button>
+        </div>
+    </form>
+</section>
+<section class="generic-modal arrepentimiento-modal" data-modalId="arrepentido">
+    <form class="generic-box users" id="arrepentido_form" data-api="{% url 'payment:solicitar_arrepentimiento' %}">
+        <div class="generic-item users warning">
+            <h2>Solicitar Arrepentimiento</h2>
+            <span>¿Estas seguro de que deseas solicitar el arrepentimiento? Esta acción no se puede deshacer.</span>
+            <input type="hidden" name="numero_firmado">
+            <button type="submit" class="generic-button btn-1 margin warning"><code>Confirmar</code><div class="btn-loader"></div></button>
+            <button type="button" class="generic-button btn-2 warning">Cancelar</button>
+        </div>
+    </form>
+</section>
+<section class="generic-modal" data-modalId="compra-exitosa">
+    <form class="generic-box users animate-modal"> 
+        <button type="button" class="generic-modal-close-2" data-modalId="compra-exitosa">
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
+        </button>
+        <div class="generic-item compra-finalizada">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+            <h2>¡Gracias por tu compra!</h2>
+            <span>Tu pedido ha sido recibido y está siendo procesado.</span>
+            <div>
+                <p>Número de pedido:</p>
+                <strong class="merchant_order_id">#1234567890</strong>
+            </div>
+            <a href="{% url 'products:grid' %}" class="generic-button btn-1 margin">Continuar comprando</a>
+        </div>
+    </form>
+</section>
+<section class="generic-modal" data-modalId="compra-fallida">
+    <form class="generic-box users animate-modal"> 
+        <button type="button" class="generic-modal-close-2" data-modalId="compra-fallida">
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
+        </button>
+        <div class="generic-item compra-finalizada fail">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-exclamation-circle"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16v.01" /></svg>            <h2>¡Ops! Algo salió mal</h2>
+            <span>Tu pedido no pudo ser procesado. Puedes volver a intentarlo nuevamente, de persistir contantá al soporte.</span>
+            <div>
+                <p>Número de pedido:</p>
+                <strong class="merchant_order_id">#1234567890</strong>
+            </div>
+            <a href="#" target="_blank" class="generic-button btn-1 margin warning whatsapp-support">Necesito ayuda</a>
+        </div>
+    </form>
+</section>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+<script src="{% static 'js/animation.js' %}"></script>
+<script src="{% static 'js/perfil-get.js' %}"></script>
+<script src="{% static 'js/micuenta.js' %}"></script>
+{% endblock myscripts %}

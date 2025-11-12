@@ -42,3 +42,14 @@ package.json
 # Logs y archivos de comandos
 logs/
 commands.txt
+
+# Celery
+celerybeat-schedule.bak
+celerybeat-schedule.dat
+celerybeat-schedule.dir
+
+# ignore todo
+todo.py
+
+*.pem
+*.key

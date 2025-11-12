@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock meta %}
+
+{% block head %}
+<title>Pedido #{{ order.merchant_order_id }}</title>
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="generic-box">
+    <header class="generic-header-nav">
+        <a href="#">
+            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M15 6l-6 6l6 6" />
+            </svg>
+        </a>
+        <h2 id="generic-title">Pedido #{{ order.merchant_order_id }}</h2>
+    </header>
+    <section class="generic-data">
+        <div class="userdata-box">
+            <div class="generic-data orders">
+                <article class="generic-item orders">
+                    <div class="orders-main">
+                        <div class="circle-stack">
+                            {% for prod in order.productos %}
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= prod.cantidad %}
+                                    <img src="{{ prod.imagen }}" alt="Producto">
+                                {% endif %}
+                            {% endfor %}
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <h3>Pedido #{{order.merchant_order_id}}</h3>
+                            <p>Fecha de compra: {{order.fecha_compra|date:"j \\d\\e F \\d\\e Y"}}</p>
+                            {% if order.estado == 'confirmado' %}
+                                <span style="font-size: 0.9rem; color: #0f5718; background-color: #b7fcc0;">Confirmado</span>
+                            {% elif order.estado == 'pendiente' %}
+                                <span style="font-size: 0.9rem; color: #969600; background-color: #f0f0b7;">Pendiente</span>
+                            {% elif order.estado == 'rechazado' %}
+                                <span style="font-size: 0.9rem; color: #8b0000; background-color: #f4b7b7;">Rechazado</span>
+                            {% elif order.estado == 'listo para retirar' %}
+                                <span style="font-size: 0.9rem; color: #004d40; background-color: #a2f0e1;">Listo para retirar</span>
+                            {% elif order.estado == 'enviado' %}
+                                <span style="font-size: 0.9rem; color: #311b92; background-color: #cbb7f4;">Enviado</span>
+                            {% elif order.estado == 'finalizado' %}
+                                <span style="font-size: 0.9rem; color: #263238; background-color: #b7c4c9;">Finalizado</span>
+                            {% elif order.estado == 'arrepentido' %}
+                                <span style="font-size: 0.9rem; color: #5c0000; background-color: #fd9898;">Arrepentido</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="orders-btns">
+                        <button type="button" class="help-btn generic-hover" title="¿Necesitas ayuda con tu pedido?">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-help"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 17l0 .01" /><path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4" /></svg>
+                        <button type="button" class="orders-info-btn" title="Mas información sobre tu pedido">
+                            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-down"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg>
+                        </button>
+                    </div>
+                    <div class="generic-expand orders-info">
+                        <dl class="methods-list">
+                            <div class="methods-item middle">
+                                <dt class="methods-term">Total de compra:</dt>
+                                <dd class="methods-desc">{{order.total_compra|formato_pesos}}</dd>
+                            </div>
+                            <div class="methods-item middle">
+                                <dt class="methods-term">Productos:</dt>
+                                <dd class="methods-desc">
+                                    {% for item in order.productos %}
+                                        {{ item.cantidad }} x {{ item.producto }}
+                                        <br>
+                                    {% endfor %}
+                                </dd>
+                            </div>
+                            <div class="methods-item middle">
+                                <dt class="methods-term">Forma de pago:</dt>
+                                <dd class="methods-desc">{{order.forma_de_pago|capfirst}}</dd>
+                            </div>
+                            <div class="methods-item middle">
+                                <dt class="methods-term">ID del pedido:</dt>
+                                <dd class="methods-desc token">{{order.merchant_order_id}}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+</section>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+<script src="{% static 'js/pedido.js' %}"></script>
+{% endblock myscripts %}

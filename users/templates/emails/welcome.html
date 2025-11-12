@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background-color: #f0f0f0;padding: 8px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">  
+    <div style="min-height: 350px;background-color: #fff;padding: 20px; margin: auto; max-width: 600px; border-radius: 12px;">
+        <h2 style="text-align: center; color: #272727; font-weight: 700; font-size: 2rem;">¡Bienvenido a TwinStore!</h2>
+        <p style="text-align: center; color: #797979; margin: auto; padding-bottom: 2rem; font-size:0.95rem; font-weight: 600;">Hola {{username}}, gracias por registrarte en TwinStore. Estamos felices de tenerte a bordo. Por favor, usá el código para activar tu cuenta.</p>
+        <div style="max-width: 300px; margin: auto; text-align: center; padding: 10px; background-color: #e1f0fc; border-radius: 10px;">
+            <span style="color: #46a6ff; font-weight: 500; font-size: 1rem;">Tu código de activación</span>
+            <p style="font-size: 1.8rem;font-weight: bold; margin: 0; color: #252525; margin-top: 0.78rem;">{{codigo}}</p>
+        </div>
+    </div>
+    <div style="max-width: 500px; margin: auto;">
+        <p style="color:#535353;font-size: 0.8rem; text-align: center;font-weight: 400; margin: 0; margin-top: 1rem">Si vos no solicitaste este correo para crear tu cuenta en TwinStore, por favor ignóralo.</p>
+        <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto; padding:12px 0;">
+            <tr>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.instagram.com/twinstore.ar" target="_blank">
+                    <img src="{{images.insta}}" alt="Instagram" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.linkedin.com/company/twinstore-ar/" target="_blank">
+                    <img src="{{images.link}}" alt="LinkedIn" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.tiktok.com/@twinstore.ar" target="_blank">
+                    <img src="{{images.tiktok}}" alt="TikTok" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+            </tr>
+        </table>
+        <p style="color:#535353;font-size: 0.8rem; text-align: center; margin: 0; font-weight: 500;">© Twinstore 2025.</p>
+    </div>
+</body>
+</html>

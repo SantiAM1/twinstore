@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import HistorialCompras,PagoRecibidoMP,ComprobanteTransferencia,EstadoPedido,Cupon,TicketDePago
-from django.utils.html import format_html, format_html_join
-from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.timezone import localtime
 from django.template.defaultfilters import date as date_filter
 from .forms import EstadoPedidoForm
@@ -29,7 +28,7 @@ class ComprobanteTransferenciaInline(admin.StackedInline):
 
 class EstadoPedidoInline(admin.StackedInline):
     model = EstadoPedido
-    form = EstadoPedidoForm  # 👈 Usamos el form custom
+    form = EstadoPedidoForm
     can_delete = False
     extra = 0
     classes = ['collapse']
@@ -88,28 +87,28 @@ class HistorialComprasAdmin(admin.ModelAdmin):
         f = obj.facturacion
         html = (
             '<div style="overflow-x: auto; max-width: 100%;">'
-            '<table style="border-collapse: collapse; width: 100%; min-width: 800px;>'
+            '<table style="border-collapse: collapse; width: 100%; min-width: 800px;">'
             '<tr>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Nombre</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">DNI/CUIT</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Email</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Dirección</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Condición frente al IVA</th>'
-            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Telefono</th>'
-            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Razon social</th>'
+            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Teléfono</th>'
+            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Razón social</th>'
             '</tr>'
             f'<tr>'
             f'<td style="padding: 6px;">{f.nombre} {f.apellido}</td>'
             f'<td style="padding: 6px;">{f.dni_cuit}</td>'
             f'<td style="padding: 6px;">{f.email}</td>'
-            f"<td style='padding: 6px;'>{f.calle} {f.calle_detail or ''}, {f.ciudad or '-'} CP({f.codigo_postal or '-'}), {f.get_provincia_display()}</td>"
+            f'<td style="padding: 6px;">{f.direccion} | {f.localidad} | CP{f.codigo_postal} | {f.get_provincia_display()}</td>'
             f'<td style="padding: 6px;">{f.get_condicion_iva_display()}</td>'
-            f"<td style='padding: 6px;'>{f.telefono or '-'}</td>"
-            f"<td style='padding: 6px;'>{f.razon_social or '-'}</td>"
+            f'<td style="padding: 6px;">{f.telefono}</td>'
+            f'<td style="padding: 6px;">{f.razon_social or " "}</td>'
             f'</tr>'
             '</table>'
             '</div>'
-            )
+        )
         return format_html(html)
 
     # def has_delete_permission(self, request, obj=None):
@@ -123,23 +122,21 @@ class HistorialComprasAdmin(admin.ModelAdmin):
         html = '<table style="border-collapse: collapse; width: 100%;">'
         html += (
             '<tr>'
-            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">SKU</th>'
+            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Imagen</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Producto</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Precio Unitario</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Cantidad</th>'
             '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Subtotal</th>'
-            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Proveedor</th>'
             '</tr>'
         )
         for p in obj.productos:
             html += (
                 f'<tr>'
-                f'<td style="padding: 6px;">{p["sku"]}</td>'
-                f'<td style="padding: 6px;">{p["nombre"]}</td>'
+                f'<td style="padding: 6px;"><img src="{p["imagen"]}" alt="{p["producto"]}" style="max-width: 50px;"/></td>'
+                f'<td style="padding: 6px;">{p["producto"]}</td>'
                 f'<td style="padding: 6px;">{p["precio_unitario"]}</td>'
                 f'<td style="padding: 6px;">{p["cantidad"]}</td>'
                 f'<td style="padding: 6px;">${p["subtotal"]:,.2f}</td>'
-                f'<td style="padding: 6px;">{p["proveedor"]}</td>'
                 f'</tr>'
             )
         html += '</table>'

@@ -1,319 +1,317 @@
-from django.shortcuts import get_object_or_404, render, redirect
-from .forms import RegistrarForm,LoginForm,BuscarPedidoForm,UsuarioForm
 from .models import PerfilUsuario,TokenUsers
+from .decorators import login_required_modal
+from .emails import mail_recuperar_cuenta_html
+
+from payment.models import HistorialCompras
+from cart.utils import merge_carts,clear_carrito_cache
+from core.permissions import BloquearSiMantenimiento
+from core.throttling import ModalUsers,MiCuentaThrottle
+from products.models import ReseñaProducto, TokenReseña
+
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
-from django.views.decorators.http import require_POST
-from payment.models import HistorialCompras
-import uuid
 from django.contrib.auth.decorators import login_required
-from .emails import mail_confirm_user_html
-from django.utils import timezone
-from datetime import timedelta
-from .tasks import enviar_mail_reset_password
-from django.conf import settings
-from .forms import EmailUsuarioRecuperacion,RestablecerContraseña
-from django.contrib.auth import views as auth_views
-from django.contrib.auth.forms import PasswordResetForm
 from django.utils.translation import gettext_lazy as _
-from django.core import signing
-from django.core.signing import BadSignature
-
+from django.http import HttpRequest, JsonResponse
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import HistorialIdSerializer
+from rest_framework.permissions import IsAuthenticated
+from .serializers import PedidoSerializer,LoginSerializer,RegisterSerializer,TokenSerializer, MiCuentaSerializer,RecuperarCuentaSerializer,NuevaContraseñaSerializer,ReseñaSerializer
 
-from core.permissions import BloquearSiMantenimiento
-
-from django.template.loader import render_to_string
-from core.throttling import ToggleNotificacionesThrottle
-
-from axes.handlers.proxy import AxesProxyHandler
-
-class RecibirMailView(APIView):
+class LoginAPIView(APIView):
     permission_classes = [BloquearSiMantenimiento]
-    throttle_classes = [ToggleNotificacionesThrottle]
-    def post(self,request):
-        serializer = HistorialIdSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data
-            try:
-                historial_id = signing.loads(data.get('id'))
-            except BadSignature:
-                return Response({'error': 'Firma inválida en el ID'}, status=status.HTTP_400_BAD_REQUEST)
-            historial = HistorialCompras.objects.get(id=historial_id)
-            historial.recibir_mail = not historial.recibir_mail
-            historial.save()
-            html = render_to_string('partials/notificacion.html',{
-                'pedido':historial
-            })
-
-            return Response({'html':html})
-        else:
+    throttle_classes = [ModalUsers]
+    def post(self, request:HttpRequest):
+        serializer = LoginSerializer(data=request.data)
+        if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@require_POST
-def arrepentimiento_post(request, historial_signed):
-    historial_id = signing.loads(historial_signed)
-    historial = get_object_or_404(HistorialCompras,id=historial_id)
-    if not historial.check_arrepentimiento():
-        messages.error(request,'Hubo un error al solicitar el Arrepentimiento')
-        return redirect('users:ver_pedidos',token=historial.token_consulta)
-    historial.estado = 'arrepentido'
-    historial.save()
-    messages.success(request,'Arrepentimiento solicitado con éxito')
-    return redirect('users:ver_pedidos',token=historial.token_consulta)
+        email = serializer.validated_data["email"]
+        password = serializer.validated_data["password"]
 
-@login_required
-def asociar_pedido(request):
-    if request.method == "POST":
-        form = BuscarPedidoForm(request.POST)
-        if form.is_valid():
-            token = form.cleaned_data['token']
-            historial = HistorialCompras.objects.filter(token_consulta=token).first()
-            if historial:
-                if historial.usuario == request.user:
-                    messages.error(request,'Ya tienes este pedido asociado')
-                else:
-                    historial.usuario = request.user
-                    historial.save()
-                    messages.success(request,'Pedido asociado con éxito!')
-                return redirect('users:mispedidos')
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "El email no está registrado."},status=status.HTTP_404_NOT_FOUND)
+
+        user = authenticate(request, username=email, password=password)
+        if user is None:
+            return Response({"error": "Credenciales incorrectas."},status=status.HTTP_400_BAD_REQUEST)
+
+        perfil:PerfilUsuario = getattr(user, "perfil", None)
+        if perfil and not perfil.email_verificado:
+            tiene_token = TokenUsers.objects.filter(user=user,tipo="verificar").first()
+            if tiene_token and tiene_token.expirado():
+                tiene_token.delete()
+                TokenUsers.objects.create(user=user,tipo="verificar")
+            return Response({"error": "Verificá tu email antes de iniciar sesión.","verificar": True,"modal": "verificar-cuenta"}, status=status.HTTP_400_BAD_REQUEST)
+
+        login(request, user)
+        merge_carts(request, user)
+        clear_carrito_cache(request)
+
+        key = make_template_fragment_key("header_main")
+        cache.delete(key)
+        
+        messages.success(request,'Has iniciado sesión correctamente.')
+
+        next_url = request.data.get("next",'')
+        if next_url:
+            return Response({"redirect": next_url}, status=status.HTTP_200_OK)
+
+        return Response({"reload": True}, status=status.HTTP_200_OK)
+
+class RegisterView(APIView):
+    permission_classes = [BloquearSiMantenimiento]
+    throttle_classes = [ModalUsers]
+    def post(self, request:HttpRequest):
+        serializer = RegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = User.objects.create_user(
+            username=serializer.validated_data["email"],
+            email=serializer.validated_data["email"],
+            password=serializer.validated_data["password"]
+        )
+
+        perfil:PerfilUsuario = user.perfil
+
+        perfil.telefono = serializer.validated_data["telefono"]
+        perfil.nombre = serializer.validated_data["nombre"]
+        perfil.apellido = serializer.validated_data["apellido"]
+        perfil.save()
+
+        token = TokenUsers.objects.create(
+            user=user,
+            tipo="verificar"
+        )
+
+        request.session['email_tag'] = serializer.validated_data["email"]
+
+        return Response({"verificar": True,"modal": "verificar-cuenta"}, status=status.HTTP_200_OK)
+
+class RecuperarCuentaView(APIView):
+    permission_classes = [BloquearSiMantenimiento]
+    throttle_classes = [ModalUsers]
+    def post(self, request:HttpRequest):
+        serializer = RecuperarCuentaSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data["email"]
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return Response({"error": "No existe un usuario con ese email."}, status=status.HTTP_404_NOT_FOUND)
+        
+        perfil:PerfilUsuario = user.perfil
+        if not perfil.email_verificado:
+            return Response({"error": "El email no ha sido verificado. No se puede recuperar la cuenta."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        tiene_token = TokenUsers.objects.filter(user=user,tipo="recuperar").first()
+        if tiene_token:
+            if tiene_token.expirado():
+                tiene_token.delete()
             else:
-                messages.error(request, "No existe un pedido con ese código.")
-                return redirect('users:mispedidos')
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, error)
-                    return redirect('users:mispedidos')
+                return Response({"verificar": True,"modal": "recuperar-cuenta"}, status=status.HTTP_200_OK)
+        
+        token = TokenUsers.objects.create(user=user,tipo="recuperar")
+        request.session['email_tag'] = email
 
-@login_required
+        mail_recuperar_cuenta_html(user)
+
+        return Response({"verificar": True,"modal": "recuperar-cuenta"}, status=status.HTTP_200_OK)
+
+class VerificarTokenView(APIView):
+    permission_classes = [BloquearSiMantenimiento]
+    throttle_classes = [ModalUsers]
+    def post(self, request:HttpRequest):
+        serializer = TokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = request.session.get('email_tag','')
+        if not email:
+            return Response({"error": "Sesión expirada, volvé a ingresar tu email."}, status=status.HTTP_400_BAD_REQUEST)
+
+        codigo = serializer.validated_data["codigo"]
+
+        try:
+            token = TokenUsers.objects.get(codigo=str(codigo), user__email=email)
+        except TokenUsers.DoesNotExist:
+            return Response({"error": "Código inválido."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if token.expirado():
+            token.delete()
+            return Response({"error": "El código ha expirado. Solicitá uno nuevo."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if token.tipo == "verificar":
+            perfil = getattr(token.user, "perfil", None)
+            if perfil:
+                perfil.email_verificado = True
+                perfil.save()
+
+            login(request, token.user, backend='django.contrib.auth.backends.ModelBackend')
+            merge_carts(request, token.user)
+            clear_carrito_cache(request)
+
+            request.session.pop('email_tag', None)
+            token.delete()
+
+            messages.success(request,'Cuenta confirmada de manera exitosa.')
+
+            key = make_template_fragment_key("header_main",[request.user.id])
+            cache.delete(key)
+
+            next_url = request.data.get("next",'')
+            return Response({"redirect": next_url} if next_url else {"reload": True}, status=status.HTTP_200_OK)
+
+        elif token.tipo == "recuperar":
+            request.session['new_password_aprove'] = True
+            token.delete()
+            return Response({"verificar": True,"modal": "nueva-contraseña"}, status=status.HTTP_200_OK)
+
+class NuevaContraseñaView(APIView):
+    permission_classes = [BloquearSiMantenimiento]
+    throttle_classes = [ModalUsers]
+    def post(self, request:HttpRequest):
+
+        if not request.session.get('new_password_aprove',False):
+            return Response({"error": "Acción no autorizada."}, status=status.HTTP_403_FORBIDDEN)
+        
+        email = request.session.get('email_tag')
+        if not email:
+            return Response({'error': 'Sesión expirada o no autorizada.'}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = NuevaContraseñaSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        nueva_contraseña = serializer.validated_data["password"]
+
+        user = User.objects.filter(email=email).first()
+        user.set_password(nueva_contraseña)
+        user.save()
+
+        request.session.pop('new_password_aprove', None)
+        request.session.pop('email_tag', None)
+
+        return Response({"verificar": True,"modal": "signin"}, status=status.HTTP_200_OK)
+
+class MiCuentaView(APIView):
+    permission_classes = [IsAuthenticated, BloquearSiMantenimiento]
+    throttle_classes = [MiCuentaThrottle]
+    def get(self, request:HttpRequest):
+        perfil:PerfilUsuario = request.user.perfil
+        data = {
+            "nombre": perfil.nombre,
+            "apellido": perfil.apellido,
+            "telefono": perfil.telefono,
+            "email":perfil.user.email,
+            "dni_cuit": perfil.dni_cuit,
+            "codigo_postal": perfil.codigo_postal,
+            "direccion": perfil.direccion,
+            "localidad": perfil.localidad,
+            "provincia": perfil.provincia,
+            "razon_social": perfil.razon_social,
+            "condicion_iva": perfil.condicion_iva,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    
+    def post(self, request:HttpRequest):
+        serializer =  MiCuentaSerializer(data=request.data,partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        data = serializer.validated_data
+
+        perfil:PerfilUsuario = request.user.perfil
+        perfil.condicion_iva = data.get("condicion_iva", perfil.condicion_iva)
+        perfil.dni_cuit = data.get("dni_cuit", perfil.dni_cuit)
+        perfil.razon_social = data.get("razon_social", perfil.razon_social)
+        perfil.direccion = data.get("direccion", perfil.direccion)
+        perfil.codigo_postal = data.get("codigo_postal", perfil.codigo_postal)
+        perfil.localidad = data.get("localidad", perfil.localidad)
+        perfil.provincia = data.get("provincia", perfil.provincia)
+        perfil.save()
+
+        return Response({"success": True}, status=status.HTTP_200_OK)
+
+class VerPedidoAPIView(APIView):
+    permission_classes = [BloquearSiMantenimiento]
+    throttle_classes = [MiCuentaThrottle]
+    def post(self, request:HttpRequest):
+        serializer = PedidoSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                historial = HistorialCompras.objects.get(merchant_order_id=serializer.validated_data["order_id"])
+            except HistorialCompras.DoesNotExist:
+                return Response({"error": "No se encontró un pedido con ese ID."}, status=status.HTTP_404_NOT_FOUND)
+            
+            return Response({"redirect": f"/usuario/pedido/{historial.merchant_order_id}"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CrearReseñaView(APIView):
+    permission_classes = [IsAuthenticated, BloquearSiMantenimiento]
+    throttle_classes = [MiCuentaThrottle]
+    def post(self, request:HttpRequest):
+        serializer = ReseñaSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        token = serializer.validated_data["token"]
+
+        try:
+            token_obj = TokenReseña.objects.get(token=token)
+        except TokenReseña.DoesNotExist:
+            return Response({"error": "Token inválido."}, status=status.HTTP_400_BAD_REQUEST)
+
+        rating = serializer.validated_data.get("rating")
+        review_text = serializer.validated_data.get("review","")
+
+        reseña = ReseñaProducto.objects.create(
+            producto=token_obj.producto,
+            usuario=request.user.perfil,
+            calificacion=rating,
+            comentario=review_text
+        )
+
+        token_obj.delete()
+
+        messages.success(request,'Muchas gracias por dejar tu reseña!')
+
+        return Response({"success": True}, status=status.HTTP_201_CREATED)
+
+def check_auth(request):
+    return JsonResponse({'is_authenticated': request.user.is_authenticated})
+
+@login_required_modal
 def mi_perfil(request):
-    perfil, created = PerfilUsuario.objects.get_or_create(user=request.user)
-    if request.method == "POST":
-        form = UsuarioForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            perfil.condicion_iva = data['condicion_iva']
-            perfil.dni_cuit = data['dni_cuit']
-            perfil.razon_social = data['razon_social']
-            perfil.nombre = data['nombre']
-            perfil.apellido = data['apellido']
-            perfil.calle = data['calle']
-            perfil.calle_detail = data['calle_detail']
-            perfil.ciudad = data['ciudad']
-            perfil.provincia = data['provincia']
-            perfil.codigo_postal = data['codigo_postal']
-            perfil.telefono = data['telefono']
-            perfil.preferencias_promociones = data['preferencias_promociones']
-            perfil.save()
-            messages.success(request,'Usuario actualizado con éxito!')
-    form = UsuarioForm(initial={
-            'condicion_iva': perfil.condicion_iva,
-            'dni_cuit': perfil.dni_cuit,
-            'razon_social': perfil.razon_social,
-            'nombre': perfil.nombre,
-            'apellido': perfil.apellido,
-            'calle': perfil.calle,
-            'calle_detail': perfil.calle_detail,
-            'ciudad': perfil.ciudad,
-            'provincia': perfil.provincia,
-            'codigo_postal': perfil.codigo_postal,
-            'email': request.user.email,
-            'telefono': perfil.telefono,
-            'preferencias_promociones': perfil.preferencias_promociones
-        })
-    return render(request,'users/perfil.html',{
-        'form':form
-    })
-
-@login_required
-def users_pedidos(request):
-    form = BuscarPedidoForm()
-    historial = HistorialCompras.objects.filter(usuario=request.user)
-    return render(request,'users/pedidos.html',{'historial':historial,'form':form})
-
-def buscar_pedidos(request):
-    form = BuscarPedidoForm()
-    if request.method == "POST":
-        form = BuscarPedidoForm(request.POST)
-        if form.is_valid():
-            token = form.cleaned_data['token']
-            return redirect('users:ver_pedidos',token=token)
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, error)
-                    return redirect('users:buscar_pedidos')
-    return render(request, 'users/buscar_pedido.html', {'form': form})
-
-def ver_pedido(request,token):
-    historial = HistorialCompras.objects.filter(token_consulta=token)
-    if historial:
-        return render(request, 'users/ver_pedido.html', {'historial': historial})
-    else:
-        messages.error(request, "No existe un pedido con ese código.")
-        return redirect('users:buscar_pedidos')
+    historial = HistorialCompras.objects.filter(usuario=request.user).order_by('-fecha_compra').prefetch_related('tickets','comprobante')
+    return render(request,'users/micuenta.html',{'historial':historial})
 
 @login_required
 def cerrar_sesion(request):
     logout(request)
-    messages.info(request,'Sesión cerrada con éxito!')
+    key = make_template_fragment_key("header_main", [request.user.id])
+    cache.delete(key)
+    messages.success(request,'Has cerrado sesión correctamente.')
     return redirect('core:home')
 
-def iniciar_sesion(request):
-    if request.user.is_authenticated:
-        return redirect('core:home')
-    form = LoginForm()
-    if request.method == "POST":
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            # 🔒 Verificar si el intento está bloqueado por Axes
-            if AxesProxyHandler.is_locked(request, credentials={'username': form.cleaned_data['email']}):
-                messages.error(request, "Demasiados intentos fallidos. Esperá 1 hora para volver a intentar.")
-                return redirect('users:login')
-            
-            user = authenticate(
-                request=request,
-                username=form.cleaned_data['email'],
-                password=form.cleaned_data['password']
-                )
-            if user is not None:
-                perfil = user.perfil
-                if not perfil.email_verificado:
-                    messages.warning(request, "Primero tenes que verificar tu correo para ingresar")
-                    return redirect('users:login')
-                login(request, user)
-                messages.info(request,'Bienvenido a Twistore!')
-                return redirect('core:home')
-            else:
-                messages.error(request, "El email o la contraseña ingresados no son correctos.")
-                return redirect('users:login')
-    return render(request,'users/login.html',{'form':form})
+def ver_pedido(request, order_id:str):
+    historial = get_object_or_404(HistorialCompras, merchant_order_id=order_id)
+    return render(request,'users/pedido.html',{'order':historial})
 
-def registarse(request):
-    if request.user.is_authenticated:
-        return redirect('core:home')
-    form = RegistrarForm()
-    if request.method == "POST":
-        form = RegistrarForm(request.POST)
-        if form.is_valid():
-            user = User.objects.create_user(
-                username=form.cleaned_data['email'],
-                email=form.cleaned_data['email'],
-                password=form.cleaned_data['password']
-            )
-            # * Forzamos acceso al perfil (por si aún no se generó en el signal)
-            _ = user.perfil
+@login_required_modal
+def review_pedido(request:HttpRequest,token:str):
+    token_obj = get_object_or_404(TokenReseña, token=token)
+    if not token_obj:
+        messages.error(request,'No se encontró el token.')
+        return redirect('users:perfil')
 
-            mail_confirm_user_html(user)
+    if token_obj.usuario.user != request.user:
+        messages.error(request, 'No estás autorizado para dejar una reseña para este producto.')
+        return redirect('users:perfil')
 
-            request.session['token_verificacion'] = str(user.perfil.token_verificacion)
-            return redirect('users:email_enviado')
-        else:
-            if form.errors.get('email'):
-                for error in form.errors.get('email'):
-                    messages.error(request, error)
-            else:
-                for field, errors in form.errors.items():
-                    for error in errors:
-                        messages.error(request, error)
-            return redirect('users:singup')
-    return render(request, 'users/registro.html', {'form': form})
-
-def email_enviado(request):
-    return render(request,'users/confirmar_mail.html')
-
-def verificar_email(request,token):
-    try:
-        perfil = get_object_or_404(PerfilUsuario, token_verificacion=token)
-        perfil.email_verificado = True
-        perfil.token_verificacion = None
-        if request.session.get('token_verificacion',''):
-            del request.session['token_verificacion']
-        perfil.save()
-        messages.success(request,'Usuario confirmado con éxito!')
-        return redirect('users:login')
-    except:
-        return render(request,'users/error_mail.html')
-
-def reenviar_verificacion(request):
-    token = request.session.get('token_verificacion','')
-    if not token:
-        messages.warning(request, "Hubo un problema, intente mas tarde.")
-        return redirect('users:email_enviado')
-    perfil = get_object_or_404(PerfilUsuario,token_verificacion=token)
-
-    tiene_token = TokenUsers.objects.filter(user=perfil.user,tipo="crear").first()
-    if tiene_token:
-        if tiene_token.expirado():
-            tiene_token.delete()
-        else:
-            messages.warning(request, "Por favor, esperá unos minutos antes de volver a reenviar el mail.")
-            return redirect('users:email_enviado')
-        
-    user = perfil.user
-    token_ticket = TokenUsers.objects.create(user=user,tipo="crear")
-    mail_confirm_user_html(user)
-    messages.success(request, "Te reenviamos el correo de verificación.")
-    return redirect('users:email_enviado')
-
-def recuperar_contraseña(request):
-    if request.method == "POST":
-        form = EmailUsuarioRecuperacion(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            user = User.objects.filter(email=email).first()
-            if user:
-                tiene_token = TokenUsers.objects.filter(user=user,tipo="recuperar").first()
-                if tiene_token:
-                    if tiene_token.expirado():
-                        tiene_token.delete()
-                    else:
-                        messages.error(request, f"Ya has solicitado esta acción, si el error persiste contactanos.")
-                        return redirect('users:recuperar') 
-                token = TokenUsers.objects.create(user=user,tipo="recuperar")
-                url = f"{settings.SITE_URL}/usuario/restablecer/{token.token}/"
-                context = {
-                    "email":user.email,
-                    "url":url
-                }
-                enviar_mail_reset_password.delay(context)
-                messages.success(request, f"Email enviado con exito!")
-                return redirect('users:login')
-            else:
-                messages.error(request, "No existe un usuario con ese correo")
-                return redirect('users:singup')
-
-    form = EmailUsuarioRecuperacion()
-    return render(request,'users/recuperar_password.html',{'form':form})
-
-def restablecer_contraseña(request,token):
-    token_obj = get_object_or_404(TokenUsers, token=token,tipo="recuperar")
-
-    if token_obj.expirado():
-        token_obj.delete()
-        messages.error(request, "⏳ El enlace expiró. Solicitá uno nuevo.")
-        return redirect('users:login')
-    
-    if request.method == "POST":
-        form = RestablecerContraseña(request.POST)
-        if form.is_valid():
-            nueva_contraseña = form.cleaned_data['password']
-            user = token_obj.user
-            user.set_password(nueva_contraseña)
-            user.save()
-            token_obj.delete()
-            messages.success(request, "Contraseña actualizada con éxito.")
-            return redirect('users:login')
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, error)
-            return render(request,'users/restablecer_password.html',{'form':form})
-    form = RestablecerContraseña()
-    return render(request,'users/restablecer_password.html',{'form':form})
+    producto = token_obj.producto
+    return render(request,'users/review_pedido.html',{'producto':producto,'token':token_obj.token})
