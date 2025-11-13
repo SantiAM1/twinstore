@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static compress %}
 
 {% block meta %}
 {% include 'components/meta.html' %}
@@ -78,5 +78,7 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
+{% compress js %}
 <script src="{% static 'js/prodGrid.js' %}"></script>
+{% endcompress %}
 {% endblock myscripts %}
