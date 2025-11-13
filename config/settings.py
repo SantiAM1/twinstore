@@ -142,17 +142,14 @@ CONTENT_SECURITY_POLICY = {
         "style-src": [
             "'self'",
             "'unsafe-inline'",
-            "https://cdn.jsdelivr.net",
             "https://fonts.googleapis.com"
         ],
         "script-src": [
             "'self'",
-            "https://cdn.jsdelivr.net",
             NONCE
         ],
         "font-src": [
             "'self'",
-            "https://cdn.jsdelivr.net",
             "https://fonts.gstatic.com",
             "data:"
         ],

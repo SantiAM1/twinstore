@@ -1,1 +1,60 @@
+# ============================
+#   Normalización global
+# ============================
+* text=auto
+
+# ============================
+#   Scripts y código fuente
+# ============================
 *.sh text eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf
+*.xml text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+
+# ============================
+#   Archivos de configuración
+# ============================
+Dockerfile text eol=lf
+*.dockerignore text eol=lf
+*.env text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+*.conf text eol=lf
+
+# ============================
+#   Archivos binarios
+# ============================
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+*.webp binary
+*.ico binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.gz binary
+*.zip binary
+*.pdf binary
+
+# ============================
+#   Excepciones importantes
+# ============================
+
+# No modificar line endings en migraciones
+*migrations/*.py text eol=lf
+
+# No modificar line endings en scripts JavaScript minificados
+*.min.js text eol=lf
+
+# No alterar archivos de Nginx
+nginx/*.conf text eol=lf
