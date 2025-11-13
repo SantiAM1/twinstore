@@ -12,7 +12,7 @@
                 <img src="{{producto.get_portada_200}}" alt="{{producto.nombre}}">
             {% endif %}
         </header>
-        <h3>{{producto.nombre}}</h3>
+        <p class="card-product__name">{{producto.nombre}}</p>
         <div class="card-product-colors">
         {% if producto.colores.exists %}
             {% for color in producto.colores.all %}

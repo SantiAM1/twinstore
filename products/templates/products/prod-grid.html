@@ -19,11 +19,11 @@
             </ul>
             <section class="product-mainnav">
                 <div class="product-category-nav">
-                    <h3 class="product-title generic-hover generic-flip">
+                    <span class="product-title generic-hover generic-flip">
                         <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-down"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg>
                         <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-category-2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 4h6v6h-6z" /><path d="M4 14h6v6h-6z" /><path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M7 7m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /></svg>
                         Categorías
-                    </h3>
+                    </span>
                     <div class="product-expand generic-expand">
                         {% for categoria in categorias_data %}
                             <div class="product-category-item">
@@ -39,11 +39,11 @@
                     </div>
                 </div>
                 <div class="product-filter-nav">
-                    <h3 class="product-title generic-hover generic-flip">
+                    <span class="product-title generic-hover generic-flip">
                         <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-down"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg>
                         <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-adjustments-horizontal"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M4 6l8 0" /><path d="M16 6l4 0" /><path d="M8 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M4 12l2 0" /><path d="M10 12l10 0" /><path d="M17 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M4 18l11 0" /><path d="M19 18l1 0" /></svg>
                         Filtros
-                    </h3>
+                    </span>
                     <div class="product-filters product-expand generic-expand">
                         {% include 'partials/filters-nav.html' %}
                     </div>
@@ -67,7 +67,7 @@
         </div>
         {% else %}
         <div class="product-empty">
-            <h3>¡Lo sentimos! No encontramos ningún producto.</h3>
+            <h2>¡Lo sentimos! No encontramos ningún producto.</h2>
             <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search-off"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5.039 5.062a7 7 0 0 0 9.91 9.89m1.584 -2.434a7 7 0 0 0 -9.038 -9.057" /><path d="M3 3l18 18" /></svg>
             <a href="{% url 'core:home' %}" class="generic-button btn-1 margin max-250">Volver al inicio</a>
             <a href="{% url 'products:grid' %}" class="generic-button btn-2 max-250">Ver todos los productos</a>
