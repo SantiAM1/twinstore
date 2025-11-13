@@ -22,14 +22,12 @@ class Pedido(models.Model):
     def dict_type(self):
         return f"{self.producto.id}-{self.color.id}" if self.color else f"{self.producto.id}-null"
     
-    @debug_queries
     def get_imagen(self):
         if self.color:
             return self.color.imagenes_color.all()[0].imagen_200.url
         else:
             return static('img/prod_default.webp')
 
-    @debug_queries
     def get_nombre_producto(self):
         if self.color:
             return f"({self.color.nombre}) {self.producto.nombre}"

@@ -6,6 +6,7 @@ Disallow: /payment/
 Disallow: /mantenimiento/
 Disallow: /media/
 Disallow: /static/
+Disallow: /busqueda/
 Disallow: /*.json$
 Disallow: /productos/api
 Disallow: /productos/api/

@@ -182,7 +182,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.carrito_total',
                 'cart.context_processors.limpiar_checkout',
-                'core.context_processors.canonical_url',
             ],
         },
     },

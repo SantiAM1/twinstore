@@ -220,7 +220,7 @@ async function buscarProductos(query) {
                         "/static/img/prod_default.webp"
                       }" alt="${p.nombre}">
                   </header>
-                  <h3>${p.nombre}</h3>
+                <p>${p.nombre}</p>
                   <div class="search-results-prices">
                       <span>${formatoPesos(p.precio)}</span>
                   </div>

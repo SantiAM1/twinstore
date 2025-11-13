@@ -5,18 +5,20 @@
 {% block meta %}
 <meta name="description" content="Twinstore es una empresa de venta de productos informáticos. Envíos a todo el país.">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Twinstore">
+<meta property="og:title" content="Twinstore - A new Hardware Experience">
 <meta property="og:description" content="A new Hardware Experience">
 <meta property="og:image" content="{% static 'img/mail.webp' %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
+<link rel="canonical" href="https://twinstore.com.ar/">
 {% endblock meta %}
 
 {% block head %}
-<title>Twinstore</title>
+<title>Twinstore | Hardware, Notebooks, Celulares y Accesorios en Argentina</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 {% endblock head %}
 
 {% block contenidomain %}
+<h1 class="visually-hidden">Twinstore - Tienda de Hardware, Notebooks y Tecnología en Argentina</h1>
 <div class="generic-box landing">
     {% cache 600 banners_home %}
     <section class="swiper banner-swiper">
@@ -50,7 +52,7 @@
     </section>
     {% endcache %}
     <section class="swiper-box">
-        <h3 class="landing-title">Descubrí nuestras <strong>ofertas</strong></h3>
+        <h2 class="landing-title">Descubrí nuestras <strong>ofertas</strong></h2>
         <section class="swiper products-swiper" data-speed="900" data-delay="2500" data-pagination=".pagination-ofertas" data-bullets="1">
             <div class="swiper-wrapper">
                 {% for producto in ofertas %}
@@ -64,7 +66,7 @@
     </section>
     {% cache 600 categorias_home %}
     <section class="swiper categories-swiper">
-        <h3 class="landing-title">Estas son nuestras <strong>categorías</strong></h3>
+        <h2 class="landing-title">Estas son nuestras <strong>categorías</strong></h2>
         <div class="swiper-wrapper">
             <div class="swiper-slide">
                 <div class="cat-grid">
@@ -109,11 +111,11 @@
         <div>
             <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.5"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shield"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /></svg>
             <span>Garantía</span>
-            <p>tus compras estan protegidas</p>
+            <p>tus compras están protegidas</p>
         </div>
     </section>
     <section class="swiper-box">
-        <h3 class="landing-title">Conocé nuestros productos <strong>Destacados</strong></h3>
+        <h2 class="landing-title">Conocé nuestros productos <strong>Destacados</strong></h2>
         <section class="swiper products-swiper" data-speed="800" data-delay="3500" data-pagination=".pagination-destacados" data-bullets="2">
             <div class="swiper-wrapper">
                 {% for producto in destacados %}
@@ -127,19 +129,55 @@
     </section>
     {% cache 600 marcas_home %}
     <section class="brands-grid-box">
-        <h3 class="landing-title">Descubrí nuestras <strong>marcas</strong></h3>
+        <h2 class="landing-title">Descubrí nuestras <strong>marcas</strong></h2>
         <div class="brands-grid">
-            <a href="{% url 'products:grid' %}?Marca=intel" class="brand" data-name="Intel"><img src="{% static 'img/landing/marcas/intel.png' %}" alt="Intel" loading="lazy"></a>
-            <a href="{% url 'products:grid' %}?Marca=amd" class="brand" data-name="AMD"><img src="{% static 'img/landing/marcas/amd.png' %}" alt="AMD" loading="lazy"></a>
-            <a href="{% url 'products:grid' %}?Marca=logitech" class="brand" data-name="Logitech"><img src="{% static 'img/landing/marcas/logitech.png' %}" alt="Logitech" loading="lazy"></a>
-            <a href="{% url 'products:grid' %}?Marca=apple" class="brand" data-name="Apple"><img src="{% static 'img/landing/marcas/apple.jpg' %}" alt="Apple" loading="lazy"></a>
-            <a href="{% url 'products:grid' %}?Marca=samsung" class="brand" data-name="Samsung"><img src="{% static 'img/landing/marcas/samsung.png' %}" alt="Samsung" loading="lazy"></a>
-            <a href="{% url 'products:grid' %}?Marca=asus" class="brand" data-name="Asus"><img src="{% static 'img/landing/marcas/asus.png' %}" alt="Asus" loading="lazy"></a>
-            <a href="{% url 'products:grid' %}?Marca=msi" class="brand" data-name="MSI"><img src="{% static 'img/landing/marcas/msi.png' %}" alt="MSI" loading="lazy"></a>
-            <a href="{% url 'products:grid' %}?Marca=gigabyte" class="brand" data-name="Gigabyte"><img src="{% static 'img/landing/marcas/gigabyte.png' %}" alt="Gigabyte" loading="lazy"></a>
+            <a href="{% url 'products:grid' %}?Marca=intel" class="brand" data-name="Intel" rel="nofollow">
+                <img src="{% static 'img/landing/marcas/intel.png' %}" alt="Intel" loading="lazy">
+            </a>
+            <a href="{% url 'products:grid' %}?Marca=amd" class="brand" data-name="AMD" rel="nofollow">
+                <img src="{% static 'img/landing/marcas/amd.png' %}" alt="AMD" loading="lazy">
+            </a>
+            <a href="{% url 'products:grid' %}?Marca=logitech" class="brand" data-name="Logitech" rel="nofollow">
+                <img src="{% static 'img/landing/marcas/logitech.png' %}" alt="Logitech" loading="lazy">
+            </a>
+            <a href="{% url 'products:grid' %}?Marca=apple" class="brand" data-name="Apple" rel="nofollow">
+                <img src="{% static 'img/landing/marcas/apple.jpg' %}" alt="Apple" loading="lazy">
+            </a>
+            <a href="{% url 'products:grid' %}?Marca=samsung" class="brand" data-name="Samsung" rel="nofollow">
+                <img src="{% static 'img/landing/marcas/samsung.png' %}" alt="Samsung" loading="lazy">
+            </a>
+            <a href="{% url 'products:grid' %}?Marca=asus" class="brand" data-name="Asus" rel="nofollow">
+                <img src="{% static 'img/landing/marcas/asus.png' %}" alt="Asus" loading="lazy">
+            </a>
+            <a href="{% url 'products:grid' %}?Marca=msi" class="brand" data-name="MSI" rel="nofollow">
+                <img src="{% static 'img/landing/marcas/msi.png' %}" alt="MSI" loading="lazy">
+            </a>
+            <a href="{% url 'products:grid' %}?Marca=gigabyte" class="brand" data-name="Gigabyte" rel="nofollow">
+                <img src="{% static 'img/landing/marcas/gigabyte.png' %}" alt="Gigabyte" loading="lazy">
+            </a>
         </div>
     </section>
     {% endcache %}
+    <section class="seo-text">
+    <h2>Twinstore: Hardware, Notebooks y Tecnología en Argentina</h2>
+    <p>
+        En Twinstore trabajamos para brindarte una experiencia completa en la compra de productos tecnológicos. 
+        Nuestro catálogo incluye notebooks, PCs armadas, placas de video, procesadores, periféricos, celulares, monitores 
+        y soluciones de almacenamiento de las marcas más reconocidas del mercado como Intel, AMD, Samsung, Apple, Asus, MSI 
+        y muchas más.
+    </p>
+    <p>
+        Realizamos envíos a todo el país mediante Andreani y contamos con múltiples métodos de pago para que puedas 
+        comprar de forma segura, rápida y con la mejor financiación disponible. Además, ofrecemos garantía en todos 
+        nuestros productos y atención personalizada para asegurarnos de que tengas la mejor experiencia de compra.
+    </p>
+    <p>
+        Si buscás hardware, accesorios o equipos de alto rendimiento, en Twinstore encontrás variedad, confianza y 
+        precios actualizados todos los días. Descubrí ofertas, novedades y productos destacados especialmente 
+        seleccionados para vos.
+    </p>
+</section>
+
 </div>
 {% endblock contenidomain %}
 

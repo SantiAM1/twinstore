@@ -13,7 +13,7 @@
             {% endif %}
         </header>
         <div>
-            <h3 class="card-product__name">{{producto.nombre}}</h3>
+            <p class="card-product__name">{{producto.nombre}}</p>
             <div class="card-product-colors">
             {% if producto.colores.exists %}
                 {% for color in producto.colores.all %}

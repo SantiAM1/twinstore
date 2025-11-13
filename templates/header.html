@@ -10,7 +10,7 @@
                 </svg>
             </button>
             <a href="{% url 'core:home' %}">
-                <h2 class="generic-hover">TwinStore</h2>
+                <span class="generic-hover">TwinStore</span>
             </a>
         </section >
         <form role="search" class="navbar-search" method="get" novalidate action="{% url 'products:busqueda_view' %}">
@@ -35,7 +35,7 @@
                     <path d="M21 21l-6 -6" />
                 </svg>
             </button>
-            <a href="{% url 'cart:ver_carrito' %}" class="navbar-carrito">
+            <a href="{% url 'cart:ver_carrito' %}" class="navbar-carrito" aria-label="Ver carrito de compras">
                 <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                     <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
@@ -46,7 +46,7 @@
                 <span id="carritoTotal" class="{% if total_productos > 0 %}active{% endif %}">{% if total_productos > 0 %}{{total_productos}}{% endif %}</span>
             </a>
             {% if user.is_authenticated %}
-            <a href="{% url 'users:perfil' %}">
+            <a href="{% url 'users:perfil' %}" aria-label="Ir a mi perfil">
                 <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-user">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                     <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
@@ -54,7 +54,7 @@
                 </svg>
             </a>
             {% else %}
-            <a href="" class="generic-modal-open" data-modalId="users" data-focus="id_login_email">
+            <a href="" class="generic-modal-open" data-modalId="users" data-focus="id_login_email" aria-label="Iniciar sesión o registrarse">
                 <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-user">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                     <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
@@ -63,14 +63,14 @@
             </a>
             {% endif %}
             {% if user.is_authenticated %}
-            <a href="{% url 'users:logout' %}">
+            <a href="{% url 'users:logout' %}" aria-label="Cerrar sesión">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-logout"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" /><path d="M9 12h12l-3 -3" /><path d="M18 15l3 -3" /></svg>
             </a>
             {% if user.is_staff %}
-            <a href="{% url 'admin:index' %}">
+            <a href="{% url 'admin:index' %}" aria-label="Ir al panel de administración">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-settings"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" /><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></svg>
             </a>
-            <a href="{% url 'core:cargar_excel' %}">
+            <a href="{% url 'core:cargar_excel' %}" aria-label="Cargar productos via Excel">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-building-store"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 21l18 0" /><path d="M3 7v1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1h-18l2 -4h14l2 4" /><path d="M5 21l0 -10.15" /><path d="M19 21l0 -10.15" /><path d="M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4" /></svg>
             </a>
             {% endif %}
