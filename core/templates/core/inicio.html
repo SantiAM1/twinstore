@@ -25,24 +25,24 @@
             <div class="swiper-slide">
                 <a href="#">
                     <picture>
-                        <source srcset="{% static 'img/banners/banner-iphone-17-pro-min.png' %}" media="(max-width: 720px)">
-                        <img src="{% static 'img/banners/banner-iphone-17-pro.png' %}" alt="iPhone 17 Pro">
+                        <source srcset="{% static 'img/banners/banner-iphone-17-pro-min.webp' %}" media="(max-width: 720px)">
+                        <img src="{% static 'img/banners/banner-iphone-17-pro.webp' %}" alt="Banner iPhone 17 Pro">
                     </picture>
                 </a>
             </div>
             <div class="swiper-slide">
                 <a href="#">
                     <picture>
-                        <source srcset="{% static 'img/banners/banner-notebook-gaming-min.png' %}" media="(max-width: 720px)">
-                        <img src="{% static 'img/banners/banner-notebook-gaming.png' %}" alt="Notebook Gaming">
+                        <source srcset="{% static 'img/banners/banner-notebook-gaming-min.webp' %}" media="(max-width: 720px)">
+                        <img src="{% static 'img/banners/banner-notebook-gaming.webp' %}" alt="Banner Notebook Gaming">
                     </picture>
                 </a>
             </div>
             <div class="swiper-slide">
                 <a href="#">
                     <picture>
-                        <source srcset="{% static 'img/banners/banner-metodo-pago-min.png' %}" media="(max-width: 720px)">
-                        <img src="{% static 'img/banners/banner-metodo-pago.png' %}" alt="Metodo de Pago">
+                        <source srcset="{% static 'img/banners/banner-metodo-pago-min.webp' %}" media="(max-width: 720px)">
+                        <img src="{% static 'img/banners/banner-metodo-pago.webp' %}" alt="Banner Metodo de Pago">
                     </picture>
                 </a>
             </div>
@@ -69,27 +69,66 @@
         <div class="swiper-wrapper">
             <div class="swiper-slide">
                 <div class="cat-grid">
-                    <a href="/productos/perifericos/monitores/" class="cat large" data-name="Monitores"><img src="{% static 'img/landing/categorias/monitores.png' %}" alt="Monitores"><span>MONITORES</span></a>
-                    <a href="/productos/celulares/" class="cat tall" data-name="Celulares"><img src="{% static 'img/landing/categorias/celulares.png' %}" alt="Celulares"><span>Celulares</span></a>
-                    <a href="/productos/hardware/procesadores/" class="cat" data-name="Periféricos"><img src="{% static 'img/landing/categorias/procesadores.png' %}" alt="Periféricos"> <span>Procesadores</span></a>
-                    <a href="/productos/perifericos/" class="cat wide" data-name="PCs"><img src="{% static 'img/landing/categorias/perifericos.png' %}" alt="Perifericos"><span>Perifericos</span></a>
+                    <a href="/productos/perifericos/monitores/" class="cat large" data-name="Monitores">
+                        <img src="{% static 'img/landing/categorias/monitores.webp' %}" alt="Categoría Monitores">
+                        <span>MONITORES</span>
+                    </a>
+                    <a href="/productos/celulares/" class="cat tall" data-name="Celulares">
+                        <img src="{% static 'img/landing/categorias/celulares.webp' %}" alt="Categoría Celulares">
+                        <span>Celulares</span>
+                    </a>
+                    <a href="/productos/hardware/procesadores/" class="cat" data-name="Periféricos">
+                        <img src="{% static 'img/landing/categorias/procesadores.webp' %}" alt="Categoría Periféricos">
+                        <span>Procesadores</span>
+                    </a>
+                    <a href="/productos/perifericos/" class="cat wide" data-name="PCs">
+                        <img src="{% static 'img/landing/categorias/perifericos.webp' %}" alt="Categoría Perifericos">
+                        <span>Perifericos</span>
+                    </a>
                 </div>
             </div>
             <div class="swiper-slide">
                 <div class="cat-grid">
-                    <a href="/productos/hardware/fuentes/" class="cat wide" data-name="Notebooks"><img src="{% static 'img/landing/categorias/fuentes.png' %}" alt="Fuentes"><span>Fuentes</span></a>
-                    <a href="/productos/hardware/placas-de-video/" class="cat tall" data-name="Placas de video"><img src="{% static 'img/landing/categorias/placa-de-video.png' %}" alt="placas de video"><span>Placas de Video</span></a>
-                    <a href="/productos/pc-de-escritorio/" class="cat tall" data-name="Discos SSD"><img src="{% static 'img/landing/categorias/pcs.png' %}" alt="Pcs"><span>PCs</span></a>
-                    <a href="/productos/hardware/memoria-ram/" class="cat" data-name="RAM"><img src="{% static 'img/landing/categorias/ram.png' %}" alt="Memorias RAM"><span>Memorias RAM</span></a>
-                    <a href="/productos/almacenamiento/discos-ssd/" class="cat wide" data-name="Celulares"><img src="{% static 'img/landing/categorias/discos-ssd.png' %}" alt="Discos SSD"><span>Discos SSD</span></a>
+                    <a href="/productos/hardware/fuentes/" class="cat wide" data-name="Notebooks">
+                        <img src="{% static 'img/landing/categorias/fuentes.webp' %}" alt="Categoría Fuentes">
+                        <span>Fuentes</span>
+                    </a>
+                    <a href="/productos/hardware/placas-de-video/" class="cat tall" data-name="Placas de video">
+                        <img src="{% static 'img/landing/categorias/placa-de-video.webp' %}" alt="Categoría placas de video">
+                        <span>Placas de Video</span>
+                    </a>
+                    <a href="/productos/pc-de-escritorio/" class="cat tall" data-name="Discos SSD">
+                        <img src="{% static 'img/landing/categorias/pcs.webp' %}" alt="Categoría Pcs">
+                        <span>PCs</span>
+                    </a>
+                    <a href="/productos/hardware/memoria-ram/" class="cat" data-name="RAM">
+                        <img src="{% static 'img/landing/categorias/ram.webp' %}" alt="Categoría Memorias RAM">
+                        <span>Memorias RAM</span>
+                    </a>
+                    <a href="/productos/almacenamiento/discos-ssd/" class="cat wide" data-name="Celulares">
+                        <img src="{% static 'img/landing/categorias/discos-ssd.webp' %}" alt="Categoría Discos SSD">
+                        <span>Discos SSD</span>
+                    </a>
                 </div>
             </div>
             <div class="swiper-slide">
                 <div class="cat-grid">
-                    <a href="/productos/almacenamiento/discos-rigidos/" class="cat wide" data-name="Periféricos"><img src="{% static 'img/landing/categorias/discos-rigidos.png' %}" alt="Discos Rígidos"><span>Discos Rígidos</span></a>
-                    <a href="/productos/hardware/gabinetes/" class="cat tall" data-name="Discos SSD"><img src="{% static 'img/landing/categorias/gabinetes.png' %}" alt="Gabinetes"><span>Gabinetes</span></a>
-                    <a href="/productos/notebooks/" class="cat large" data-name="PCs"><img src="{% static 'img/landing/categorias/notebooks.png' %}" alt="Notebooks"><span>Notebooks</span></a>
-                    <a href="/productos/hardware/motherboards/" class="cat" data-name="RAM"><img src="{% static 'img/landing/categorias/mothers.png' %}" alt="Motherboards"><span>Motherboards</span></a>
+                    <a href="/productos/almacenamiento/discos-rigidos/" class="cat wide" data-name="Periféricos">
+                        <img src="{% static 'img/landing/categorias/discos-rigidos.webp' %}" alt="Categoría Discos Rígidos">
+                        <span>Discos Rígidos</span>
+                    </a>
+                    <a href="/productos/hardware/gabinetes/" class="cat tall" data-name="Discos SSD">
+                        <img src="{% static 'img/landing/categorias/gabinetes.webp' %}" alt="Categoría Gabinetes">
+                        <span>Gabinetes</span>
+                    </a>
+                    <a href="/productos/notebooks/" class="cat large" data-name="PCs">
+                        <img src="{% static 'img/landing/categorias/notebooks.webp' %}" alt="Categoría Notebooks">
+                        <span>Notebooks</span>
+                    </a>
+                    <a href="/productos/hardware/motherboards/" class="cat" data-name="RAM">
+                        <img src="{% static 'img/landing/categorias/mothers.webp' %}" alt="Categoría Motherboards">
+                        <span>Motherboards</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -131,28 +170,28 @@
         <h2 class="landing-title">Descubrí nuestras <strong>marcas</strong></h2>
         <div class="brands-grid">
             <a href="{% url 'products:grid' %}?Marca=intel" class="brand" data-name="Intel" rel="nofollow">
-                <img src="{% static 'img/landing/marcas/intel.png' %}" alt="Intel" loading="lazy">
+                <img src="{% static 'img/landing/marcas/intel.webp' %}" alt="Marca Intel" loading="lazy">
             </a>
             <a href="{% url 'products:grid' %}?Marca=amd" class="brand" data-name="AMD" rel="nofollow">
-                <img src="{% static 'img/landing/marcas/amd.png' %}" alt="AMD" loading="lazy">
+                <img src="{% static 'img/landing/marcas/amd.webp' %}" alt="Marca AMD" loading="lazy">
             </a>
             <a href="{% url 'products:grid' %}?Marca=logitech" class="brand" data-name="Logitech" rel="nofollow">
-                <img src="{% static 'img/landing/marcas/logitech.png' %}" alt="Logitech" loading="lazy">
+                <img src="{% static 'img/landing/marcas/logitech.webp' %}" alt="Marca Logitech" loading="lazy">
             </a>
             <a href="{% url 'products:grid' %}?Marca=apple" class="brand" data-name="Apple" rel="nofollow">
-                <img src="{% static 'img/landing/marcas/apple.jpg' %}" alt="Apple" loading="lazy">
+                <img src="{% static 'img/landing/marcas/apple.webp' %}" alt="Marca Apple" loading="lazy">
             </a>
             <a href="{% url 'products:grid' %}?Marca=samsung" class="brand" data-name="Samsung" rel="nofollow">
-                <img src="{% static 'img/landing/marcas/samsung.png' %}" alt="Samsung" loading="lazy">
+                <img src="{% static 'img/landing/marcas/samsung.webp' %}" alt="Marca Samsung" loading="lazy">
             </a>
             <a href="{% url 'products:grid' %}?Marca=asus" class="brand" data-name="Asus" rel="nofollow">
-                <img src="{% static 'img/landing/marcas/asus.png' %}" alt="Asus" loading="lazy">
+                <img src="{% static 'img/landing/marcas/asus.webp' %}" alt="Marca Asus" loading="lazy">
             </a>
             <a href="{% url 'products:grid' %}?Marca=msi" class="brand" data-name="MSI" rel="nofollow">
-                <img src="{% static 'img/landing/marcas/msi.png' %}" alt="MSI" loading="lazy">
+                <img src="{% static 'img/landing/marcas/msi.webp' %}" alt="Marca MSI" loading="lazy">
             </a>
             <a href="{% url 'products:grid' %}?Marca=gigabyte" class="brand" data-name="Gigabyte" rel="nofollow">
-                <img src="{% static 'img/landing/marcas/gigabyte.png' %}" alt="Gigabyte" loading="lazy">
+                <img src="{% static 'img/landing/marcas/gigabyte.webp' %}" alt="Marca Gigabyte" loading="lazy">
             </a>
         </div>
     </section>
