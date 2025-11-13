@@ -1,97 +1,8 @@
 [
     {
-        "nombre": "Insumos",
-        "descripcion_seo": "",
-        "slug": "insumos",
-        "seccion_id": "impresion",
-        "orden": 2,
-        "subcategorias": [
-            {
-                "nombre": "Cartuchos",
-                "descripcion_seo": "",
-                "slug": "cartuchos"
-            },
-            {
-                "nombre": "Rollos",
-                "descripcion_seo": "",
-                "slug": "rollos"
-            },
-            {
-                "nombre": "Toners",
-                "descripcion_seo": "",
-                "slug": "toners"
-            },
-            {
-                "nombre": "Resmas",
-                "descripcion_seo": "",
-                "slug": "resmas"
-            }
-        ]
-    },
-    {
-        "nombre": "Impresoras",
-        "descripcion_seo": "",
-        "slug": "impresoras",
-        "seccion_id": "impresion",
-        "orden": 1,
-        "subcategorias": [
-            {
-                "nombre": "Impresoras multifunción",
-                "descripcion_seo": "",
-                "slug": "impresoras-multifuncion"
-            },
-            {
-                "nombre": "Impresoras laser multifunción",
-                "descripcion_seo": "",
-                "slug": "impresoras-laser-multifuncion"
-            },
-            {
-                "nombre": "Impresoras chorro de tinta",
-                "descripcion_seo": "",
-                "slug": "impresoras-chorro-de-tinta"
-            },
-            {
-                "nombre": "Impresoras termicas",
-                "descripcion_seo": "",
-                "slug": "impresoras-termicas"
-            },
-            {
-                "nombre": "Impresoras laser",
-                "descripcion_seo": "",
-                "slug": "impresoras-laser"
-            }
-        ]
-    },
-    {
-        "nombre": "Gaming",
-        "descripcion_seo": "",
-        "slug": "gaming",
-        "seccion_id": null,
-        "orden": 0,
-        "subcategorias": [
-            {
-                "nombre": "Volantes",
-                "descripcion_seo": "",
-                "slug": "volantes"
-            },
-            {
-                "nombre": "Joysticks",
-                "descripcion_seo": "",
-                "slug": "joysticks"
-            },
-            {
-                "nombre": "Sillas",
-                "descripcion_seo": "",
-                "slug": "sillas"
-            }
-        ]
-    },
-    {
-        "nombre": "Perifericos",
+        "nombre": "Periféricos",
         "descripcion_seo": "",
         "slug": "perifericos",
-        "seccion_id": "accesorios",
-        "orden": 1,
         "subcategorias": [
             {
                 "nombre": "Teclados",
@@ -119,139 +30,31 @@
                 "slug": "parlantes"
             },
             {
-                "nombre": "Webcams",
-                "descripcion_seo": "",
-                "slug": "webcams"
-            },
-            {
                 "nombre": "Micrófonos",
                 "descripcion_seo": "",
                 "slug": "microfonos"
+            },
+            {
+                "nombre": "Webcams",
+                "descripcion_seo": "",
+                "slug": "webcams"
             }
         ]
     },
     {
-        "nombre": "Complementos",
+        "nombre": "PC de escritorio",
         "descripcion_seo": "",
-        "slug": "complementos",
-        "seccion_id": "accesorios",
-        "orden": 2,
+        "slug": "pc-de-escritorio",
         "subcategorias": [
             {
-                "nombre": "Mouse PAD",
+                "nombre": "PC Gaming",
                 "descripcion_seo": "",
-                "slug": "mouse-pad"
-            }
-        ]
-    },
-    {
-        "nombre": "Almacenamiento",
-        "descripcion_seo": "",
-        "slug": "almacenamiento",
-        "seccion_id": "componentes",
-        "orden": 2,
-        "subcategorias": [
-            {
-                "nombre": "Discos Rigidos",
-                "descripcion_seo": "",
-                "slug": "discos-rigidos"
+                "slug": "pc-gaming"
             },
             {
-                "nombre": "Discos SSD",
+                "nombre": "PC Oficina / Hogar",
                 "descripcion_seo": "",
-                "slug": "discos-ssd"
-            }
-        ]
-    },
-    {
-        "nombre": "Hardware",
-        "descripcion_seo": "",
-        "slug": "hardware",
-        "seccion_id": "componentes",
-        "orden": 1,
-        "subcategorias": [
-            {
-                "nombre": "Procesadores",
-                "descripcion_seo": "",
-                "slug": "procesadores"
-            },
-            {
-                "nombre": "Motherboards",
-                "descripcion_seo": "",
-                "slug": "motherboards"
-            },
-            {
-                "nombre": "Memoria RAM",
-                "descripcion_seo": "",
-                "slug": "memoria-ram"
-            },
-            {
-                "nombre": "Placas de video",
-                "descripcion_seo": "",
-                "slug": "placas-de-video"
-            },
-            {
-                "nombre": "Gabinetes",
-                "descripcion_seo": "",
-                "slug": "gabinetes"
-            },
-            {
-                "nombre": "Fuentes",
-                "descripcion_seo": "",
-                "slug": "fuentes"
-            },
-            {
-                "nombre": "Coolers",
-                "descripcion_seo": "",
-                "slug": "coolers"
-            }
-        ]
-    },
-    {
-        "nombre": "Expansiones",
-        "descripcion_seo": "",
-        "slug": "expansiones",
-        "seccion_id": "componentes",
-        "orden": 3,
-        "subcategorias": [
-            {
-                "nombre": "Placas Wi-Fi / Bluetooth",
-                "descripcion_seo": "",
-                "slug": "placas-wi-fi-bluetooth"
-            },
-            {
-                "nombre": "Placas controladoras",
-                "descripcion_seo": "",
-                "slug": "placas-controladoras"
-            },
-            {
-                "nombre": "Adaptadores y cables",
-                "descripcion_seo": "",
-                "slug": "adaptadores-y-cables"
-            }
-        ]
-    },
-    {
-        "nombre": "Computadoras",
-        "descripcion_seo": "",
-        "slug": "computadoras",
-        "seccion_id": "computos",
-        "orden": 1,
-        "subcategorias": [
-            {
-                "nombre": "PCs Estandar",
-                "descripcion_seo": "",
-                "slug": "pcs-estandar"
-            },
-            {
-                "nombre": "PCs Gaming",
-                "descripcion_seo": "",
-                "slug": "pcs-gaming"
-            },
-            {
-                "nombre": "Mini PCs",
-                "descripcion_seo": "",
-                "slug": "mini-pcs"
+                "slug": "pcs-oficina-hogar"
             }
         ]
     },
@@ -259,8 +62,6 @@
         "nombre": "Notebooks",
         "descripcion_seo": "",
         "slug": "notebooks",
-        "seccion_id": "computos",
-        "orden": 2,
         "subcategorias": [
             {
                 "nombre": "Notebooks Office",
@@ -275,31 +76,57 @@
         ]
     },
     {
-        "nombre": "iOS",
+        "nombre": "Hardware",
         "descripcion_seo": "",
-        "slug": "ios",
-        "seccion_id": "moviles",
-        "orden": 1,
+        "slug": "hardware",
         "subcategorias": [
             {
-                "nombre": "iPhone",
+                "nombre": "Procesadores",
                 "descripcion_seo": "",
-                "slug": "iphone"
+                "slug": "procesadores"
             },
             {
-                "nombre": "iPad",
+                "nombre": "Motherboards",
                 "descripcion_seo": "",
-                "slug": "ipad"
+                "slug": "motherboards"
+            },
+            {
+                "nombre": "Placas de video",
+                "descripcion_seo": "",
+                "slug": "placas-de-video"
+            },
+            {
+                "nombre": "Memoria RAM",
+                "descripcion_seo": "",
+                "slug": "memoria-ram"
+            },
+            {
+                "nombre": "Fuentes",
+                "descripcion_seo": "",
+                "slug": "fuentes"
+            },
+            {
+                "nombre": "Coolers",
+                "descripcion_seo": "",
+                "slug": "coolers"
+            },
+            {
+                "nombre": "Gabinetes",
+                "descripcion_seo": "",
+                "slug": "gabinetes"
             }
         ]
     },
     {
-        "nombre": "Android",
+        "nombre": "Celulares",
         "descripcion_seo": "",
-        "slug": "android",
-        "seccion_id": "moviles",
-        "orden": 2,
+        "slug": "celulares",
         "subcategorias": [
+            {
+                "nombre": "Apple",
+                "descripcion_seo": "",
+                "slug": "apple"
+            },
             {
                 "nombre": "Samsung",
                 "descripcion_seo": "",
@@ -309,16 +136,140 @@
                 "nombre": "Xiaomi",
                 "descripcion_seo": "",
                 "slug": "xiaomi"
+            }
+        ]
+    },
+    {
+        "nombre": "Accesorios",
+        "descripcion_seo": "",
+        "slug": "accesorios",
+        "subcategorias": [
+            {
+                "nombre": "Mouse PAD",
+                "descripcion_seo": "",
+                "slug": "mouse-pad"
+            }
+        ]
+    },
+    {
+        "nombre": "Almacenamiento",
+        "descripcion_seo": "",
+        "slug": "almacenamiento",
+        "subcategorias": [
+            {
+                "nombre": "Discos SSD",
+                "descripcion_seo": "",
+                "slug": "discos-ssd"
             },
             {
-                "nombre": "Motorola",
+                "nombre": "Discos Rígidos",
                 "descripcion_seo": "",
-                "slug": "motorola"
+                "slug": "discos-rigidos"
+            }
+        ]
+    },
+    {
+        "nombre": "Sillas Gamers",
+        "descripcion_seo": "",
+        "slug": "sillas-gamers",
+        "subcategorias": [
+            {
+                "nombre": "Sillas Gamers",
+                "descripcion_seo": "",
+                "slug": "sillas-gamers"
+            }
+        ]
+    },
+    {
+        "nombre": "Redes",
+        "descripcion_seo": "",
+        "slug": "redes",
+        "subcategorias": [
+            {
+                "nombre": "Switches",
+                "descripcion_seo": "",
+                "slug": "switches"
             },
             {
-                "nombre": "Tablets",
+                "nombre": "Routers",
                 "descripcion_seo": "",
-                "slug": "tablets"
+                "slug": "routers"
+            },
+            {
+                "nombre": "Adaptadores de RED",
+                "descripcion_seo": "",
+                "slug": "adaptadores-de-red"
+            }
+        ]
+    },
+    {
+        "nombre": "Seguridad",
+        "descripcion_seo": "",
+        "slug": "seguridad",
+        "subcategorias": [
+            {
+                "nombre": "Cámaras IP",
+                "descripcion_seo": "",
+                "slug": "camaras-ip"
+            }
+        ]
+    },
+    {
+        "nombre": "Insumos",
+        "descripcion_seo": "",
+        "slug": "insumos",
+        "subcategorias": [
+            {
+                "nombre": "Toners",
+                "descripcion_seo": "",
+                "slug": "toners"
+            },
+            {
+                "nombre": "Resmas",
+                "descripcion_seo": "",
+                "slug": "resmas"
+            },
+            {
+                "nombre": "Rollos",
+                "descripcion_seo": "",
+                "slug": "rollos"
+            },
+            {
+                "nombre": "Cartuchos",
+                "descripcion_seo": "",
+                "slug": "cartuchos"
+            }
+        ]
+    },
+    {
+        "nombre": "Impresoras",
+        "descripcion_seo": "",
+        "slug": "impresoras",
+        "subcategorias": [
+            {
+                "nombre": "Impresoras multifunción",
+                "descripcion_seo": "",
+                "slug": "impresoras-multifuncion"
+            },
+            {
+                "nombre": "Impresoras laser multifunción",
+                "descripcion_seo": "",
+                "slug": "impresoras-laser-multifuncion"
+            },
+            {
+                "nombre": "Impresoras chorro de tinta",
+                "descripcion_seo": "",
+                "slug": "impresoras-chorro-de-tinta"
+            },
+            {
+                "nombre": "Impresoras térmicas",
+                "descripcion_seo": "",
+                "slug": "impresoras-termicas"
+            },
+            {
+                "nombre": "Impresoras laser",
+                "descripcion_seo": "",
+                "slug": "impresoras-laser"
             }
         ]
     }

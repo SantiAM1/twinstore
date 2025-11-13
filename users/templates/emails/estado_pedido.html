@@ -4,30 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: 'Poppins', Arial, sans-serif;; background: #f4f4f4; padding: 10px;">
-    <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; position: relative;">
-    <h2 style="color: #007BFF; width: 200px;">¡Hola!</h2>
-    <br>
-    <p style="text-align: center;font-size: 1.2rem"></p>
-    <p style="font-size: 0.9rem;color: #686868;margin: 0;">Queríamos contarte que el estado de tu pedido ha cambiado:</p>
-    <br>
-    <p style="font-size: 0.9rem;color: #3b3b3b;margin: 0;">🛒 Pedido: <strong>{{pedido_id}}</strong></p>
-    <p style="font-size: 0.9rem;color: #3b3b3b;margin: 0;">📦 Estado actual: <strong>{{estado}}</strong></p>
-    <br>
-    <p style="font-size: 0.9rem;color: #3f3f3f;margin: 0;">{{mensaje}}</p>
-    <br>
-    <p style="font-size: 0.9rem;color: #6a73e9;margin: 0; text-align: center; font-style: italic;">Puedes ver el estado en tiempo real desde el siguente enlace:</p>
-    <p style="text-align: center;">
-        <a href="{{url}}" 
-        style="font-weight: bold; padding: 12px 20px; background-color: #286aa7; color: white; text-decoration: none; border-radius: 5px;">
-        Ver pedido →
-        </a>
-    </p>
-    <br>
-    <p style="font-size: 1rem;color: #414141;margin: 0; font-style: italic;"><strong>¿Tenés alguna duda?</strong></p>
-    <br>
-    <p style="font-size: 0.9rem;color: #3f3f3f;margin: 0;">Escribinos directamente a este correo o por WhatsApp, estamos para ayudarte.</p>
-    <p style="font-size: 0.9rem;color: #3f3f3f;margin: 0;">¡Gracias por confiar en Twinstore!💙</p>
+<body style="background-color: #f0f0f0;padding: 8px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">  
+    <div style="min-height: 350px;background-color: #fff;padding: 20px; margin: auto; max-width: 600px; border-radius: 12px;">
+        <img src="/static/img/mails/check-64.png" alt="Compra exitosa" style="display: block; margin: auto; margin-bottom: 1rem;">
+        <h2 style="text-align: center; color: #272727; font-weight: 700; font-size: 1.8rem;">El estado de tu pedido ha cambiado!</h2>
+        <p style="text-align: center; color: #1173d4; margin: auto; padding-bottom: 2rem; font-size:0.95rem; font-weight: 600;">Hola, tu pedido # {{codigo}} tiene un nuevo estado.</p>
+        <div style="max-width: 350px; margin: auto; padding: 10px; background-color: #ffffff; border-radius: 10px; border: 1px solid #dcdcdc;">
+            <span style="min-width: 150px; display: inline-block;padding: 8px;color: #1475d6;font-weight: 500;">ID de pedido: </span><span style="color: #272727;font-weight: 500;">{{codigo}}</span>
+            <div style="border-top: 1px solid #e2e2e2;"></div>
+            <span style="min-width: 150px; display: inline-block;padding: 8px;color: #1475d6;font-weight: 500;">Nuevo estado: </span><span style="background-color: #1172d43f;color: #1172d4;font-weight: 500;padding: 2px 6px;border-radius: 12px;display: inline-block;font-size: 0.9rem;">{{estado}}</span>
+        </div>
+        <a href="{{url}}" style="display: block; text-decoration: none; text-align: center;padding: 0.5rem;background-color: #1173d4;color: #fff; border-radius: 5px; max-width: 300px; margin: auto;margin-top: 1rem;font-weight: 500;">Ver pedido</a>
+        <div style="border-top: 1px solid #e2e2e2; margin-top: 2rem;"></div>
+        <h3 style="font-weight: 500; color: #2b2b2b; font-size: 1.1rem;text-align: center;margin-bottom: 0.5rem;">¿Preguntas sobre tu pedido?</h3>
+        <p style="text-align: center; color: #0f5fafab; margin: auto; padding-bottom: 2rem; font-size:0.95rem; font-weight: 600; padding: 0;">Si tienes alguna duda, no dudes en contactarnos.</p>
+        <a href="https://wa.me/5493413491911" target="_blank" style="text-decoration: none;text-align: center;display: block; color: #25a344;font-weight: 500; margin-top: 1rem;">Chatea por WhatsApp</a>
+    </div>
+    <div style="max-width: 500px; margin: auto;">
+        <p style="color:#535353;font-size: 0.9rem; text-align: center;font-weight: 400; margin: 0; margin-top: 1rem;">¿Necesitas ayuda? <a href="#" style="color: #1173d4; text-decoration: none; font-weight: 500; font-size: 0.9rem;">Contacta con nosotros.</a></p>
+        <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto; padding:12px 0;">
+            <tr>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.instagram.com/twinstore.ar" target="_blank">
+                    <img src="{{images.insta}}" alt="Instagram" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.linkedin.com/company/twinstore-ar/" target="_blank">
+                    <img src="{{images.link}}" alt="LinkedIn" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.tiktok.com/@twinstore.ar" target="_blank">
+                    <img src="{{images.tiktok}}" alt="TikTok" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+            </tr>
+        </table>
+        <p style="color:#535353;font-size: 0.8rem; text-align: center; margin: 0;">© Twinstore 2025.</p>
     </div>
 </body>
 </html>

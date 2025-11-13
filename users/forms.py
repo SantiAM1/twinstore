@@ -208,37 +208,24 @@ class BuscarPedidoForm(forms.Form):
         return token
 
 class LoginForm(forms.Form):
-    email = forms.EmailField(required=True,label="Email",widget=forms.EmailInput(attrs={
-        'placeholder':'Email',
-        'class':'user-form-control'
-    }))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Contraseña',
-        'class': 'user-form-control'
-    }))
+    login_email = forms.EmailField(required=True)
+    login_password = forms.CharField(required=True)
 
 class RegistrarForm(forms.Form):
-    email = forms.EmailField(required=True,label="Email",widget=forms.EmailInput(attrs={
-        'placeholder':'Email',
-        'class':'user-form-control'
-    }))
+    reg_nombre = forms.EmailField(required=True)
+    reg_apellido = forms.EmailField(required=True)
+    reg_telefono = forms.EmailField(required=True)
+    reg_email = forms.EmailField(required=True)
+    reg_password = forms.CharField(required=True)
+    reg_password_repeat = forms.CharField(required=True)
 
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Contraseña',
-        'class': 'user-form-control'
-    }))
-    password_repeat = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Repetir contraseña',
-        'class': 'user-form-control'
-    }))
-
-    def clean_email(self):
+    def clean_reg_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('Ya existe un usuario registrado con este email.')
         return email
 
-    def clean_password(self):
+    def clean_reg_password(self):
         password = self.cleaned_data.get('password')
         if len(password) < 8:
             raise forms.ValidationError("La contraseña debe tener al menos 8 caracteres.")
@@ -246,10 +233,10 @@ class RegistrarForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        password_repeat = cleaned_data.get("password_repeat")
+        reg_password = cleaned_data.get("reg_password")
+        reg_password_repeat = cleaned_data.get("reg_password_repeat")
 
-        if password and password_repeat and password != password_repeat:
+        if reg_password and reg_password_repeat and reg_password != reg_password_repeat:
             self.add_error('password_repeat', "Las contraseñas no coinciden.")
 
 class RestablecerContraseña(forms.Form):

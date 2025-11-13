@@ -1,13 +1,22 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse,HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.core import signing
 from django.core.signing import BadSignature
-from django.template.loader import render_to_string
 
-from .models import HistorialCompras
-from .forms import ComprobanteForm
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+
+from core.permissions import BloquearSiMantenimiento
+from core.throttling import ModalUsers
+from cart.utils import preference_mp
+
+from .templatetags.custom_filters import formato_pesos
+from .serializers import ComprobanteSerializer,IntSigned
+from .models import HistorialCompras,ComprobanteTransferencia,TicketDePago
 from .webhook import (
     check_hmac_signature,
     requests_header,
@@ -16,43 +25,8 @@ from .webhook import (
     obtener_ticket,
     validar_ticket)
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from core.throttling import SolicitarComprobante
-from core.permissions import BloquearSiMantenimiento
-from users.serializers import HistorialIdSerializer
-
 import logging
 logger = logging.getLogger('mercadopago')
-
-
-class GenerarComprobante(APIView):
-    permission_classes = [BloquearSiMantenimiento]
-    throttle_classes = [SolicitarComprobante]
-
-    def get(self, request: HttpRequest):
-        serializer = HistorialIdSerializer(data=request.query_params)
-        if not serializer.is_valid():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        data = serializer.validated_data
-        try:
-            historial_id = signing.loads(data.get('id'))
-        except BadSignature:
-            return Response({'error': 'Firma inválida en el ID'}, status=status.HTTP_400_BAD_REQUEST)
-
-        historial = HistorialCompras.objects.get(id=historial_id)
-
-        if historial.forma_de_pago not in ['mixto','transferencia'] or historial.check_comprobante_subido():
-            return Response({'error':'El comprobante ya fue subido'},status=status.HTTP_400_BAD_REQUEST)
-        
-        form = ComprobanteForm()
-        modal_html = render_to_string("partials/comprobante-modal.html",{
-            'historial': historial,
-            'form': form
-        },request=request)
-        return Response({'modal': modal_html})
 
 # -----WEBHOOK----- #
 @csrf_exempt
@@ -95,35 +69,115 @@ def webhook_mercadopago(request):
 
         return HttpResponse(status=200)
 
+class DatosComprobante(APIView):
+    permission_classes = [IsAuthenticated,BloquearSiMantenimiento]
+    throttle_classes = [ModalUsers]
+    def post(self, request: HttpRequest):
+        serializer = IntSigned(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors,status=400)
+        id_signed = serializer.validated_data.get('numero_firmado')
+        try:
+            id_historial = signing.loads(id_signed)
+        except BadSignature:
+            return Response({"error": "ID de historial inválido."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        historial = get_object_or_404(HistorialCompras, id=id_historial, usuario=request.user)
+        monto = historial.monto_tranferir()
+
+        return Response({'monto':formato_pesos(monto), 'id_firmado':id_signed}, status=status.HTTP_200_OK)
+
+class SubirComprobante(APIView):
+    permission_classes = [IsAuthenticated,BloquearSiMantenimiento]
+    throttle_classes = [ModalUsers]
+    def post(self, request: HttpRequest):
+        serializer = ComprobanteSerializer(data=request.data)
+        if not serializer.is_valid():
+            messages.error(request, "Error al subir el comprobante.")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        data = serializer.validated_data
+        comprobante_file = data.get('comprobante')
+        id_signed = data.get('historial_id')
+
+        try:
+            id_historial = signing.loads(id_signed)
+        except BadSignature:
+            return Response({"error": "ID de historial inválido."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        historial = get_object_or_404(HistorialCompras, id=id_historial, usuario=request.user)
+
+        ComprobanteTransferencia.objects.create(
+            historial=historial,
+            file=comprobante_file
+        )
+
+        messages.success(request, "Comprobante subido exitosamente.")
+
+        return Response({"reload":True},status=status.HTTP_200_OK)
+
+class InitPointMPView(APIView):
+    permission_classes = [BloquearSiMantenimiento]
+    throttle_classes = [ModalUsers]
+    def post(self,request):
+        serializer = IntSigned(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors,status=400)
+        
+        numero_firmado = serializer.validated_data.get('numero_firmado')
+
+        try:
+            ticket_id = signing.loads(numero_firmado)
+        except BadSignature:
+            return Response({'error': 'Firma inválida'}, status=400)
+
+        try:
+            ticket = TicketDePago.objects.get(id=ticket_id)
+            if ticket.estado == 'aprobado':
+                return Response(status=400)
+            data = ticket.get_preference_data()
+            metadata = data.get('metadata')
+            firma = {"firma":signing.dumps(metadata)}
+
+            try:
+                preference = preference_mp(data['numero'],data['ticket_id'],data['dni_cuit'],data['ident_type'],data['email'],data['nombre'],data['apellido'],data['codigo_postal'],data['calle_nombre'],data['calle_altura'],firma,backurl_success=data['backurl_success'],backurl_fail=data['backurl_fail'])
+                init_point = preference.get("init_point", "")
+                return Response({'init_point':init_point},status=200)
+            except ValueError as e:
+                return Response({'error': str(e)}, status=500)
+            
+        except TicketDePago.DoesNotExist:
+            return Response(status=404)
+
+class ArrepentimientoPostView(APIView):
+    permission_classes = [IsAuthenticated,BloquearSiMantenimiento]
+    throttle_classes = [ModalUsers]
+    def post(self, request: HttpRequest):
+        serializer = IntSigned(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors,status=400)
+        historial_signed = serializer.validated_data.get('numero_firmado')
+        try:
+            historial_id = signing.loads(historial_signed)
+        except BadSignature:
+            return Response({'error':'Firma inválida'},status=400)
+        
+        historial = get_object_or_404(HistorialCompras,id=historial_id,usuario=request.user)
+        if not historial.verificar_arrepentimiento():
+            return Response({'error':'No se puede solicitar el arrepentimiento'},status=400)
+        
+        historial.estado = 'arrepentido'
+        historial.save()
+
+        messages.success(request,'Arrepentimiento solicitado con éxito')
+
+        return Response({'reload':True},status=200)
+
 def payment_success(request):
     merchant_order_id = request.GET.get('merchant_order_id','')
     historial = HistorialCompras.objects.filter(merchant_order_id=merchant_order_id).first()
     return render(request, 'payment/success.html',{'historial':historial})
 
-def subir_comprobante(request, id_signed):
-    try:
-        historial_id = signing.loads(id_signed)
-    except BadSignature:
-        return HttpResponse(status=404)
-    
-    historial = get_object_or_404(HistorialCompras, id=historial_id)
-    if historial.forma_de_pago not in ['mixto','transferencia'] or historial.check_comprobante_subido():
-        return HttpResponse(status=404)
-    
-    if request.method == 'POST':
-        form = ComprobanteForm(request.POST, request.FILES)
-        if form.is_valid():
-            comprobante = form.save(commit=False)
-            comprobante.historial = historial
-            comprobante.save()
-            messages.success(request, "Comprobante subido correctamente. Lo revisaremos a la brevedad.")
-            return redirect('users:ver_pedidos',token=historial.token_consulta)
-        else:
-            messages.error(request,"Error al subir el comprobante.")
-            return redirect('users:ver_pedidos',token=historial.token_consulta)
-    
-    return redirect("core:home")
-        
 def failure(request):
     return render(request,'payment/fail.html')
 

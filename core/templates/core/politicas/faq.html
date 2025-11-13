@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<meta name="description" content="Respondemos tus dudas frecuentes: medios de pago, envíos, tiempos de entrega y mucho más. Twinstore te brinda atención clara y rápida.">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Preguntas Frecuentes - Twinstore</title>
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="generic-box">
+    {% include "partials/generic-header.html" with title="Preguntas frecuentes - FAQ" %}
+    <section class="generic-data">
+        {% include 'components/politicas-navbar.html' with faq="selected" %}
+        <div class="generic-item faq">
+            <h1>Preguntes Frecuentes - FAQ</h1>
+            <p class="faq__description"></p>
+            <!-- <details class="faq">
+                <summary>
+                    <span class="faq__title">¿Cuáles son las formas de pago disponibles?</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Estas son nuestras opciones para que abones tu pedido: Efectivo o Transferencia (un precio preferencial), Tarjeta de crédito (hasta 12 cuotas, 3 y 6 cuotas bonificadas), Mercado pago (podes abonar con 2 tarjetas, dinero en cuenta o en efectivo) o podes abonar con nuestro Pago Mixto (Transferencia + Mercado Pago o Tarjeta de crédito), con esta opción abonas menos comisión y logras en financiamiento ideal para vos.
+                </p>
+            </details> -->
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">¿Cuáles son las formas de pago disponibles?</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Estas son nuestras opciones para que abones tu pedido: Efectivo o Transferencia (un precio preferencial), Mercado pago (podes abonar con 2 tarjetas, dinero en cuenta o en efectivo) o podes abonar con nuestro Pago Mixto (Transferencia + Mercado Pago), con esta opción abonas menos comisión y logras en financiamiento ideal para vos.
+                </p>
+            </details>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">¿Cómo puedo seguir el estado de mi pedido?</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Una vez realizada la compra, recibirás por correo electrónico un código de orden. Podés ingresar ese código en el apartado "Pedidos" del sitio para consultar el estado en cualquier momento. Si tenés una cuenta registrada, toda la información relevante sobre tus compras estará disponible en el apartado "Mis pedidos" dentro de tu perfil de usuario.
+                </p>
+            </details>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">¿Por qué iniciar sesión?</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    En Twinstore solicitamos a nuestros usuarios que inicien sesión para avanzar con sus compras por varias razones importantes:<br>
+                    1. Seguridad: Iniciar sesión ayuda a proteger la información personal y los datos de pago del usuario, asegurando que solo el titular de la cuenta pueda acceder a ellos.<br>
+                    2. Historial de compras: Al iniciar sesión, los usuarios pueden acceder fácilmente a su historial de compras, lo que facilita la gestión de pedidos anteriores, devoluciones y garantías.<br>
+                    3. Gestión de cuenta: Los usuarios pueden actualizar su información personal, y gestionar sus compras de una manera más sencilla.<br>
+                </p>
+            </details>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">¿Puedo cambiar o devolver un producto?</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Sí, podés solicitar el cambio o la devolución de un producto dentro de los 10 días corridos desde la recepción. El producto debe estar sin uso, en su empaque original. Encontrá todos los detalles en nuestras <a href="" class="generic-link">Políticas de devolución</a>.
+                </p>
+            </details>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">¿Qué hago si tengo un problema con mi pedido?</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Ante cualquier inconveniente, escribinos a <a class="generic-link">contacto@twinstore.com.ar</a> con tu número de pedido. Nuestro equipo va a responderte lo antes posible para resolver el problema de forma rápida y eficiente.
+                </p>
+            </details>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">¿Cómo realizo mi transferencia?</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Luego de haber completado los datos de facturación te pediremos que nos adjuntes el comprobante de transferencia. Una vez verificado el pago, procesaremos tu pedido y te enviaremos una confirmación por correo electrónico.
+                </p>
+            </details>
+        </div>
+    </section>
+</section>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+{% endblock myscripts %}

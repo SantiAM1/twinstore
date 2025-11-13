@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load compress %}
+{% load cache %}
 
 {% block meta %}
 <meta name="description" content="Twinstore es una empresa de venta de productos informáticos. Envíos a todo el país.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="Twinstore">
-<meta property="og:description" content="Los mejores productos en un solo lugar. Tu casa, tu tienda. Twinstore">
+<meta property="og:description" content="A new Hardware Experience">
 <meta property="og:image" content="{% static 'img/mail.webp' %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 {% endblock meta %}
@@ -14,121 +14,206 @@
 {% block head %}
 <title>Twinstore</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-{% compress css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}" />
-<link rel="stylesheet" href="{% static 'css/substyles/prod-card.css' %}"/>
-<link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}"/>
-<link rel="stylesheet" href="{% static 'css/widgets.css' %}">
-{% endcompress %}
 {% endblock head %}
 
 {% block contenidomain %}
-{% include 'core/carousel.html' %}
-    <h1 class="display-none">Bienvenidos a Twinstore</h1>
-    <section class="landing-grid-section">
-        <div class="landing-grid">
-            <a href="{% url 'products:categoria' 'computos' 'computadoras'  %}" class="landing-box decoration-none">
-                <div class="landing-content font-roboto font-bold flex flex-column text-center test-class width-100 height-100" data-type="computadoras">
-                    PC ARMADAS
-                </div>
-            </a>
-            <a href="{% url 'products:slug_dispatcher' slug='componentes' %}" class="landing-box decoration-none">
-                <div class="landing-content font-roboto font-bold flex flex-column text-center test-class width-100 height-100" data-type="componentes">
-                    COMPONENTES
-                </div>
-            </a>
-            <a href="{% url 'core:servicio_tecnico' %}" class="landing-box decoration-none">
-                <div class="landing-content font-roboto font-bold flex flex-column text-center test-class width-100 height-100" data-type="servicios">
-                    SERVICIOS
-                </div>
-            </a>
-            <a href="{% url 'products:slug_dispatcher' slug='moviles' %}" class="landing-box decoration-none">
-                <div class="landing-content font-roboto font-bold flex flex-column text-center test-class width-100 height-100" data-type="celulares">
-                    MÓVILES
-                </div>
-            </a>
+<div class="generic-box landing">
+    {% cache 600 banners_home %}
+    <section class="swiper banner-swiper">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <a href="#">
+                    <picture>
+                        <source srcset="{% static 'img/banners/banner-iphone-17-pro-min.png' %}" media="(max-width: 720px)">
+                        <img src="{% static 'img/banners/banner-iphone-17-pro.png' %}" alt="iPhone 17 Pro">
+                    </picture>
+                </a>
+            </div>
+            <div class="swiper-slide">
+                <a href="#">
+                    <picture>
+                        <source srcset="{% static 'img/banners/banner-notebook-gaming-min.png' %}" media="(max-width: 720px)">
+                        <img src="{% static 'img/banners/banner-notebook-gaming.png' %}" alt="Notebook Gaming">
+                    </picture>
+                </a>
+            </div>
+            <div class="swiper-slide">
+                <a href="#">
+                    <picture>
+                        <source srcset="{% static 'img/banners/banner-metodo-pago-min.png' %}" media="(max-width: 720px)">
+                        <img src="{% static 'img/banners/banner-metodo-pago.png' %}" alt="Metodo de Pago">
+                    </picture>
+                </a>
+            </div>
         </div>
+        <div class="swiper-pagination banner-pag"></div>
     </section>
-    <section class="landing-section">
-        <h2 class="text-center width-100 font-roboto position-relative">
-            Nuestras ofertas 🔥
-        </h2>
-        <div class="swiper ofertaProds">
+    {% endcache %}
+    <section class="swiper-box">
+        <h3 class="landing-title">Descubrí nuestras <strong>ofertas</strong></h3>
+        <section class="swiper products-swiper" data-speed="900" data-delay="2500" data-pagination=".pagination-ofertas" data-bullets="1">
             <div class="swiper-wrapper">
-                {% for producto in productos_descuento %}
+                {% for producto in ofertas %}
                 <div class="swiper-slide">
-                    <div class="flex flex-column items-center justify-center product-card bg-white position-relative">
-                        {% if producto.portada %}
-                            {% include 'components/cards_dinamic.html' %} 
-                        {% else %} 
-                            {% include 'components/cards_static.html' %}
-                        {% endif %}
-                    </div>
+                    {% include 'components/product_card_line.html' %}
                 </div>
                 {% endfor %}
             </div>
-            <div class="swiper-button-next ofertaProds-next"></div>
-            <div class="swiper-button-prev ofertaProds-prev"></div>
+        </section>
+        <div class="swiper-pagination pagination-ofertas"></div>
+    </section>
+    {% cache 600 categorias_home %}
+    <section class="swiper categories-swiper">
+        <h3 class="landing-title">Estas son nuestras <strong>categorías</strong></h3>
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <div class="cat-grid">
+                    <a href="/productos/perifericos/monitores/" class="cat large" data-name="Monitores"><img src="{% static 'img/landing/categorias/monitores.png' %}" alt="Monitores"><span>MONITORES</span></a>
+                    <a href="/productos/celulares/" class="cat tall" data-name="Celulares"><img src="{% static 'img/landing/categorias/celulares.png' %}" alt="Celulares"><span>Celulares</span></a>
+                    <a href="/productos/hardware/procesadores/" class="cat" data-name="Periféricos"><img src="{% static 'img/landing/categorias/procesadores.png' %}" alt="Periféricos"> <span>Procesadores</span></a>
+                    <a href="/productos/perifericos/" class="cat wide" data-name="PCs"><img src="{% static 'img/landing/categorias/perifericos.png' %}" alt="Perifericos"><span>Perifericos</span></a>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="cat-grid">
+                    <a href="/productos/hardware/fuentes/" class="cat wide" data-name="Notebooks"><img src="{% static 'img/landing/categorias/fuentes.png' %}" alt="Fuentes"><span>Fuentes</span></a>
+                    <a href="/productos/hardware/placas-de-video/" class="cat tall" data-name="Placas de video"><img src="{% static 'img/landing/categorias/placa-de-video.png' %}" alt="placas de video"><span>Placas de Video</span></a>
+                    <a href="/productos/pc-de-escritorio/" class="cat tall" data-name="Discos SSD"><img src="{% static 'img/landing/categorias/pcs.png' %}" alt="Pcs"><span>PCs</span></a>
+                    <a href="/productos/hardware/memoria-ram/" class="cat" data-name="RAM"><img src="{% static 'img/landing/categorias/ram.png' %}" alt="Memorias RAM"><span>Memorias RAM</span></a>
+                    <a href="/productos/almacenamiento/discos-ssd/" class="cat wide" data-name="Celulares"><img src="{% static 'img/landing/categorias/discos-ssd.png' %}" alt="Discos SSD"><span>Discos SSD</span></a>
+                </div>
+            </div>
+            <div class="swiper-slide">
+                <div class="cat-grid">
+                    <a href="/productos/almacenamiento/discos-rigidos/" class="cat wide" data-name="Periféricos"><img src="{% static 'img/landing/categorias/discos-rigidos.png' %}" alt="Discos Rígidos"><span>Discos Rígidos</span></a>
+                    <a href="/productos/hardware/gabinetes/" class="cat tall" data-name="Discos SSD"><img src="{% static 'img/landing/categorias/gabinetes.png' %}" alt="Gabinetes"><span>Gabinetes</span></a>
+                    <a href="/productos/notebooks/" class="cat large" data-name="PCs"><img src="{% static 'img/landing/categorias/notebooks.png' %}" alt="Notebooks"><span>Notebooks</span></a>
+                    <a href="/productos/hardware/motherboards/" class="cat" data-name="RAM"><img src="{% static 'img/landing/categorias/mothers.png' %}" alt="Motherboards"><span>Motherboards</span></a>
+                </div>
+            </div>
+        </div>
+        <div class="swiper-pagination category-pag"></div>
+    </section>
+    {% endcache %}
+    <section class="landing-banner">
+        <div>
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.5"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-credit-card"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 5m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" /><path d="M3 10l18 0" /><path d="M7 15l.01 0" /><path d="M11 15l2 0" /></svg>
+            <span>Hasta 24 cuotas</span>
+            <p>abonando con metodos seleccionados</p>
+        </div>
+        <div>
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.5"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-truck"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" /></svg>
+            <span>Envíos a todos el país</span>
+            <p>mediante Andreani</p>
+        </div>
+        <div>
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.5"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shield"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /></svg>
+            <span>Garantía</span>
+            <p>tus compras estan protegidas</p>
         </div>
     </section>
-{% include 'widgets/home.html' %}
-{% if messages %}
-    {% for message in messages %}
-    <div class="notification-mainpage position-fixed">
-        <div class="flex flex-column text-center notification-item django-msg-{{message.tags}} font-roboto">
-            {{ message }}
+    <section class="swiper-box">
+        <h3 class="landing-title">Conocé nuestros productos <strong>Destacados</strong></h3>
+        <section class="swiper products-swiper" data-speed="800" data-delay="3500" data-pagination=".pagination-destacados" data-bullets="2">
+            <div class="swiper-wrapper">
+                {% for producto in destacados %}
+                <div class="swiper-slide">
+                    {% include 'components/product_card_line.html' %}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        <div class="swiper-pagination pagination-destacados"></div>
+    </section>
+    {% cache 600 marcas_home %}
+    <section class="brands-grid-box">
+        <h3 class="landing-title">Descubrí nuestras <strong>marcas</strong></h3>
+        <div class="brands-grid">
+            <a href="{% url 'products:grid' %}?Marca=intel" class="brand" data-name="Intel"><img src="{% static 'img/landing/marcas/intel.png' %}" alt="Intel" loading="lazy"></a>
+            <a href="{% url 'products:grid' %}?Marca=amd" class="brand" data-name="AMD"><img src="{% static 'img/landing/marcas/amd.png' %}" alt="AMD" loading="lazy"></a>
+            <a href="{% url 'products:grid' %}?Marca=logitech" class="brand" data-name="Logitech"><img src="{% static 'img/landing/marcas/logitech.png' %}" alt="Logitech" loading="lazy"></a>
+            <a href="{% url 'products:grid' %}?Marca=apple" class="brand" data-name="Apple"><img src="{% static 'img/landing/marcas/apple.jpg' %}" alt="Apple" loading="lazy"></a>
+            <a href="{% url 'products:grid' %}?Marca=samsung" class="brand" data-name="Samsung"><img src="{% static 'img/landing/marcas/samsung.png' %}" alt="Samsung" loading="lazy"></a>
+            <a href="{% url 'products:grid' %}?Marca=asus" class="brand" data-name="Asus"><img src="{% static 'img/landing/marcas/asus.png' %}" alt="Asus" loading="lazy"></a>
+            <a href="{% url 'products:grid' %}?Marca=msi" class="brand" data-name="MSI"><img src="{% static 'img/landing/marcas/msi.png' %}" alt="MSI" loading="lazy"></a>
+            <a href="{% url 'products:grid' %}?Marca=gigabyte" class="brand" data-name="Gigabyte"><img src="{% static 'img/landing/marcas/gigabyte.png' %}" alt="Gigabyte" loading="lazy"></a>
         </div>
-    </div>
-    {% endfor %}
-{% endif %}
+    </section>
+    {% endcache %}
+</div>
 {% endblock contenidomain %}
 
 {% block myscripts %}
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="{% static 'js/landing.js' %}"></script>
 <script nonce="{{ request.csp_nonce }}">
-    var swiper = new Swiper(".ofertaProds", {
-        slidesPerView: 2,
-        spaceBetween: 10,
-        navigation: {
-            nextEl: ".ofertaProds-next",
-            prevEl: ".ofertaProds-prev",
+function generateSwiper(data) {
+    const gripConf = {
+        slidesPerView: 3,
+        grid: {
+        rows: 2,
+        fill: "row",
         },
-        autoplay: {
-            delay: 3500,
-            disableOnInteraction: false,
-        },
-        loop: true,
-        breakpoints: {
-            768: {
-                slidesPerView: 3,
-                spaceBetween: 10,
-            },
-            900: {
-                slidesPerView: 4,
-                spaceBetween: 15,
-            },
-        },
-    });
-
-    var swiper = new Swiper(".myCarousel", {
-        loop: true,
         pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
+        el: data.pagination,
+        dynamicBullets: true,
+        dynamicMainBullets: parseInt(data.bullets),
+        clickable: true,
         },
+        spaceBetween: 10,
+        loop: false,
         autoplay: {
-            delay: 6000,
+        delay: data.delay,
+        disableOnInteraction: false,
         },
-        slidesPerView: 1,
+        speed: data.speed,
+        grabCursor: true,
+        breakpoints: {
+        0: { slidesPerView: 1, grid: { rows: 2 } },
+        740: { slidesPerView: 2, grid: { rows: 2 } },
+        1050: { slidesPerView: 3, grid: { rows: 2 } },
+        },
+    }
+    return gripConf;
+}
+
+document.querySelectorAll(".products-swiper").forEach(swp => {
+    const config = generateSwiper(swp.dataset)
+    const swiper = new Swiper(swp, config);
+})
+
+const swiperCat = new Swiper(".categories-swiper", {
+    slidesPerView: 1,
+    spaceBetween: 0,
+    pagination: {
+        el: ".category-pag",
+        clickable: true,
+    },
+    autoplay: {
+        delay: 3500,
+        disableOnInteraction: false,
+    },
+    speed: 800,
+    grabCursor: true,
+    breakpoints: {
+    1050: { slidesPerView: 2},
+    },
     });
 
-    var swiper = new Swiper(".myWidgets", {
-        slidesPerView: 1,
-        spaceBetween: 10,
-        navigation: {
-            nextEl: ".myWidgets-next",
-            prevEl: ".myWidgets-prev",
-        },
-        });
+const swiperBanner = new Swiper(".banner-swiper", {
+    slidesPerView: 1,
+    spaceBetween: 10,
+    loop: true,
+    autoplay: {
+        delay: 6000,
+        disableOnInteraction: false,
+    },
+    pagination: {
+        el: ".banner-pag",
+        clickable: true,
+    },
+    speed: 1000,
+});
+
 </script>
 {% endblock myscripts %}

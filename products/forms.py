@@ -1,6 +1,5 @@
 from django import forms
 from .models import EspecificacionTecnica,Producto,ImagenProducto,ColorProducto
-import json
 
 class EspecificacionTecnicaForm(forms.ModelForm):
     class Meta:
@@ -12,17 +11,16 @@ class EspecificacionTecnicaForm(forms.ModelForm):
 
 class EditarProducto(forms.ModelForm):
     class Meta:
-        INPUT_ATTRS = {'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none','autocomplete':'off','placeholder':' '}
         model = Producto
-        fields = ['nombre', 'marca', 'sub_categoria', 'precio_dolar', 'descuento', 'portada','precio','inhabilitar']
+        fields = ['nombre', 'marca', 'sub_categoria', 'precio_dolar','descripcion_seo', 'descuento','precio','inhabilitar']
         widgets = {
             'marca': forms.Select(attrs={'class': 'users-select bloqueable'}),
             'sub_categoria': forms.Select(attrs={'class': 'users-select bloqueable'}),
-            'precio_dolar': forms.NumberInput(attrs=INPUT_ATTRS),
-            'descuento': forms.NumberInput(attrs=INPUT_ATTRS),
-            'nombre': forms.TextInput(attrs=INPUT_ATTRS),
-            'portada': forms.FileInput(attrs={'class': 'form-admin-control display-none'}),
-            'precio': forms.NumberInput(attrs={'class': 'form-input bloqueable font-roboto position-absolute width-100 height-100 border-none', 'readonly': 'readonly'}),
+            'precio_dolar': forms.NumberInput(),
+            'descripcion_seo': forms.Textarea(attrs={'style': 'width: 100%;border: 1px solid #bdbdbd;border-radius: 8px;padding: 0.5rem;font-size: 0.9rem;resize: vertical;min-height: 80px;max-height: 150px;'}),
+            'descuento': forms.NumberInput(),
+            'nombre': forms.TextInput(),
+            'precio': forms.NumberInput(attrs={'readonly': 'readonly'}),
             'inhabilitar':forms.CheckboxInput()
         }
 
@@ -33,7 +31,7 @@ class ImagenProductoForm(forms.ModelForm):
         widgets = {
             'imagen': forms.FileInput(attrs={'class': 'form-admin-control display-none'}),
         }
-
+        
 class ImagenProductoForm(forms.ModelForm):
     class Meta:
         model = ImagenProducto

@@ -1,6 +1,0 @@
-<div class="result-productos-column flex">
-    <a href="{% url 'products:categoria' categoria.seccion_id categoria.slug %}" class="result-productos-titulo">{{categoria.nombre}}</a>
-    {% for subcategoria in categoria.subcategorias.all %}
-        <a href="{% url 'products:categoria_subcategoria' categoria.seccion_id categoria.slug subcategoria.slug %}" class="hover-pad-weight">{{subcategoria.nombre}}</a>
-    {% endfor %}
-</div>

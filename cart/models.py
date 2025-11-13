@@ -1,6 +1,8 @@
 from django.db import models
 from products.models import Producto
 from django.contrib.auth.models import User
+from django.templatetags.static import static
+from products.utils_debug import debug_queries
 
 class Pedido(models.Model):
     producto = models.ForeignKey(Producto,on_delete=models.CASCADE)
@@ -19,7 +21,15 @@ class Pedido(models.Model):
 
     def dict_type(self):
         return f"{self.producto.id}-{self.color.id}" if self.color else f"{self.producto.id}-null"
+    
+    @debug_queries
+    def get_imagen(self):
+        if self.color:
+            return self.color.imagenes_color.all()[0].imagen_200.url
+        else:
+            return static('img/prod_default.webp')
 
+    @debug_queries
     def get_nombre_producto(self):
         if self.color:
             return f"({self.color.nombre}) {self.producto.nombre}"
@@ -51,3 +61,16 @@ class Carrito(models.Model):
 
     def get_total(self):
         return sum(pedido.get_total_precio() for pedido in self.pedidos.all())
+
+class CheckOutData(models.Model):
+    usuario = models.ForeignKey(User,on_delete=models.CASCADE)
+    cupon_id = models.PositiveIntegerField(blank=True,null=True)
+    adicional = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
+    forma_de_pago = models.CharField(max_length=50,blank=True,null=True)
+    creado = models.DateTimeField(auto_now_add=True)
+    completado = models.BooleanField(default=False)
+    descuento = models.DecimalField(max_digits=10,decimal_places=2,blank=True,null=True)
+    mixto = models.DecimalField(max_digits=10,decimal_places=2,blank=True,null=True)
+
+    def __str__(self):
+        return f"Checkout de: {self.usuario.username}"

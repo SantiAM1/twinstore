@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock meta %}
+
+{% block head %}
+<title>Facturacion - Twinstore</title>
+{% endblock head %}
+
+{% block contenidomain %}
+<form class="generic-box" id="form-checkout" data-api="{% url 'cart:api_checkout' %}" data-validate="{% url 'cart:api_validar_facturacion' %}" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="step3-check" value="false">
+    {% include 'partials/generic-header.html' with title="Facturación" %}
+    <section class="generic-data cliente" id="step1">
+        <div class="generic-item">
+            <h3>DATOS PARA LA FACTURACIÓN</h3>
+            <div class="generic-row">
+                <div class="generic-input">
+                    <label for="id_nombre">Nombre*</label>
+                    <input type="text" id="id_nombre" name="nombre">
+                    <p class="msg-required"></p>
+                </div>
+                <div class="generic-input">
+                    <label for="id_apellido">Apellido(s)*</label>
+                    <input type="text" id="id_apellido" name="apellido">
+                    <p class="msg-required"></p>
+                </div>
+            </div>
+            <div class="generic-row-50">
+                <div class="generic-input">
+                    <label for="id_condicion_iva">Condición frente al IVA</label>
+                    <select class="api-required" id="id_condicion_iva" name="condicion_iva" required>
+                        <option value="" selected disabled>Condición frente al IVA*</option>
+                        <option value="A">Responsable Inscripto</option>
+                        <option value="B">Consumidor Final</option>
+                        <option value="C">Monotributista</option>
+                    </select>
+                    <p class="msg-required"></p>
+                </div>
+                <div class="generic-input">
+                    <label for="id_dni_cuit">DNI/CUIT*</label>
+                    <input type="text" maxlength="30" placeholder="12345678" inputmode="numeric" id="id_dni_cuit" name="dni_cuit" class="api-required" required>
+                    <p class="msg-required"></p>
+                </div>
+            </div>
+            <div class="generic-input">
+                <label for="id_razon_social">Razón social (Si aplica)</label>
+                <input type="text" maxlength="30" placeholder="" id="id_razon_social" name="razon_social" class="api-required" required>
+                <p class="msg-required"></p>
+            </div>
+            <h3>Dirección de facturación</h3>
+            <div class="generic-row-50">
+                <div class="generic-input">
+                    <label for="id_direccion">Dirección (calle,altura y piso)*</label>
+                    <input type="text" maxlength="50" placeholder="Av. Cabildo 1111 Piso 5B" id="id_direccion" name="direccion" class="api-required" required>
+                    <p class="msg-required"></p>
+                </div>
+                <div class="generic-input">
+                    <label for="id_codigo_postal">Código Postal*</label>
+                    <input type="text" maxlength="30" placeholder="1111" inputmode="numeric" id="id_codigo_postal" name="codigo_postal" class="api-required" required>
+                    <p class="msg-required"></p>
+                </div>
+            </div>
+            <div class="generic-row-50">
+                <div class="generic-input">
+                    <label for="id_localidad">Localidad*</label>
+                    <input type="text" maxlength="30" placeholder="CABA" id="id_localidad" name="localidad" class="api-required" required>
+                    <p class="msg-required"></p>
+                </div>
+                <div class="generic-input">
+                    <label for="id_provincia">Provincia*</label>
+                    <select class="api-required" id="id_provincia" name="provincia" required>
+                        <option value="" selected disabled>Provincia*</option>
+                        <option value="A">Ciudad Autónoma de Buenos Aires</option>
+                        <option value="B">Buenos Aires</option>
+                        <option value="C">Catamarca</option>
+                        <option value="D">Chaco</option>
+                        <option value="E">Chubut</option>
+                        <option value="F">Córdoba</option>
+                        <option value="G">Corrientes</option>
+                        <option value="H">Entre Ríos</option>
+                        <option value="I">Formosa</option>
+                        <option value="J">Jujuy</option>
+                        <option value="K">La Pampa</option>
+                        <option value="L">La Rioja</option>
+                        <option value="M">Mendoza</option>
+                        <option value="N">Misiones</option>
+                        <option value="O">Neuquén</option>
+                        <option value="P">Río Negro</option>
+                        <option value="Q">Salta</option>
+                        <option value="R">San Juan</option>
+                        <option value="S">San Luis</option>
+                        <option value="T">Santa Cruz</option>
+                        <option value="U">Santa Fe</option>
+                        <option value="V">Santiago del Estero</option>
+                        <option value="W">Tierra del Fuego</option>
+                        <option value="X">Tucumán</option>
+                    </select>
+                    <p class="msg-required"></p>
+                </div>
+            </div>
+            <h3>Contacto</h3>
+            <div class="generic-row-50">
+                <div class="generic-input">
+                    <label for="id_email">Email*</label>
+                    <input type="text" readonly id="id_email" name="email">
+                </div>
+                <div class="generic-input">
+                    <label for="id_telefono">Telefono*</label>
+                    <input type="text" id="id_telefono" name="telefono" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="generic-item resume">
+            <div class="billing-resume">
+                <h3>RESUMEN</h3>
+                {% for item in carrito %}
+                <article class="billing-resume-article">
+                    <img src="{{item.imagen}}" alt="{{item.nombre}}" height="60" width="60">
+                    <span>{% if item.cantidad > 1 %}<p>{{item.cantidad}} x </p>{% endif %}{{item.nombre}}</span>
+                    <div>
+                        {% if item.precio_anterior %}<p>{{item.precio_anterior|formato_pesos}}</p>{% endif %}
+                        <strong>{{item.precio|formato_pesos}}</strong>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            <div class="billing-resume-end">
+                <span class="billing-resume-sub"><code>Subtotal</code><p>{{precio_subtotal|formato_pesos}}</p></span>
+                {% if descuento %}<span class="billing-resume-sub"><code>Descuento</code><p>-{{descuento|formato_pesos}}</p></span>{% endif %}
+                <span class="billing-resume-total"><code>Total</code><p>{{precio_total|formato_pesos}}</p></span>
+                <button type="button" class="generic-button btn-2 billing-next">Continuar</button>
+            </div>
+        </div>
+    </section>
+    <section class="generic-data payment hide" id="step2">
+        <div class="generic-item max-content-h">
+            <h3>TUS FORMAS DE PAGO</h3>
+            <div class="billing-payment-method">
+                <input type="radio" name="forma_de_pago" value="efectivo" id="formaPago1" data-info="pagoEfectivo" required data-finish="Finalizar" class="api-required">
+                <label for="formaPago1">Efectivo</label>
+                <input type="radio" name="forma_de_pago" value="transferencia" id="formaPago2" data-info="pagoTransferencia" required data-finish="Continuar" class="api-required">
+                <label for="formaPago2">Transferencia</label>
+                <!-- <input type="radio" name="forma_pago" value="tarjeta" id="formaPago3" data-info="pagoPayway" required data-finish="Pagar" class="api-required">
+                <label for="formaPago3">Tarjeta de Credito/Debito</label> -->
+                <input type="radio" name="forma_de_pago" value="mixto" id="formaPago4" data-info="pagoMix" required data-finish="Continuar" class="api-required">
+                <label for="formaPago4">Pago Mixto</label>
+                <input type="radio" name="forma_de_pago" value="mercado_pago" id="formaPago5" data-info="pagoMP" required data-finish="Pagar" class="api-required">
+                <label for="formaPago5">Mercado Pago</label>
+            </div>
+            <h3>Cupón de descuento</h3>
+            <div class="generic-input">
+                <label for="id_cupon">Ingresá el código</label>
+                <div class="billing-aplicar-row">
+                    <input type="text" id="id_cupon" placeholder="XXXXXX">
+                    <button type="button" class="generic-button btn-1 facturacion" id="submitCupon" data-api="{% url 'cart:validar-cupon' %}"><code>Aplicar</code><div class="btn-loader"></div></button>
+                </div>
+                <p class="msg-required"></p>
+            </div>
+        </div>
+        <div class="billing-payment-details">
+            <div class="generic-item details">
+                <h3>DETALLES</h3>
+                <section id="pagoEmpty">Seleccioná un método de pago</section>
+                <section id="pagoEfectivo" class="details-msg hide">
+                    <h4>Efectivo</h4>
+                    <p>En TwinStore ofrecemos la opción de pago en efectivo. Podes abonar al momento de retirar tu pedido en nuestro punto de retiro.<br>
+                    Algunos productos pueden requerir un pago anticipado para asegurar su disponibilidad. En estos casos, la coordinación será gestionada por TwinStore, donde te indicaremos los pasos a seguir. Este anticipo podrá ser abonado en nuestro punto de retiro o coordinado con el cliente.</p>
+                </section>
+                <section id="pagoTransferencia" class="details-msg hide">
+                    <h4>Transferencia</h4>
+                    <p>Aboná tu compra mediante transferencia bancaria. Los datos bancarios serán proporcionados al momento de realizar la compra. Aprovechá este metodo abonando un precio preferencial.</p>
+                    <div class="payment-info-method">
+                        <span>¿Cómo seguir?</span>
+                        <ul>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 10l2 -2v8" /></svg>
+                                Haz click en "Continuar" para ver los datos bancarios.
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /></svg>
+                                Realizá el deposito siguiendo los pasos indicados y adjunta el comprobante de transferencia.
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
+                                Nuestro equipo verificará el pago y seras notificado vía mail.
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+                <section id="pagoMP" class="details-msg hide">
+                    <h4>Mercado Pago</h4>
+                    <p>Pagá con Mercado Pago y combiná, podes abonar con multiples tarjetas y contas con hasta 24 cuotas. Los pagos realizados mediante este metodo cuentan con un recargo del 6,42% más IVA. Una vez que realices el pago, en el caso de ser rechazado puedes ingresar en el apartado "Mi cuenta" y volver a generar el pago. El Ticket de pago cuenta con una (1) hora de vencimiento, luego de ese plazo la compra queda cancelada.</p>
+                    <div class="payment-info-method">
+                        <span>¿Cómo seguir?</span>
+                        <ul>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 10l2 -2v8" /></svg>
+                                Haz click en "Pagar" para ser redirigido a la plataforma de Mercado Pago.
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /></svg>
+                                Realizá tu pago eligiendo el método que prefieras.
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
+                                Serás redirigido nuevamente a TwinStore una vez finalizado el pago y veras el estado final de tu compra.
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+                <section id="pagoMix" class="details-msg hide">
+                    <h4>Pago Mixto</h4>
+                    <p>En TwinStore puedes combinar diferentes métodos de pago. Estamos inaugurando el pago mixto, un metodo de pago que combina transferencia bancaria y Mercado Pago. Aprovecha, combina tus métodos de pago y disfruta de mayor flexibilidad.</p>
+                    <div class="generic-input">
+                        <label for="id_montomixto">Ingresá el monto a transferir</label>
+                        <div class="billing-aplicar-row" id="montomixto">
+                            <p>$</p>
+                            <input type="text" inputmode="numeric" id="id_montomixto" placeholder="$ 0.00"> 
+                            <button type="button" class="generic-button btn-1 facturacion" id="submitMixto" data-api="{% url 'cart:api_pagomixto' %}"><code>Aplicar</code><div class="btn-loader"></div></button>
+                        </div>
+                        <p class="msg-required"></p>
+                    </div>
+                    <div class="payment-info-method mixto-info hide">
+                        <p>El monto a abonar mediante Mercado Pago es: <strong id="montoMixto"></strong></p>
+                        <span>¿Cómo seguir?</span>
+                        <ul>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 10l2 -2v8" /></svg>
+                                Haz click en "Continuar" para ver los datos bancarios.
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /></svg>
+                                Realizá el deposito siguiendo los pasos indicados y adjunta el comprobante de transferencia.
+                            </li>
+                            <li>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
+                                Serás redirigido automáticamente a la plataforma de Mercado Pago para completar el pago del saldo restante.
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+                <!-- <section id="pagoPayway" class="details-msg hide">
+                    <strong>Tarjeta de Crédito/Débito:</strong>
+                    <p>Serás redirigido a la pasarela de pagos segura para completar tu compra con tarjeta.</p>
+                </section> -->
+            </div>
+            <div class="generic-item">
+                <table class="billing-prices">
+                    <tbody>
+                        <tr>
+                            <td>Subtotal</td>
+                            <th>{{precio_subtotal|formato_pesos}}</th>
+                        </tr>
+                        <tr class="hide adicional-row">
+                            <td>Adicional</td>
+                            <th></th>
+                        </tr>
+                        {% if descuento %}
+                        <tr>
+                            <td>Descuento</td>
+                            <th>-{{descuento|formato_pesos}}</th>
+                        </tr>
+                        {% endif %}
+                        <tr class="cupon-row hide">
+                            <td>Cupón</td>
+                            <th></th>
+                        </tr>
+                        <tr class="total-row">
+                            <td>Total</td>
+                            <th>{{precio_total|formato_pesos}}</th>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="submit" class="generic-button btn-1 margin not-ready btn-finish billing-next"><code>Finalizar</code><div class="btn-loader"></div></button>
+            </div>
+        </div>
+    </section>
+    <section class="generic-data hide payment-finish" id="step3">
+        <div class="generic-item details comprobante">
+            <h4>Realizá tu pago</h4>
+            <span>Completa los siguientes datos para finalizar tu compra.</span>
+            <strong>Datos bancarios</strong>
+            <ul>
+                <li><code>Banco:</code><p>Santander Río</p></li>
+                <li><code>CBU:</code><p>0720000730000001234567</p></li>
+                <li><code>Alias:</code><p>twinstore.ar</p></li>
+                <li><code>Titular:</code><p>Aguirre Moretto Santiago</p></li>
+                <li><code>Importe:</code><p class="importe-transferencia"></p></li>
+            </ul>
+            <p class="comprobante-format">Subí el comprobante de tu pago (formato PDF, JPG o PNG)</p>
+            <input type="file" id="id_comprobante" name="comprobante" accept=".pdf,.jpg,.jpeg,.png," class="api-required">
+            <label for="id_comprobante">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-file-upload"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M12 11v6" /><path d="M9.5 13.5l2.5 -2.5l2.5 2.5" /></svg>
+                    <p id="file_name">Subir comprobante</p>
+                </div>
+            </label>
+            <button type="button" class="generic-button btn-1 margin not-ready" id="submitComprobante"><code>Finalizar</code><div class="btn-loader"></div></button>
+        </div>
+    </section>
+</form>
+<section class="generic-modal" data-modalId="compra-finalizada">
+    <form class="generic-box users"> 
+        <div class="generic-item compra-finalizada">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+            <h2>¡Gracias por tu compra!</h2>
+            <span>Tu pedido ha sido recibido y está siendo procesado.</span>
+            <div>
+                <p>Número de pedido:</p>
+                <strong id="merchant_order_id">#1234567890</strong>
+            </div>
+            <a href="{% url 'users:perfil' %}?section=orders" class="generic-button btn-2 margin">Ver mis pedidos</a>
+            <a href="{% url 'products:grid' %}" class="generic-button btn-1">Continuar comprando</a>
+        </div>
+    </form>
+</section>
+<section class="generic-modal card-checkout">
+    <div class="card-generic-box">
+        <div class="card-container">
+            <div class="card-template front">
+                <div class="header">
+                    <img src="static/chip.webp" alt="chip" height="30">
+                    <span class="card-company">Visa</span>
+                </div>
+                <div class="card-number-box">#### #### #### ####</div>
+                <div class="card-data">
+                    <div>
+                        <span>Titular</span>
+                        <div class="card-fullname">Nombre completo</div>
+                    </div>
+                    <div>
+                        <span>Vence</span>
+                        <div>
+                            <span class="exp-month">mm</span>
+                            <span class="exp-year">yy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-template back">
+                <div class="stripe"></div>
+                <div class="card-cvv">
+                    <span>cvv</span>
+                    <div class="card-cvv-box"></div>
+                    <span class="card-company">Visa</span>
+                </div>
+            </div>
+        </div>
+        <form id="payway-form" novalidate>
+            <button type="button" class="generic-modal-close"><svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg></button>
+            <div class="generic-input">
+                <label for="id_card_number">Numero de tarjeta</label>
+                <input type="text"
+                id="id_card_number"
+                maxlength="19" 
+                inputmode="numeric" 
+                data-decidir="card_number" 
+                autocomplete="cc-number" 
+                class="card-number-input" 
+                placeholder="#### #### #### ####" 
+                spellcheck="false" autocapitalize="off">
+            </div>
+            <div class="generic-input">
+                <label for="id_holder">Titular de la tarjeta</label>
+                <input type="text" 
+                id="id_holder"
+                maxlength="23" 
+                data-decidir="card_holder_name" 
+                autocomplete="cc-name" 
+                class="card-holder-input" 
+                placeholder="José Perez" spellcheck="false">
+            </div>
+            <div class="generic-input">
+                <label for="id_card_dni">DNI del titular</label>
+                <input type="hidden" data-decidir="card_holder_doc_type" value="dni">
+                <input type="text" 
+                id="id_card_dni"
+                maxlength="11" 
+                data-decidir="card_holder_doc_number" 
+                inputmode="numeric" 
+                class="card-number-input" 
+                placeholder="12345678" 
+                spellcheck="false" autocapitalize="off">
+            </div>
+            <div class="billing-date-cvv">
+                <div class="generic-input">
+                    <label for="id_expiration_month">Vencimiento mm</label>
+                    <input type="text"
+                    id="id_expiration_month"
+                    data-decidir="card_expiration_month"
+                    inputmode="numeric"
+                    class="card-month-input"
+                    autocomplete="cc-exp-month"
+                    placeholder="MM"
+                    maxlength="2"
+                    spellcheck="false" autocapitalize="off">
+                </div>
+                <div class="generic-input">
+                    <label for="id_expiration_year">vencimiento yy</label>
+                    <input type="text" 
+                    id="id_expiration_year"
+                    data-decidir="card_expiration_year" 
+                    inputmode="numeric"
+                    autocomplete="cc-exp-year"
+                    class="card-year-input" 
+                    placeholder="YY" 
+                    maxlength="2" 
+                    spellcheck="false" autocapitalize="off">
+                </div>
+                <div class="generic-input">
+                    <label for="id_cvv">CVV</label>
+                    <input type="text" 
+                    id="id_cvv"
+                    data-decidir="security_code" 
+                    inputmode="numeric" 
+                    autocomplete="cc-csc"
+                    placeholder="XXX" 
+                    maxlength="4" 
+                    class="card-cvv-input" 
+                    spellcheck="false" autocapitalize="off">
+                </div>
+            </div>
+            <input type="button" value="Pagar" class="card-sumbit-btn">
+            <br><br>
+            <p class="billing-secure">
+                En <strong>Twinstore</strong> no almacenamos ni procesamos los datos de tu tarjeta. La operación es 100% segura y es gestionada directamente por <strong>Payway</strong>, una pasarela certificada con estándares internacionales de seguridad.
+                <a href="https://www.payway.com.ar/" target="_blank">Conocé más sobre Payway.</a>
+            </p>
+        </form>
+    </div>
+</section>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+<script src="{% static 'js/animation.js' %}"></script>
+<script src="{% static 'js/perfil-get.js' %}"></script>
+<script src="{% static 'js/facturacion.js' %}"></script>
+{% endblock myscripts %}

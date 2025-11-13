@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock meta %}
+
+{% block head %}
+<title>Tu Reseña</title>
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="generic-box">
+    <header class="generic-header-nav">
+        <a href="#">
+            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M15 6l-6 6l6 6" />
+            </svg>
+        </a>
+        <h2 id="generic-title">Tu Reseña.</h2>
+    </header>
+    <section class="generic-data">
+        <div class="review-box">
+            <form>
+                <h3>Deja tu opinión</h3>
+                <p>Compartí tu experiencia para ayudar a otros clientes.</p>
+                <div class="review-divider"></div>
+                <article>
+                    <img src="{{producto.get_portada_200}}" alt="{{producto.nombre}}" height="80">
+                    <div>
+                        <h4>{{producto.nombre}}</h4>
+                        <span>{{producto.descripcion_seo}}</span>
+                    </div>
+                </article>
+                <span class="title">Como nos calificarias?</span>
+                <div>
+                {% for i in "12345" %}
+                    <svg xmlns="http://www.w3.org/2000/svg" data-index="{{i}}" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-star generic-hover"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" /></svg>
+                {% endfor %}
+                </div>
+                <p class="msg-required-2"></p>
+                <span class="title">Tu reseña</span>
+                <textarea placeholder="Escribe tu reseña aquí..." maxlength="250"></textarea>
+                <div class="review-divider"></div>
+                <button type="submit" class="generic-button btn-2 left" data-token="{{token}}">Enviar Reseña</button>
+            </form>
+        </div>
+    </section>
+</section>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+<script src="{% static 'js/review.js' %}"></script>
+{% endblock myscripts %}

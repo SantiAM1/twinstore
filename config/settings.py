@@ -9,14 +9,10 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
-# ! GTK3 WEASYPRINT
-
 from pathlib import Path
 import os
 import environ
 from csp.constants import NONCE
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,35 +34,62 @@ SECRET_KEY = DJANGO_SECRET_KEY
 
 DEBUG = env("DEBUG").lower() == "true"
 
+# * NGROK para pruebas externas
+NGROK_URL = None
+
 # * Host
 SITE_URL = "twinstore.com.ar"
 
-# ! Actualizar el HOST con el dominio
 ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(",")
 
-# ! Verificar las correspondencias
 CSRF_TRUSTED_ORIGINS = [
-    f"https://twinstore.com.ar", "https://www.twinstore.com.ar"
+    f"https://twinstore.com.ar", "https://www.twinstore.com.ar",
 ]
 
-# * Sessions
+if NGROK_URL:
+    ALLOWED_HOSTS += [NGROK_URL]
+    CSRF_TRUSTED_ORIGINS += [f"https://{NGROK_URL}"]
+    SITE_URL = NGROK_URL
+
+# Session Security
+# SESSION_ENGINE = "django.contrib.sessions.backends.db"
+# SESSION_COOKIE_AGE = 86400
+# SESSION_COOKIE_HTTPONLY = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# CSRF_COOKIE_HTTPONLY = True
+# SECURE_HSTS_SECONDS = 31536000
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
+# SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_SSL_REDIRECT = False
+
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 86400
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = True        # * Solo se envían por HTTPS
-CSRF_COOKIE_SECURE = True           # * Igual para CSRF
-CSRF_COOKIE_HTTPONLY = True         # * Protege aún más
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "Lax"
+
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = "Strict"
+
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = False
 
 # Application definition
 
 INSTALLED_APPS = [
-    "django_user_agents",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -84,12 +107,10 @@ INSTALLED_APPS = [
     'cart',
     'users',
     'payment',
-    'compressor',
 ]
 
 MIDDLEWARE = [
     'axes.middleware.AxesMiddleware',
-    "django_user_agents.middleware.UserAgentMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -109,7 +130,7 @@ AUTHENTICATION_BACKENDS = [
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024
 
 AXES_LOCKOUT_PARAMETERS = ['username', 'ip_address']
-AXES_FAILURE_LIMIT = 5
+AXES_FAILURE_LIMIT = 500
 AXES_COOLOFF_TIME = 1
 AXES_RESET_ON_SUCCESS = True
 
@@ -144,10 +165,6 @@ CONTENT_SECURITY_POLICY = {
     }
 }
 
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = "DENY"
-SECURE_CONTENT_TYPE_NOSNIFF = True
-
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -164,7 +181,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.carrito_total',
-                'core.context_processors.render_menu',
+                'cart.context_processors.limpiar_checkout',
                 'core.context_processors.canonical_url',
             ],
         },
@@ -183,12 +200,14 @@ REST_FRAMEWORK = {
     'user': '100/minute',
 
     'carrito': '30/minute',
-    'calcular_pedido': '10/minute',
+    'calcular_pedido': '15/minute',
     'solicitar_comprobante': '10/minute',
+    'modal_users': '15/minute',
     'toggle_notificaciones': '10/hour',
     'enviar_wtap': '10/day',
     'filtros_dinamicos': '30/minute',
     'prediccion_busqueda': '60/minute',
+    'micuenta': '20/minute',
     },
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
@@ -214,18 +233,12 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "users.validators.StrongPasswordValidator"},
 ]
 
 # Static files (CSS, JavaScript, Images)
@@ -237,13 +250,12 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-COMPRESS_ENABLED = not DEBUG
-COMPRESS_OFFLINE = True  # Compila los archivos al hacer collectstatic
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "compressor.finders.CompressorFinder",
 ]
+
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -252,11 +264,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Celery Configuration
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
+CELERY_TIMEZONE = 'America/Argentina/Buenos_Aires'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-
-# Configurar la URL de login
-LOGIN_URL = "/usuario/login/"
+CELERY_RESULT_SERIALIZER = 'json'
 
 # * Argentina !
 LANGUAGE_CODE = 'es-ar'
@@ -270,6 +281,28 @@ AWS_SES_ACCESS_KEY_ID = env("AWS_SES_ACCESS_KEY_ID")
 AWS_SES_SECRET_ACCESS_KEY = env("AWS_SES_SECRET_ACCESS_KEY")
 AWS_SES_REGION_NAME = env("AWS_SES_REGION_NAME")
 AWS_SES_SOURCE_EMAIL = env("AWS_SES_SOURCE_EMAIL")
+
+# ! Produccion --> Conviene usar redis
+
+
+if DEBUG:
+    CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-twinstore-cache',
+    }
+}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': 'redis://redis:6379/1',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'IGNORE_EXCEPTIONS': True,
+            }
+        }
+    }
 
 LOGGING = {
     "version": 1,
@@ -304,3 +337,11 @@ LOGGING = {
         "level": "INFO",
     },
 }
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+if DEBUG:
+    INSTALLED_APPS += ["debug_toolbar"]
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")

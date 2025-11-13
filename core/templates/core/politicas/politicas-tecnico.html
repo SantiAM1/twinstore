@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<meta name="description" content="¿Dejaste un producto en nuestras manos? Leé nuestra política de servicio técnico y conocé como cuidamos y entregamos tus productos.">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Politicas de servicio técnico - Twinstore</title>
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="generic-box">
+    {% include "partials/generic-header.html" with title="Politicas de servicio técnico" %}
+    <section class="generic-data">
+        {% include 'components/politicas-navbar.html' with serv="selected" %}
+        <div class="generic-item faq">
+            <h1>Políticas de servicio técnico</h1>
+            <p class="faq__description"></p>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">Condiciones respecto al servicio técnico</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Al momento de dejar un equipo para diagnóstico o reparación en nuestro laboratorio técnico, el cliente acepta las siguientes condiciones:<br>
+                    • Twinstore notificará al cliente cuando el producto esté disponible para su retiro, ya sea por llamada, WhatsApp o correo electrónico.<br>
+                    • Una vez notificado, el cliente dispone de un plazo máximo de 90 (noventa) días corridos para retirar el producto de nuestras instalaciones.<br>
+                    • Si transcurrido dicho plazo el producto no fuera retirado, Twinstore quedará liberado de toda responsabilidad respecto de la guarda, integridad y estado del equipo, y podrá disponer del mismo sin derecho a reclamo posterior por parte del cliente.<br>
+                    • El retiro del producto debe ser efectuado presentando el comprobante o parte de recepción emitido al momento de la entrega.
+                </p>
+            </details>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">Cargos adicionales y custodia</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Los equipos no retirados en plazo no generan cargos de almacenamiento ni de custodia, pero sí dejan de estar bajo la responsabilidad de Twinstore.<br>
+                    En Twinstore valoramos y respetamos la confianza de nuestros clientes, por eso trabajamos con total transparencia en cada etapa del servicio.
+                </p>
+            </details>
+        </div>
+    </section>
+</section>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+{% endblock myscripts %}

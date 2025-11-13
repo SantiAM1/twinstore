@@ -20,3 +20,9 @@ class PrediccionBusquedaThrottle(AnonRateThrottle):
 
 class SolicitarComprobante(AnonRateThrottle):
     scope = 'solicitar_comprobante'
+
+class ModalUsers(AnonRateThrottle):
+    scope = 'modal_users'
+
+class MiCuentaThrottle(UserRateThrottle):
+    scope = 'micuenta'

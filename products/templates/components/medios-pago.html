@@ -1,0 +1,79 @@
+{% load custom_filters %}
+<div class="generic-modal" data-modalId="prodSpecs">
+    <div class="generic-box users animate-modal"> 
+        <button type="button" class="generic-modal-close-2" data-modalId="prodSpecs">
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
+        </button>
+        <div class="generic-item prod">
+            <h2>Medios de pago</h2>
+            <div class="prod-payment-methods">
+                <span>¿Cómo abonas?</span>
+                <button type="button" class="prod-payment-btn"><p class="generic-select-title">Mercado Pago</p>
+                    <svg  xmlns="http://www.w3.org/2000/svg"  width="16"  height="16"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-caret-down"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 9c.852 0 1.297 .986 .783 1.623l-.076 .084l-6 6a1 1 0 0 1 -1.32 .083l-.094 -.083l-6 -6l-.083 -.094l-.054 -.077l-.054 -.096l-.017 -.036l-.027 -.067l-.032 -.108l-.01 -.053l-.01 -.06l-.004 -.057v-.118l.005 -.058l.009 -.06l.01 -.052l.032 -.108l.027 -.067l.07 -.132l.065 -.09l.073 -.081l.094 -.083l.077 -.054l.096 -.054l.036 -.017l.067 -.027l.108 -.032l.053 -.01l.06 -.01l.057 -.004l12.059 -.002z" /></svg>
+                </button>
+                <div class="payment-select hide">
+                    <!-- <button type="button" class="payment-method-btn" data-method="credit">Tarjeta de crédito</button>
+                    <button type="button" class="payment-method-btn" data-method="debit">Tarjeta de débito</button> -->
+                    <button type="button" class="payment-method-btn" data-method="mercadopago">Mercado Pago</button>
+                    <button type="button" class="payment-method-btn" data-method="efec-tran">Efectivo/Trasferencia</button>
+                    <button type="button" class="payment-method-btn" data-method="mixto">Pago Mixto</button>
+                </div>
+            </div>
+            <!-- <div class="payment-info" data-method="credit">
+                <dl class="methods-list">
+                    <div class="methods-item">
+                        <dt class="methods-term mipyme">3 Cuotas de $400.000</dt>
+                        <dd class="methods-desc">$1.200.000</dd>
+                    </div>
+                    <div class="methods-item">
+                        <dt class="methods-term mipyme">6 Cuotas de $500.000</dt>
+                        <dd class="methods-desc">$1.500.000</dd>
+                    </div>
+                    <div class="methods-item">
+                        <dt class="methods-term">9 Cuotas de $300.000</dt>
+                        <dd class="methods-desc">$1.800.000</dd>
+                    </div>
+                    <div class="methods-item">
+                        <dt class="methods-term">12 Cuotas de $200.000</dt>
+                        <dd class="methods-desc">$2.000.000</dd>
+                    </div>
+                </dl>
+                <p class="methods-msg">Los pagos abonados por tarjeta de crédito son procesados a travez de payway, nuestras 3 y 6 cuotas se encuentran bonificadas.</p>
+            </div>
+            <div class="payment-info hide" data-method="debit">
+                <dl class="methods-list">
+                    <div class="methods-item">
+                        <dt class="methods-term mipyme">1 Pago de $1.200.000</dt>
+                        <dd class="methods-desc">$1.200.000</dd>
+                    </div>
+                </dl>
+                <p class="methods-msg">Los pagos abonados por tarjeta de débito son procesados a travez de <strong>Payway</strong>. El cobro cuenta con un recargo del 3%.</p>
+            </div> -->
+            <div class="payment-info" data-method="mercadopago">
+                <dl class="methods-list">
+                    {% for cuota,monto in mercado_pago_cuotas.items %}
+                    <div class="methods-item">
+                        <dt class="methods-term {% if forloop.first %}mipyme{% endif %}">{{cuota}} {% if forloop.first %}Pago{% else %}Cuotas{% endif %} de {{monto.valor_cuota|formato_pesos}}</dt>
+                        <dd class="methods-desc">{{monto.total|formato_pesos}}</dd>
+                    </div>
+                    {% endfor %}
+                </dl>
+                <p class="methods-msg">Los pagos realizados por Mercado Pago cuentan con un recargo del 6.42% + IVA. Los valores son aproximados y pueden variar al momento de realizar el pago.</p>
+            </div>
+            <div class="payment-info hide" data-method="efec-tran">
+                <dl class="methods-list">
+                    <div class="methods-item">
+                        <dt class="methods-term mipyme">1 Depósito / Pago de {{producto.precio|formato_pesos}}</dt>
+                        <dd class="methods-desc">{{producto.precio|formato_pesos}}</dd>
+                    </div>
+                </dl>
+                <p class="methods-msg">Las compras abonadas en <strong>Efectivo</strong> o <strong>Transferencia</strong> tienen 24hrs para realizarse.</p>
+            </div>
+            <div class="payment-info hide" data-method="mixto">
+                <dl class="methods-list">
+                </dl>
+                <p class="methods-msg">En TwinStore podes realizar tus pagos de forma <strong>Mixta</strong> (Tarjeta + Efectivo o Transferencia). Los montos recibidos de contado cuentan con un descuento. El resto se puede abonar con cualquier metodo habilitado (Tarjetas de Crédito/Débito, Mercado Pago)</p>
+            </div>
+        </div>
+    </div>
+</div>

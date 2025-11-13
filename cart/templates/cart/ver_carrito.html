@@ -1,153 +1,78 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
-{% load compress %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
 {% endblock meta %}
 
 {% block head %}
-    <title>Carrito - Twinstore</title>
-    {% compress css %}
-    <link rel="stylesheet" href="{% static 'css/carrito.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/substyles/quantity.css' %}" />
-    {% endcompress %}
+<title>Carrito - Twinstore</title>
 {% endblock head %}
 
-{% block theme %}black{% endblock theme %}
-
 {% block contenidomain %}
-<div class="padding-1rem"> 
-    <div class="cart-box flex justify-between gap-1rem" id="carrito-box">
-        {% if not empty %}
-            <div class="cart-items flex flex-column justify-between">
-                <table class="cart-table">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th class="cart-responsive-hide">Precio</th>
-                            <th>Cantidad</th>
-                            <th class="cart-responsive-hide">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="cart-divider-main" colspan="4"></td>
-                        </tr>
-                        {% if carrito.pedidos.all %}
-                            {% for pedido in carrito.pedidos.all %}
-                            <tr class="items-center">
-                                <td class="cart-prod flex items-center">
-                                    <div class="cart-prod-responsive flex items-center position-relative gap-05rem">
-                                        <a href="#" class="cart-prod-delete bloqueable" data-pedido-id="{{ pedido.id|signing_data }}"><i class="bi bi-x-circle"></i></a>
-                                        {% if pedido.producto.portada %}
-                                            <img src="{{ pedido.producto.portada.url }}" alt="{{ pedido.get_nombre_producto }}" class="cart-prod-img" loading="lazy">
-                                        {% else %}
-                                            <img src="{% static 'img/prod_default.webp' %}" alt="{{ pedido.producto.nombre }}" class="cart-prod-img" loading="lazy">
-                                        {% endif %}
-                                    </div>
-                                    <div class="cart-prod-cantidad flex flex-column">
-                                        <span class="font-roboto">{{ pedido.get_nombre_producto }}</span>
-                                        <p class="display-none font-roboto font-bold"><span class="font-roboto prod-mobile-count">{{pedido.get_cantidad}} x </span>{{pedido.producto.precio|formato_pesos}}</p>
-                                    </div>
-                                </td>
-                                <td class="cart-price-sub">{{ pedido.producto.precio|formato_pesos }}</td>
-                                <td>
-                                    <div class="flex items-center justify-center quantity-container bloqueable" data-pedido-id="{{ pedido.id|signing_data }}">
-                                        <button type="button" name="action" data-action="decrement" class="btn-cantidad"><i class="bi bi-dash"></i></button>
-                                        <input type="text" class="input-value-cart" name="cantidad" value="{{ pedido.cantidad }}" readonly>
-                                        <button type="button" name="action" data-action="increment" class="btn-cantidad"><i class="bi bi-plus"></i></button>
-                                    </div>
-                                </td>
-                                <td class="cart-price-sub cart-total-precio">{{ pedido.get_total_precio|formato_pesos }}</td>
-                            </tr>
-                            <tr>
-                                <td class="cart-divider-prod" colspan="4"></td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            {% for pedido in carrito %}
-                            <tr class="items-center">
-                                <td class="cart-prod flex items-center">
-                                    <div class="cart-prod-responsive flex items-center position-relative gap-05rem">
-                                        <a href="#" class="cart-prod-delete bloqueable" data-pedido-id="{{ pedido.id|signing_data }}"><i class="bi bi-x-circle"></i></a>
-                                        {% if pedido.producto.portada %}
-                                            <img src="{{ pedido.producto.portada.url }}" alt="{{ pedido.nombre_producto }}" class="cart-prod-img" loading="lazy">
-                                        {% else %}
-                                            <img src="{% static 'img/prod_default.webp' %}" alt="{{ pedido.nombre_producto }}" class="cart-prod-img" loading="lazy">
-                                        {% endif %}
-                                    </div>
-                                    <div class="cart-prod-cantidad flex flex-column">
-                                        <span>{{ pedido.nombre_producto }}</span>
-                                        <p class="display-none font-roboto"><span class="font-roboto prod-mobile-count">{{pedido.cantidad}} x </span>{{pedido.producto.precio|formato_pesos}}</p>
-                                    </div>
-                                </td>
-                                <td class="cart-price-sub">{{ pedido.producto.precio|formato_pesos }}</td>
-                                <td>
-                                    <div class="flex items-center justify-center quantity-container bloqueable" data-pedido-id="{{ pedido.id|signing_data }}">
-                                        <button type="button" name="action" data-action="decrement" class="btn-cantidad"><i class="bi bi-dash"></i></button>
-                                        <input type="text" class="input-value-cart" name="cantidad" value="{{ pedido.cantidad }}" readonly>
-                                        <button type="button" name="action" data-action="increment" class="btn-cantidad"><i class="bi bi-plus"></i></button>
-                                    </div>
-                                </td>
-                                <td class="cart-price-sub cart-total-precio">{{ pedido.total_precio|formato_pesos }}</td>
-                            </tr>
-                            <tr>
-                                <td class="cart-divider-prod" colspan="4"></td>
-                            </tr>
-                            {% endfor %}
-                        {% endif %}
-                    </tbody>
-                </table>
-                <a href="{% url 'core:home' %}" class="continue-shopping decoration-none bloqueable"><i class="bi bi-arrow-left"></i>  SEGUIR COMPRANDO</a>
-            </div>
-            <div class="cart-divider-side"></div>
-            <div class="cart-finish flex flex-column justify-between">
-                <table class="cart-finish-table">
-                    <caption>Total del Carrito</caption>
-                    <tbody>
-                        <tr class="cart-finish-info">
-                            <th>Subtotal</th>
-                            <td id="cart-subtotal">{{ total_precio|formato_pesos }}</td>
-                        </tr>
-                        <tr>
-                            <td class="cart-divider-prod" colspan="2"></td>
-                        </tr>
-                        <tr class="cart-finish-info">
-                            <th>Envío</th>
-                            <td class="cart-finish-shipping"><a href="#" id="cotizar-envio" class="decoration-none font-roboto cotizar-envio">Cotizar envío</a></td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td class="cart-divider-prod" colspan="2"></td>
-                        </tr>
-                        <tr class="cart-finish-info total-row">
-                            <th class="cart-finish-th">Total</th>
-                            <td id="cart-total">{{ total_precio|formato_pesos }}</td>
-                        </tr>
-                        <tr>
-                            <td class="cart-divider-main" colspan="2"></td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <div>
-                    <a href="{% url 'cart:realizar_pedido' %}" class="decoration-none cart-finish-button cart-finish-comprar bloqueable">Finalizar compra</a>
-                    <a href="{% url 'cart:presupuestar' %}" target="_blank" class="decoration-none cart-finish-button cart-finish-presupuesto bloqueable">Presupuestar</a>
+<section class="generic-box">
+    {% include 'partials/generic-header.html' with title="Carrito" %}
+    <section class="generic-data">
+        {% if carrito %}
+        <div class="generic-item max-content-h">
+            <h3>Productos</h3>
+            {% for item in carrito %}
+            <article class="cart-item">
+                <img src="{{item.imagen}}" alt="{{item.producto.nombre}}" height="80">
+                <div class="cart-details">
+                    <span>{{item.nombre}}</span>
+                    <nav aria-label="Acciones del producto" data-pedidoId="{{item.id|signing_data}}" class="cart-navbox">
+                        <button type="button" aria-label="Eliminar del carrito" data-api="/carro/api/eliminar_pedido/">
+                            <svg  xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-trash"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+                        </button>
+                        <div class="quantity-controls">
+                            <button type="button" aria-label="Disminuir cantidad" data-api="/carro/api/actualizar_pedido/" data-action="menos">
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-minus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /></svg>
+                            </button>
+                            <p class="cart-item-cantidad">{{item.cantidad}}</p>
+                            <button type="button" aria-label="Aumentar cantidad" data-api="/carro/api/actualizar_pedido/" data-action="mas">
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+                            </button>
+                        </div>
+                    </nav>
                 </div>
+                <div class="cart-item-price">
+                    {% if item.descuento %}<p class="cart-item-price-old">{{item.precio_anterior|formato_pesos}}</p>{% endif %}
+                    <strong class="cart-item-price-now">{{item.precio|formato_pesos}}</strong>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        <div class="generic-item cart-resume max-content-h">
+            <h3>Resumen</h3>
+            <div class="cart-prod-resume">
+                <p class="cart-totalProds">{{total_productos}} producto(s)</p>
+                <span class="cart-subtotal">{{precio_subtotal|formato_pesos}}</span>
             </div>
+            <div class="cart-prod-resume">
+                <p>Descuento</p>
+                <span class="cart-descuento">{% if descuento > 0 %}-{% endif %}{{descuento|formato_pesos}}</span>
+            </div>
+            <section class="cart-total-price">
+                <span>Total</span>
+                <strong class="cart-total">{{precio_total|formato_pesos}}</strong>
+            </section>
+            <p class="generic-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-cash"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 15h-3a1 1 0 0 1 -1 -1v-8a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v3" /><path d="M7 9m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" /><path d="M12 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /></svg>
+                Abonando con efectivo o transferencia*
+            </p>
+            <a href="{% url 'cart:finalizar_compra' %}" class="generic-button btn-2 {% if not user.is_authenticated %}check-auth{% endif %}" data-api="{% url 'users:api_check_auth' %}">Iniciar compra</a>
+            <a href="{% url 'products:grid' %}" class="generic-button btn-1">Volver a la tienda</a>
+        </div>
         {% else %}
-            <p class="cart-empty-msg font-roboto">Tu carrito esta vacío</p>
-            <a href="{% url 'core:home' %}" class="decoration-none cart-volver-tienda font-roboto color-fff font-bold text-center padding1rem">Volver a la tienda</a>
+        <div class="generic-item cart-empty">
+            <h3>Tu carrito esta vacío<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 19a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M13 17h-7v-14h-2" /><path d="M6 5l14 1l-1 7h-13" /><path d="M22 22l-5 -5" /><path d="M17 22l5 -5" /></svg></h3>
+            <a href="{% url 'products:grid' %}" class="generic-button btn-1">Volver a la tienda</a>
+        </div>
         {% endif %}
-    </div>
-</div>
-<div id="loading-overlay" class="loading-overlay position-fixed display-none flex-column items-center justify-center">
-    <div class="spinner"></div>
-    <p>Procesando...</p>
-</div>
-
+    </section>
+</section>
 {% endblock contenidomain %}
 
 {% block myscripts %}

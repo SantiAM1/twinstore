@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .forms import EspecificacionTecnicaForm,ImagenProductoForm
-from .models import Marca, Categoria, SubCategoria, Producto, ImagenProducto, Atributo, EspecificacionTecnica, CategoriaEspecificacion,Etiquetas,ColorProducto
+from .models import Marca, Categoria, SubCategoria, Producto, ImagenProducto, Atributo, EspecificacionTecnica,Etiquetas,ColorProducto,ReseñaProducto,TokenReseña
 from django.utils.html import format_html
 
 class AtributoInline(admin.TabularInline):
@@ -22,8 +22,13 @@ class ImagenProductoInline(admin.StackedInline):
 
     miniatura.short_description = "Preview"
 
-class EtiquetasInline(admin.TabularInline):
-    model = Etiquetas
+# class EtiquetasInline(admin.TabularInline):
+#     model = Etiquetas
+#     extra = 1
+#     classes = ['collapse']
+
+class ReseñaProductoInline(admin.TabularInline):
+    model = ReseñaProducto
     extra = 1
     classes = ['collapse']
 
@@ -39,22 +44,20 @@ class EspecificacionTecnicaInline(admin.StackedInline):
     classes = ['collapse']
 
 class ProductoAdmin(admin.ModelAdmin):
-    inlines = [AtributoInline, ImagenProductoInline, ColoresInline,EspecificacionTecnicaInline,EtiquetasInline]
+    inlines = [AtributoInline, ImagenProductoInline, ColoresInline,EspecificacionTecnicaInline,ReseñaProductoInline]
     list_display = ['nombre', 'sku', 'marca', 'sub_categoria','inhabilitar']
     search_fields = ['nombre', 'sku']
     list_filter = ['marca', 'sub_categoria']
     readonly_fields = ['precio','slug']
 
-@admin.register(Marca)
-class MarcaAdmin(admin.ModelAdmin):
-    def has_module_permission(self, request):
-        return False  # Oculta de la barra lateral
-
-@admin.register(CategoriaEspecificacion)
-class CategoriaEspecificacionAdmin(admin.ModelAdmin):
-    def has_module_permission(self, request):
-        return False
+# @admin.register(Marca)
+# class MarcaAdmin(admin.ModelAdmin):
+#     def has_module_permission(self, request):
+#         return False
 
 admin.site.register(Producto, ProductoAdmin)
 admin.site.register(Categoria)
 admin.site.register(SubCategoria)
+admin.site.register(Marca)
+admin.site.register(Etiquetas)
+admin.site.register(TokenReseña)    

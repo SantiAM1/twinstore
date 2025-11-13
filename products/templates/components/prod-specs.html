@@ -1,0 +1,32 @@
+{% load custom_filters %}
+
+<h3>Especificaciones</h3>
+{% if producto.especificaciones.exists %}
+<dl class="specs-list">
+{% for specs in producto.especificaciones.all %}
+{% if forloop.counter <= 3 %}
+    <div class="specs-item">
+        <dt class="specs-term">{{specs.clave}}</dt>
+        <dd class="specs-desc">{{specs.valor}}</dd>
+    </div>
+{% endif %}
+{% endfor %}
+</dl>
+<dl class="specs-list generic-expand animate">
+{% for specs in producto.especificaciones.all %}
+{% if forloop.counter > 3 %}
+    <div class="specs-item">
+        <dt class="specs-term">{{specs.clave}}</dt>
+        <dd class="specs-desc">{{specs.valor}}</dd>
+    </div>
+{% endif %}
+{% endfor %}
+</dl>
+<span class="specs-more">Ver más</span>
+{% else %}
+<dl class="specs-list">
+    <div class="specs-item nospecs">
+        <dt class="specs-term">No hay especificaciones disponibles</dt>
+    </div>
+</dl>
+{% endif %}

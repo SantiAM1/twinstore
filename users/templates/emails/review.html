@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<!--
+producto: "Nombre del producto"
+username: "Nombre del usuario"
+img_prod: "URL de la imagen del producto"
+url: "URL para dejar la reseña" -->
+<body style="background-color: #f0f0f0;padding: 8px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">  
+    <div style="min-height: 350px;background-color: #fff;padding: 20px; margin: auto; max-width: 600px; border-radius: 12px;">
+        <h2 style="text-align: center; color: #272727; font-weight: 700; font-size: 1.6rem;">Tu opinión importa. ¡Evaluá tu {{producto}}!</h2>
+        <p style="text-align: center; color: #797979; margin: auto; padding-bottom: 2rem; font-weight: 500;padding-bottom: 1rem;">Hola {{username}},</p>
+        <p style="text-align: center; color: #797979; margin: auto; padding-bottom: 2rem; font-weight: 400;padding: 0;">Gracias por tu reciente compra del {{producto}}. Tu opinión es muy importante para nosotros, te invitamos a dejar una reseña.</p>
+        <img src="{{img_prod}}" alt="{{producto}}" style="display: block; margin: auto; max-width: 100%; height: auto; border-radius: 8px; padding-bottom: 1.5rem;width: 300px;margin-top: 2rem;">
+        <p style="text-align: center;color: #797979;font-weight: 500;margin-bottom: 0.2rem">Valorá tu producto con un click:</p>
+        <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto; padding:12px 0;">
+            <tr>
+                <td align="center" style="padding:0 6px;">
+                    <a href="{{url}}/?stars=1" target="_blank">
+                        <img src="/static/img/mails/star.png" alt="1 Estrella" height="24" style="display:block; border:0;">
+                    </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                    <a href="{{url}}/?stars=2" target="_blank">
+                        <img src="/static/img/mails/star.png" alt="2 Estrellas" height="24" style="display:block; border:0;">
+                    </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                    <a href="{{url}}/?stars=3" target="_blank">
+                        <img src="/static/img/mails/star.png" alt="3 Estrellas" height="24" style="display:block; border:0;">
+                    </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                    <a href="{{url}}/?stars=4" target="_blank">
+                        <img src="/static/img/mails/star.png" alt="4 Estrellas" height="24" style="display:block; border:0;">
+                    </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                    <a href="{{url}}/?stars=5" target="_blank">
+                        <img src="/static/img/mails/star.png" alt="5 Estrellas" height="24" style="display:block; border:0;">
+                    </a>
+                </td>
+            </tr>
+        </table>
+        <a href="{{url}}" style="text-align: center;display: block;color: #fff;font-weight: 500;text-decoration: none;background-color: #1173d4;width: 200px;margin: 0 auto;padding: 12px 0;border-radius: 4px;margin-top: 1rem;">Dejar una reseña</a>
+    </div>
+    <div style="max-width: 500px; margin: auto;">
+        <p style="color: #1173d4; text-decoration: none; font-weight: 500; font-size: 0.9rem;text-align: center;">Gracias por confiar en TwinStore!</p>
+        <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto; padding:12px 0;">
+            <tr>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.instagram.com/twinstore.ar" target="_blank">
+                    <img src="{{images.insta}}" alt="Instagram" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.linkedin.com/company/twinstore-ar/" target="_blank">
+                    <img src="{{images.link}}" alt="LinkedIn" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.tiktok.com/@twinstore.ar" target="_blank">
+                    <img src="{{images.tiktok}}" alt="TikTok" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+            </tr>
+        </table>
+        <p style="color:#535353;font-size: 0.8rem; text-align: center; margin: 0;">© Twinstore 2025.</p>
+    </div>
+</body>
+</html>

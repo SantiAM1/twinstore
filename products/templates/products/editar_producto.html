@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load compress %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
@@ -10,104 +9,115 @@
 <title>{{producto.nombre}} - Twinstore</title>
 {% endblock head %}
 
-{% block headend %}
-{% compress css %}
-<link rel="stylesheet" href="{% static 'css/forms-ts.css' %}">
-<link rel="stylesheet" href="{% static 'css/substyles/feedback-users.css' %}">
-<link rel="stylesheet" href="{% static 'css/substyles/django-msg.css' %}">
-<link rel="stylesheet" href="{% static 'css/prod-view.css' %}" />
-{% endcompress %}
-{% endblock headend %}
-
 {% block contenidomain %}
-<div class="padding-1rem">
-    <div class="users-perfil flex font-roboto width-100">
-        <div class="flex flex-column gap-1rem width-100">
-            <form method="POST" enctype="multipart/form-data" action="{% url 'products:editar_producto' producto.id %}" class="flex flex-column gap-1rem width-100">
+<div class="generic-box">
+    <div class="generic-data editar-prod">
+        <div class="generic-item">
+            <form method="POST" enctype="multipart/form-data" action="{% url 'products:editar_producto' producto.id %}">
                 {% csrf_token %}
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="django-msg-{{message.tags}} font-roboto text-center">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                <h1>Editar producto: {{ producto.nombre }}</h1>
-                <a href="{% url 'products:slug_dispatcher' producto.slug %}" class="tw-hover-button decoration-none text-center">Volver al producto</a>
-                <div class="container-form">
+                <h3>Editar producto: {{ producto.nombre }}</h3>
+                <a href="{% url 'products:slug_dispatcher' producto.slug %}" class="generic-button btn-1">Volver al producto</a>
+                <div class="generic-input">
+                    <label for="{{ form.nombre.id_for_label }}">{{form.nombre.label}}</label>
                     {{form.nombre}}
-                    <label for="{{ form.nombre.id_for_label }}" class="form-label">{{form.nombre.label}}</label>
                 </div>
-                <div class="container-form">
+                <div class="generic-input">
+                    <label for="{{form.marca.id_for_label }}">{{form.marca.label}}</label>
                     {{form.marca}}
                 </div>
-                <div class="container-form">
+                <div class="generic-input">
+                    <label for="{{form.sub_categoria.id_for_label }}">{{form.sub_categoria.label}}</label>
                     {{form.sub_categoria}}
                 </div>
-                <div class="container-form">
+                <div class="generic-input">
+                    <label for="{{form.descripcion_seo.id_for_label }}">Descripcion</label>
+                    {{form.descripcion_seo}}
+                </div>
+                <div class="generic-input">
+                    <label for="{{ form.precio.id_for_label }}">{{form.precio.label}}</label>
                     {{form.precio}}
-                    <label for="{{ form.precio.id_for_label }}" class="form-label">{{form.precio.label}}</label>
                 </div>
-                <div class="container-form">
+                <div class="generic-input">
+                    <label for="{{ form.precio_dolar.id_for_label }}">{{form.precio_dolar.label}}</label>
                     {{form.precio_dolar}}
-                    <label for="{{ form.precio_dolar.id_for_label }}" class="form-label">{{form.precio_dolar.label}}</label>
                 </div>
-                <div class="container-form">
+                <div class="generic-input">
+                    <label for="{{ form.descuento.id_for_label }}">{{form.descuento.label}}</label>
                     {{form.descuento}}
-                    <label for="{{ form.descuento.id_for_label }}" class="form-label">{{form.descuento.label}}</label>
                 </div>
-                <div class="container-checkbox font-roboto">
+                <div>
                     {{ form.inhabilitar }}
-                    <label class="form-check-label" for="{{ form.inhabilitar.id_for_label }}">
+                    <label for="{{ form.inhabilitar.id_for_label }}">
                         {{ form.inhabilitar.label }}
                     </label>
                 </div>
-                <div>
-                    {{form.portada}}
-                    <span class="display-none"></span>
-                    <div class="flex height-100 gap-1rem">
-                        {% if producto.portada %}
-                        <img src="{{producto.portada.url}}" alt="No hay una portada" class="thumbnail-swiper">
-                        {% endif %}
-                        <label for="{{ form.portada.id_for_label }}" class="form-label-img width-100 height-100 flex items-center justify-center">Portada</label>
+                <button type="submit" class="generic-button btn-2">Guardar cambios</button>
+            </form>
+        </div>
+        <div class="generic-item">
+            <h3>Colores</h3>
+            {% if producto.colores.exists %}
+            <p>Colores existentes</p>
+            {% for color in producto.colores.all %}
+                <div class="generic-row-50">
+                    <div class="generic-input">
+                        <input type="text" name="nombre_color[]" placeholder="Nombre del color" value="{{ color.nombre }}">
+                    </div>
+                    <div class="generic-row">
+                        <div class="generic-input">
+                            <input type="color" name="codigo_color[]" value="{{ color.hex }}" style="min-width: 50px;">
+                        </div>
+                        <a href="{% url 'products:eliminar_color' color.id %}" style="min-width: 100px; background-color: rgba(255, 30, 0, 0.171); margin: 8px; display: flex; align-items: center;  justify-content: center; text-decoration: none; color: brown;">Eliminar</a>
                     </div>
                 </div>
-                <button type="submit" class="tw-hover-button">Guardar cambios</button>
-            </form>
-            {% if imagenes %}
-                <div class="flex gap-1rem flex-column">
-                    <h3>Imágenes existentes</h3>
-                    {% for img in imagenes %}
-                        <div class="flex height-100 width-100 gap-1rem items-center">
-                            <img src="{{img.imagen.url}}" alt="{{img.imagen}}" class="thumbnail-swiper">
-                            <a href="{% url 'products:eliminar_imagen' img.id %}" class="tw-hover-button decoration-none">Eliminar Imagen</a>
-                        </div>
-                    {% endfor %}
-                </div>
+            {% endfor %}
             {% endif %}
-            {% if formularios_nuevos %}
-                <h3>Agregar nuevas imágenes</h3>
-                <form method="post" enctype="multipart/form-data" class="width-100 flex flex-column gap-1rem" action="{% url 'products:agregar_imagenes' producto.id %}">
+            <p>Agregar nuevos colores</p>
+            <form class="colores-box" action="{% url 'products:agregar_color' producto.id %}" method="post">
                 {% csrf_token %}
-                {% for form in formularios_nuevos %}
-                    {% with forloop.counter as i %}
-                        <div class="flex flex-column gap-1rem width-100">
-                            <input type="file" name="{{ form.imagen.name }}" id="id_imagen_{{ i }}" class="form-admin-control">
-                            <span class="archivo-info display-none"></span>
-                            <label for="id_imagen_{{ i }}" class="form-label-img width-100 height-100 flex items-center justify-center">
-                                Imagen {{ i }}
-                            </label>
-                        </div>
-                    {% endwith %}
+                <button type="submit" class="generic-button btn-2 hide" id="agregar-colores" style="background-color: rgba(55, 82, 14, 0.486);">Guardar colores</button>
+            </form>
+            <button type="button" id="agregar-color" class="generic-button btn-1 margin">Agregar Color</button>
+        </div>
+        <div class="generic-item">
+            <h3>Imágenes</h3>
+            {% if producto.imagenes_producto.exists %}
+            <p>Imágenes existentes</p>
+            <form action="{% url 'products:asociar_color_img' producto.id %}" method="post">
+                {% csrf_token %}
+                {% for imagen in producto.imagenes_producto.all %}
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; max-width: 100px;">
+                    <img src="{{ imagen.imagen_200.url }}" alt="Imagen de {{ producto.nombre }}" height="100">
+                    <input type="hidden" name="imagen_id" value="{{imagen.id}}">
+                    <select name="color_id" style="min-width: 100px;">
+                        {% if imagen.color %}
+                        <option value="{{imagen.color.id}}" selected disabled>{{imagen.color.nombre}}</option>
+                        {% else %}
+                        <option value="" disabled selected>----</option>
+                        {% endif %}
+                        {% for color in producto.colores.all %}
+                        <option value="{{ color.id }}">{{ color.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    <a href="#" style="min-width: 100px; background-color: rgba(255, 30, 0, 0.171); margin: 8px; display: flex; align-items: center;  justify-content: center; text-decoration: none; color: brown;">Eliminar</a>
+                </div>
                 {% endfor %}
-                <button type="submit" class="tw-hover-button">Subir imagen</button>
-                </form>
+                <button type="submit" class="generic-button btn-1">Guardar cambios</button>
+            </form>
+            {% else %}
+            <p>No hay imagenes existentes</p>
             {% endif %}
+            <p>Agregar imagenes</p>
+            <form class="imagenes-box" action="{% url 'products:agregar_imagenes' producto.id %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <button type="submit" class="generic-button btn-2 hide" id="agregar-imgs" style="background-color: rgba(55, 82, 14, 0.486);">Guardar imagenes</button>
+            </form>
+            <button type="button" id="agregar-img" class="generic-button btn-1 margin">Agregar Imagenes</button>
         </div>
     </div>
 </div>
 {% endblock contenidomain %}
 
 {% block myscripts %}
-    <script src="{% static 'js/subir-archivo.js' %}"></script>
+<script src="{% static 'js/editar-producto.js' %}"></script>
 {% endblock myscripts %}

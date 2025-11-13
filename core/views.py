@@ -1,91 +1,130 @@
 from django.shortcuts import render
-from django.contrib.auth.decorators import user_passes_test, login_required
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.safestring import mark_safe
-import pandas as pd
-import uuid
-from .forms import ExcelUploadForm,DolarActualizar
-from products.models import Producto, Marca, Categoria, SubCategoria, Atributo,Etiquetas
-from django.http import JsonResponse
-from django.views.decorators.http import require_GET
+from django.http import HttpRequest
 from django.core.cache import cache
-import hashlib
-from django.core.paginator import Paginator
-from .decorators import bloquear_si_mantenimiento
-from .throttling import PrediccionBusquedaThrottle
-from rest_framework.decorators import throttle_classes
-from .models import DolarConfiguracion
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.timezone import now
-from core.utils import obtener_valor_dolar
+from django.views.decorators.cache import cache_page
+
+from .throttling import PrediccionBusquedaThrottle
+from .utils import obtener_valor_dolar
+from .models import DolarConfiguracion
+from .forms import ExcelUploadForm,DolarActualizar
+from .permissions import BloquearSiMantenimiento
+
+from products.models import Producto, Marca, SubCategoria, Atributo,Etiquetas
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+import pandas as pd
+import uuid
+import re
 from decimal import Decimal, InvalidOperation
 # Create your views here.
 
+@cache_page(60 * 15)
 def contacto(request):
     return render(request,'core/contacto.html')
 
+@cache_page(60 * 15)
 def politicas_tecnico(request):
-    return render(request,'core/politicas_tecnico.html')
+    return render(request,'core/politicas/politicas-tecnico.html')
 
-def servicio_tecnico(request):
-    return render(request,'core/servicio_tecnico.html')
-
-def quienes_somos(request):
-    return render(request,'core/quienes_somos.html')
-
+@cache_page(60 * 15)
 def boton_arrepentimiento(request):
-    return render(request,'core/arrepentimiento.html')
+    return render(request,'core/politicas/arrepentimiento.html')
 
+@cache_page(60 * 15)
 def terminos_condiciones(request):
-    return render(request,'core/terminos_condiciones.html')
+    return render(request,'core/politicas/terminos-condiciones.html')
 
+@cache_page(60 * 15)
 def preguntas_frecuentes(request):
-    return render(request,'core/preguntas_faq.html')
+    return render(request,'core/politicas/faq.html')
 
+@cache_page(60 * 15)
 def politicas_envios(request):
-    return render(request, 'core/politicas_envios.html')
+    return render(request, 'core/politicas/politicas-envios.html')
 
-def politicas_devolicion(request):
-    return render(request,'core/politicas_devolucion.html')
+@cache_page(60 * 15)
+def politicas_devolucion(request):
+    return render(request,'core/politicas/politicas-devolucion.html')
 
+@cache_page(60 * 15)
 def politicas_priv(request):
-    return render(request,'core/politicas_privacidad.html')
+    return render(request,'core/politicas/politicas-privacidad.html')
 
 def pagina_mantenimiento(request):
     return render(request, 'core/mantenimiento.html')
 
-@require_GET
-@bloquear_si_mantenimiento
-@throttle_classes([PrediccionBusquedaThrottle])
-def buscar_productos(request):
-    q = request.GET.get('q', '').strip().lower()
-    if not q or len(q) < 2:
-        return JsonResponse([], safe=False)
+class BusquedaPredictivaView(APIView):
+    throttle_classes = [PrediccionBusquedaThrottle]
+    permission_classes = [BloquearSiMantenimiento]
+    def get(self,request:HttpRequest):
+        q = request.GET.get('q', '').strip().lower()
+        if not q or len(q) < 2:
+            return Response([])
+        
+        productos = cache.get('productos_busqueda')
+        if not productos:
+            productos_raw = list(
+                Producto.objects.values(
+                    'nombre', 'slug', 'imagenes_producto__imagen_200','precio','descuento'
+                ).order_by('-precio')
+            )
+            productos = {}
+            for p in productos_raw:
+                if p['slug'] not in productos:
+                    productos[p['slug']] = p
 
-    hash_q = hashlib.md5(q.encode()).hexdigest()
-    cache_key = f"autocomplete:{hash_q}"
+            productos = list(productos.values())
+            
+            for p in productos:
+                img = p.get('imagenes_producto__imagen_200')
+                if img:
+                    p['imagenes_producto__imagen_200'] = f"{settings.MEDIA_URL}{img}"
+            
+            cache.set('productos_busqueda', productos, 300)
 
-    resultados = cache.get(cache_key)
+        busqueda = q.split()
 
-    if not resultados:
-        productos = Producto.objects.filter(nombre__icontains=q).values('nombre', 'slug')[:10]
-        resultados = list(productos)
-        cache.set(cache_key, resultados, 60 * 5)
+        resultados = []
+        for producto in productos:
+            if all(word in (producto['slug'] + producto['nombre'].lower()) for word in busqueda):
+                resultados.append(producto)
 
-    return JsonResponse(resultados, safe=False)
+        if not resultados:
+            resultados = [
+                p for p in productos if any(word in p['slug'] for word in busqueda)
+            ]
+
+        return Response(resultados[:10])
 
 def home(request):
-    productos_descuento = Producto.objects.filter(descuento__gt=0).order_by('-descuento')[:20]
-    return render(request,'core/inicio.html',{
-        'productos_descuento': productos_descuento,
-    })
+    home_cache = cache.get('home_cache')
+    valor_dolar = cache.get('valor_dolar_actual')
+    if valor_dolar is None:
+        valor_dolar = obtener_valor_dolar()
+        cache.set('valor_dolar_actual', valor_dolar, 3600)
 
-def local(request):
-    return render(request,'core/local.html')
+    if not home_cache:
+        home_cache = {
+            'ofertas': Producto.objects.filter(descuento__gt=0).prefetch_related("colores__imagenes_color","imagenes_producto"),
+            'destacados': Producto.objects.filter(etiquetas__slug='destacado').prefetch_related("colores__imagenes_color","imagenes_producto"),
+        }
+        cache.set('home_cache', home_cache, 60 * 30)
 
-@login_required
+    return render(request,'core/inicio.html', {'destacados': home_cache['destacados'], 'ofertas': home_cache['ofertas'],'valor_dolar': valor_dolar,})
+
+@staff_member_required
+def test(request):
+    cache.clear()
+    return render(request,'core/test.html')
+
 @staff_member_required
 def cargar_productos_excel(request):
     if request.method == 'POST':
@@ -121,12 +160,14 @@ def cargar_productos_excel(request):
 
                     productos_a_eliminar.delete()
 
+                    Atributo.objects.all().delete()
+                    Etiquetas.objects.all().delete()
+
                     for _, fila in df.iterrows():
                         marca, _ = Marca.objects.get_or_create(nombre=fila['Marca'])
 
                         try:
                             sub_categoria = SubCategoria.objects.get(nombre=fila['Sub-categoria'])
-                            categoria = sub_categoria.categoria
                         except SubCategoria.DoesNotExist:
                             messages.warning(request, f'Subcategoría no encontrada: {fila["Sub-categoria"]}')
                             continue
@@ -139,7 +180,6 @@ def cargar_productos_excel(request):
                         inhabilitar_flag = inhabilitar_str in ['si', 'sí', 'true', '1']
 
                         try:
-                            # Conversión segura del precio en USD
                             precio_raw = fila.get('Precio USD', '')
                             precio_str = str(precio_raw).replace(',', '.')
                             precio_dolar_excel = Decimal(precio_str)
@@ -148,7 +188,6 @@ def cargar_productos_excel(request):
                             continue
 
                         try:
-                            # Conversión segura del descuento
                             descuento_raw = fila.get('Descuento', '0')
                             descuento_str = str(descuento_raw).replace(',', '.')
                             descuento_excel = Decimal(descuento_str)
@@ -200,11 +239,6 @@ def cargar_productos_excel(request):
                                     producto.sku = sku
                                 producto.save()
 
-                        # Eliminar atributos anteriores para no duplicar
-                        producto.atributos.all().delete()
-                        producto.etiquetas.all().delete()
-
-                        # Cargar nuevos atributos separados por ';'
                         if 'Atributos' in fila and isinstance(fila['Atributos'], str):
                             atributos = fila['Atributos'].split(';')
                             for atributo in atributos:
@@ -220,7 +254,8 @@ def cargar_productos_excel(request):
                             for nombre_etiqueta in etiquetas:
                                 nombre_etiqueta = nombre_etiqueta.strip()
                                 if nombre_etiqueta:
-                                    Etiquetas.objects.get_or_create(producto=producto, nombre=nombre_etiqueta)
+                                    etiqueta, _ = Etiquetas.objects.get_or_create(nombre=nombre_etiqueta)
+                                    producto.etiquetas.add(etiqueta)
 
                     messages.success(request, f"Productos cargados correctamente. Se eliminaron {eliminados} productos.")
                     return redirect('core:cargar_excel')
@@ -231,6 +266,8 @@ def cargar_productos_excel(request):
     
         dolar = DolarActualizar(request.POST)
         if dolar.is_valid():
+            if dolar.cleaned_data['dolar'] is None:
+                return redirect('core:cargar_excel')
             valor_dolar = dolar.cleaned_data['dolar']
             dolar_model = DolarConfiguracion.objects.first()
             dolar_model.valor = valor_dolar

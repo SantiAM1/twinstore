@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<meta name="description" content="Conocé los tiempos, costos y condiciones de envío de Twinstore. Realizamos entregas a todo el país a través de Andreani. Información clara para tu compra online.">
+<meta name="robots" content="index, follow">
+{% endblock meta %}
+
+{% block head %}
+<title>Politicas de envios - Twinstore</title>
+{% endblock head %}
+
+{% block contenidomain %}
+<section class="generic-box">
+    {% include "partials/generic-header.html" with title="Politicas de envios" %}
+    <section class="generic-data">
+        {% include 'components/politicas-navbar.html' with env="selected" %}
+        <div class="generic-item faq">
+            <h1>Políticas de envíos</h1>
+            <p class="faq__description">Twinstore realiza envíos a todo el país a través de Andreani. Al momento de realizar la compra, el cliente debera consultar via WhatsApp el costo de envio.</p>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">Tiempos de entrega</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    Los plazos de entrega comienzan a contarse a partir de la confirmación del pago. Los tiempos pueden variar según la localidad de destino, la disponibilidad del producto y eventualidades propias del servicio logístico. Twinstore no se responsabiliza por demoras atribuibles a la empresa transportista.<br>
+                    Una vez que el pedido es despachado, el cliente recibirá por correo electrónico o medio de contacto indicado el número de seguimiento correspondiente para monitorear el estado de su envío.
+                </p>
+            </details>
+            <details class="faq">
+                <summary>
+                    <span class="faq__title">Entrega del producto</span>
+                    <svg class="faq__chevron" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+                    <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/>
+                    </svg>
+                </summary>
+                <p class="faq__content">
+                    La entrega se realizará en el domicilio indicado por el cliente al momento de la compra. Es responsabilidad del cliente verificar que los datos proporcionados sean correctos y que haya una persona mayor de 18 años para recibir el paquete. Si no se logra concretar la entrega tras los intentos estipulados por la empresa logística, el pedido podrá ser retornado a origen, generando cargos adicionales.<br>
+                    Al recibir el producto, es recomendable que el cliente revise el paquete antes de firmar el remito. En caso de detectar daño físico visible, envoltorio abierto o signos de manipulación indebida, se recomienda rechazar la entrega y notificar inmediatamente a Twinstore dentro de las 24 horas hábiles.<br>
+                    Si el cliente opta por el retiro en sucursal, deberá acercarse dentro del horario de atención publicado, presentando el número de pedido y un documento de identidad.
+                </p>
+            </details>
+        </div>
+    </section>
+</section>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+{% endblock myscripts %}

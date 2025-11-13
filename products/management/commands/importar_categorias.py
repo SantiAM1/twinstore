@@ -24,8 +24,6 @@ class Command(BaseCommand):
                 defaults={
                     'descripcion_seo': item['descripcion_seo'],
                     'slug': item.get('slug') or slugify(item['nombre']),
-                    'seccion_id': item.get('seccion_id'),
-                    'orden': item.get('orden', 0)
                 }
             )
 

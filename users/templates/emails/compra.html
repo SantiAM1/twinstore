@@ -1,0 +1,84 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background-color: #f0f0f0;padding: 8px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">  
+    <div style="min-height: 350px;background-color: #fff;padding: 20px; margin: auto; max-width: 600px; border-radius: 12px;">
+        <img src="{{images.success}}" alt="Compra exitosa" style="display: block; margin: auto; margin-bottom: 1rem;">
+        <h2 style="text-align: center; color: #272727; font-weight: 700; font-size: 2rem;">¡Gracias por tu compra!</h2>
+        <p style="text-align: center; color: #797979; margin: auto; padding-bottom: 2rem; font-size:0.95rem; font-weight: 600;">Tu pedido ha sido recibido y esta siendo procesado. A continuacion encontraras el detalle de tu compra.</p>
+        <div style="max-width: 350px; margin: auto; text-align: center; padding: 10px; background-color: #f5f5f5; border-radius: 10px; border: 1px solid #dcdcdc;">
+            <span style="font-weight: 600; font-size: 1.1rem; display: block; margin-top: 0.5rem;">El código de tu pedido es:</span>
+            <p style="font-size: 1.3rem;font-weight: 600; margin: 0; color: #1173d4; margin-top: 0.78rem;"># {{codigo}}</p>
+            <p style="color: #797979; font-size: 0.8rem; font-weight: 400;">Usá este código para cualquier consulta sobre tu pedido.</p>
+        </div>
+        <a href="{{url}}" style="display: block; text-decoration: none; text-align: center;padding: 0.5rem;background-color: #1173d4;color: #fff; border-radius: 5px; max-width: 300px; margin: auto;margin-top: 1rem;font-weight: 500;">Ver pedido</a>
+        <div style="border-top: 1px solid #e2e2e2; margin-top: 2rem;"></div>
+        <h3 style="font-weight: 500; color: #2b2b2b; font-size: 1.3rem;">Resumen de tu pedido</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <thead>
+                <tr>
+                    <th style="text-align: left;font-size: 1.1rem; padding: 8px; font-weight: 600; color: #5a5a5a;">Producto</th>
+                    <th style="text-align: right;font-size: 1.1rem; padding: 8px; font-weight: 600; color: #5a5a5a;">Cantidad</th>
+                    <th style="text-align: right;font-size: 1.1rem; padding: 8px; font-weight: 600; color: #5a5a5a;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="3" style="border-top: 1px solid #c9c9c9;"></td>
+                </tr>
+                {% for item in compra %}
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 500; color: #383838;">
+                            <img src="{{site_url}}{{item.imagen}}" alt="Imagen Producto" style="width: 50px; height: auto; vertical-align: middle; margin-right: 10px;">
+                            {{item.producto}}
+                        </td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;color: #797979; font-weight: 500;">{{item.cantidad}}</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;color: #3a3a3a; font-weight: 500;">{{item.subtotal|formato_pesos}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="margin-top: 1rem; margin-left: auto; max-width: 300px;">
+            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <tbody>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 500; color: #919191;">Adicionales</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;color: #696969; font-weight: 400;">{{adicional|formato_pesos}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee; color: #383838; font-weight: 600; font-size: 1.1rem;">Total</td>
+                        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;color: #3a3a3a; font-weight: 500; font-size: 1.1rem;">{{total|formato_pesos}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div style="max-width: 500px; margin: auto;">
+        <p style="color:#535353;font-size: 0.9rem; text-align: center;font-weight: 400; margin: 0; margin-top: 1rem;">¿Necesitas ayuda? <a href="https://wa.me/5493413491911" target="_blank" style="color: #1173d4; text-decoration: none; font-weight: 500; font-size: 0.9rem;">Contacta con nosotros.</a></p>
+        <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto; padding:12px 0;">
+            <tr>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.instagram.com/twinstore.ar" target="_blank">
+                    <img src="{{images.insta}}" alt="Instagram" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.linkedin.com/company/twinstore-ar/" target="_blank">
+                    <img src="{{images.link}}" alt="LinkedIn" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+                <td align="center" style="padding:0 6px;">
+                <a href="https://www.tiktok.com/@twinstore.ar" target="_blank">
+                    <img src="{{images.tiktok}}" alt="TikTok" height="24" style="display:block; border:0;">
+                </a>
+                </td>
+            </tr>
+        </table>
+        <p style="color:#535353;font-size: 0.8rem; text-align: center; margin: 0;">© Twinstore 2025.</p>
+    </div>
+</body>
+</html>
