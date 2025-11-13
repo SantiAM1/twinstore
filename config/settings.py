@@ -218,10 +218,23 @@ REST_FRAMEWORK = {
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 if DEBUG:
+    import subprocess
+
+    def get_current_branch():
+        try:
+            branch = subprocess.check_output(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"]
+            ).decode().strip()
+            return branch.replace("/", "_")
+        except:
+            return "default"
+
+    current_branch = get_current_branch()
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / "db.sqlite3",
+            'NAME': BASE_DIR / f"db_{current_branch}.sqlite3",
         }
     }
 else:
