@@ -15,11 +15,6 @@ class Migration(migrations.Migration):
             name='producto',
         ),
         migrations.AddField(
-            model_name='etiquetas',
-            name='slug',
-            field=models.SlugField(blank=True, unique=True),
-        ),
-        migrations.AddField(
             model_name='producto',
             name='etiquetas',
             field=models.ManyToManyField(blank=True, related_name='productos', to='products.etiquetas'),
