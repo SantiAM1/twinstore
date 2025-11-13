@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
-{% load custom_filters %}
+{% load static compress custom_filters %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
@@ -437,7 +436,9 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
+{% compress js %}
 <script src="{% static 'js/animation.js' %}"></script>
 <script src="{% static 'js/perfil-get.js' %}"></script>
 <script src="{% static 'js/facturacion.js' %}"></script>
+{% endcompress %}
 {% endblock myscripts %}

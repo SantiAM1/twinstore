@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
-{% load cache %}
+{% load static compress cache %}
 
 {% block meta %}
 <meta name="description" content="Twinstore es una empresa de venta de productos informáticos. Envíos a todo el país.">
@@ -183,7 +182,9 @@
 
 {% block myscripts %}
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+{% compress js %}
 <script src="{% static 'js/landing.js' %}"></script>
+{% endcompress %}
 <script nonce="{{ request.csp_nonce }}">
 function generateSwiper(data) {
     const gripConf = {

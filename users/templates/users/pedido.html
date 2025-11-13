@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
-{% load custom_filters %}
+{% load static custom_filters compress %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
@@ -95,5 +94,7 @@
 {% endblock contenidomain %}
 
 {% block myscripts %}
+{% compress js %}
 <script src="{% static 'js/pedido.js' %}"></script>
+{% endcompress %}
 {% endblock myscripts %}
