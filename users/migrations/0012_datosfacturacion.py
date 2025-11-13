@@ -7,7 +7,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('payment', '0015_alter_historialcompras_pagos'),
         ('users', '0011_alter_perfilusuario_tipo_factura'),
     ]
 
