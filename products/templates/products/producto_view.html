@@ -29,7 +29,7 @@
 
 {% block head %}
 <title>{{producto.nombre}} - Twinstore</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+<link rel="stylesheet" href="{% static 'css/libs/swiper-bundle.min.css' %}">
 {% endblock head %}
 
 {% block theme %}product{% endblock theme %}
@@ -126,7 +126,7 @@
 {% compress js %}
 <script src="{% static 'js/prodView.js' %}"></script>
 {% endcompress %}
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script defer src="{% static 'js/libs/swiper.js' %}"></script>
 <script nonce="{{ request.csp_nonce }}">
     const thumbsConf = {
     spaceBetween: 8,

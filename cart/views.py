@@ -2,6 +2,8 @@ from django.http import HttpRequest
 from django.shortcuts import get_object_or_404,render
 from django.conf import settings
 from django.core import signing
+from django.core.cache.utils import make_template_fragment_key
+from django.core.cache import cache
 
 from users.decorators import login_required_modal
 
@@ -122,6 +124,8 @@ class ActualizarPedidoView(APIView):
             cantidad = carrito.get(key, 0)
 
         clear_carrito_cache(request)
+        key = make_template_fragment_key("header_main",[request.user.id])
+        cache.delete(key)
 
         carrito = obtener_carrito(request)
         precio_total, precio_subtotal, descuento = obtener_total(carrito)
@@ -163,6 +167,9 @@ class EliminarPedidoView(APIView):
             carrito = request.session.get('carrito',{})
             carrito.pop(str(pedido_id), None)
             request.session['carrito'] = carrito
+
+        key = make_template_fragment_key("header_main",[request.user.id])
+        cache.delete(key)
 
         total_productos = carrito_total(request)
         carrito = obtener_carrito(request)
@@ -211,6 +218,8 @@ class AgregarAlCarritoView(APIView):
             request.session['carrito'] = carrito
 
         clear_carrito_cache(request)
+        key = make_template_fragment_key("header_main",[request.user.id])
+        cache.delete(key)
 
         total_processor = carrito_total(request)
 

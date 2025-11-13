@@ -44,7 +44,7 @@
 {% include 'modals.html' %}
 <!--- Scripts --->
 <!-- * AXIOS -->
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script defer src="{% static 'js/libs/axios.js' %}"></script>
 {% compress js %}
 <script defer src="{% static 'js/generic-axios.js' %}"></script>
 <script defer src="{% static 'js/base.js' %}"></script>
