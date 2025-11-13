@@ -126,7 +126,7 @@
 {% compress js %}
 <script src="{% static 'js/prodView.js' %}"></script>
 {% endcompress %}
-<script defer src="{% static 'js/libs/swiper.js' %}"></script>
+<script src="{% static 'js/libs/swiper.js' %}"></script>
 <script nonce="{{ request.csp_nonce }}">
     const thumbsConf = {
     spaceBetween: 8,
