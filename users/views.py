@@ -2,8 +2,8 @@ from .models import PerfilUsuario,TokenUsers
 from .decorators import login_required_modal
 from .emails import mail_recuperar_cuenta_html
 
-from payment.models import HistorialCompras
-from cart.utils import merge_carts,clear_carrito_cache
+from payment.models import Venta
+from cart.utils import merge_carts,clear_carrito_cache,clear_cache_header
 from core.permissions import BloquearSiMantenimiento
 from core.throttling import ModalUsers,MiCuentaThrottle
 from products.models import ReseñaProducto, TokenReseña
@@ -16,7 +16,6 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpRequest, JsonResponse
 from django.core.cache import cache
-from django.core.cache.utils import make_template_fragment_key
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -55,9 +54,6 @@ class LoginAPIView(APIView):
         login(request, user)
         merge_carts(request, user)
         clear_carrito_cache(request)
-
-        key = make_template_fragment_key("header_main")
-        cache.delete(key)
         
         messages.success(request,'Has iniciado sesión correctamente.')
 
@@ -163,9 +159,6 @@ class VerificarTokenView(APIView):
 
             messages.success(request,'Cuenta confirmada de manera exitosa.')
 
-            key = make_template_fragment_key("header_main",[request.user.id])
-            cache.delete(key)
-
             next_url = request.data.get("next",'')
             return Response({"redirect": next_url} if next_url else {"reload": True}, status=status.HTTP_200_OK)
 
@@ -245,11 +238,11 @@ class VerPedidoAPIView(APIView):
         serializer = PedidoSerializer(data=request.data)
         if serializer.is_valid():
             try:
-                historial = HistorialCompras.objects.get(merchant_order_id=serializer.validated_data["order_id"])
-            except HistorialCompras.DoesNotExist:
+                venta = Venta.objects.get(merchant_order_id=serializer.validated_data["order_id"])
+            except Venta.DoesNotExist:
                 return Response({"error": "No se encontró un pedido con ese ID."}, status=status.HTTP_404_NOT_FOUND)
             
-            return Response({"redirect": f"/usuario/pedido/{historial.merchant_order_id}"}, status=status.HTTP_200_OK)
+            return Response({"redirect": f"/usuario/pedido/{venta.merchant_order_id}"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CrearReseñaView(APIView):
@@ -287,20 +280,19 @@ def check_auth(request):
 
 @login_required_modal
 def mi_perfil(request):
-    historial = HistorialCompras.objects.filter(usuario=request.user).order_by('-fecha_compra').prefetch_related('tickets','comprobante')
-    return render(request,'users/micuenta.html',{'historial':historial})
+    ventas = Venta.objects.filter(usuario=request.user).order_by('-fecha_compra').prefetch_related('tickets','comprobante','detalles')
+    return render(request,'users/micuenta.html',{'ventas':ventas})
 
 @login_required
 def cerrar_sesion(request):
+    clear_cache_header(request)
     logout(request)
-    key = make_template_fragment_key("header_main", [request.user.id])
-    cache.delete(key)
     messages.success(request,'Has cerrado sesión correctamente.')
     return redirect('core:home')
 
 def ver_pedido(request, order_id:str):
-    historial = get_object_or_404(HistorialCompras, merchant_order_id=order_id)
-    return render(request,'users/pedido.html',{'order':historial})
+    venta = get_object_or_404(Venta, merchant_order_id=order_id)
+    return render(request,'users/pedido.html',{'venta':venta})
 
 @login_required_modal
 def review_pedido(request:HttpRequest,token:str):

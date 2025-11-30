@@ -70,7 +70,7 @@
             <a href="{% url 'admin:index' %}" aria-label="Ir al panel de administración">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-settings"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" /><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></svg>
             </a>
-            <a href="{% url 'core:cargar_excel' %}" aria-label="Cargar productos via Excel">
+            <a href="{% url 'dashboard:dashboard' %}" aria-label="Ir al Dashboard">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-building-store"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 21l18 0" /><path d="M3 7v1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1h-18l2 -4h14l2 4" /><path d="M5 21l0 -10.15" /><path d="M19 21l0 -10.15" /><path d="M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4" /></svg>
             </a>
             {% endif %}
@@ -80,6 +80,14 @@
     <nav class="navbar-buttom">
         <a class="" href="{% url 'products:grid' %}">Productos</a>
         <a class="generic-modal-open" href="#" data-modalId="pedidos" data-focus="id_buscar_pedido">Pedidos</a>
+        {% if evento_activo %}
+        <a class="navbar-event" href="{% url 'products:grid' %}?evento={{ evento_activo.slug }}">
+        {% if evento_activo.logo %}
+        <img class="navbar-evento-icon" src="{{ evento_activo.logo.url }}" alt="{{ evento_activo.nombre }}" height="23" width="23">
+        {% endif %}
+        {{ evento_activo.nombre_evento }}
+        </a>
+        {% endif %}
         <a class="" href="{% url 'core:contacto' %}">Contacto</a>
         <a class="" href="{% url 'core:faq' %}">Ayuda</a>
         <a class="" href="https://maps.app.goo.gl/bxRjuN4sWMKrNPe49" target="_blank" rel="noopener noreferrer">Pick-up</a>

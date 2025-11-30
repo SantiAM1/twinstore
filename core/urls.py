@@ -11,7 +11,8 @@ from .views import (
     politicas_tecnico,
     contacto,
     BusquedaPredictivaView,
-    test
+    cache_clear,
+    test,
 )
 
 app_name = "core"
@@ -28,5 +29,6 @@ urlpatterns = [
     path('politicas-tecnico/',politicas_tecnico,name="politicas-tecnico"),
     path('contacto/',contacto,name="contacto"),
     path('api/busqueda_predictiva/',BusquedaPredictivaView.as_view(), name='busqueda_predictiva'),
+    path('cache_clear/',cache_clear,name="cache_clear"),
     path('test/',test,name="test"),
 ]

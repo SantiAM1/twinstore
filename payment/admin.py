@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import HistorialCompras,PagoRecibidoMP,ComprobanteTransferencia,EstadoPedido,Cupon,TicketDePago
+from .models import Venta,PagoRecibidoMP,ComprobanteTransferencia,EstadoPedido,Cupon,TicketDePago,VentaDetalle
 from django.utils.html import format_html
 from django.utils.timezone import localtime
 from django.template.defaultfilters import date as date_filter
@@ -26,6 +26,20 @@ class ComprobanteTransferenciaInline(admin.StackedInline):
     classes = ['collapse']
     readonly_fields = ['file', 'fecha_subida']
 
+class VentaDetalleInline(admin.StackedInline):
+    model = VentaDetalle
+    can_delete = False
+    extra = 0
+    classes = ['collapse']
+    readonly_fields = ['producto','color','cantidad','precio_unitario','subtotal']
+    fieldsets = (
+        (None, {
+            'fields': (
+                'producto','color','cantidad','precio_unitario','subtotal'
+            )
+        }),
+    )
+
 class EstadoPedidoInline(admin.StackedInline):
     model = EstadoPedido
     form = EstadoPedidoForm
@@ -51,23 +65,24 @@ class EstadoPedidoInline(admin.StackedInline):
 
     render_estado_pedido.short_description = "Informacion"
 
-@admin.register(HistorialCompras)
-class HistorialComprasAdmin(admin.ModelAdmin):
+@admin.register(Venta)
+class VentaAdmin(admin.ModelAdmin):
     inlines = [EstadoPedidoInline]
     search_fields = ('merchant_order_id',)
     list_filter = ('estado', 'fecha_compra', 'requiere_revision')
     list_display = ('merchant_order_id', 'mostrar_nombre_apellido', 'total_compra', 'estado', 'fecha_compra','fecha_finalizado','requiere_revision')
-    readonly_fields = ('merchant_order_id','detalle_productos','datos_facturacion_expandible','fecha_compra','forma_de_pago','total_compra','fecha_finalizado')
+    readonly_fields = ('merchant_order_id','datos_facturacion_expandible','fecha_compra','forma_de_pago','total_compra','fecha_finalizado')
     fieldsets = (
         (None, {
             'fields': (
-                'detalle_productos','merchant_order_id','total_compra', 'estado', 'forma_de_pago', 'fecha_finalizado','datos_facturacion_expandible'
+                'merchant_order_id','total_compra', 'estado', 'forma_de_pago', 'fecha_finalizado','datos_facturacion_expandible'
             )
         }),
     )
 
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
+        inline_instances.append(VentaDetalleInline(self.model, self.admin_site))
         inline_instances.append(EstadoPedidoInline(self.model, self.admin_site))
         if obj and obj.forma_de_pago in ['transferencia','mixto']:
             inline_instances.append(ComprobanteTransferenciaInline(self.model, self.admin_site))
@@ -111,37 +126,10 @@ class HistorialComprasAdmin(admin.ModelAdmin):
         )
         return format_html(html)
 
-    # def has_delete_permission(self, request, obj=None):
-    #     if obj is None:
-    #         return False  # no permitir borrar desde la lista
-    #     return obj.estado in ['finalizado', 'arrepentido']
+    def has_delete_permission(self, request, obj=None):
+        if obj is None:
+            return False  # no permitir borrar desde la lista
+        return obj.estado in ['finalizado', 'arrepentido']
 
-    def detalle_productos(self, obj):
-        if not obj.productos:
-            return "Sin productos."
-        html = '<table style="border-collapse: collapse; width: 100%;">'
-        html += (
-            '<tr>'
-            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Imagen</th>'
-            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Producto</th>'
-            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Precio Unitario</th>'
-            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Cantidad</th>'
-            '<th style="padding: 6px; border-bottom: 1px solid #ddd;">Subtotal</th>'
-            '</tr>'
-        )
-        for p in obj.productos:
-            html += (
-                f'<tr>'
-                f'<td style="padding: 6px;"><img src="{p["imagen"]}" alt="{p["producto"]}" style="max-width: 50px;"/></td>'
-                f'<td style="padding: 6px;">{p["producto"]}</td>'
-                f'<td style="padding: 6px;">{p["precio_unitario"]}</td>'
-                f'<td style="padding: 6px;">{p["cantidad"]}</td>'
-                f'<td style="padding: 6px;">${p["subtotal"]:,.2f}</td>'
-                f'</tr>'
-            )
-        html += '</table>'
-        return format_html(html)
-
-    detalle_productos.short_description = "Detalle de compra"
     mostrar_nombre_apellido.short_description = "Cliente"
     datos_facturacion_expandible.short_description = "Datos de facturación"

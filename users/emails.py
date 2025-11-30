@@ -28,31 +28,31 @@ def mail_recuperar_cuenta_html(usuario:User) -> None:
     enviar_mail_recuperar_cuenta.delay(mail_data,user_email=usuario.email)
 
 @debug_pass
-def mail_buy_send_html(historial,user_email):
+def mail_buy_send_html(venta,user_email):
     """
     Envía el mail de compra exitosa
     """
-    codigo = historial.merchant_order_id
+    codigo = venta.merchant_order_id
     site_url = f'{settings.SITE_URL}'
-    compra = historial.productos
-    adicional = historial.get_adicional()
-    total = historial.total_compra
-    historial_data = {
+    compra = venta.productos
+    adicional = venta.get_adicional()
+    total = venta.total_compra
+    venta_data = {
     'url': f"{site_url}/usuario/pedido/{codigo}",
     'codigo': codigo,
     'compra':compra,
     'adicional':adicional,
     'total':total
     }
-    enviar_mail_compra.delay(historial_data, user_email)
+    enviar_mail_compra.delay(venta_data, user_email)
 
 @debug_pass
-def mail_estado_pedido_html(historial,user_email):
+def mail_estado_pedido_html(venta,user_email):
     """Envía el mail cuando hay un cambio en el estado del pedido"""
-    codigo = historial.merchant_order_id
+    codigo = venta.merchant_order_id
     site_url = f'{settings.SITE_URL}'
 
-    estado = historial.estado
+    estado = venta.estado
     estado = estado.capitalize()
 
     mail_data = {
@@ -76,10 +76,10 @@ def reseña_token_html(token_usuario,user_email):
     enviar_reseña_token_html.delay(mail_data, user_email,'emails/review.html')
 
 @debug_pass
-def mail_obs_comprobante_html(historial,observaciones):
-    token = historial.merchant_order_id
-    user_email = historial.facturacion.email
-    pedido_id = historial.merchant_order_id
+def mail_obs_comprobante_html(venta,observaciones):
+    token = venta.merchant_order_id
+    user_email = venta.facturacion.email
+    pedido_id = venta.merchant_order_id
     site_url = f'{settings.SITE_URL}'
     mail_data = {
         'url': f"{site_url}/usuario/ver_pedido/{token}",

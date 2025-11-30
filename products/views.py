@@ -3,6 +3,7 @@ from django.shortcuts import render
 
 from .models import Producto, SubCategoria,Marca,ImagenProducto,Categoria,ColorProducto
 from .utils import inject_categorias_subcategorias,filters,ordenby,cuotas_mp,grid_meta_data,prod_meta_data
+from .types import GridContext
 from django.db.models import Q
 from django.template.loader import render_to_string
 from .forms import EditarProducto
@@ -10,7 +11,12 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count,Prefetch
+
+from core.models import EventosPromociones
+from django.utils import timezone
+
+
 
 # Create your views here.
 # ----- Prod View ----- #
@@ -31,11 +37,16 @@ def producto_view(request: HttpRequest, slug: str):
     """
     producto = (
         Producto.objects
-        .prefetch_related('colores__imagenes_color', 'imagenes_producto','especificaciones','reseñas','reseñas__usuario')
-        .get(slug=slug)
-    )
+        .prefetch_related(
+            'colores__imagenes_color',
+            'imagenes_producto',
+            'especificaciones',
+            'reseñas',
+            'reseñas__usuario')
+            .get(slug=slug)
+        )
 
-    mercado_pago_cuotas = cuotas_mp(float(producto.precio))
+    mercado_pago_cuotas = cuotas_mp(float(producto.precio_final))
 
     imagenes_dict = producto.obtener_imagenes()
 
@@ -156,114 +167,87 @@ def eliminar_imagen(request, img_id):
     return redirect('products:editar_producto', pk=producto_id)
 
 # ----- ProdGrid ----- #
-def productos_filters(request:HttpRequest,type:str='render',subcategoria_slug:str=None,categoria_slug:str=None,flag_filters:bool=False,marca_request:str=None,busqueda:str=None):
-    """
-    Filtra los productos según los parámetros proporcionados.
-    Si no hay parametros, devuelve todos los productos.
-    1. subcategoria_slug: Filtra por subcategoría si se proporciona.
-    2. categoria_slug: Filtra por categoría si se proporciona.
-    3. marca: Filtra por marca si se proporciona.
-    4. busqueda: Filtra por término de búsqueda si se proporciona.
-    5. flag_filters: Si es True, aplica filtros adicionales.
-    6. type: Define el tipo de respuesta ('json' o django 'render').
-    """
-    if subcategoria_slug:
-        subcategoria = get_object_or_404(SubCategoria,slug=subcategoria_slug)
-        productos = Producto.objects.filter(sub_categoria=subcategoria).prefetch_related("colores__imagenes_color","imagenes_producto")
-        title = subcategoria.nombre
+def products_grid_response(
+        request: HttpRequest,
+        ctx: GridContext,
+        type_request: str = 'render'
+        ):
     
-    elif categoria_slug:
-        categoria = get_object_or_404(Categoria, slug=categoria_slug)
-        sub_categorias = (
-            SubCategoria.objects
-            .filter(categoria=categoria)
-            .annotate(total=Count('productos', distinct=True))
-        )
-        productos = Producto.objects.filter(sub_categoria__in=sub_categorias).prefetch_related("colores__imagenes_color","imagenes_producto")
-        title = categoria.nombre
+    productos = ctx['productos']
 
-    else:
-        if marca_request:
-            marca = Marca.objects.get(slug=marca_request)
-            productos = Producto.objects.filter(marca=marca).prefetch_related("colores__imagenes_color","imagenes_producto")
-            title = marca.nombre
-        elif busqueda:
-            productos = (
-                Producto.objects
-                .filter(
-                    Q(nombre__icontains=busqueda) | Q(slug__icontains=busqueda)
-                )
-                .prefetch_related("colores__imagenes_color", "imagenes_producto")
-            )
-            title = f'Resultados de busqueda'
-        else:
-            productos = Producto.objects.all().prefetch_related("colores__imagenes_color","imagenes_producto")
-            title = 'Productos'
-
-    if flag_filters:
-        marca_seleccionada = request.GET.get('Marca')
-        if marca_seleccionada:
-            productos = productos.filter(marca__nombre=marca_seleccionada)
-        productos,atributos_unicos = filters(request,productos)
-        marcas = (
-            Marca.objects
-            .filter(producto__in=productos)
-            .annotate(total=Count('producto', distinct=True))
-            .distinct()
-        )
-    else:
-        marcas = {}
-        atributos_unicos = {}
-
-    productos, filtro=ordenby(request,productos)
-
-    if type == 'json':
+    if type_request == 'json':
         mutable_get = request.GET.copy()
         mutable_get.pop('type', None)
         request.GET = mutable_get
         
-        filters_nav = render_to_string('partials/filters-nav.html',{"title":"pass","marcas":marcas,'atributos':atributos_unicos},request=request)
+        filters_nav = render_to_string('partials/filters-nav.html',{"title":"pass","marcas":ctx['marcas'],'atributos':ctx['atributos']},request=request)
         prod_grid = render_to_string('partials/prod-grid.html',{'productos':productos})
         filters_active = render_to_string('partials/active-filters.html',request=request)
         order_links = render_to_string('partials/order-links.html',request=request)
-        return JsonResponse({'filtersNav':filters_nav,'prodGrid':prod_grid,'filtro':filtro,'activeFilters':filters_active,'orderLinks':order_links,'title':title})
-
-    elif type == 'render':
+        return JsonResponse({'filtersNav':filters_nav,'prodGrid':prod_grid,'filtro':ctx['filtro'],'activeFilters':filters_active,'orderLinks':order_links,'title':ctx['title']})
+    
+    elif type_request == 'render':
         meta = grid_meta_data(
             request,
             productos,
-            title,
-            categoria_obj=categoria if categoria_slug else None,
-            subcategoria_obj=subcategoria if subcategoria_slug else None
-            )
+            ctx["title"],
+            categoria_obj=ctx.get('categoria', None),
+            subcategoria_obj=ctx.get('sub_categoria_obj', None)
+        )
         return render(request,'products/prod-grid.html',{
-            'productos': productos,
+            **ctx,
             'categorias_data': request.categorias_data,
-            'marcas':marcas,
-            'title':title,
-            'filtro':filtro,
-            'atributos':atributos_unicos,
-            'sub_categorias': sub_categorias if categoria_slug else None,
             'meta':meta
         })
-    
-    return Http404("Type no válido")
 
 @inject_categorias_subcategorias
 def categoria_view(request:HttpRequest,slug:str):
     type_request = request.GET.get('type', 'render')
-    return productos_filters(request,type_request,categoria_slug=slug,flag_filters=True)
+
+    ctx = Producto.objects.master_request(
+        categoria_slug=slug,
+        request=request,
+        flag_filters=True
+    )
+
+    return products_grid_response(request, ctx, type_request)
 
 @inject_categorias_subcategorias
 def subcategoria_view(request:HttpRequest,categoria,subcategoria):
     type_request = request.GET.get('type', 'render')
-    return productos_filters(request,type_request,subcategoria_slug=subcategoria,flag_filters=True)
+    
+    ctx = Producto.objects.master_request(
+        subcategoria_slug=subcategoria,
+        request=request,
+        flag_filters=True
+    )
+
+    return products_grid_response(request, ctx, type_request)
+
 
 @inject_categorias_subcategorias
-def productos(request:HttpRequest):
-    type_request = request.GET.get('type', 'render')
-    marca_request = request.GET.get('Marca', None)
-    return productos_filters(request,type_request,marca_request=marca_request)
+def productos(request: HttpRequest):
+    type_request = request.GET.get("type", "render")
+
+    marca_slug = request.GET.get("marca")
+    evento_slug = request.GET.get("evento")
+
+    evento_obj = None
+    if evento_slug:
+        ahora = timezone.now()
+        evento_obj = EventosPromociones.objects.filter(
+            activo=True,
+            fecha_inicio__lte=ahora,
+            fecha_fin__gte=ahora,
+            slug=evento_slug
+        ).first()
+
+    ctx = Producto.objects.master_request(
+        marca_slug=marca_slug,
+        evento=evento_obj,
+        request=request
+    )
+    return products_grid_response(request, ctx, type_request)
 
 # ----- Busqueda de productos ----- #
 @inject_categorias_subcategorias
@@ -274,4 +258,10 @@ def busqueda_view(request:HttpRequest):
     if not q or len(q) < 2:
         return redirect('products:grid')
     
-    return productos_filters(request,type_request,flag_filters=True,busqueda=q)
+    ctx = Producto.objects.master_request(
+        busqueda=q,
+        request=request,
+        flag_filters=True
+    )
+
+    return products_grid_response(request, ctx, type_request)

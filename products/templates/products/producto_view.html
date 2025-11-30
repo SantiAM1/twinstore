@@ -47,9 +47,14 @@
             {% endif %}
             <p class="product-description">{{producto.descripcion_seo}}</p>
             <div class="product-prices">
-                {% if producto.descuento > 0 %}<p>{{producto.precio_anterior|formato_pesos}}</p><span>-{{producto.descuento}}%</span>{% endif %}
-                <h2>{{producto.precio|formato_pesos}}</h2>
-                <aside>Precio s/imp. nac. {{producto.precio|imp_nac|formato_pesos}}</aside>
+                {% if producto.banner %}
+                <p>{{producto.precio_base|formato_pesos}}</p><span>{{producto.banner}}</span>
+                {% endif %}
+                <h2>{{producto.precio_final|formato_pesos}}</h2>
+                <aside>Precio s/imp. nac. {{producto.precio_final|imp_nac|formato_pesos}}</aside>
+                {% if producto.evento.logo %}
+                <img src="{{producto.evento.logo.url}}" alt="{{producto.evento.nombre}}" width="70" height="70">
+                {% endif %}
             </div>
             <div class="product-colors">
             {% if producto.colores.exists %}

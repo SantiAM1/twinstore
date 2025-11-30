@@ -1,33 +1,37 @@
 from decimal import Decimal
-from .models import DolarConfiguracion,ConfiguracionTienda
+from .models import Tienda
 from django.core.cache import cache
 from django.conf import settings
-
-def actualizar_precio_final(producto, valor_dolar) -> None:
-    """
-    Calcula el precio final en ARS a partir del precio en USD y el descuento.
-    """
-    if producto.precio_dolar is None:
-        return 
-
-    precio_base = round(producto.precio_dolar * valor_dolar, 2)
-
-    if producto.descuento > 0:
-        descuento_decimal = Decimal(producto.descuento) / Decimal('100')
-        producto.precio = round(precio_base * (1 - descuento_decimal), 2)
-    else:
-        producto.precio = precio_base
-
-def obtener_valor_dolar() -> Decimal:
-    """
-    Obtiene el valor actual del dólar desde la configuración.
-    """
-    dolar = DolarConfiguracion.objects.first()
-    return dolar.valor
+from .types import ConfigDict
 
 CACHE_KEY_CONFIG = "configuracion_tienda"
 
-def get_configuracion_tienda() -> ConfiguracionTienda:
+def actualizar_precio_final(producto) -> None:
+    """
+    Calcula el precio final de un producto basado en la configuración de la tienda y actualiza su atributo 'precio'.
+    Args:
+        producto (Producto): Instancia del producto cuyo precio se va a actualizar.
+    """
+    config = get_configuracion_tienda()
+    if config['divisa'] == Tienda.Divisas.USD:
+        if producto.precio_divisa is None:
+            return 
+
+        precio_base = round(producto.precio_divisa * config['valor_dolar'], 2)
+
+        if producto.descuento > 0:
+            descuento_decimal = Decimal(producto.descuento) / Decimal('100')
+            producto.precio = round(precio_base * (1 - descuento_decimal), 2)
+        else:
+            producto.precio = precio_base
+    else:
+        if producto.descuento > 0:
+            descuento_decimal = Decimal(producto.descuento) / Decimal('100')
+            producto.precio = round(producto.precio_divisa * (1 - descuento_decimal), 2)
+        else:
+            producto.precio = producto.precio_divisa
+
+def get_configuracion_tienda() -> ConfigDict:
     """
     Obtiene la configuración general de la tienda desde caché.
     Si no existe, la crea o la guarda automáticamente.
@@ -36,11 +40,102 @@ def get_configuracion_tienda() -> ConfiguracionTienda:
     if config:
         return config
 
-    config = ConfiguracionTienda.objects.first()
+    config = Tienda.objects.first()
     if not config:
-        config = ConfiguracionTienda.objects.create()
+        config = Tienda.objects.create()
+
+    data = {
+        'id': config.id,
+        'nombre_tienda': config.nombre_tienda,
+        'modo_stock': config.modo_stock,
+        'mostrar_stock_en_front': config.mostrar_stock_en_front,
+        'borrar_cupon': config.borrar_cupon,
+        'mantenimiento': config.mantenimiento,
+        'divisa': config.divisa,
+        'valor_dolar': config.valor_dolar,
+        'maximo_compra': config.maximo_compra,
+        'fecha_actualizacion_dolar': config.fecha_actualizacion_dolar,
+        'fecha_actualizacion_config': config.fecha_actualizacion_config,
+    }
 
     time = 43200 if not settings.DEBUG else 5
 
-    cache.set(CACHE_KEY_CONFIG, config, timeout=time)
-    return config
+    cache.set(CACHE_KEY_CONFIG, data, timeout=time)
+    return data
+
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
+import os
+
+try:
+    RESAMPLE = Image.Resampling.LANCZOS
+except AttributeError:
+    RESAMPLE = Image.ANTIALIAS
+
+def resize_to_size(image_field, size=(200, 200)):
+    """
+    Resize para logos, iconos y elementos gráficos:
+    - Mantiene proporción sin deformar
+    - No corta nada
+    - Centra la imagen en un canvas transparente exacto
+    - Perfecto para logos tipo 'Hot Sale'
+    """
+    if not image_field:
+        return None
+
+    try:
+        img = Image.open(image_field)
+
+        if img.mode != "RGBA":
+            img = img.convert("RGBA")
+
+        target_w, target_h = size
+        original_w, original_h = img.size
+
+        # --- 1. Resize proporcional SIN corte ---
+        ratio_w = target_w / original_w
+        ratio_h = target_h / original_h
+        scale = min(ratio_w, ratio_h)
+
+        new_w = int(original_w * scale)
+        new_h = int(original_h * scale)
+
+        img = img.resize((new_w, new_h), RESAMPLE)
+
+        # --- 2. Crear canvas transparente ---
+        canvas = Image.new("RGBA", size, (0, 0, 0, 0))
+
+        # --- 3. Centrar imagen dentro del canvas ---
+        left = (target_w - new_w) // 2
+        top = (target_h - new_h) // 2
+        canvas.paste(img, (left, top), img)
+
+        # --- 4. Guardar en WEBP ---
+        buffer = BytesIO()
+        canvas.save(fp=buffer, format="WEBP", quality=90)
+
+        return ContentFile(buffer.getvalue())
+
+    except Exception as e:
+        print("ERROR resize:", e)
+        return None
+    
+# def resize_to_size(image_field, size=(200, 200)):
+#     if not image_field:
+#         return None
+#     try:
+#         img = Image.open(image_field)
+#         if img.mode in ('RGBA', 'LA'):
+#             fondo = Image.new('RGB', img.size, (255, 255, 255))
+#             fondo.paste(img, mask=img.split()[-1])
+#             img = fondo
+#         else:
+#             img = img.convert('RGB')
+            
+#         img.thumbnail(size, RESAMPLE)
+#         buffer = BytesIO()
+#         img.save(fp=buffer, format='WEBP', quality=85)
+#         return ContentFile(buffer.getvalue())
+#     except Exception as e:
+#         return None

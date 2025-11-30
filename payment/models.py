@@ -7,42 +7,60 @@ import string
 import secrets
 import re
 from django.core import signing
-from products.models import TokenReseña, Producto,ReseñaProducto
+from products.models import TokenReseña, Producto,ReseñaProducto,ColorProducto
 
-class HistorialCompras(models.Model):
-    ESTADOS = [
-        ('pendiente', 'Pendiente🟡'),
-        ('confirmado', 'Confirmado🟢'),
-        ('rechazado', 'Rechazado🔴'),
-        ('listo para retirar','Listo para retirar✔️'),
-        ('enviado','Enviado🟣'),
-        ('finalizado','Finalizado⚪'),
-        ('arrepentido', 'Arrepentido⭕')
-    ]
+class Venta(models.Model):
+    class Estado(models.TextChoices):
+        PENDIENTE = "pendiente", "Pendiente🟡"
+        CONFIRMADO = "confirmado", "Confirmado🟢"
+        RECHAZADO = "rechazado", "Rechazado🔴"
+        FINALIZADO = "finalizado", "Finalizado⚪"
+        ARREPENTIDO = "arrepentido", "Arrepentido⭕"
+        LISTO_PARA_RETIRAR = "listo para retirar", "Listo para retirar✔️"
+        ENVIADO = "enviado", "Enviado🟣"
 
-    FORMA_DE_PAGO = [
-        ('efectivo','Efectivo'),
-        ('mercado_pago','Mercado Pago'),
-        ('transferencia','Transferencia'),
-        ('mixto','Mixto'),
-        ('tarjeta','Tarjeta')
-    ]
+    class FormaPago(models.TextChoices):
+        EFECTIVO = "efectivo", "Efectivo"
+        MP = "mercado_pago", "Mercado Pago"
+        TRANSFERENCIA = "transferencia", "Transferencia"
+        MIXTO = "mixto", "Mixto"
+        TARJETA = "tarjeta", "Tarjeta"
 
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='historial_compras')
-    productos = models.JSONField()
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ventas')
     total_compra = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_compra = models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=20, choices=ESTADOS, default='pendiente')
-    forma_de_pago = models.CharField(max_length=20,choices=FORMA_DE_PAGO,default='efectivo')
+    estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.PENDIENTE)
+    forma_de_pago = models.CharField(max_length=20,choices=FormaPago.choices,default=FormaPago.EFECTIVO)
     pagos = models.ManyToManyField("PagoRecibidoMP", blank=True,editable=False)
     merchant_order_id = models.CharField(max_length=100, blank=True, null=True,unique=True)
     fecha_finalizado = models.DateTimeField(null=True,blank=True)
     requiere_revision = models.BooleanField(default=True)
 
-    def check_comprobante_subido(self):
+    def detalle_productos(self) -> list[dict[str, str | Decimal | int]]:
+        """
+        Retorna una lista con los detalles de los productos en la venta.
+        """
+        detalle = []
+        for venta in self.detalles.all():
+            detalle.append({
+                'producto': venta.producto.nombre if not venta.color else f"({venta.color.nombre}) {venta.producto.nombre}",
+                'cantidad': venta.cantidad,
+                'precio_unitario': venta.precio_unitario,
+                'subtotal': venta.subtotal,
+                'imagen': venta.imagen_url
+            })
+        return detalle
+
+    def check_comprobante_subido(self) -> bool:
+        """
+        Verifica si se ha subido un comprobante de transferencia.
+        """
         return hasattr(self, 'comprobante')
 
-    def check_historial(self):
+    def check_venta(self) -> None:
+        """
+        Verifica y actualiza el estado de la venta según la forma de pago y el estado de los tickets asociados.
+        """
         if self.estado == 'confirmado':
             return
 
@@ -84,7 +102,7 @@ class HistorialCompras(models.Model):
         
         return total - subtotal
 
-    def ticket_mp(self):
+    def ticket_mp(self) -> "TicketDePago | None":
         """
         Retorna el ticket de Mercado Pago asociado a la compra.
         """
@@ -131,9 +149,9 @@ class HistorialCompras(models.Model):
             return timezone.now() <= limite_arrepentimiento
         return False
 
-    def manage_buttons(self):
+    def manage_buttons(self) -> dict[str, bool]:
         """
-        Gestiona los botones de los productos en la vista de historial de compras.
+        Gestiona los botones de los productos en la vista de la Venta.
         Retorna un diccionario con los botones habilitados o deshabilitados.
         """
         buttons = {
@@ -152,18 +170,13 @@ class HistorialCompras(models.Model):
             buttons['subir_comprobante'] = True
 
         return buttons
-    
-    def token_reseñas(self):
-        """
-        Cuando el Historial de Compras está finalizado, crea tokens de reseñas para cada producto comprado.
-        """
-        for item in self.productos:
-            try:
-                nombre = item['producto'].split(') ')[1]
-            except:
-                nombre = item['producto']
-            producto = Producto.objects.filter(nombre=nombre).first()
 
+    def token_reseñas(self) -> None:
+        """
+        Cuando la Venta está finalizada, crea tokens de reseñas para cada producto comprado.
+        """
+        for detalle in self.detalles.all():
+            producto = detalle.producto
             if ReseñaProducto.objects.filter(usuario=self.usuario.perfil,producto=producto).exists():
                 return None
             TokenReseña.objects.get_or_create(
@@ -174,8 +187,23 @@ class HistorialCompras(models.Model):
     def __str__(self):
         return f"{self.merchant_order_id} - {self.estado} - {self.usuario}"
 
+class VentaDetalle(models.Model):
+    venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name='detalles')
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
+    color = models.ForeignKey(ColorProducto, on_delete=models.PROTECT, blank=True, null=True)
+    imagen_url = models.URLField(blank=True, null=True)
+    cantidad = models.IntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def get_range(self):
+        return range(self.cantidad)
+
+    def __str__(self):
+        return f"{self.producto.nombre} x {self.cantidad} - {self.venta.merchant_order_id}"
+
 class EstadoPedido(models.Model):
-    historial = models.ForeignKey(HistorialCompras, on_delete=models.CASCADE, related_name='estados')
+    venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name='estados')
     estado = models.CharField(max_length=100)
     fecha = models.DateTimeField(auto_now_add=True)
     comentario = models.TextField(blank=True, null=True)
@@ -197,29 +225,29 @@ class PagoRecibidoMP(models.Model):
         return f"Pago {self.payment_id} - {self.status}"
 
 class TicketDePago(models.Model):
-    ESTADOS = [
-        ('aprobado','Aprobado'),
-        ('rechazado','Rechazado'),
-        ('pendiente','Pendiente')
-    ]
-    historial = models.ForeignKey(HistorialCompras,on_delete=models.CASCADE,related_name='tickets')
-    estado = models.CharField(max_length=20,choices=ESTADOS,default='pendiente')
+    class Estado(models.TextChoices):
+        APROBADO = 'aprobado', 'Aprobado'
+        RECHAZADO = 'rechazado', 'Rechazado'
+        PENDIENTE = 'pendiente', 'Pendiente'
+
+    venta = models.ForeignKey(Venta,on_delete=models.CASCADE,related_name='tickets')
+    estado = models.CharField(max_length=20,choices=Estado.choices,default=Estado.PENDIENTE)
     monto = models.DecimalField(max_digits=10,decimal_places=2)
     merchant_order_id = models.CharField(max_length=100, blank=True, null=True)
     creado = models.DateTimeField(auto_now_add=True,blank=True,null=True)
 
     def expirado(self) -> bool:
         """
-        Verifica si el ticket ha expirado (1 hora desde su creación).
+        Verifica si el ticket ha expirado (30 minutos desde su creación).
         """
-        return timezone.now() > self.creado + timedelta(hours=1)
+        return timezone.now() > self.creado + timedelta(minutes=30)
 
-    def cancelar_ticket(self):
+    def cancelar_ticket(self) -> None:
         """
         Cancela el ticket estableciendo su estado a 'rechazado'.
         """
-        self.historial.estado = 'rechazado'
-        self.historial.save(update_fields=['estado'])
+        self.venta.estado = 'rechazado'
+        self.venta.save(update_fields=['estado'])
         self.delete()
 
     def get_preference_data(self) -> dict:
@@ -228,7 +256,7 @@ class TicketDePago(models.Model):
         """
         if self.expirado():
             raise ValueError("El ticket ha expirado.")
-        data = self.historial.facturacion
+        data = self.venta.facturacion
         match = re.match(r'^(.*?)(?:\s+(\d+))?$', data.direccion.strip())
         if match:
             calle_nombre = match.group(1).strip()
@@ -245,8 +273,8 @@ class TicketDePago(models.Model):
             'metadata':{'ticket':self.id},
             'calle_nombre':calle_nombre,
             'calle_altura':calle_altura,
-            'backurl_success':f"usuario/micuenta/?section=orders&compra=exitosa&idcompra={self.historial.merchant_order_id}",
-            'backurl_fail':f"usuario/micuenta/?section=orders&compra=fallida&idcompra={self.historial.merchant_order_id}"
+            'backurl_success':f"usuario/micuenta/?section=orders&compra=exitosa&idcompra={self.venta.merchant_order_id}",
+            'backurl_fail':f"usuario/micuenta/?section=orders&compra=fallida&idcompra={self.venta.merchant_order_id}"
         }
         return metadata
 
@@ -260,14 +288,14 @@ class ComprobanteTransferencia(models.Model):
         ('no verificado','No verificado')
     ]
 
-    historial = models.OneToOneField("HistorialCompras", on_delete=models.CASCADE, related_name="comprobante")
+    venta = models.OneToOneField("Venta", on_delete=models.CASCADE, related_name="comprobante")
     file = models.FileField(upload_to="comprobantes/")
     fecha_subida = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20,choices=ESTADOS,default='no verificado')
     observaciones = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Comprobante de {self.historial.merchant_order_id}"
+        return f"Comprobante de {self.venta.merchant_order_id}"
 
 class Cupon(models.Model):
     codigo = models.CharField(unique=True,max_length=6,blank=True)

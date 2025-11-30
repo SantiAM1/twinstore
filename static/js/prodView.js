@@ -61,8 +61,11 @@ addToCart.addEventListener("click", async () => {
       producto_id: prodId,
       color_id: colorId || null,
     });
-    totalCarro.classList.add("active");
-    totalCarro.textContent = response.data.totalProds;
+
+    if (response.data.totalProds > 0) {
+      totalCarro.classList.add("active");
+      totalCarro.textContent = response.data.totalProds;
+    }
   } catch (err) {
     console.warn(err);
   }

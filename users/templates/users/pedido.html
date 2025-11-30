@@ -6,50 +6,40 @@
 {% endblock meta %}
 
 {% block head %}
-<title>Pedido #{{ order.merchant_order_id }}</title>
+<title>Pedido #{{ venta.merchant_order_id }}</title>
 {% endblock head %}
 
 {% block contenidomain %}
 <section class="generic-box">
-    <header class="generic-header-nav">
-        <a href="#">
-            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path d="M15 6l-6 6l6 6" />
-            </svg>
-        </a>
-        <h2 id="generic-title">Pedido #{{ order.merchant_order_id }}</h2>
-    </header>
+    {% include 'partials/generic-header.html' with title="Pedido #"|add:venta.merchant_order_id %}
     <section class="generic-data">
         <div class="userdata-box">
             <div class="generic-data orders">
                 <article class="generic-item orders">
                     <div class="orders-main">
                         <div class="circle-stack">
-                            {% for prod in order.productos %}
-                            {% for i in "12345" %}
-                                {% if forloop.counter <= prod.cantidad %}
-                                    <img src="{{ prod.imagen }}" alt="Producto">
-                                {% endif %}
-                            {% endfor %}
-                            {% endfor %}
+                        {% for detalle in venta.detalles.all %}
+                        {% for _ in detalle.get_range %}
+                            <img src="{{ detalle.imagen_url }}" alt="Producto">
+                        {% endfor %}
+                        {% endfor %}
                         </div>
                         <div>
-                            <h3>Pedido #{{order.merchant_order_id}}</h3>
-                            <p>Fecha de compra: {{order.fecha_compra|date:"j \\d\\e F \\d\\e Y"}}</p>
-                            {% if order.estado == 'confirmado' %}
+                            <h3>Pedido #{{venta.merchant_order_id}}</h3>
+                            <p>Fecha de compra: {{venta.fecha_compra|date:"j \\d\\e F \\d\\e Y"}}</p>
+                            {% if venta.estado == 'confirmado' %}
                                 <span style="font-size: 0.9rem; color: #0f5718; background-color: #b7fcc0;">Confirmado</span>
-                            {% elif order.estado == 'pendiente' %}
+                            {% elif venta.estado == 'pendiente' %}
                                 <span style="font-size: 0.9rem; color: #969600; background-color: #f0f0b7;">Pendiente</span>
-                            {% elif order.estado == 'rechazado' %}
+                            {% elif venta.estado == 'rechazado' %}
                                 <span style="font-size: 0.9rem; color: #8b0000; background-color: #f4b7b7;">Rechazado</span>
-                            {% elif order.estado == 'listo para retirar' %}
+                            {% elif venta.estado == 'listo para retirar' %}
                                 <span style="font-size: 0.9rem; color: #004d40; background-color: #a2f0e1;">Listo para retirar</span>
-                            {% elif order.estado == 'enviado' %}
+                            {% elif venta.estado == 'enviado' %}
                                 <span style="font-size: 0.9rem; color: #311b92; background-color: #cbb7f4;">Enviado</span>
-                            {% elif order.estado == 'finalizado' %}
+                            {% elif venta.estado == 'finalizado' %}
                                 <span style="font-size: 0.9rem; color: #263238; background-color: #b7c4c9;">Finalizado</span>
-                            {% elif order.estado == 'arrepentido' %}
+                            {% elif venta.estado == 'arrepentido' %}
                                 <span style="font-size: 0.9rem; color: #5c0000; background-color: #fd9898;">Arrepentido</span>
                             {% endif %}
                         </div>
@@ -65,24 +55,24 @@
                         <dl class="methods-list">
                             <div class="methods-item middle">
                                 <dt class="methods-term">Total de compra:</dt>
-                                <dd class="methods-desc">{{order.total_compra|formato_pesos}}</dd>
+                                <dd class="methods-desc">{{venta.total_compra|formato_pesos}}</dd>
                             </div>
                             <div class="methods-item middle">
                                 <dt class="methods-term">Productos:</dt>
                                 <dd class="methods-desc">
-                                    {% for item in order.productos %}
-                                        {{ item.cantidad }} x {{ item.producto }}
-                                        <br>
-                                    {% endfor %}
+                                {% for item in venta.detalles.all %}
+                                    {{ item.cantidad }} x {{ item.producto }}
+                                    <br>
+                                {% endfor %}
                                 </dd>
                             </div>
                             <div class="methods-item middle">
                                 <dt class="methods-term">Forma de pago:</dt>
-                                <dd class="methods-desc">{{order.forma_de_pago|capfirst}}</dd>
+                                <dd class="methods-desc">{{venta.forma_de_pago|capfirst}}</dd>
                             </div>
                             <div class="methods-item middle">
                                 <dt class="methods-term">ID del pedido:</dt>
-                                <dd class="methods-desc token">{{order.merchant_order_id}}</dd>
+                                <dd class="methods-desc token">{{venta.merchant_order_id}}</dd>
                             </div>
                         </dl>
                     </div>

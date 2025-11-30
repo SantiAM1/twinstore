@@ -14,7 +14,7 @@ class Pedido(models.Model):
         return f"{self.producto.nombre} x {self.cantidad}"
     
     def get_total_precio(self):
-        return self.producto.precio * self.cantidad
+        return self.producto.precio_final * self.cantidad
     
     def get_cantidad(self):
         return self.cantidad
@@ -40,17 +40,17 @@ class Carrito(models.Model):
     def __str__(self):
         return f"Carrito de:{self.usuario}" if self.usuario else "Carrito Anonimo"
     
-    def agregar_producto(self,producto,cantidad,color=None):
+    def agregar_producto(self,producto,stock:int,color = None):
         pedido, creado = Pedido.objects.get_or_create(
             producto=producto,
             carrito=self,
             color=color,
-            defaults={'cantidad':cantidad}
+            defaults={'cantidad':1}
         )
         if not creado:
-            pedido.cantidad += cantidad
-            if pedido.cantidad > 5:
-                pedido.cantidad = 5
+            pedido.cantidad += 1
+            if pedido.cantidad > stock:
+                pedido.cantidad = stock
             pedido.save()
         return pedido
 
