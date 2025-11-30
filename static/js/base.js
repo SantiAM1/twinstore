@@ -212,7 +212,6 @@ async function buscarProductos(query) {
       .map(
         (p) => `
           <li>
-            ${p.descuento ? `<strong>-${p.descuento}%</strong>` : ""}
               <a href="/productos/${p.slug}/">
                   <header>
                       <img src="${
@@ -222,7 +221,7 @@ async function buscarProductos(query) {
                   </header>
                 <p>${p.nombre}</p>
                   <div class="search-results-prices">
-                      <span>${formatoPesos(p.precio)}</span>
+                      <span>${formatoPesos(p.precio_final)}</span>
                   </div>
               </a>
           </li>

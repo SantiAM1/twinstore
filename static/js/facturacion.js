@@ -222,6 +222,10 @@ btnFinish?.addEventListener("click", async (e) => {
 
     btnSubmit.classList.remove("loading");
   } catch (err) {
+    if (err.response.data.reload) {
+      window.location.href = "/carro/";
+      return;
+    }
     console.error(err);
     btnSubmit.classList.remove("loading");
     reiniciarInputComprobante();

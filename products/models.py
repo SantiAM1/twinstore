@@ -1,10 +1,15 @@
-from django.db import models
-from core.utils import obtener_valor_dolar
+from django.db import models,transaction
+from django.db.models import Sum
+from core.utils import get_configuracion_tienda
 from django.utils.text import slugify
 from django.urls import reverse
 from django.templatetags.static import static
 from django.core.cache import cache
 import uuid
+from decimal import Decimal
+from .managers import ProductoManager
+from products.utils_debug import debug_queries
+from django.contrib.auth.models import User
 
 class Marca(models.Model):
     nombre = models.CharField(max_length=30)
@@ -78,17 +83,20 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=50,unique=True)
     marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
     sub_categoria = models.ForeignKey(SubCategoria, on_delete=models.CASCADE, related_name='productos',null=True,blank=True)
+    precio_divisa = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    precio_base = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_dolar = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    precio_evento = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    precio_final = models.DecimalField(max_digits=10, decimal_places=2,default=0)
     descuento = models.IntegerField(default=0)
     sku = models.CharField(max_length=20, unique=True, blank=True, null=True,editable=False)
     descripcion_seo = models.CharField(max_length=160,blank=True,help_text="Descripción corta para SEO (aparece en Google). Máximo 160 caracteres.")
     inhabilitar = models.BooleanField(default=False)
     slug = models.SlugField(max_length=100, blank=True,unique=True)
-    proveedor = models.CharField(max_length=30,blank=True,null=True)
     updated_at = models.DateTimeField(auto_now=True)
     etiquetas = models.ManyToManyField(Etiquetas, blank=True, related_name='productos')
-    stock = models.PositiveIntegerField(default=0)
+    evento = models.ForeignKey('core.EventosPromociones',on_delete=models.SET_NULL,blank=True,null=True)
+    objects = ProductoManager()
 
     def get_absolute_url(self):
         return reverse('products:slug_dispatcher',args=[self.slug])
@@ -100,7 +108,11 @@ class Producto(models.Model):
                 self.slug = None
 
         self.generar_slug()
+        self.calcular_precio_sin_evento()
         super().save(*args, **kwargs)
+
+        self.calcular_precio_con_eventos()
+        super().save(update_fields=['precio_evento','precio_final'])
 
     def generar_slug(self):
         if not self.slug:
@@ -112,55 +124,75 @@ class Producto(models.Model):
                 i += 1
             self.slug = slug
 
-    @property
-    def precio_anterior(self):
-        """
-        Calcula el precio anterior basado en el valor del dólar.
-        El valor del dólar se cachea durante 1 hora para evitar consultas repetidas.
-        """
-        if not self.precio_dolar:
-            return None
-        try:
-            valor_dolar = cache.get('valor_dolar_actual')
-            if valor_dolar is None:
-                valor_dolar = obtener_valor_dolar()
-                cache.set('valor_dolar_actual', valor_dolar, 3600)
-            return round(self.precio_dolar * valor_dolar, 2)
-        except Exception:
-            return None
-        
-    def get_stock_disponible(self, color_id=None):
-        """
-        Retorna el stock disponible del producto o de un color específico.
-        """
-        if self.colores.exists():
-            if color_id:
-                color = self.colores.filter(id=color_id).first()
-                return color.stock if color else 0
-            return sum(c.stock for c in self.colores.all())
-        return self.stock
-
-    def get_stock_colores(self):
-        """
-        Retorna el stock de cada color asociado al producto.
-        """
-        return [{'color':color.nombre,'stock':color.stock} for color in self.colores.all()]
-
-    def restar_stock(self, cantidad, color_id=None):
-        """
-        Resta stock del producto o del color específico si se proporciona color_id.
-        """
-        if self.colores.exists() and color_id:
-            color = self.colores.filter(id=color_id).first()
-            if not color or color.stock < cantidad:
-                raise ValueError(f"Stock insuficiente para {self.nombre} ({color.nombre if color else 'color desconocido'})")
-            color.stock -= cantidad
-            color.save()
+    def calcular_precio_sin_evento(self):
+        from core.models import Tienda
+        config = get_configuracion_tienda()
+        if config['divisa'] == Tienda.Divisas.USD:
+            self.precio_base = round(self.precio_divisa * config['valor_dolar'], 2)
         else:
-            if self.stock < cantidad:
-                raise ValueError(f"Stock insuficiente para {self.nombre}")
-            self.stock -= cantidad
-            self.save()
+            self.precio_base = self.precio_divisa
+        
+        if self.descuento > 0:
+            descuento_decimal = Decimal(self.descuento) / Decimal('100')
+            self.precio = round(self.precio_base * (1 - descuento_decimal), 2)
+        else:
+            self.precio = self.precio_base
+    
+    def calcular_precio_con_eventos(self):
+        evento = self.evento
+
+        if evento:
+            if evento.descuento_porcentaje > 0:
+                d = Decimal(evento.descuento_porcentaje) / Decimal('100')
+                self.precio_evento = round(self.precio_base * (1 - d), 2)
+
+            elif evento.descuento_fijo > 0:
+                self.precio_evento = round(self.precio_base - evento.descuento_fijo, 2)
+        else:
+            self.precio_evento = None
+
+        self.precio_final = min(
+            [p for p in [self.precio, self.precio_evento] if p is not None]
+        )
+    
+    def banner(self):
+        """
+        Texto a mostrar en la banderita de la card:
+        * Si hay evento → se muestra el descuento del evento.
+        * Si no hay evento pero hay descuento propio → se muestra el del producto.
+        * Si no hay nada → devuelve None.
+        """
+        evento = self.evento
+        if evento:
+            if evento.descuento_porcentaje:
+                return f"-{int(evento.descuento_porcentaje)}%"
+            if evento.descuento_fijo:
+                base = self.precio_base
+                descuento = (evento.descuento_fijo / base) * Decimal("100")
+                return f"-{int(descuento)}%"
+        
+        if getattr(self,'descuento',0) and self.descuento > 0:
+            return f"-{self.descuento}%"
+        return None
+
+    def obtener_stock(self, color=None) -> int:
+        """
+        Obtiene el stock disponible del producto o de un color específico si se proporciona.
+        """
+        if color:
+            return (
+                LoteStock.objects.filter(
+                    ingreso__producto_color=color,
+                    cantidad_disponible__gt=0
+                ).aggregate(total=Sum("cantidad_disponible"))["total"] or 0
+            )
+
+        return (
+            LoteStock.objects.filter(
+                ingreso__producto=self,
+                cantidad_disponible__gt=0
+            ).aggregate(total=Sum("cantidad_disponible"))["total"] or 0
+        )
 
     def get_portada_200(self):
         """
@@ -243,7 +275,6 @@ class ColorProducto(models.Model):
     producto = models.ForeignKey(Producto,on_delete=models.CASCADE,related_name='colores')
     nombre = models.CharField(max_length=50)
     hex = models.CharField(max_length=7,help_text='Color en HEXADECIMAL (#ffffff)',default='#ffffff')
-    stock = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.nombre} ({self.producto})"
@@ -307,3 +338,72 @@ class TokenReseña(models.Model):
 
     def __str__(self):
         return f"Token para {self.usuario.nombre} - {self.producto.nombre} - {self.token}"
+
+class Proveedor(models.Model):
+    nombre = models.CharField(max_length=50)
+    direccion = models.CharField(max_length=100,null=True,blank=True)
+    telefono = models.CharField(max_length=15,null=True,blank=True)
+    email = models.EmailField(null=True,blank=True)
+    cuit = models.CharField(max_length=20,null=True,blank=True)
+
+    class Meta:
+        ordering = ["nombre"]
+    
+    def __str__(self):
+        return self.nombre
+
+class IngresoStock(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='ingresos_stock')
+    producto_color = models.ForeignKey(ColorProducto, on_delete=models.CASCADE, null=True, blank=True, related_name='ingresos_stock')
+    cantidad = models.PositiveIntegerField()
+    costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
+    creado_por = models.ForeignKey(User, on_delete=models.CASCADE)
+    fecha_ingreso = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Ingreso de {self.cantidad} unidades de {self.producto.nombre} por {self.proveedor.nombre} el {self.fecha_ingreso}"
+
+class LoteStock(models.Model):
+    ingreso = models.ForeignKey(IngresoStock, on_delete=models.CASCADE, related_name='lotes')
+    cantidad_disponible = models.PositiveIntegerField()
+    costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    fecha_ingreso = models.DateTimeField()
+
+    class Meta:
+        ordering = ['fecha_ingreso']
+
+    def __str__(self):
+        return f"Lote de {self.cantidad_disponible} unidades a {self.ingreso.costo_unitario} cada una"
+
+class MovimientoStock(models.Model):
+    class Tipo(models.TextChoices):
+        INGRESO = "INGRESO", "Ingreso"
+        SALIDA = "SALIDA", "Salida"
+        AJUSTE_POSITIVO = "AJUSTE_POSITIVO", "Ajuste +"
+        AJUSTE_NEGATIVO = "AJUSTE_NEGATIVO", "Ajuste -"
+    
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
+    producto_color = models.ForeignKey(ColorProducto, on_delete=models.PROTECT, null=True, blank=True)
+    tipo = models.CharField(max_length=20, choices=Tipo.choices)
+    cantidad = models.PositiveIntegerField()
+    lote = models.ForeignKey(LoteStock, on_delete=models.SET_NULL, null=True, blank=True)
+    venta = models.ForeignKey('payment.Venta', on_delete=models.SET_NULL, null=True, blank=True)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.tipo} de {self.cantidad} unidades de {self.producto.nombre} el {self.fecha}"
+
+    class Meta:
+        ordering = ['-fecha']
+
+class AjusteStock(models.Model):
+    venta = models.ForeignKey('payment.Venta', on_delete=models.CASCADE, related_name='ajustes_stock')
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
+    color = models.ForeignKey(ColorProducto, on_delete=models.PROTECT, null=True, blank=True)
+    cantidad_faltante = models.IntegerField()
+    creado_en = models.DateTimeField(auto_now_add=True)
+    resuelto = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Faltante {self.cantidad_faltante} de {self.producto.nombre} en venta {self.venta.id}"

@@ -39,10 +39,10 @@ def inject_categorias_subcategorias(view_func):
 def ordenby(request, productos):
     orden = request.GET.get('ordenby', '')
     if orden == 'price_lower':
-        productos = productos.order_by('precio')
+        productos = productos.order_by('precio_orden')
         filtro = 'Menor precio'
     elif orden == 'price_higher':
-        productos = productos.order_by('-precio')
+        productos = productos.order_by('-precio_orden')
         filtro = 'Mayor precio'
     elif orden == 'date':
         productos = productos.order_by('-id')
@@ -153,7 +153,7 @@ def prod_meta_data(request: HttpRequest, producto: Producto) -> dict:
         "url": request.build_absolute_uri(producto.get_absolute_url()),
         "image": imagen,
         "robots": "index, follow",
-        "price": float(producto.precio),
+        "price": float(producto.precio_final),
         "currency": "ARS",
         "og": {
             "type": "product",
@@ -180,8 +180,8 @@ def prod_meta_data(request: HttpRequest, producto: Producto) -> dict:
                 "@type": "Offer",
                 "url": request.build_absolute_uri(producto.get_absolute_url()),
                 "priceCurrency": "ARS",
-                "price": float(producto.precio),
-                "availability": "https://schema.org/InStock" if producto.stock > 0 else "https://schema.org/OutOfStock",
+                "price": float(producto.precio_final),
+                "availability": "https://schema.org/InStock" if producto.obtener_stock() > 0 else "https://schema.org/OutOfStock",
                 "seller": {"@type": "Organization", "name": "Twinstore"}
             }
         }, ensure_ascii=False)

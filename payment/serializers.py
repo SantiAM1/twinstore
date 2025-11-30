@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 class ComprobanteSerializer(serializers.Serializer):
     comprobante = serializers.FileField()
-    historial_id = serializers.CharField()
+    venta_id = serializers.CharField()
 
     def validate_comprobante(self, file):
         if not file:

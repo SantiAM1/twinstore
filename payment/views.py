@@ -16,7 +16,7 @@ from cart.utils import preference_mp
 
 from .templatetags.custom_filters import formato_pesos
 from .serializers import ComprobanteSerializer,IntSigned
-from .models import HistorialCompras,ComprobanteTransferencia,TicketDePago
+from .models import Venta,ComprobanteTransferencia,TicketDePago,EstadoPedido
 from .webhook import (
     check_hmac_signature,
     requests_header,
@@ -78,12 +78,12 @@ class DatosComprobante(APIView):
             return Response(serializer.errors,status=400)
         id_signed = serializer.validated_data.get('numero_firmado')
         try:
-            id_historial = signing.loads(id_signed)
+            id_venta = signing.loads(id_signed)
         except BadSignature:
-            return Response({"error": "ID de historial inválido."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "ID de venta inválido."}, status=status.HTTP_400_BAD_REQUEST)
         
-        historial = get_object_or_404(HistorialCompras, id=id_historial, usuario=request.user)
-        monto = historial.monto_tranferir()
+        venta = get_object_or_404(Venta, id=id_venta, usuario=request.user)
+        monto = venta.monto_tranferir()
 
         return Response({'monto':formato_pesos(monto), 'id_firmado':id_signed}, status=status.HTTP_200_OK)
 
@@ -98,17 +98,17 @@ class SubirComprobante(APIView):
         
         data = serializer.validated_data
         comprobante_file = data.get('comprobante')
-        id_signed = data.get('historial_id')
+        id_signed = data.get('venta_id')
 
         try:
-            id_historial = signing.loads(id_signed)
+            id_venta = signing.loads(id_signed)
         except BadSignature:
-            return Response({"error": "ID de historial inválido."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "ID de venta inválido."}, status=status.HTTP_400_BAD_REQUEST)
         
-        historial = get_object_or_404(HistorialCompras, id=id_historial, usuario=request.user)
+        venta = get_object_or_404(Venta, id=id_venta, usuario=request.user)
 
         ComprobanteTransferencia.objects.create(
-            historial=historial,
+            venta=venta,
             file=comprobante_file
         )
 
@@ -156,18 +156,26 @@ class ArrepentimientoPostView(APIView):
         serializer = IntSigned(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors,status=400)
-        historial_signed = serializer.validated_data.get('numero_firmado')
+        venta_signed = serializer.validated_data.get('numero_firmado')
         try:
-            historial_id = signing.loads(historial_signed)
+            venta_id = signing.loads(venta_signed)
         except BadSignature:
             return Response({'error':'Firma inválida'},status=400)
         
-        historial = get_object_or_404(HistorialCompras,id=historial_id,usuario=request.user)
-        if not historial.verificar_arrepentimiento():
+        venta = get_object_or_404(Venta,id=venta_id,usuario=request.user)
+        if not venta.verificar_arrepentimiento():
             return Response({'error':'No se puede solicitar el arrepentimiento'},status=400)
         
-        historial.estado = 'arrepentido'
-        historial.save()
+        venta.estado = 'arrepentido'
+        venta.requiere_revision = True
+        EstadoPedido.objects.get_or_create(
+            venta=venta,
+            estado="Arrepentimiento (Servidor)",
+            defaults={
+                "comentario": "Arrepentimiento solicitado por el cliente"
+            }
+        )
+        venta.save()
 
         messages.success(request,'Arrepentimiento solicitado con éxito')
 
@@ -175,8 +183,8 @@ class ArrepentimientoPostView(APIView):
 
 def payment_success(request):
     merchant_order_id = request.GET.get('merchant_order_id','')
-    historial = HistorialCompras.objects.filter(merchant_order_id=merchant_order_id).first()
-    return render(request, 'payment/success.html',{'historial':historial})
+    venta = Venta.objects.filter(merchant_order_id=merchant_order_id).first()
+    return render(request, 'payment/success.html',{'venta':venta})
 
 def failure(request):
     return render(request,'payment/fail.html')

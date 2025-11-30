@@ -8,12 +8,14 @@ from django.core.cache import cache
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.cache import cache_page
+from django.db.models import Prefetch
+from django.utils import timezone
 
 from .throttling import PrediccionBusquedaThrottle
-from .utils import obtener_valor_dolar
-from .models import DolarConfiguracion
+from .utils import get_configuracion_tienda
 from .forms import ExcelUploadForm,DolarActualizar
 from .permissions import BloquearSiMantenimiento
+from .models import Tienda,EventosPromociones
 
 from products.models import Producto, Marca, SubCategoria, Atributo,Etiquetas
 
@@ -24,6 +26,7 @@ import pandas as pd
 import uuid
 import re
 from decimal import Decimal, InvalidOperation
+import unicodedata
 # Create your views here.
 
 @cache_page(60 * 15)
@@ -61,56 +64,86 @@ def politicas_priv(request):
 def pagina_mantenimiento(request):
     return render(request, 'core/mantenimiento.html')
 
+def normalize_text(text: str) -> str:
+    """
+    Normaliza texto eliminando tildes, símbolos y lower-case.
+    """
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join([c for c in text if not unicodedata.combining(c)])
+    return text.lower()
+
+
 class BusquedaPredictivaView(APIView):
     throttle_classes = [PrediccionBusquedaThrottle]
     permission_classes = [BloquearSiMantenimiento]
-    def get(self,request:HttpRequest):
-        q = request.GET.get('q', '').strip().lower()
+
+    def get(self, request):
+        q = request.GET.get('q', '').strip()
         if not q or len(q) < 2:
             return Response([])
-        
+
+        q = normalize_text(q)
+        tokens = [t for t in q.replace("-", " ").split() if t]
+
         productos = cache.get('productos_busqueda')
+
         if not productos:
             productos_raw = list(
-                Producto.objects.values(
-                    'nombre', 'slug', 'imagenes_producto__imagen_200','precio','descuento'
-                ).order_by('-precio')
+                Producto.objects
+                .values(
+                    'nombre',
+                    'slug',
+                    'imagenes_producto__imagen_200',
+                    'precio_final',
+                )
+                .order_by('-precio_final')
             )
-            productos = {}
-            for p in productos_raw:
-                if p['slug'] not in productos:
-                    productos[p['slug']] = p
 
-            productos = list(productos.values())
-            
+            productos_dict = {}
+            for p in productos_raw:
+                slug = p['slug']
+                if slug not in productos_dict:
+                    productos_dict[slug] = p
+
+            productos = list(productos_dict.values())
+
             for p in productos:
                 img = p.get('imagenes_producto__imagen_200')
                 if img:
                     p['imagenes_producto__imagen_200'] = f"{settings.MEDIA_URL}{img}"
-            
+
+                p["search"] = normalize_text(f"{p['nombre']} {p['slug']}")
+
             cache.set('productos_busqueda', productos, 300)
 
-        busqueda = q.split()
-
         resultados = []
-        for producto in productos:
-            if all(word in (producto['slug'] + producto['nombre'].lower()) for word in busqueda):
-                resultados.append(producto)
+        for p in productos:
+            search = p['search']
+            score = 0
 
-        if not resultados:
-            resultados = [
-                p for p in productos if any(word in p['slug'] for word in busqueda)
-            ]
+            for token in tokens:
+                if token == search:
+                    score += 50  # coincidencia perfecta
+                elif token in search.split():
+                    score += 25  # palabra exacta
+                elif search.startswith(token):
+                    score += 15  # prefix
+                elif token in search:
+                    score += 10  # substring
+
+            if score > 0:
+                p['_score'] = score
+                resultados.append(p)
+
+        resultados.sort(
+            key=lambda x: (x['_score'], x['precio_final'], bool(x["imagenes_producto__imagen_200"])),
+            reverse=True
+        )
 
         return Response(resultados[:10])
 
 def home(request):
     home_cache = cache.get('home_cache')
-    valor_dolar = cache.get('valor_dolar_actual')
-    if valor_dolar is None:
-        valor_dolar = obtener_valor_dolar()
-        cache.set('valor_dolar_actual', valor_dolar, 3600)
-
     if not home_cache:
         home_cache = {
             'ofertas': Producto.objects.filter(descuento__gt=0).prefetch_related("colores__imagenes_color","imagenes_producto"),
@@ -118,12 +151,39 @@ def home(request):
         }
         cache.set('home_cache', home_cache, 60 * 30)
 
-    return render(request,'core/inicio.html', {'destacados': home_cache['destacados'], 'ofertas': home_cache['ofertas'],'valor_dolar': valor_dolar,})
+    return render(request,'core/inicio.html', {'destacados': home_cache['destacados'], 'ofertas': home_cache['ofertas']})
+
+@staff_member_required
+def cache_clear(request):
+    cache.clear()
+    messages.success(request, "Cache limpiada correctamente.")
+    return redirect('core:home')
 
 @staff_member_required
 def test(request):
-    cache.clear()
-    return render(request,'core/test.html')
+    ahora = timezone.now()
+
+    eventos_activos = EventosPromociones.objects.filter(
+        activo=True,
+        fecha_inicio__lte=ahora,
+        fecha_fin__gte=ahora,
+    )
+
+    productos = (
+        Producto.objects.all()
+        .prefetch_related(
+            "colores__imagenes_color",
+            "imagenes_producto",
+            "etiquetas",
+            Prefetch(
+                "etiquetas__eventos",
+                queryset=eventos_activos,
+                to_attr="eventos_filtrados"
+            )
+        )
+    )
+
+    return render(request, "core/test.html", {"productos": productos})
 
 @staff_member_required
 def cargar_productos_excel(request):
@@ -174,17 +234,18 @@ def cargar_productos_excel(request):
 
                         sku = f"{marca.nombre[:3].upper()}-{sub_categoria.nombre[:3].upper()}-{uuid.uuid4().hex[:6].upper()}"
 
-                        valor_dolar = obtener_valor_dolar()
+                        config = get_configuracion_tienda()
 
                         inhabilitar_str = str(fila.get('Inhabilitar', '')).strip().lower()
                         inhabilitar_flag = inhabilitar_str in ['si', 'sí', 'true', '1']
 
                         try:
-                            precio_raw = fila.get('Precio USD', '')
+                            precio_raw = fila.get('Precio', '')
                             precio_str = str(precio_raw).replace(',', '.')
-                            precio_dolar_excel = Decimal(precio_str)
+                            precio_excel = Decimal(precio_str)
+
                         except (InvalidOperation, TypeError, ValueError) as e:
-                            messages.error(request, f"❌ Error al convertir el precio: {fila.get('Precio USD')} → {e}")
+                            messages.error(request, f"❌ Error al convertir el precio: {fila.get('Precio')} → {e}")
                             continue
 
                         try:
@@ -200,9 +261,9 @@ def cargar_productos_excel(request):
                             defaults={
                                 'marca': marca,
                                 'sub_categoria': sub_categoria,
-                                'precio_dolar': precio_dolar_excel,
+                                'precio_divisa': precio_excel,
+                                'precio': precio_excel if config['divisa'] == Tienda.Divisas.ARS else None,
                                 'descuento': fila['Descuento'],
-                                'proveedor':fila['Proveedor'],
                                 'sku': sku,
                                 'inhabilitar': inhabilitar_flag
                             }
@@ -211,9 +272,6 @@ def cargar_productos_excel(request):
                         if creado:
                             messages.success(request, mark_safe(f'✅ Producto <strong>{producto.nombre}</strong> agregado'))
                         else:
-                            if fila.get('Proveedor'):
-                                producto.proveedor = fila['Proveedor']
-                                producto.save(update_fields=['proveedor'])
                             inhabilitar_str = str(fila.get('Inhabilitar', '')).strip().lower()
                             producto.inhabilitar = inhabilitar_str in ['si', 'sí', 'true', '1']
                             producto.save(update_fields=['inhabilitar'])
@@ -224,16 +282,21 @@ def cargar_productos_excel(request):
 
                             hubo_cambio = False
 
-                            if producto.precio_dolar != precio_dolar_excel:
-                                hubo_cambio = True
-                                messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Precio en USD actualizado → ${precio_dolar_excel}'))
+                            if config['divisa'] == Tienda.Divisas.USD:
+                                if producto.precio_divisa != precio_excel:
+                                    hubo_cambio = True
+                                    messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Precio en USD actualizado → ${precio_excel}'))
+                            else:
+                                if producto.precio != precio_excel:
+                                    hubo_cambio = True
+                                    messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Precio en ARS actualizado → ${precio_excel}'))
 
                             if producto.descuento != descuento_excel:
                                 hubo_cambio = True
                                 messages.info(request, mark_safe(f'ℹ️ Producto <strong>{producto.nombre}</strong>: Descuento actualizado → %{descuento_excel}'))
 
                             if hubo_cambio:
-                                producto.precio_dolar = precio_dolar_excel
+                                producto.precio_divisa = precio_excel
                                 producto.descuento = descuento_excel
                                 if not producto.sku:
                                     producto.sku = sku
@@ -269,12 +332,15 @@ def cargar_productos_excel(request):
             if dolar.cleaned_data['dolar'] is None:
                 return redirect('core:cargar_excel')
             valor_dolar = dolar.cleaned_data['dolar']
-            dolar_model = DolarConfiguracion.objects.first()
-            dolar_model.valor = valor_dolar
-            dolar_model.save()
+            config = Tienda.objects.first()
+            if not config:
+                config = Tienda.objects.create()
+            config.valor_dolar = valor_dolar
+            config.save()
             messages.success(request, f"Valor del Dolar actualizado a ${valor_dolar}")
     else:
+        config = get_configuracion_tienda()
         excel = ExcelUploadForm()
-        dolar = DolarActualizar(initial={'dolar': obtener_valor_dolar()})
+        dolar = DolarActualizar(initial={'dolar': config['valor_dolar']})
 
     return render(request, 'core/cargar_excel.html', {'excel': excel,'dolar': dolar})

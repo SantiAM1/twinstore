@@ -54,13 +54,13 @@ def master_mail(user_email, subject, html_content):
         return None
 
 @shared_task
-def enviar_mail_compra(historial_data, user_email):
+def enviar_mail_compra(venta_data, user_email):
     context = {
-        'url': historial_data['url'],
-        'codigo': historial_data['codigo'],
-        'compra':historial_data['compra'],
-        'adicional':historial_data['adicional'],
-        'total':historial_data['total']
+        'url': venta_data['url'],
+        'codigo': venta_data['codigo'],
+        'compra':venta_data['compra'],
+        'adicional':venta_data['adicional'],
+        'total':venta_data['total']
     }
 
     images = get_mail_imgs()

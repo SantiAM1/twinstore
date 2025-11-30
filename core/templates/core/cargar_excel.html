@@ -22,17 +22,18 @@
 {% block contenidomain %}
 <div>
     <div class="cargar-excel-admin">
-    <h2>Administrar productos</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ excel.as_p }}
-        <button type="submit">Cargar archivo</button>
-    </form>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ dolar.as_p }}
-        <button type="submit">Actualizar dolar</button>
-    </form>
+        <h2>Administrar productos</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ excel.as_p }}
+            <button type="submit">Cargar archivo</button>
+        </form>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ dolar.as_p }}
+            <button type="submit">Actualizar dolar</button>
+        </form>
+        <a href="{% url 'core:cache_clear' %}">Limpiar caché</a>
     </div>
 </div>
 {% endblock contenidomain %}

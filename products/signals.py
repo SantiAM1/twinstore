@@ -1,45 +1,32 @@
 from django.db.models.signals import pre_save,post_save
+from django.db import transaction
 from django.dispatch import receiver
-from .models import Producto, ImagenProducto,TokenReseña
-from core.utils import obtener_valor_dolar,actualizar_precio_final
+from .models import ImagenProducto,TokenReseña,IngresoStock,LoteStock,MovimientoStock
+from core.utils import resize_to_size
 from users.emails import reseña_token_html
 
-from PIL import Image
-from io import BytesIO
-from django.core.files.base import ContentFile
+@receiver(post_save, sender=IngresoStock)
+def manejar_ingreso_stock(sender, instance:IngresoStock, created, **kwargs):
+    if created:
+        with transaction.atomic():
+            LoteStock.objects.create(
+                ingreso=instance,
+                cantidad_disponible=instance.cantidad,
+                costo_unitario=instance.costo_unitario,
+                fecha_ingreso=instance.fecha_ingreso
+            )
 
-try:
-    RESAMPLE = Image.Resampling.LANCZOS
-except AttributeError:
-    RESAMPLE = Image.ANTIALIAS
-
-
-def resize_to_size(image_field, size=(200, 200)):
-    if not image_field:
-        return None
-    try:
-        img = Image.open(image_field)
-        if img.mode in ('RGBA', 'LA'):
-            fondo = Image.new('RGB', img.size, (255, 255, 255))
-            fondo.paste(img, mask=img.split()[-1])
-            img = fondo
-        else:
-            img = img.convert('RGB')
-            
-        img.thumbnail(size, RESAMPLE)
-        buffer = BytesIO()
-        img.save(fp=buffer, format='WEBP', quality=85)
-        return ContentFile(buffer.getvalue())
-    except Exception as e:
-        return None
-
-@receiver(pre_save, sender=Producto)
-def calcular_precio_final(sender, instance, **kwargs):
-    """
-    Antes de guardar un producto, calcular el precio final en ARS a partir de precio_dolar y descuento.
-    """
-    valor_dolar = obtener_valor_dolar()
-    actualizar_precio_final(instance, valor_dolar)
+@receiver(post_save,sender=LoteStock)
+def manejar_lote_stock(sender, instance:LoteStock, created, **kwargs):
+    if created:
+        with transaction.atomic():
+            MovimientoStock.objects.create(
+                producto=instance.ingreso.producto,
+                producto_color=instance.ingreso.producto_color,
+                tipo=MovimientoStock.Tipo.INGRESO,
+                cantidad=instance.cantidad_disponible,
+                lote=instance,
+            )
 
 @receiver(post_save, sender=TokenReseña)
 def notificar_token_reseña(sender, instance, created, **kwargs):

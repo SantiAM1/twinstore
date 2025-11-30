@@ -6,9 +6,9 @@ from .models import TicketDePago
 @shared_task
 def eliminar_tickets_expirados():
     """
-    Cancela o elimina tickets expirados (más de 1 hora).
+    Cancela o elimina tickets expirados (más de 30 minutos).
     """
-    limite = timezone.now() - timedelta(hours=1)
+    limite = timezone.now() - timedelta(minutes=30)
     expirados = TicketDePago.objects.filter(
         creado__lt=limite
     ).exclude(estado='aprobado')

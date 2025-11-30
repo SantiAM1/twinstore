@@ -64,7 +64,7 @@ class DatosFacturacion(models.Model):
 
     PROVINCIA_CHOICES = PerfilUsuario.PROVINCIA_CHOICES
 
-    historial = models.OneToOneField("payment.HistorialCompras", on_delete=models.CASCADE, related_name="facturacion")
+    venta = models.OneToOneField("payment.Venta", on_delete=models.CASCADE, related_name="facturacion")
 
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)

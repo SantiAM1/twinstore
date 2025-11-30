@@ -64,9 +64,7 @@ const labelComprobante = inputComprobante.nextElementSibling;
 const formComprobante = document.getElementById("comprobante-form");
 const btnTransferencia = document.querySelectorAll("button.comprobante");
 const importeTransferencia = document.querySelector(".importe-transferencia");
-const historialIdInput = formComprobante.querySelector(
-  'input[name="historial_id"]'
-);
+const ventaIdInput = formComprobante.querySelector('input[name="venta_id"]');
 const btnMercadoPago = document.querySelectorAll("button.mercadopago");
 const btnArrepentimiento = document.querySelectorAll("button.arrepentimiento");
 const arrepentimientoModal = document.querySelector(".arrepentimiento-modal");
@@ -152,7 +150,7 @@ btnTransferencia.forEach((btn) => {
       });
       const datos = response.data;
       importeTransferencia.textContent = datos.monto;
-      historialIdInput.value = datos.id_firmado;
+      ventaIdInput.value = datos.id_firmado;
       document
         .querySelector(".generic-modal.comprobante-modal")
         .classList.add("open");

@@ -116,7 +116,7 @@ def obtener_ticket(id,merchant_order_id):
 
 def validar_ticket(ticket:TicketDePago,merchant_order_id):
     monto_a_validar = ticket.monto
-    historial = ticket.historial
+    venta = ticket.venta
 
     pagos = PagoRecibidoMP.objects.filter(merchant_order_id=merchant_order_id)
     total_pagado = sum((p.transaction_amount or 0 for p in pagos if p.status == "approved"), Decimal('0.00'))
@@ -142,7 +142,7 @@ def validar_ticket(ticket:TicketDePago,merchant_order_id):
     logger.info(f"Estado final del Ticket: {ticket.estado}")
 
     EstadoPedido.objects.create(
-        historial=historial,
+        venta=venta,
         estado='Pago de mercado pago recibido (Servidor)',
         comentario=f'Ticket pagado: ID:#{ticket.merchant_order_id}.\nEstado del ticket: {ticket.estado}.\n{comentario_extra}.'
     )

@@ -1134,6 +1134,7 @@ main.main-content {
     font-size: 0.9rem;
     color: #414141;
     margin-top: 0.5rem;
+    width: 100%;
 
     p {
       display: inline;
@@ -2010,6 +2011,7 @@ main.main-content {
     top: 40px;
     border-radius: 5px;
     overflow-x: hidden;
+    z-index: 1000;
 
     &.active {
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
@@ -2167,6 +2169,17 @@ main.main-content {
 
     font-size: 0.9rem;
     transition: color 0.3s ease;
+
+    &.navbar-event {
+      font-weight: 500;
+      position: relative;
+
+      img {
+        position: absolute;
+        top: -10px;
+        right: -25px;
+      }
+    }
   }
   a:hover {
     color: var(--primary-color);
@@ -2223,8 +2236,9 @@ main.main-content {
   border-radius: 12px;
   box-shadow: 0 6px 6px rgba(0, 0, 0, 0.06);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
 
-  & > span {
+  & .card-product-discount {
     position: absolute;
     background: var(--discount);
     color: var(--bg-white);
@@ -2233,6 +2247,17 @@ main.main-content {
     padding: 0.4rem 1rem;
     z-index: 10;
     border-radius: 11px 0;
+
+    &.event {
+      background: var(--primary-color);
+    }
+  }
+
+  & .card-product-banner {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 1000;
   }
 
   .card-product__name {
@@ -2269,8 +2294,6 @@ main.main-content {
   }
 
   &.line {
-    position: relative;
-
     .card-product__name {
       font-size: 0.9rem;
       width: auto;
@@ -2455,9 +2478,9 @@ main.main-content {
 
 /* ---- Products ---- */
 .product-nav {
-  width: 400px;
-
+  max-width: 315px;
   padding: 0.5rem;
+  width: 100%;
 }
 
 .product-mainnav {
@@ -2657,6 +2680,112 @@ main.main-content {
   z-index: 100;
 }
 
+/* --- Card principal --- */
+.evento-card {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: white;
+  background: linear-gradient(to bottom right, #2e1a47, #1a4747);
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.evento-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 12px 20px -8px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Contenido interno --- */
+.evento-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* --- Header del evento --- */
+.evento-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.evento-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.evento-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.evento-icon {
+  font-size: 24px;
+  color: var(--blue-ts);
+  display: flex;
+}
+
+.evento-title {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin: 0;
+  color: white;
+}
+
+.evento-arrow {
+  color: rgba(255, 255, 255, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.evento-card:hover .evento-arrow {
+  transform: translateX(4px);
+}
+
+/* --- Contador --- */
+.evento-countdown {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.evento-time-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.evento-time-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
+
+.evento-time-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.evento-separator {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.5);
+}
+
 /* ---- Vista del producto ---- */
 .prod-payment-methods {
   display: flex;
@@ -2812,6 +2941,13 @@ main.main-content {
 }
 
 .product-prices {
+  position: relative;
+  img {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    z-index: 10;
+  }
   h2 {
     color: #2b2b2b;
     font-size: 2rem;
@@ -2872,6 +3008,7 @@ main.main-content {
   gap: 0.75rem;
   width: 100%;
   place-content: center;
+  position: relative;
 }
 
 .main-swiper {
@@ -3378,9 +3515,9 @@ details.faq {
     grid-template-columns: 1fr;
     place-items: start;
   }
-  .footer-main h3 {
+  .footer-main .footer-title {
     text-align: start;
-    margin-bottom: 0;
+    margin-bottom: 0.25rem;
   }
   .footer-fiscal {
     display: block;

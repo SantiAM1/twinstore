@@ -28,6 +28,7 @@ urlpatterns = [
     path('carro/',include('cart.urls')),
     path('usuario/',include('users.urls')),
     path('payment/',include('payment.urls')),
+    path('dashboard/',include('dashboard.urls')),
     path('mantenimiento/',pagina_mantenimiento,name="pagina_mantenimiento"),
     path("sitemap.xml", sitemap_view, name="django.contrib.sitemaps.views.sitemap"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,7 +1,12 @@
 {% load static %}
 {% load custom_filters %}
 <article class="card-product">
-    {% if producto.descuento > 0 %}<span>-{{producto.descuento}}%</span>{% endif %}
+    {% if producto.banner %}
+        <span class="card-product-discount {% if producto.evento %}event{% endif %}">{{ producto.banner }}</span>
+        {% if producto.evento.logo %}
+        <img class="card-product-banner" src="{{ producto.evento.logo.url }}" alt="{{ producto.evento.nombre }}" height="50" width="50">
+        {% endif %}
+    {% endif %}
     <a href="{% url 'products:slug_dispatcher' producto.slug %}">
         <header class="card-product__media">
             {% if producto.colores.exists %}
@@ -22,8 +27,8 @@
         </div>
         <footer>
             <div class="card-product__prices">
-                <span class="price--current">{{producto.precio|formato_pesos}}</span>
-                {% if producto.descuento > 0 %}<span class="price--old">{{producto.precio_anterior|formato_pesos}}</span>{% endif %}
+                <span class="price--current">{{producto.precio_final|formato_pesos}}</span>
+                {% if producto.descuento > 0 %}<span class="price--old">{{producto.precio_base|formato_pesos}}</span>{% endif %}
             </div>
             <button class="card-product__cart btn-card" type="button" aria-label="Agregar al carrito" data-productId="{{producto.id|signing_data}}">
                 <svg  xmlns="http://www.w3.org/2000/svg"  width="30"  height="30"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart">

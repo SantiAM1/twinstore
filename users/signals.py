@@ -16,7 +16,7 @@ def guardar_perfil_usuario(sender, instance, **kwargs):
 
 @receiver(post_save, sender=DatosFacturacion)
 def enviar_mail_compra(sender, instance, **kwargs):
-    mail_buy_send_html(instance.historial,instance.email)
+    mail_buy_send_html(instance.venta,instance.email)
 
 @receiver(post_save, sender=TokenUsers)
 def enviar_mail_token(sender, instance:TokenUsers, created, **kwargs):

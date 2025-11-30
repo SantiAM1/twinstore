@@ -44,12 +44,12 @@
 {% include 'modals.html' %}
 <!--- Scripts --->
 <!-- * AXIOS -->
-<script defer src="{% static 'js/libs/axios.js' %}"></script>
+<script src="{% static 'js/libs/axios.js' %}"></script>
 {% compress js %}
-<script defer src="{% static 'js/generic-axios.js' %}"></script>
-<script defer src="{% static 'js/base.js' %}"></script>
-<script defer src="{% static 'js/modal.js' %}"></script>
-<script defer src="{% static 'js/input.js' %}"></script>
+<script src="{% static 'js/generic-axios.js' %}"></script>
+<script src="{% static 'js/base.js' %}"></script>
+<script src="{% static 'js/modal.js' %}"></script>
+<script src="{% static 'js/input.js' %}"></script>
 {% endcompress %}
 {% block myscripts %}
 {% endblock myscripts %}

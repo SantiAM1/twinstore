@@ -51,20 +51,6 @@ if NGROK_URL:
     CSRF_TRUSTED_ORIGINS += [f"https://{NGROK_URL}"]
     SITE_URL = NGROK_URL
 
-# Session Security
-# SESSION_ENGINE = "django.contrib.sessions.backends.db"
-# SESSION_COOKIE_AGE = 86400
-# SESSION_COOKIE_HTTPONLY = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
-# CSRF_COOKIE_HTTPONLY = True
-# SECURE_HSTS_SECONDS = 31536000
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-# SECURE_HSTS_PRELOAD = True
-# SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-# SECURE_SSL_REDIRECT = False
-
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 86400
 SESSION_COOKIE_HTTPONLY = True
@@ -107,6 +93,7 @@ INSTALLED_APPS = [
     'cart',
     'users',
     'payment',
+    'dashboard',
     'compressor'
 ]
 
@@ -181,6 +168,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.carrito_total',
                 'cart.context_processors.limpiar_checkout',
+                'core.context_processors.evento_activo_context',
             ],
         },
     },
@@ -216,7 +204,6 @@ REST_FRAMEWORK = {
 }
 
 # Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 if DEBUG:
     import subprocess
 
@@ -250,7 +237,6 @@ else:
     }
 
 # Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
@@ -261,7 +247,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
@@ -277,8 +262,8 @@ STATICFILES_FINDERS = [
     'compressor.finders.CompressorFinder',
 ]
 
-COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = True
+COMPRESS_ENABLED = not DEBUG
+COMPRESS_OFFLINE = not DEBUG
 
 COMPRESS_CSS_FILTERS = [
     "compressor.filters.css_default.CssAbsoluteFilter",
@@ -316,9 +301,7 @@ AWS_SES_SECRET_ACCESS_KEY = env("AWS_SES_SECRET_ACCESS_KEY")
 AWS_SES_REGION_NAME = env("AWS_SES_REGION_NAME")
 AWS_SES_SOURCE_EMAIL = env("AWS_SES_SOURCE_EMAIL")
 
-# ! Produccion --> Conviene usar redis
-
-
+# CACHES
 if DEBUG:
     CACHES = {
     'default': {

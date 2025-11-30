@@ -1,74 +1,60 @@
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
-from .models import HistorialCompras,ComprobanteTransferencia,EstadoPedido,TicketDePago
+from .models import Venta,ComprobanteTransferencia,EstadoPedido,TicketDePago
 from users.emails import mail_estado_pedido_html
+from products.services import gestionar_stock_venta
+from products.models import MovimientoStock
 from django.utils import timezone
-from threading import local
-_signal_flags = local()
+from core.utils import get_configuracion_tienda
 
 @receiver(post_save,sender=EstadoPedido)
 def estados_requiere_revision(sender, instance, created, **kwargs):
     if '(Servidor)' not in instance.estado:
-        instance.historial.requiere_revision = False
-        instance.historial.save(update_fields=["requiere_revision"])
+        instance.venta.requiere_revision = False
+        instance.venta.save(update_fields=["requiere_revision"])
 
-@receiver(pre_save, sender=HistorialCompras)
-def detectar_cambio_a_arrepentido(sender, instance, **kwargs):
-    if not instance.pk:
-        return
-    try:
-        estado_anterior = HistorialCompras.objects.get(pk=instance.pk).estado
-    except HistorialCompras.DoesNotExist:
-        return
-    if estado_anterior != "arrepentido" and instance.estado == "arrepentido":
-        instance._cambio_a_arrepentido = True
+@receiver(post_save, sender=Venta)
+def manejar_actualizaciones_venta(sender: Venta, instance: Venta, created, **kwargs):
+    estado_actual = instance.estado
 
-@receiver(post_save, sender=HistorialCompras)
-def manejar_actualizaciones_historial(sender, instance:HistorialCompras, created, **kwargs):
-    if getattr(_signal_flags, 'skip', False):
-        return
-    # * 1 Cuando un pedido es arrepentido, quita la verificacion
-    if getattr(instance, '_cambio_a_arrepentido', False):
-        instance.requiere_revision = True
-        _signal_flags.skip = True
-        instance.save(update_fields=["requiere_revision"])
-        _signal_flags.skip = False
-        ya_creado = EstadoPedido.objects.filter(
-            historial=instance,
-            estado='Arrepentimiento (Servidor)'
-        ).exists()
-        if not ya_creado:
-            EstadoPedido.objects.create(
-                historial=instance,
-                estado='Arrepentimiento (Servidor)',
-                comentario='Arrepentimiento solicitado por el cliente'
-            )
-    # * 2 Se crea la fecha finalizado de cuando el producto es entregado/recibido
-    if instance.estado == "finalizado" and not instance.fecha_finalizado:
-        instance.fecha_finalizado = timezone.now()
-        instance.token_reseñas()
-        _signal_flags.skip = True
-        instance.save(update_fields=["fecha_finalizado"])
-        _signal_flags.skip = False
+    if estado_actual == "confirmado":
+        config = get_configuracion_tienda()
+        if config['modo_stock'] == 'libre':
+            return
 
-    # * 3 Se envía un mail al actualizar el historial de compras.
-    estado_valido = (
-        (instance.forma_de_pago == "transferencia" and instance.estado != "pendiente") or 
-        (instance.forma_de_pago == "efectivo" and instance.estado != "confirmado") or 
-        (instance.forma_de_pago == "mercadopago" and instance.estado != "pendiente")
-    )
-    if estado_valido:
+        if not MovimientoStock.objects.filter(venta=instance).exists():
+            success = gestionar_stock_venta(instance)
+            if not success:
+                # Si falló el descuento (falta stock), revertimos a pendiente
+                Venta.objects.filter(pk=instance.pk).update(
+                    estado=Venta.Estado.PENDIENTE,
+                    requiere_revision=True
+                )
+                EstadoPedido.objects.create(
+                    venta=instance,
+                    estado='Falta de Stock (Servidor)',
+                    comentario='La venta no se pudo confirmar por falta de stock. Se generó un ajuste.'
+                )
+                return
+
+    if estado_actual == "finalizado":
+        if not instance.fecha_finalizado:
+            instance.fecha_finalizado = timezone.now()
+            instance.token_reseñas()
+            instance.save(update_fields=["fecha_finalizado"])
+
+    if estado_actual != "pendiente":
         mail_estado_pedido_html(instance, instance.facturacion.email)
 
 @receiver(post_save, sender=ComprobanteTransferencia)
-def aprobar_historial_transferencia(sender, instance: ComprobanteTransferencia, created, **kwargs):
+def aprobar_venta_transferencia(sender, instance: ComprobanteTransferencia, created, **kwargs):
     # * 1 Notifica al staff cuando se recibe una transferencia
-    historial: HistorialCompras = instance.historial
+    venta: Venta = instance.venta
     if created:
-        historial.requiere_revision = True
-        historial.save(update_fields=["requiere_revision"])
+        venta.requiere_revision = True
+        venta.save(update_fields=["requiere_revision"])
         EstadoPedido.objects.create(
-            historial=historial,
+            venta=venta,
             estado='Transferencia recibida (Servidor)',
             comentario='Subida por el cliente automáticamente.'
         )
@@ -77,18 +63,18 @@ def aprobar_historial_transferencia(sender, instance: ComprobanteTransferencia, 
     if instance.estado == 'rechazado':
         if instance.observaciones:
             EstadoPedido.objects.create(
-                historial=historial,
+                venta=venta,
                 estado='Comprobante rechazado (Servidor)',
                 comentario='Esperando que el cliente vuelva a enviarlo'
             )
-            # mail_obs_comprobante_html(historial, instance.observaciones)
+            # mail_obs_comprobante_html(venta, instance.observaciones)
         instance.delete()
 
-    # * 3 Si el comprobante es aprobado se confirma el historial
+    # * 3 Si el comprobante es aprobado se verifica la venta
     if instance.estado == 'aprobado':
-        historial.check_historial()
+        venta.check_venta()
 
 @receiver(post_save,sender=TicketDePago)
-def actualizar_historial(sender, instance:TicketDePago, created, **kwargs):
+def actualizar_venta(sender, instance:TicketDePago, created, **kwargs):
     if instance.estado == "aprobado":
-        instance.historial.check_historial()
+        instance.venta.check_venta()

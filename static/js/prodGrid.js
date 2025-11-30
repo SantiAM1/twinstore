@@ -140,3 +140,33 @@ function resetTitle() {
     title.nextElementSibling.classList.remove("expand");
   });
 }
+
+const eventoTimer = document.getElementById("evento_timer");
+if (eventoTimer) {
+  const fechaFin = new Date(eventoTimer.value.replace(" ", "T")).getTime();
+  console.log(fechaFin);
+  const diasValue = document.getElementById("dias_value");
+  const horasValue = document.getElementById("horas_value");
+  const minValue = document.getElementById("min_value");
+
+  function actualizarContador() {
+    const ahora = new Date().getTime();
+    const diff = fechaFin - ahora;
+
+    if (diff <= 0) {
+      document.getElementById("countdown").innerHTML = "¡Finalizado!";
+      return;
+    }
+
+    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    diasValue.textContent = dias;
+    horasValue.textContent = horas;
+    minValue.textContent = mins;
+  }
+
+  actualizarContador();
+  setInterval(actualizarContador, 1000);
+}

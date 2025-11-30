@@ -12,11 +12,11 @@ class EspecificacionTecnicaForm(forms.ModelForm):
 class EditarProducto(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ['nombre', 'marca', 'sub_categoria', 'precio_dolar','descripcion_seo', 'descuento','precio','inhabilitar']
+        fields = ['nombre', 'marca', 'sub_categoria', 'precio_divisa','descripcion_seo', 'descuento','precio','inhabilitar']
         widgets = {
             'marca': forms.Select(attrs={'class': 'users-select bloqueable'}),
             'sub_categoria': forms.Select(attrs={'class': 'users-select bloqueable'}),
-            'precio_dolar': forms.NumberInput(),
+            'precio_divisa': forms.NumberInput(),
             'descripcion_seo': forms.Textarea(attrs={'style': 'width: 100%;border: 1px solid #bdbdbd;border-radius: 8px;padding: 0.5rem;font-size: 0.9rem;resize: vertical;min-height: 80px;max-height: 150px;'}),
             'descuento': forms.NumberInput(),
             'nombre': forms.TextInput(),

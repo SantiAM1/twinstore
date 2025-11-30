@@ -2,7 +2,6 @@ from django.http import HttpRequest
 from django.shortcuts import get_object_or_404,render
 from django.conf import settings
 from django.core import signing
-from django.core.cache.utils import make_template_fragment_key
 from django.core.cache import cache
 
 from users.decorators import login_required_modal
@@ -10,11 +9,22 @@ from users.decorators import login_required_modal
 from core.permissions import BloquearSiMantenimiento
 from core.decorators import bloquear_si_mantenimiento
 from core.throttling import EnviarWtapThrottle,CarritoThrottle,CalcularPedidoThrottle
+from core.utils import get_configuracion_tienda
 
 from payment.models import Cupon
 from payment.templatetags.custom_filters import formato_pesos
 
-from .utils import obtener_carrito,obtener_total,clear_carrito_cache,crear_historial_compras,obtener_crear_checkout
+from .utils import (
+    obtener_carrito,
+    obtener_total,
+    clear_carrito_cache,
+    crear_venta,
+    obtener_crear_checkout,
+    validar_compra,
+    sumar_carrito,
+    eliminar_del_carrito,
+    actualizar_carrito
+    )
 from .models import Producto, Carrito, Pedido
 from products.models import ColorProducto
 
@@ -77,7 +87,7 @@ class ActualizarPedidoView(APIView):
     permission_classes = [TieneCarrito, BloquearSiMantenimiento]
     throttle_classes = [CarritoThrottle]
 
-    def post(self, request):
+    def post(self, request:HttpRequest):
         serializer = ActualizarPedidoSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
@@ -86,46 +96,12 @@ class ActualizarPedidoView(APIView):
         pedido_id = signing.loads(data["pedido_id"])
         cantidad = 0
 
-        if request.user.is_authenticated:
-            pedido = Pedido.objects.filter(
-                id=pedido_id, carrito__usuario=request.user
-            ).select_related("producto").first()
+        config = get_configuracion_tienda()
+        stock_flag = config['modo_stock'] == "estricto"
+        maximo_compra = config['maximo_compra']
 
-            if not pedido:
-                return Response({"error": "Pedido no encontrado"}, status=404)
-
-            if action == "mas" and pedido.cantidad < 5:
-                pedido.cantidad += 1
-                pedido.save(update_fields=["cantidad"])
-            elif action == "menos":
-                if pedido.cantidad > 1:
-                    pedido.cantidad -= 1
-                    pedido.save(update_fields=["cantidad"])
-                else:
-                    pedido.delete()
-                    pedido = None
-
-            cantidad = pedido.cantidad if pedido else 0
-
-        else:
-            carrito = request.session.get("carrito", {})
-            key = str(pedido_id)
-            if key in carrito:
-                if action == "mas" and carrito[key] < 5:
-                    carrito[key] += 1
-                elif action == "menos":
-                    if carrito[key] > 1:
-                        carrito[key] -= 1
-                    else:
-                        carrito.pop(key)
-
-            request.session["carrito"] = carrito
-            request.session.modified = True
-            cantidad = carrito.get(key, 0)
-
+        cantidad = actualizar_carrito(request,pedido_id,action,stock_flag,maximo_compra)
         clear_carrito_cache(request)
-        key = make_template_fragment_key("header_main",[request.user.id])
-        cache.delete(key)
 
         carrito = obtener_carrito(request)
         precio_total, precio_subtotal, descuento = obtener_total(carrito)
@@ -135,7 +111,6 @@ class ActualizarPedidoView(APIView):
             item = next((i for i in carrito if i['id'] == pedido_id), None)
         except:
             item = None
-
 
         return Response({
             "totalPrecio": formato_pesos(precio_total),
@@ -158,18 +133,7 @@ class EliminarPedidoView(APIView):
         pedido_id = signing.loads(data.get('pedido_id'))
 
         clear_carrito_cache(request)
-
-        if request.user.is_authenticated:
-            carrito = get_object_or_404(Carrito,usuario=request.user)
-            pedido = get_object_or_404(Pedido,id=int(pedido_id),carrito=carrito)
-            pedido.delete()
-        else:
-            carrito = request.session.get('carrito',{})
-            carrito.pop(str(pedido_id), None)
-            request.session['carrito'] = carrito
-
-        key = make_template_fragment_key("header_main",[request.user.id])
-        cache.delete(key)
+        eliminar_del_carrito(request,pedido_id)
 
         total_productos = carrito_total(request)
         carrito = obtener_carrito(request)
@@ -204,27 +168,17 @@ class AgregarAlCarritoView(APIView):
                 color = None
         else:
             color = None
+        
+        config = get_configuracion_tienda()
+        stock = producto.obtener_stock(color) if config['modo_stock'] == "estricto" else config['maximo_compra']
 
-        if request.user.is_authenticated:
-            carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
-            carrito.agregar_producto(producto, 1 ,color)
-
-        else:
-            carrito = request.session.get('carrito', {})
-            key = f"{producto_id}-{color.id if color else 'null'}"
-            carrito[key] = carrito.get(key, 0) + 1
-            if carrito[key] > 5:
-                carrito[key] = 5
-            request.session['carrito'] = carrito
-
+        sumar_carrito(request,producto,stock,color)
         clear_carrito_cache(request)
-        key = make_template_fragment_key("header_main",[request.user.id])
-        cache.delete(key)
 
         total_processor = carrito_total(request)
 
         return Response({
-            'totalProds':total_processor['total_productos'],
+            'totalProds': total_processor['total_productos'],
         })
 
 class ValidarCuponView(APIView):
@@ -315,10 +269,15 @@ class CheckoutView(APIView):
         if not forma_pago.is_valid():
             return Response(forma_pago.errors,status=400)
         
+        carrito = obtener_carrito(request)
+        config = get_configuracion_tienda()
+        if not validar_compra(carrito,request,config):
+            return Response({"reload": True},status=400)
+        
         data_checkout = checkout_serializer.validated_data
         data_comprobante = comprobante_serializer.validated_data
 
-        order_id,init_point = crear_historial_compras(request, data_checkout,forma_pago.validated_data.get('forma_de_pago'),data_comprobante.get('comprobante'))
+        order_id,init_point = crear_venta(carrito, request, data_checkout,forma_pago.validated_data.get('forma_de_pago'),data_comprobante.get('comprobante'))
 
         return Response({'success':True,'order_id':order_id,'init_point':init_point if init_point else None},status=200)
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .forms import EspecificacionTecnicaForm,ImagenProductoForm
-from .models import Marca, Categoria, SubCategoria, Producto, ImagenProducto, Atributo, EspecificacionTecnica,Etiquetas,ColorProducto,ReseñaProducto,TokenReseña
+from .models import Producto, ImagenProducto, Atributo, EspecificacionTecnica,Etiquetas,ColorProducto,ReseñaProducto,TokenReseña,IngresoStock, Proveedor,LoteStock,MovimientoStock,AjusteStock  
 from django.utils.html import format_html
 
 class AtributoInline(admin.TabularInline):
@@ -44,6 +44,22 @@ class EspecificacionTecnicaInline(admin.StackedInline):
     classes = ['collapse']
 
 class ProductoAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ("Información General", {
+            "fields": ('nombre', 'marca', 'sub_categoria', 'descripcion_seo', 'inhabilitar')
+        }),
+        ("Eventos y Descuentos", {
+            "fields": ('descuento', 'evento')
+        }),
+        ("Precio y Stock", {
+            "fields": ('precio_divisa','precio_final', 'stock')
+        }),
+        ("Etiquetas e Identificadores", {
+            "fields": ('etiquetas','slug')
+        }),
+    )
+
+    filter_horizontal = ("etiquetas",)
     inlines = [AtributoInline, ImagenProductoInline, ColoresInline,EspecificacionTecnicaInline,ReseñaProductoInline]
     list_display = ['nombre', 'sku', 'marca', 'sub_categoria','inhabilitar']
     search_fields = ['nombre', 'sku']
@@ -56,8 +72,9 @@ class ProductoAdmin(admin.ModelAdmin):
 #         return False
 
 admin.site.register(Producto, ProductoAdmin)
-admin.site.register(Categoria)
-admin.site.register(SubCategoria)
-admin.site.register(Marca)
-admin.site.register(Etiquetas)
-admin.site.register(TokenReseña)    
+admin.site.register(TokenReseña)
+admin.site.register(IngresoStock)
+admin.site.register(Proveedor)
+admin.site.register(LoteStock)
+admin.site.register(MovimientoStock)
+admin.site.register(AjusteStock)
