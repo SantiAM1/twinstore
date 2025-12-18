@@ -9,9 +9,13 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'eliminar-tickets-expirados-cada-10-min': {
+    'eliminar-tickets-expirados-cada-5-min': {
         'task': 'payment.tasks.eliminar_tickets_expirados',
-        'schedule': crontab(minute='*/10'),
+        'schedule': crontab(minute='*/5'),
+    },
+    'evento-finalizado-cada-5-min': {
+        'task': 'products.tasks.evento_finalizado',
+        'schedule': crontab(minute='*/5'),
     },
 }
 

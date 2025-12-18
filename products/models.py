@@ -108,6 +108,7 @@ class Producto(models.Model):
                 self.slug = None
 
         self.generar_slug()
+        self.generar_sku()
         self.calcular_precio_sin_evento()
         super().save(*args, **kwargs)
 
@@ -123,6 +124,16 @@ class Producto(models.Model):
                 slug = f"{base_slug}-{i}"
                 i += 1
             self.slug = slug
+
+    def generar_sku(self):
+        if not self.sku:
+            prod_marca = slugify(self.marca.nombre).upper()[:3]
+            prod_subcat = slugify(self.sub_categoria.nombre).upper()[:3] if self.sub_categoria else "GEN"
+            unique_id = uuid.uuid4().hex[:4].upper()
+            self.sku = f"{prod_marca}-{prod_subcat}-{unique_id}"
+            while Producto.objects.exclude(id=self.id).filter(sku=self.sku).exists():
+                unique_id = uuid.uuid4().hex[:4].upper()
+                self.sku = f"{prod_marca}-{prod_subcat}-{unique_id}"
 
     def calcular_precio_sin_evento(self):
         from core.models import Tienda
@@ -162,8 +173,13 @@ class Producto(models.Model):
         * Si no hay evento pero hay descuento propio → se muestra el del producto.
         * Si no hay nada → devuelve None.
         """
+        if not self.evento_id:
+            if getattr(self, 'descuento', 0) and self.descuento > 0:
+                return f"-{self.descuento}%"
+            return None
+
         evento = self.evento
-        if evento:
+        if evento and evento.esta_activo:
             if evento.descuento_porcentaje:
                 return f"-{int(evento.descuento_porcentaje)}%"
             if evento.descuento_fijo:
@@ -174,6 +190,43 @@ class Producto(models.Model):
         if getattr(self,'descuento',0) and self.descuento > 0:
             return f"-{self.descuento}%"
         return None
+
+    def obtener_stock_dict(self):
+        """
+        Devuelve {color_hex: stock} si tiene colores, o {'total': stock} si no.
+        Optimizado para usar datos precargados si existen.
+        """
+        stock_dict = {}
+
+        # 1. Obtenemos los colores (aprovechando el caché de prefetch si existe)
+        colores = self.colores.all()
+
+        if len(colores) > 0:
+            for color in colores:
+                if hasattr(color, '_stock_cache'):
+                    stock_dict[color.hex] = color._stock_cache
+                
+                # FALLBACK
+                else:
+                    stock = (LoteStock.objects.filter(
+                        ingreso__producto_color=color,
+                        cantidad_disponible__gt=0
+                    ).aggregate(t=Sum("cantidad_disponible"))["t"] or 0)
+                    stock_dict[color.hex] = stock
+            
+            return stock_dict
+
+        else:
+            if hasattr(self, '_total_stock_cache'):
+                return {'total': self._total_stock_cache}
+            
+            # FALLBACK
+            total_stock = (LoteStock.objects.filter(
+                ingreso__producto=self,
+                cantidad_disponible__gt=0
+            ).aggregate(t=Sum("cantidad_disponible"))["t"] or 0)
+            
+            return {'total': total_stock}
 
     def obtener_stock(self, color=None) -> int:
         """
@@ -276,6 +329,10 @@ class ColorProducto(models.Model):
     nombre = models.CharField(max_length=50)
     hex = models.CharField(max_length=7,help_text='Color en HEXADECIMAL (#ffffff)',default='#ffffff')
 
+    class Meta:
+        verbose_name = "Color"
+        verbose_name_plural = "Colores"
+
     def __str__(self):
         return f"{self.nombre} ({self.producto})"
     
@@ -284,6 +341,10 @@ class ImagenProducto(models.Model):
     color = models.ForeignKey(ColorProducto,on_delete=models.CASCADE,related_name='imagenes_color',null=True,blank=True)
     imagen = models.ImageField(upload_to='productos/imagenes/')
     imagen_200 = models.ImageField(upload_to='productos/imagenes/', null=True, blank=True,editable=False)
+
+    class Meta:
+        verbose_name = "Imagen"
+        verbose_name_plural = "Imagenes"
 
 class Atributo(models.Model):
     producto = models.ForeignKey(Producto, related_name="atributos", on_delete=models.CASCADE)
@@ -304,6 +365,8 @@ class EspecificacionTecnica(models.Model):
     valor = models.CharField(max_length=255,default="")
 
     class Meta:
+        verbose_name = "Especificacion Técnica"
+        verbose_name_plural = "Especificaciones Técnicas"
         ordering = ['clave']
 
     def __str__(self):
@@ -317,6 +380,8 @@ class ReseñaProducto(models.Model):
     creado_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        verbose_name = "Reseña"
+        verbose_name_plural = "Reseñas"
         ordering = ['-creado_en']
 
     def __str__(self):
@@ -348,6 +413,8 @@ class Proveedor(models.Model):
 
     class Meta:
         ordering = ["nombre"]
+        verbose_name = "Proveedor"
+        verbose_name_plural = "Proveedores"
     
     def __str__(self):
         return self.nombre
@@ -361,8 +428,13 @@ class IngresoStock(models.Model):
     creado_por = models.ForeignKey(User, on_delete=models.CASCADE)
     fecha_ingreso = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Ingreso de Stock"
+        verbose_name_plural = "Ingresos de Stock"
+        ordering = ['-fecha_ingreso']
+
     def __str__(self):
-        return f"Ingreso de {self.cantidad} unidades de {self.producto.nombre} por {self.proveedor.nombre} el {self.fecha_ingreso}"
+        return f"Ingreso: {self.cantidad} x {self.producto.nombre} | {self.fecha_ingreso.strftime('%Y-%m-%d') if self.fecha_ingreso else ''}"
 
 class LoteStock(models.Model):
     ingreso = models.ForeignKey(IngresoStock, on_delete=models.CASCADE, related_name='lotes')
@@ -374,7 +446,7 @@ class LoteStock(models.Model):
         ordering = ['fecha_ingreso']
 
     def __str__(self):
-        return f"Lote de {self.cantidad_disponible} unidades a {self.ingreso.costo_unitario} cada una"
+        return f"Lote {self.id}"
 
 class MovimientoStock(models.Model):
     class Tipo(models.TextChoices):
@@ -392,7 +464,7 @@ class MovimientoStock(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.tipo} de {self.cantidad} unidades de {self.producto.nombre} el {self.fecha}"
+        return f"{self.tipo}: {self.producto.nombre} x {self.cantidad} -{self.fecha.strftime('%Y-%m-%d')}"
 
     class Meta:
         ordering = ['-fecha']

@@ -76,6 +76,8 @@ SECURE_SSL_REDIRECT = False
 # Application definition
 
 INSTALLED_APPS = [
+    'unfold',
+    'unfold.contrib.import_export',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -94,6 +96,7 @@ INSTALLED_APPS = [
     'users',
     'payment',
     'dashboard',
+    'import_export',
     'compressor'
 ]
 
@@ -133,7 +136,8 @@ CONTENT_SECURITY_POLICY = {
         ],
         "script-src": [
             "'self'",
-            NONCE
+            NONCE,
+            "'unsafe-eval'",
         ],
         "font-src": [
             "'self'",
@@ -169,6 +173,7 @@ TEMPLATES = [
                 'cart.context_processors.carrito_total',
                 'cart.context_processors.limpiar_checkout',
                 'core.context_processors.evento_activo_context',
+                'core.context_processors.config_context',
             ],
         },
     },
@@ -295,6 +300,15 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Español'),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
 # Amazon SES
 AWS_SES_ACCESS_KEY_ID = env("AWS_SES_ACCESS_KEY_ID")
 AWS_SES_SECRET_ACCESS_KEY = env("AWS_SES_SECRET_ACCESS_KEY")
@@ -362,3 +376,219 @@ INTERNAL_IPS = [
 if DEBUG:
     INSTALLED_APPS += ["debug_toolbar"]
     MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+
+from django.templatetags.static import static
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+
+UNFOLD = {
+    "SITE_TITLE": "Twinstore Admin",
+    "SITE_HEADER": "Twinstore",
+    "SITE_SYMBOL": "speed",
+    "DASHBOARD_CALLBACK": "dashboard.views.dashboard_callback",
+    "ENVIRONMENT": "dashboard.views.environment_callback",
+    "SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "sizes": "32x32",
+            "type": "image/svg+xml",
+            "href": lambda request: static("img/favicon.ico"),
+        },
+    ],
+    "SITE_DROPDOWN": [
+        {
+            "icon": "diamond",
+            "title": _("Volver al sitio"),
+            "link": "/",
+        },
+        {
+            "icon": "build_circle",
+            "title": _("Activar/Desactivar Mantenimiento"),
+            "link": reverse_lazy("core:toggle_mantenimiento"),
+        },
+    ],
+    "COLORS": {
+        "base": {
+            "50": "oklch(98.5% .002 247.839)",
+            "100": "oklch(96.7% .003 264.542)",
+            "200": "oklch(92.8% .006 264.531)",
+            "300": "oklch(87.2% .01 258.338)",
+            "400": "oklch(70.7% .022 261.325)",
+            "500": "oklch(55.1% .027 264.364)",
+            "600": "oklch(44.6% .03 256.802)",
+            "700": "oklch(37.3% .034 259.733)",
+            "800": "oklch(27.8% .033 256.848)",
+            "900": "oklch(21% .034 264.665)",
+            "950": "oklch(13% .028 261.692)",
+        },
+        "primary": {
+            "50": "oklch(97% .014 254.604)",
+            "100": "oklch(93.2% .032 255.585)",
+            "200": "oklch(88.2% .059 254.128)",
+            "300": "oklch(80.9% .105 251.813)",
+            "400": "oklch(70.7% .165 254.624)",
+            "500": "oklch(62.3% .214 259.815)",
+            "600": "oklch(54.6% .245 262.881)",
+            "700": "oklch(48.8% .243 264.376)",
+            "800": "oklch(42.4% .199 265.638)",
+            "900": "oklch(37.9% .146 265.522)",
+            "950": "oklch(28.2% .091 267.935)",
+        },
+        "font": {
+            "subtle-light": "var(--color-base-500)",
+            "subtle-dark": "var(--color-base-400)",
+            "default-light": "var(--color-base-600)",
+            "default-dark": "var(--color-base-300)",
+            "important-light": "var(--color-base-900)",
+            "important-dark": "var(--color-base-100)",
+        },
+    },
+    "SIDEBAR": {
+        "navigation": [
+            {
+                "items": [
+                    {
+                        "title": _("Users"),
+                        "icon": "person",
+                        "link": reverse_lazy("admin:auth_user_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                    {
+                        "title": _("Grupos"),
+                        "icon": "group",
+                        "link": reverse_lazy("admin:auth_group_changelist"),
+                        "permission": lambda request: request.user.is_superuser,
+                    },
+                ],
+            },
+            {
+                "items": [
+                    {
+                        "title": _("Dashboard"),
+                        "icon": "dashboard",
+                        "link": reverse_lazy("admin:index"),
+                    },
+                ],
+            },
+            {
+                "title": _("Tu tienda"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("Tienda"),
+                        "icon": "shopping_bag",
+                        "link": reverse_lazy('admin:core_tienda_change', args=[1]),
+                    },
+                    {
+                        "title": _("Eventos y promociones"),
+                        "icon": "featured_seasonal_and_gifts",
+                        "link": reverse_lazy('admin:core_eventospromociones_changelist'),
+                    },
+                    {
+                        "title": _("Cupones"),
+                        "icon": "confirmation_number",
+                        "link": reverse_lazy('admin:payment_cupon_changelist'),
+                    },
+                ],
+            },
+            {
+                "title": _("Ventas y usuarios"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("Ventas"),
+                        "icon": "inventory_2",
+                        "link": reverse_lazy('admin:payment_venta_changelist'),
+                        "badge": "dashboard.views.ventas_verificacion",
+                        "badge_variant": "info",
+                        "badge_style": "solid",
+                    },
+                ]
+            },
+            {
+                "items": [
+                    {
+                        "title": _("Usuarios"),
+                        "icon": "manage_accounts",
+                        "link": reverse_lazy('admin:users_perfilusuario_changelist'),
+                    },
+                ]
+            },
+            {
+                "title": _("Gestión de productos"),
+                "separator": True,
+                "items": [
+                    {
+                        "title": _("Productos"),
+                        "icon": "inventory",
+                        "link": reverse_lazy('admin:products_producto_changelist'),
+                    },
+                    {
+                        "title": _("Proveedores"),
+                        "icon": "local_shipping",
+                        "link": reverse_lazy('admin:products_proveedor_changelist'),
+                    },
+                    {
+                        "title": _("Ingresar Stock"),
+                        "icon": "category",
+                        "link": reverse_lazy('admin:products_ingresostock_changelist'),
+                        "permission": "core.permissions.ingreso_stock",
+                    },
+                    {
+                        "title": _("Lotes de Stock"),
+                        "icon": "view_list",
+                        "link": reverse_lazy('admin:products_lotestock_changelist'),
+                        "permission": "core.permissions.ingreso_stock",
+                    },
+                    {
+                        "title": _("Movimientos de Stock"),
+                        "icon": "swap_horiz",
+                        "link": reverse_lazy('admin:products_movimientostock_changelist'),
+                        "permission": "core.permissions.ingreso_stock",
+                    },
+                    {
+                        "title": _("Ajustes de Stock"),
+                        "icon": "tune",
+                        "link": reverse_lazy('admin:products_ajustestock_changelist'),
+                        "permission": "core.permissions.ingreso_stock",
+                        "badge": "dashboard.views.ajuste_stock",
+                        "badge_variant": "danger",
+                        "badge_style": "solid",
+                    },
+                ]
+            },
+            {
+                "title": _("Configuración de productos"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Categorias"),
+                        "icon": "settings",
+                        "link": reverse_lazy('admin:products_categoria_changelist'),
+                    },
+                    {
+                        "title": _("Sub Categorias"),
+                        "icon": "settings",
+                        "link": reverse_lazy('admin:products_subcategoria_changelist'),
+                    },
+                    {
+                        "title": _("Marcas"),
+                        "icon": "settings",
+                        "link": reverse_lazy('admin:products_marca_changelist'),
+                    },
+                    {
+                        "title": _("Etiquetas"),
+                        "icon": "settings",
+                        "link": reverse_lazy('admin:products_etiquetas_changelist'),
+                    },
+                    {
+                        "title": _("Tokens para reseñas"),
+                        "icon": "settings",
+                        "link": reverse_lazy('admin:products_tokenreseña_changelist'),
+                    }
+                ]
+            },
+        ],
+    },
+}

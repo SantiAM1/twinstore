@@ -2,12 +2,12 @@
 {% load static %}
 
 {% block meta %}
-<meta name="description" content="Conocé cómo Twinstore protege tus datos personales. Accedé a nuestra política de privacidad y descubrí cómo usamos y almacenamos tu información.">
+<meta name="description" content="Conocé cómo {{config.nombre_tienda}} protege tus datos personales. Accedé a nuestra política de privacidad y descubrí cómo usamos y almacenamos tu información.">
 <meta name="robots" content="index, follow">
 {% endblock meta %}
 
 {% block head %}
-<title>Politicas de privacidad - Twinstore</title>
+<title>Politicas de privacidad - {{config.nombre_tienda}}</title>
 {% endblock head %}
 
 {% block contenidomain %}
@@ -17,7 +17,7 @@
         {% include 'components/politicas-navbar.html' with priv="selected" %}
         <div class="generic-item faq">
             <h1>Políticas de privacidad</h1>
-            <p class="faq__description">En Twinstore nos comprometemos a proteger la privacidad de nuestros usuarios y clientes. La presente Política de Privacidad describe cómo recopilamos, utilizamos, almacenamos y protegemos los datos personales que nos proporcionás al utilizar nuestro sitio web y nuestros servicios. Cuando solicitamos que inicies sesión es con el único objetivo de ofrecerte una experiencia de compra segura y personalizada, y siempre en conformidad con los términos de este documento. Esta política puede ser modificada o actualizada en cualquier momento, por lo que recomendamos revisarla periódicamente para asegurarte de estar conforme con cualquier cambio.
+            <p class="faq__description">En {{config.nombre_tienda}} nos comprometemos a proteger la privacidad de nuestros usuarios y clientes. La presente Política de Privacidad describe cómo recopilamos, utilizamos, almacenamos y protegemos los datos personales que nos proporcionás al utilizar nuestro sitio web y nuestros servicios. Cuando solicitamos que inicies sesión es con el único objetivo de ofrecerte una experiencia de compra segura y personalizada, y siempre en conformidad con los términos de este documento. Esta política puede ser modificada o actualizada en cualquier momento, por lo que recomendamos revisarla periódicamente para asegurarte de estar conforme con cualquier cambio.
             </p>
             <details class="faq">
                 <summary>
@@ -27,7 +27,7 @@
                     </svg>
                 </summary>
                 <p class="faq__content">
-                    En Twinstore recopilamos información personal únicamente cuando es necesaria para brindarte nuestros servicios. Esto puede incluir: nombre completo, dirección de correo electrónico, domicilio, número de documento, teléfono de contacto y datos de facturación. También almacenamos información relacionada a tus pedidos, medios de pago y datos necesarios para realizar envíos.
+                    En {{config.nombre_tienda}} recopilamos información personal únicamente cuando es necesaria para brindarte nuestros servicios. Esto puede incluir: nombre completo, dirección de correo electrónico, domicilio, número de documento, teléfono de contacto y datos de facturación. También almacenamos información relacionada a tus pedidos, medios de pago y datos necesarios para realizar envíos.
                 </p>
             </details>
             <details class="faq">
@@ -53,7 +53,7 @@
                     </svg>
                 </summary>
                 <p class="faq__content">
-                    En Twinstore aplicamos medidas técnicas y organizativas adecuadas para proteger tus datos personales frente a accesos no autorizados, pérdida o alteración. Utilizamos conexiones seguras (HTTPS), cifrado de información crítica y actualizaciones constantes de nuestros sistemas para garantizar tu privacidad.
+                    En {{config.nombre_tienda}} aplicamos medidas técnicas y organizativas adecuadas para proteger tus datos personales frente a accesos no autorizados, pérdida o alteración. Utilizamos conexiones seguras (HTTPS), cifrado de información crítica y actualizaciones constantes de nuestros sistemas para garantizar tu privacidad.
                 </p>
             </details>
             <details class="faq">
@@ -64,7 +64,7 @@
                     </svg>
                 </summary>
                 <p class="faq__content">
-                    Twinstore utiliza cookies técnicas esenciales para el funcionamiento del sitio, como la gestión del carrito de compras a través de sesiones. Estas cookies no recopilan información personal identificable, ni se utilizan con fines publicitarios. Al navegar por nuestro sitio, aceptás el uso de estas cookies necesarias para que la experiencia de compra funcione correctamente. Podés configurar tu navegador para bloquear o eliminar cookies, pero esto podría afectar ciertas funcionalidades, como el guardado del carrito.
+                    {{config.nombre_tienda}} utiliza cookies técnicas esenciales para el funcionamiento del sitio, como la gestión del carrito de compras a través de sesiones. Estas cookies no recopilan información personal identificable, ni se utilizan con fines publicitarios. Al navegar por nuestro sitio, aceptás el uso de estas cookies necesarias para que la experiencia de compra funcione correctamente. Podés configurar tu navegador para bloquear o eliminar cookies, pero esto podría afectar ciertas funcionalidades, como el guardado del carrito.
                 </p>
             </details>
             <details class="faq">
@@ -92,7 +92,7 @@
                     • Solicitar la baja de envíos promocionales en cualquier momento.<br>
                     • Oponerte al tratamiento de tus datos en ciertas circunstancias.<br>
                     Podés ejercer estos derechos escribiendo a <a href="#" class="generic-link">contacto@twinstore.com.ar</a> con tu solicitud.<br><br>
-                    Twinstore no vende, cede ni distribuye los datos personales de sus usuarios sin su consentimiento, salvo obligación legal o requerimiento judicial formal. Nos reservamos el derecho de modificar esta Política de Privacidad en cualquier momento. Cualquier cambio será publicado en esta misma página, y se recomienda revisar periódicamente su contenido para mantenerse informado.
+                    {{config.nombre_tienda}} no vende, cede ni distribuye los datos personales de sus usuarios sin su consentimiento, salvo obligación legal o requerimiento judicial formal. Nos reservamos el derecho de modificar esta Política de Privacidad en cualquier momento. Cualquier cambio será publicado en esta misma página, y se recomienda revisar periódicamente su contenido para mantenerse informado.
                 </p>
             </details>
             <details class="faq">
@@ -103,7 +103,7 @@
                     </svg>
                 </summary>
                 <p class="faq__content">
-                    De acuerdo con los artículos 14 y 16 de la Ley N.º 25.326 de Protección de Datos Personales, el usuario tiene derecho a acceder a los datos personales que Twinstore posee sobre él y solicitar su actualización, corrección o eliminación. Para ejercer estos derechos, se deberá enviar un correo a <a href="#" class="generic-link">contacto@twinstore.com.ar</a>, acreditando identidad de manera fehaciente. Es posible que cierta información residual deba conservarse por motivos legales o administrativos, o para garantizar el cumplimiento de servicios en curso (por ejemplo, pedidos en proceso o facturación ya emitida). En todo momento, el usuario podrá modificar o actualizar los datos proporcionados desde los canales habilitados en el sitio. Los cambios se reflejarán en el menor tiempo posible.
+                    De acuerdo con los artículos 14 y 16 de la Ley N.º 25.326 de Protección de Datos Personales, el usuario tiene derecho a acceder a los datos personales que {{config.nombre_tienda}} posee sobre él y solicitar su actualización, corrección o eliminación. Para ejercer estos derechos, se deberá enviar un correo a <a href="#" class="generic-link">contacto@twinstore.com.ar</a>, acreditando identidad de manera fehaciente. Es posible que cierta información residual deba conservarse por motivos legales o administrativos, o para garantizar el cumplimiento de servicios en curso (por ejemplo, pedidos en proceso o facturación ya emitida). En todo momento, el usuario podrá modificar o actualizar los datos proporcionados desde los canales habilitados en el sitio. Los cambios se reflejarán en el menor tiempo posible.
                 </p>
             </details>
         </div>

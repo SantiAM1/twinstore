@@ -3,6 +3,10 @@ from .models import Tienda
 from django.core.cache import cache
 from django.conf import settings
 from .types import ConfigDict
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
+
 
 CACHE_KEY_CONFIG = "configuracion_tienda"
 
@@ -45,7 +49,6 @@ def get_configuracion_tienda() -> ConfigDict:
         config = Tienda.objects.create()
 
     data = {
-        'id': config.id,
         'nombre_tienda': config.nombre_tienda,
         'modo_stock': config.modo_stock,
         'mostrar_stock_en_front': config.mostrar_stock_en_front,
@@ -54,19 +57,12 @@ def get_configuracion_tienda() -> ConfigDict:
         'divisa': config.divisa,
         'valor_dolar': config.valor_dolar,
         'maximo_compra': config.maximo_compra,
-        'fecha_actualizacion_dolar': config.fecha_actualizacion_dolar,
-        'fecha_actualizacion_config': config.fecha_actualizacion_config,
     }
 
     time = 43200 if not settings.DEBUG else 5
 
     cache.set(CACHE_KEY_CONFIG, data, timeout=time)
     return data
-
-from PIL import Image
-from io import BytesIO
-from django.core.files.base import ContentFile
-import os
 
 try:
     RESAMPLE = Image.Resampling.LANCZOS
@@ -76,10 +72,6 @@ except AttributeError:
 def resize_to_size(image_field, size=(200, 200)):
     """
     Resize para logos, iconos y elementos gráficos:
-    - Mantiene proporción sin deformar
-    - No corta nada
-    - Centra la imagen en un canvas transparente exacto
-    - Perfecto para logos tipo 'Hot Sale'
     """
     if not image_field:
         return None

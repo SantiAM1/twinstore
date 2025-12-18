@@ -2,8 +2,8 @@
 {% load custom_filters %}
 <article class="card-product">
     {% if producto.banner %}
-        <span class="card-product-discount {% if producto.evento %}event{% endif %}">{{ producto.banner }}</span>
-        {% if producto.evento.logo %}
+        <span class="card-product-discount {% if producto.evento.esta_activo %}event{% endif %}">{{ producto.banner }}</span>
+        {% if producto.evento.esta_activo and producto.evento.logo %}
         <img class="card-product-banner" src="{{ producto.evento.logo.url }}" alt="{{ producto.evento.nombre }}" height="50" width="50">
         {% endif %}
     {% endif %}
@@ -31,6 +31,9 @@
                 {% if producto.descuento > 0 %}<span class="price--old">{{producto.precio_base|formato_pesos}}</span>{% endif %}
             </div>
             <button class="card-product__cart btn-card" type="button" aria-label="Agregar al carrito" data-productId="{{producto.id|signing_data}}">
+                {% if config.modo_stock == 'estricto' %}
+                {{ producto.obtener_stock_dict|json_script:"stock-data" }}
+                {% endif %}
                 <svg  xmlns="http://www.w3.org/2000/svg"  width="30"  height="30"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                     <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />

@@ -1,0 +1,8 @@
+{% load unfold %}
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));gap: 1rem;">
+    {% for _,kpi in kpi_macro.items %}
+        {% component "unfold/components/card.html" with title=kpi.title icon=kpi.icon footer=kpi.footer %}
+        <span class="text-2xl font-semibold">{{kpi.value}}</span>
+        {% endcomponent %}
+    {% endfor %}
+</div>

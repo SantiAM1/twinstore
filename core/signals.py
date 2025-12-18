@@ -14,6 +14,7 @@ def actualizar_precios(sender, instance, **kwargs):
 @receiver(post_save, sender=Tienda)
 def limpiar_cache_configuracion(sender, instance, **kwargs):
     cache.delete(CACHE_KEY_CONFIG)
+    cache.delete('modo_mantenimiento')
 
 @receiver(post_save, sender=EventosPromociones)
 def resize_imagen_evento(sender, instance, **kwargs):

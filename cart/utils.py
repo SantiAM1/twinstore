@@ -17,6 +17,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from core.types import ConfigDict
 from cart.types import CarritoDict
+from core.utils import get_configuracion_tienda
 
 def crear_venta(carrito:dict,request:HttpRequest,checkout_serializer:dict,forma_pago,comprobante=None,) -> tuple[str, str|None]:
     """
@@ -296,14 +297,16 @@ def borrar_cupon(cupon_id:int,venta:Venta) -> float:
     """
     Elimina el cupón aplicado y registra el estado en la Venta.
     """
+    config = get_configuracion_tienda()
     try:
         cupon = Cupon.objects.get(id=cupon_id)
+        if config['borrar_cupon']:
+            cupon.delete()
         EstadoPedido.objects.create(
-            venta=venta,
-            estado="Cupón Aplicado (Servidor)",
-            comentario=f"Cupón CÓDIGO #{cupon.codigo} del %{cupon.descuento} Aplicado en la compra"
-        )
-        cupon.delete()
+                venta=venta,
+                estado="Cupón Aplicado (Servidor)",
+                comentario=f"Cupón CÓDIGO #{cupon.codigo} del %{cupon.descuento} Aplicado en la compra"
+            )
     except Cupon.DoesNotExist:
         EstadoPedido.objects.create(
             venta=venta,

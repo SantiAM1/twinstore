@@ -36,6 +36,10 @@ colorDots?.forEach((dot) => {
       dot.classList.remove("selected");
     });
     dot.classList.add("selected");
+
+    btnCartStockManagement(addToCart);
+    updateStockMsg(dot.dataset.hex);
+
     imgSwipers.forEach((img) => img.classList.add("hide"));
     thumbs.forEach((thum) => thum.classList.add("hide"));
     const index = dot.dataset.index;
@@ -70,3 +74,63 @@ addToCart.addEventListener("click", async () => {
     console.warn(err);
   }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  btnCartStockManagement(addToCart);
+});
+
+function btnCartStockManagement(button) {
+  const stockDict = button.querySelector("script[type='application/json']");
+
+  if (stockDict) {
+    const stockValue = JSON.parse(stockDict.textContent.trim());
+
+    const box = button.closest(".product-view");
+    const colorsBox = box.querySelector(".product-colors");
+    const colorDot = colorsBox.querySelector(".dot-ring.selected");
+    if (colorsBox && colorDot) {
+      const colorHex = colorDot.getAttribute("data-hex");
+      const stockDisponible = stockValue[colorHex];
+      console.log(
+        "Stock disponible para color " + colorHex + ": " + stockDisponible
+      );
+      if (stockDisponible > 0) {
+        btnEnableItem(button);
+      } else {
+        btnDisableItem(button);
+      }
+      return;
+    }
+
+    if (stockValue.total == 0) {
+      btnDisableItem(button);
+    }
+  }
+}
+
+function btnEnableItem(button) {
+  button.disabled = false;
+  button.classList.remove("disabled");
+  button.setAttribute("aria-disabled", "false");
+  button.removeAttribute("title");
+}
+
+function btnDisableItem(button) {
+  button.disabled = true;
+  button.classList.add("disabled");
+  button.setAttribute("aria-disabled", "true");
+  button.setAttribute("title", "Producto sin stock");
+}
+
+const inputFront = document.querySelector("input[name='stock-front']");
+function updateStockMsg(hexColor) {
+  if (!inputFront) return;
+  const stockStatus = document.querySelectorAll(".stock-status");
+  stockStatus.forEach((status) => {
+    if (status.dataset.hex === hexColor) {
+      status.classList.remove("hide");
+    } else {
+      status.classList.add("hide");
+    }
+  });
+}

@@ -2,9 +2,9 @@
 {% load static compress cache %}
 
 {% block meta %}
-<meta name="description" content="Twinstore es una empresa de venta de productos informáticos. Envíos a todo el país.">
+<meta name="description" content="{{config.nombre_tienda}} es una empresa de venta de productos informáticos. Envíos a todo el país.">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Twinstore - A new Hardware Experience">
+<meta property="og:title" content="{{config.nombre_tienda}} - A new Hardware Experience">
 <meta property="og:description" content="A new Hardware Experience">
 <meta property="og:image" content="{% static 'img/mail.webp' %}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
@@ -12,12 +12,12 @@
 {% endblock meta %}
 
 {% block head %}
-<title>Twinstore | Hardware, Notebooks, Celulares y Accesorios en Argentina</title>
+<title>{{config.nombre_tienda}} | Hardware, Notebooks, Celulares y Accesorios en Argentina</title>
 <link rel="stylesheet" href="{% static 'css/libs/swiper-bundle.min.css' %}">
 {% endblock head %}
 
 {% block contenidomain %}
-<h1 class="visually-hidden">Twinstore - Tienda de Hardware, Notebooks y Tecnología en Argentina</h1>
+<h1 class="visually-hidden">{{config.nombre_tienda}} - Tienda de Hardware, Notebooks y Tecnología en Argentina</h1>
 <div class="generic-box landing">
     {% cache 600 banners_home %}
     <section class="swiper banner-swiper">
@@ -169,37 +169,37 @@
     <section class="brands-grid-box">
         <h2 class="landing-title">Descubrí nuestras <strong>marcas</strong></h2>
         <div class="brands-grid">
-            <a href="{% url 'products:grid' %}?Marca=intel" class="brand" data-name="Intel" rel="nofollow">
+            <a href="{% url 'products:grid' %}?marca=intel" class="brand" data-name="Intel" rel="nofollow">
                 <img src="{% static 'img/landing/marcas/intel.webp' %}" alt="Marca Intel" loading="lazy">
             </a>
-            <a href="{% url 'products:grid' %}?Marca=amd" class="brand" data-name="AMD" rel="nofollow">
+            <a href="{% url 'products:grid' %}?marca=amd" class="brand" data-name="AMD" rel="nofollow">
                 <img src="{% static 'img/landing/marcas/amd.webp' %}" alt="Marca AMD" loading="lazy">
             </a>
-            <a href="{% url 'products:grid' %}?Marca=logitech" class="brand" data-name="Logitech" rel="nofollow">
+            <a href="{% url 'products:grid' %}?marca=logitech" class="brand" data-name="Logitech" rel="nofollow">
                 <img src="{% static 'img/landing/marcas/logitech.webp' %}" alt="Marca Logitech" loading="lazy">
             </a>
-            <a href="{% url 'products:grid' %}?Marca=apple" class="brand" data-name="Apple" rel="nofollow">
+            <a href="{% url 'products:grid' %}?marca=apple" class="brand" data-name="Apple" rel="nofollow">
                 <img src="{% static 'img/landing/marcas/apple.webp' %}" alt="Marca Apple" loading="lazy">
             </a>
-            <a href="{% url 'products:grid' %}?Marca=samsung" class="brand" data-name="Samsung" rel="nofollow">
+            <a href="{% url 'products:grid' %}?marca=samsung" class="brand" data-name="Samsung" rel="nofollow">
                 <img src="{% static 'img/landing/marcas/samsung.webp' %}" alt="Marca Samsung" loading="lazy">
             </a>
-            <a href="{% url 'products:grid' %}?Marca=asus" class="brand" data-name="Asus" rel="nofollow">
+            <a href="{% url 'products:grid' %}?marca=asus" class="brand" data-name="Asus" rel="nofollow">
                 <img src="{% static 'img/landing/marcas/asus.webp' %}" alt="Marca Asus" loading="lazy">
             </a>
-            <a href="{% url 'products:grid' %}?Marca=msi" class="brand" data-name="MSI" rel="nofollow">
+            <a href="{% url 'products:grid' %}?marca=msi" class="brand" data-name="MSI" rel="nofollow">
                 <img src="{% static 'img/landing/marcas/msi.webp' %}" alt="Marca MSI" loading="lazy">
             </a>
-            <a href="{% url 'products:grid' %}?Marca=gigabyte" class="brand" data-name="Gigabyte" rel="nofollow">
+            <a href="{% url 'products:grid' %}?marca=gigabyte" class="brand" data-name="Gigabyte" rel="nofollow">
                 <img src="{% static 'img/landing/marcas/gigabyte.webp' %}" alt="Marca Gigabyte" loading="lazy">
             </a>
         </div>
     </section>
     {% endcache %}
     <section class="seo-text">
-    <h2>Twinstore: Hardware, Notebooks y Tecnología en Argentina</h2>
+    <h2>{{config.nombre_tienda}}: Hardware, Notebooks y Tecnología en Argentina</h2>
     <p>
-        En Twinstore trabajamos para brindarte una experiencia completa en la compra de productos tecnológicos. 
+        En {{config.nombre_tienda}} trabajamos para brindarte una experiencia completa en la compra de productos tecnológicos. 
         Nuestro catálogo incluye notebooks, PCs armadas, placas de video, procesadores, periféricos, celulares, monitores 
         y soluciones de almacenamiento de las marcas más reconocidas del mercado como Intel, AMD, Samsung, Apple, Asus, MSI 
         y muchas más.
@@ -210,7 +210,7 @@
         nuestros productos y atención personalizada para asegurarnos de que tengas la mejor experiencia de compra.
     </p>
     <p>
-        Si buscás hardware, accesorios o equipos de alto rendimiento, en Twinstore encontrás variedad, confianza y 
+        Si buscás hardware, accesorios o equipos de alto rendimiento, en {{config.nombre_tienda}} encontrás variedad, confianza y 
         precios actualizados todos los días. Descubrí ofertas, novedades y productos destacados especialmente 
         seleccionados para vos.
     </p>

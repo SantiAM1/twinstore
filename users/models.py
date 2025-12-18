@@ -78,6 +78,10 @@ class DatosFacturacion(models.Model):
     direccion = models.CharField(max_length=255)
     localidad = models.CharField(max_length=255,null=True, blank=True)
 
+    class Meta:
+        verbose_name = "Facturación"
+        verbose_name_plural = "Datos de Facturación"
+
     def __str__(self):
         return f"Datos Facturación #{self.id} - {self.nombre} {self.apellido}"
 

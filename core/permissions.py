@@ -1,6 +1,7 @@
 from rest_framework.permissions import BasePermission
 from django.core.cache import cache
 from .utils import get_configuracion_tienda
+from django.http import HttpRequest
 
 class BloquearSiMantenimiento(BasePermission):
     def has_permission(self, request, view):
@@ -20,3 +21,7 @@ class BloquearSiMantenimiento(BasePermission):
             return False
 
         return True
+
+def ingreso_stock(request: HttpRequest) -> bool:
+    config = get_configuracion_tienda()
+    return config['modo_stock'] == 'estricto'

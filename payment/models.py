@@ -11,13 +11,13 @@ from products.models import TokenReseña, Producto,ReseñaProducto,ColorProducto
 
 class Venta(models.Model):
     class Estado(models.TextChoices):
-        PENDIENTE = "pendiente", "Pendiente🟡"
-        CONFIRMADO = "confirmado", "Confirmado🟢"
-        RECHAZADO = "rechazado", "Rechazado🔴"
-        FINALIZADO = "finalizado", "Finalizado⚪"
-        ARREPENTIDO = "arrepentido", "Arrepentido⭕"
-        LISTO_PARA_RETIRAR = "listo para retirar", "Listo para retirar✔️"
-        ENVIADO = "enviado", "Enviado🟣"
+        PENDIENTE = "pendiente", "Pendiente"
+        CONFIRMADO = "confirmado", "Confirmado"
+        RECHAZADO = "rechazado", "Rechazado"
+        FINALIZADO = "finalizado", "Finalizado"
+        ARREPENTIDO = "arrepentido", "Arrepentido"
+        LISTO_PARA_RETIRAR = "listo para retirar", "Listo para retirar"
+        ENVIADO = "enviado", "Enviado"
 
     class FormaPago(models.TextChoices):
         EFECTIVO = "efectivo", "Efectivo"
@@ -185,7 +185,7 @@ class Venta(models.Model):
             )
 
     def __str__(self):
-        return f"{self.merchant_order_id} - {self.estado} - {self.usuario}"
+        return f"{self.merchant_order_id}"
 
 class VentaDetalle(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name='detalles')
@@ -195,6 +195,10 @@ class VentaDetalle(models.Model):
     cantidad = models.IntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        verbose_name = "Detalle de Venta"
+        verbose_name_plural = "Detalles de Ventas"
 
     def get_range(self):
         return range(self.cantidad)
@@ -209,7 +213,12 @@ class EstadoPedido(models.Model):
     comentario = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"_____________{self.estado}"
+        return f"{self.estado}"
+    
+    class Meta:
+        verbose_name = "Notificacion"
+        verbose_name_plural = "Notificaciones"
+
 
 class PagoRecibidoMP(models.Model):
     payment_id = models.CharField(max_length=100, unique=True)
@@ -235,6 +244,10 @@ class TicketDePago(models.Model):
     monto = models.DecimalField(max_digits=10,decimal_places=2)
     merchant_order_id = models.CharField(max_length=100, blank=True, null=True)
     creado = models.DateTimeField(auto_now_add=True,blank=True,null=True)
+
+    class Meta:
+        verbose_name = "Ticket"
+        verbose_name_plural = "Tickets"
 
     def expirado(self) -> bool:
         """
@@ -301,6 +314,10 @@ class Cupon(models.Model):
     codigo = models.CharField(unique=True,max_length=6,blank=True)
     descuento = models.DecimalField(max_digits=5,decimal_places=2)
     creado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Cupón"
+        verbose_name_plural = "Cupones"
 
     def save(self, *args, **kwargs):
         if not self.codigo:

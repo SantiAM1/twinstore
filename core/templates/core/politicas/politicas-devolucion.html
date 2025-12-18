@@ -2,12 +2,12 @@
 {% load static %}
 
 {% block meta %}
-<meta name="description" content="¿Tuviste un problema con un producto? Leé nuestra política de devoluciones y conocé los pasos para realizar un cambio o devolución en Twinstore.">
+<meta name="description" content="¿Tuviste un problema con un producto? Leé nuestra política de devoluciones y conocé los pasos para realizar un cambio o devolución en {{config.nombre_tienda}}.">
 <meta name="robots" content="index, follow">
 {% endblock meta %}
 
 {% block head %}
-<title>Políticas de devolución - Twinstore</title>
+<title>Políticas de devolución - {{config.nombre_tienda}}</title>
 {% endblock head %}
 
 {% block contenidomain %}
@@ -17,7 +17,7 @@
         {% include 'components/politicas-navbar.html' with dev="selected" %}
         <div class="generic-item faq">
             <h1>Políticas de devolución</h1>
-            <p class="faq__description">En Twinstore aceptamos cambios y devoluciones de productos dentro de un plazo de 10 días corridos. En caso de retiro presencial, el plazo comienza a partir de la fecha de entrega. Si el producto fue enviado a domicilio, el plazo se cuenta desde la fecha efectiva de entrega. Las solicitudes deberán gestionarse exclusivamente dentro de los días y horarios de atención publicados en nuestros canales oficiales.</p>
+            <p class="faq__description">En {{config.nombre_tienda}} aceptamos cambios y devoluciones de productos dentro de un plazo de 10 días corridos. En caso de retiro presencial, el plazo comienza a partir de la fecha de entrega. Si el producto fue enviado a domicilio, el plazo se cuenta desde la fecha efectiva de entrega. Las solicitudes deberán gestionarse exclusivamente dentro de los días y horarios de atención publicados en nuestros canales oficiales.</p>
             <details class="faq">
                 <summary>
                     <span class="faq__title">Condiciones generales para el cambio o devolución de un producto</span>
@@ -43,8 +43,8 @@
                 </summary>
                 <p class="faq__content">
                     De acuerdo con el artículo 34 de la Ley 24.240 de Defensa del Consumidor y los artículos 1.111 y 1.112 del Código Civil y Comercial de la Nación, el comprador tiene derecho a revocar la aceptación de la compra sin expresión de causa dentro de los 10 días corridos desde la entrega del bien o la celebración del contrato.<br><br>
-                    Para ejercer este derecho, el usuario deberá contactarse con Twinstore por correo electrónico a contacto@twinstore.com.ar, indicando el número de pedido y solicitando la devolución. El producto deberá ser devuelto en perfecto estado, sin uso, con sus etiquetas, embalaje original, manuales, factura de compra y accesorios completos.<br><br>
-                    Twinstore se reserva el derecho de rechazar solicitudes de devolución que no cumplan con las condiciones mencionadas, o cuando el producto presente señales de uso o deterioro.
+                    Para ejercer este derecho, el usuario deberá contactarse con {{config.nombre_tienda}} por correo electrónico a contacto@twinstore.com.ar, indicando el número de pedido y solicitando la devolución. El producto deberá ser devuelto en perfecto estado, sin uso, con sus etiquetas, embalaje original, manuales, factura de compra y accesorios completos.<br><br>
+                    {{config.nombre_tienda}} se reserva el derecho de rechazar solicitudes de devolución que no cumplan con las condiciones mencionadas, o cuando el producto presente señales de uso o deterioro.
                 </p>
             </details>
             <details class="faq">

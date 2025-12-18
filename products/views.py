@@ -16,8 +16,6 @@ from django.db.models import Count,Prefetch
 from core.models import EventosPromociones
 from django.utils import timezone
 
-
-
 # Create your views here.
 # ----- Prod View ----- #
 def slug_dispatcher(request, slug):
@@ -79,93 +77,6 @@ def producto_view(request: HttpRequest, slug: str):
         'meta':meta
     })
 
-# * Solo admin o staff
-@staff_member_required
-def editar_producto_view(request, pk):
-    producto = Producto.objects.filter(pk=pk).prefetch_related('imagenes_producto','colores__imagenes_color').get(pk=pk)
-
-    if request.method == 'POST':
-        form = EditarProducto(request.POST, request.FILES, instance=producto)
-
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Producto editado correctamente.')
-            return redirect('products:editar_producto', pk=producto.pk)
-    else:
-        form = EditarProducto(instance=producto)
-
-    return render(request, 'products/editar_producto.html',{
-        'form': form,
-        'producto': producto,
-        })
-
-@staff_member_required
-def agregar_color(request,producto_id):
-    producto = get_object_or_404(Producto, id=producto_id)
-    if request.method == 'POST':
-        nombres = request.POST.getlist('nombre_color[]')
-        codigos = request.POST.getlist('codigo_color[]')
-
-        for nombre, codigo in zip(nombres, codigos):
-            if nombre and codigo:
-                ColorProducto.objects.create(
-                    producto=producto,
-                    nombre=nombre.capitalize(),
-                    hex=codigo
-                )
-                messages.success(request, 'Color/es agregado/s correctamente.')
-
-    return redirect('products:editar_producto', pk=producto.pk)
-
-@staff_member_required
-def eliminar_color(request, color_id):
-    color = get_object_or_404(ColorProducto, id=color_id)
-    producto_id = color.producto.id
-
-    color.delete()
-    messages.success(request, 'Color eliminado correctamente.')
-    return redirect('products:editar_producto', pk=producto_id)
-
-@staff_member_required
-def agregar_imagenes(request, producto_id):
-    producto = get_object_or_404(Producto, id=producto_id)
-    if request.method == 'POST':
-        for archivo in request.FILES.getlist('imagenes_producto[]'):
-            if archivo:
-                ImagenProducto.objects.create(
-                    producto=producto,
-                    imagen=archivo
-                )
-        messages.success(request, 'Imagen/es cargada/s correctamente.')
-
-    return redirect('products:editar_producto', pk=producto.pk)
-
-@staff_member_required
-def asociar_color_img(request, producto_id):
-    producto = get_object_or_404(Producto, id=producto_id)
-
-    if request.method == 'POST':
-        imagenes = request.POST.getlist('imagen_id')
-        colores = request.POST.getlist('color_id')
-        for imagen_id, color_id in zip(imagenes, colores):
-            if imagen_id and color_id:
-                imagen = get_object_or_404(ImagenProducto, id=imagen_id, producto=producto)
-                color = get_object_or_404(ColorProducto, id=color_id, producto=producto)
-                imagen.color = color
-                imagen.save()
-                messages.success(request, f'Color {color.nombre} asociado a la imagen correctamente.')
-    
-    return redirect('products:editar_producto', pk=producto.pk)
-
-@staff_member_required
-def eliminar_imagen(request, img_id):
-    imagen = get_object_or_404(ImagenProducto, id=img_id)
-    producto_id = imagen.producto.id
-
-    imagen.delete()
-    messages.success(request, 'Imagen eliminada correctamente.')
-    return redirect('products:editar_producto', pk=producto_id)
-
 # ----- ProdGrid ----- #
 def products_grid_response(
         request: HttpRequest,
@@ -223,7 +134,6 @@ def subcategoria_view(request:HttpRequest,categoria,subcategoria):
     )
 
     return products_grid_response(request, ctx, type_request)
-
 
 @inject_categorias_subcategorias
 def productos(request: HttpRequest):
