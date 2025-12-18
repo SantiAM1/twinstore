@@ -1,7 +1,6 @@
 from django.urls import path
 from .views import (
     home,
-    cargar_productos_excel,
     politicas_priv,
     politicas_devolucion,
     politicas_envios,
@@ -13,13 +12,13 @@ from .views import (
     BusquedaPredictivaView,
     cache_clear,
     test,
+    toggle_mantenimiento
 )
 
 app_name = "core"
 
 urlpatterns = [
     path('', home, name="home"),
-    path('cargar-productos/', cargar_productos_excel, name='cargar_excel'),
     path('politicas-privacidad/',politicas_priv,name="politicas-privacidad"),
     path('politicas-devoluciones/',politicas_devolucion,name="politicas-devolucion"),
     path('politicas-envios/',politicas_envios,name="politicas-envios"),
@@ -31,4 +30,5 @@ urlpatterns = [
     path('api/busqueda_predictiva/',BusquedaPredictivaView.as_view(), name='busqueda_predictiva'),
     path('cache_clear/',cache_clear,name="cache_clear"),
     path('test/',test,name="test"),
+    path('toggle-mantenimiento/', toggle_mantenimiento, name='toggle_mantenimiento'),
 ]

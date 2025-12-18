@@ -7,7 +7,7 @@
 {% endblock meta %}
 
 {% block head %}
-<title>Politicas de servicio técnico - Twinstore</title>
+<title>Politicas de servicio técnico - {{config.nombre_tienda}}</title>
 {% endblock head %}
 
 {% block contenidomain %}
@@ -27,9 +27,9 @@
                 </summary>
                 <p class="faq__content">
                     Al momento de dejar un equipo para diagnóstico o reparación en nuestro laboratorio técnico, el cliente acepta las siguientes condiciones:<br>
-                    • Twinstore notificará al cliente cuando el producto esté disponible para su retiro, ya sea por llamada, WhatsApp o correo electrónico.<br>
+                    • {{config.nombre_tienda}} notificará al cliente cuando el producto esté disponible para su retiro, ya sea por llamada, WhatsApp o correo electrónico.<br>
                     • Una vez notificado, el cliente dispone de un plazo máximo de 90 (noventa) días corridos para retirar el producto de nuestras instalaciones.<br>
-                    • Si transcurrido dicho plazo el producto no fuera retirado, Twinstore quedará liberado de toda responsabilidad respecto de la guarda, integridad y estado del equipo, y podrá disponer del mismo sin derecho a reclamo posterior por parte del cliente.<br>
+                    • Si transcurrido dicho plazo el producto no fuera retirado, {{config.nombre_tienda}} quedará liberado de toda responsabilidad respecto de la guarda, integridad y estado del equipo, y podrá disponer del mismo sin derecho a reclamo posterior por parte del cliente.<br>
                     • El retiro del producto debe ser efectuado presentando el comprobante o parte de recepción emitido al momento de la entrega.
                 </p>
             </details>
@@ -41,8 +41,8 @@
                     </svg>
                 </summary>
                 <p class="faq__content">
-                    Los equipos no retirados en plazo no generan cargos de almacenamiento ni de custodia, pero sí dejan de estar bajo la responsabilidad de Twinstore.<br>
-                    En Twinstore valoramos y respetamos la confianza de nuestros clientes, por eso trabajamos con total transparencia en cada etapa del servicio.
+                    Los equipos no retirados en plazo no generan cargos de almacenamiento ni de custodia, pero sí dejan de estar bajo la responsabilidad de {{config.nombre_tienda}}.<br>
+                    En {{config.nombre_tienda}} valoramos y respetamos la confianza de nuestros clientes, por eso trabajamos con total transparencia en cada etapa del servicio.
                 </p>
             </details>
         </div>

@@ -3,6 +3,8 @@ from django.db.models import Sum
 from django.http import HttpRequest
 
 def carrito_total(request:HttpRequest):
+    if request.path.startswith('/panel-admin-twinstore/'):
+        return {}
     total_productos = 0
 
     if request.user.is_authenticated:

@@ -1,0 +1,620 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-08 18:07-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
+
+#: .\config\settings.py:399
+msgid "Volver al sitio"
+msgstr ""
+
+#: .\config\settings.py:404
+msgid "Activar/Desactivar Mantenimiento"
+msgstr ""
+
+#: .\config\settings.py:449
+msgid "Dashboard"
+msgstr ""
+
+#: .\config\settings.py:456
+msgid "Tu tienda"
+msgstr ""
+
+#: .\config\settings.py:459
+msgid "Tienda"
+msgstr ""
+
+#: .\config\settings.py:464
+msgid "Eventos y promociones"
+msgstr ""
+
+#: .\config\settings.py:471
+msgid "Gestión de productos"
+msgstr ""
+
+#: .\config\settings.py:474
+msgid "Productos"
+msgstr ""
+
+#: .\config\settings.py:479
+msgid "Ingresar Stock"
+msgstr ""
+
+#: .\config\settings.py:485
+msgid "Proveedores"
+msgstr ""
+
+#: .\config\settings.py:492
+msgid "Ventas y usuarios"
+msgstr ""
+
+#: .\config\settings.py:495
+msgid "Ventas"
+msgstr ""
+
+#: .\config\settings.py:504
+msgid "Usuarios"
+msgstr ""
+
+#: .\payment\admin.py:14
+msgid "Detalle de compra"
+msgstr ""
+
+#: .\templates\admin\index.html:10
+#: .\templates\admin\templates\admin\app_index.html:5
+#: .\templates\admin\templates\admin\base_site.html:3
+#: .\templates\admin\templates\admin\index.html:5
+#: .\templates\admin\templates\admin\login.html:15
+#: .\templates\admin\templates\unfold\layouts\base.html:7
+msgid "Django site admin"
+msgstr ""
+
+#: .\templates\admin\templates\admin\actions.html:22
+#: .\templates\admin\templates\admin\dataset_actions.html:46
+msgid "Run the selected action"
+msgstr ""
+
+#: .\templates\admin\templates\admin\actions.html:23
+#: .\templates\admin\templates\admin\dataset_actions.html:47
+msgid "Run"
+msgstr ""
+
+#: .\templates\admin\templates\admin\actions.html:43
+#: .\templates\admin\templates\admin\dataset_actions.html:17
+msgid "Click here to select the objects across all pages"
+msgstr ""
+
+#: .\templates\admin\templates\admin\actions.html:44
+#: .\templates\admin\templates\admin\dataset_actions.html:18
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr ""
+
+#: .\templates\admin\templates\admin\actions.html:50
+#: .\templates\admin\templates\admin\dataset_actions.html:24
+msgid "Clear selection"
+msgstr ""
+
+#: .\templates\admin\templates\admin\app_list.html:12
+#: .\templates\admin\templates\unfold\helpers\app_list_default.html:9
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr ""
+
+#: .\templates\admin\templates\admin\app_list.html:48
+#: .\templates\admin\templates\unfold\helpers\app_list.html:91
+#: .\templates\admin\templates\unfold\helpers\app_list_default.html:59
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
+#: .\templates\admin\templates\admin\auth\user\add_form.html:6
+msgid "After you've created a user, you’ll be able to edit more user options."
+msgstr ""
+
+#: .\templates\admin\templates\admin\auth\user\change_password.html:19
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr ""
+
+#: .\templates\admin\templates\admin\auth\user\change_password.html:30
+#: .\templates\admin\templates\registration\password_change_form.html:32
+#: .\templates\admin\templates\unfold\helpers\account_links.html:30
+msgid "Change password"
+msgstr ""
+
+#: .\templates\admin\templates\admin\change_form_object_tools.html:6
+msgid "History"
+msgstr ""
+
+#: .\templates\admin\templates\admin\change_form_object_tools.html:12
+#: .\templates\admin\templates\admin\edit_inline\stacked.html:71
+#: .\templates\admin\templates\unfold\helpers\edit_inline\tabular_title.html:33
+msgid "View on site"
+msgstr ""
+
+#: .\templates\admin\templates\admin\change_list.html:69
+msgid "Filters"
+msgstr ""
+
+#: .\templates\admin\templates\admin\change_list_results.html:33
+msgid "Expand row"
+msgstr ""
+
+#: .\templates\admin\templates\admin\delete_confirmation.html:16
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+
+#: .\templates\admin\templates\admin\delete_confirmation.html:32
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#: .\templates\admin\templates\admin\delete_confirmation.html:48
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+
+#: .\templates\admin\templates\admin\delete_confirmation.html:55
+#: .\templates\admin\templates\admin\delete_selected_confirmation.html:49
+msgid "Objects"
+msgstr ""
+
+#: .\templates\admin\templates\admin\delete_selected_confirmation.html:15
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+
+#: .\templates\admin\templates\admin\delete_selected_confirmation.html:28
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+
+#: .\templates\admin\templates\admin\delete_selected_confirmation.html:42
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+
+#: .\templates\admin\templates\admin\edit_inline\stacked.html:57
+#: .\templates\admin\templates\unfold\helpers\app_list_default.html:42
+#: .\templates\admin\templates\unfold\helpers\edit_inline\tabular_title.html:23
+msgid "Change"
+msgstr ""
+
+#: .\templates\admin\templates\admin\edit_inline\stacked.html:59
+#: .\templates\admin\templates\unfold\helpers\app_list_default.html:38
+#: .\templates\admin\templates\unfold\helpers\edit_inline\tabular_title.html:25
+msgid "View"
+msgstr ""
+
+#: .\templates\admin\templates\admin\filter.html:5
+#, python-format
+msgid " By %(filter_title)s "
+msgstr ""
+
+#: .\templates\admin\templates\admin\includes\object_delete_summary.html:5
+msgid "Summary"
+msgstr ""
+
+#: .\templates\admin\templates\admin\login.html:15
+msgid "Welcome back to"
+msgstr ""
+
+#: .\templates\admin\templates\admin\login.html:26
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
+#: .\templates\admin\templates\admin\login.html:47
+msgid "Log in"
+msgstr ""
+
+#: .\templates\admin\templates\admin\login.html:55
+msgid "Forgotten your password or username?"
+msgstr ""
+
+#: .\templates\admin\templates\admin\object_history.html:10
+#: .\templates\admin\templates\admin\object_history.html:26
+msgid "Date/time"
+msgstr ""
+
+#: .\templates\admin\templates\admin\object_history.html:14
+#: .\templates\admin\templates\admin\object_history.html:30
+msgid "User"
+msgstr ""
+
+#: .\templates\admin\templates\admin\object_history.html:18
+#: .\templates\admin\templates\admin\object_history.html:34
+msgid "Action"
+msgstr ""
+
+#: .\templates\admin\templates\admin\object_history.html:57
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: .\templates\admin\templates\admin\object_history.html:60
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"admin site."
+msgstr ""
+
+#: .\templates\admin\templates\admin\pagination.html:12
+#: .\templates\admin\templates\unfold\helpers\popup_header.html:14
+#: .\templates\admin\templates\unfold\helpers\welcomemsg.html:25
+msgid "Show all"
+msgstr ""
+
+#: .\templates\admin\templates\admin\pagination.html:19
+#: .\templates\admin\templates\admin\submit_line.html:9
+msgid "Save"
+msgstr ""
+
+#: .\templates\admin\templates\admin\search_form.html:18
+#: .\templates\admin\templates\unfold\helpers\command.html:24
+msgid "Type to search"
+msgstr ""
+
+#: .\templates\admin\templates\admin\submit_line.html:28
+msgid "Save and continue editing"
+msgstr ""
+
+#: .\templates\admin\templates\admin\submit_line.html:30
+msgid "Save and view"
+msgstr ""
+
+#: .\templates\admin\templates\admin\submit_line.html:37
+msgid "Save and add another"
+msgstr ""
+
+#: .\templates\admin\templates\admin\submit_line.html:43
+msgid "Save as new"
+msgstr ""
+
+#: .\templates\admin\templates\admin\submit_line.html:52
+msgid "Close"
+msgstr ""
+
+#: .\templates\admin\templates\admin\submit_line.html:60
+msgid "Delete"
+msgstr ""
+
+#: .\templates\admin\templates\registration\logged_out.html:14
+msgid "You have been successfully logged out from the administration"
+msgstr ""
+
+#: .\templates\admin\templates\registration\logged_out.html:18
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
+
+#: .\templates\admin\templates\registration\logged_out.html:23
+msgid "Log in again"
+msgstr ""
+
+#: .\templates\admin\templates\registration\password_change_done.html:8
+msgid "Your password was changed."
+msgstr ""
+
+#: .\templates\admin\templates\registration\password_change_form.html:18
+msgid ""
+"Please enter your old password, for security’s sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+
+#: .\templates\admin\templates\unfold\components\table.html:93
+msgid "No data"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\account_links.html:17
+msgid "View site"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\account_links.html:40
+msgid "Log out"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\actions_row.html:4
+msgid "More actions"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\add_link.html:5
+#: .\templates\admin\templates\unfold\helpers\add_link.html:8
+#: .\templates\admin\templates\unfold\helpers\empty_results.html:4
+#, python-format
+msgid "Add %(name)s"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\app_list.html:60
+msgid "All applications"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\app_list_default.html:31
+msgid "Add"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\boolean.html:4
+msgid "Unknown"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\boolean.html:4
+msgid "True"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\boolean.html:4
+msgid "False"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\change_list_filter_actions.html:7
+msgid "Apply Filters"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\change_list_filter_actions.html:16
+msgid "Hide counts"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\change_list_filter_actions.html:20
+msgid "Show counts"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\change_list_filter_actions.html:27
+msgid "Clear all filters"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\change_list_headers.html:27
+msgid "Select all rows"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\change_list_headers.html:41
+msgid "Toggle sorting"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\change_list_headers.html:49
+msgid "Remove from sorting"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\change_list_headers.html:55
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\command_history.html:7
+msgid "Recent searches"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\command_history.html:49
+msgid "No recent searches"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\command_results.html:44
+msgid "No results matching your query"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\command_results.html:57
+msgid "Loading more results..."
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\command_results.html:62
+#, python-format
+msgid ""
+"\n"
+"                Found %(counter)s result in %(time)s seconds\n"
+"            "
+msgid_plural ""
+"\n"
+"                Found %(counter)s results in %(time)s seconds\n"
+"            "
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: .\templates\admin\templates\unfold\helpers\delete_submit_line.html:5
+msgid "No, take me back"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\delete_submit_line.html:9
+msgid "Yes, I’m sure"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\display_header.html:10
+msgid "Record picture"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\edit_inline\tabular_delete.html:4
+msgid "Remove"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\edit_inline\tabular_heading.html:21
+msgid "Delete?"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\empty_results.html:14
+msgid "No results found"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\empty_results.html:18
+msgid ""
+"This page yielded into no results. Create a new item or reset your filters."
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\empty_results.html:32
+msgid "Reset filters"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\field_readonly_value_file.html:8
+#: .\templates\admin\templates\unfold\widgets\clearable_file_input.html:6
+msgid "Image preview"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\field_readonly_value_file.html:13
+msgid "Click to download"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\header_back_button.html:7
+#: .\templates\admin\templates\unfold\helpers\header_back_button.html:15
+msgid "Go back"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\history.html:9
+msgid "Recent actions"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\history.html:28
+msgid "Unknown content"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\messages\errornote.html:5
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: .\templates\admin\templates\unfold\helpers\pagination_infinite.html:5
+msgid "Previous"
+msgstr "Anterior"
+
+#: .\templates\admin\templates\unfold\helpers\pagination_infinite.html:9
+msgid "Next"
+msgstr "Siguente"
+
+#: .\templates\admin\templates\unfold\helpers\popup_header.html:14
+#: .\templates\admin\templates\unfold\helpers\welcomemsg.html:25
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: .\templates\admin\templates\unfold\helpers\popup_header.html:14
+#: .\templates\admin\templates\unfold\helpers\welcomemsg.html:25
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\search.html:10
+#: .\templates\admin\templates\unfold\helpers\search.html:40
+msgid "Search apps and models..."
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\search.html:41
+msgid "Filter navigation items"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\site_branding.html:3
+#: .\templates\admin\templates\unfold\helpers\site_branding.html:6
+msgid "Django administration"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\site_icon.html:7
+#: .\templates\admin\templates\unfold\helpers\site_icon.html:9
+#: .\templates\admin\templates\unfold\helpers\site_icon.html:11
+#: .\templates\admin\templates\unfold\helpers\site_logo.html:5
+#: .\templates\admin\templates\unfold\helpers\site_logo.html:7
+#: .\templates\admin\templates\unfold\helpers\site_logo.html:9
+msgid "Home"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\tab_items.html:16
+msgid "General"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\theme_switch.html:16
+msgid "Dark"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\theme_switch.html:23
+msgid "Light"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\theme_switch.html:30
+msgid "System"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\helpers\unauthenticated_header.html:6
+msgid "Return to site"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\widgets\clearable_file_input.html:25
+#: .\templates\admin\templates\unfold\widgets\clearable_file_input_small.html:18
+msgid "Choose file to upload"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\widgets\related_widget_wrapper.html:16
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\widgets\related_widget_wrapper.html:26
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\widgets\related_widget_wrapper.html:35
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+#: .\templates\admin\templates\unfold\widgets\related_widget_wrapper.html:45
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+#: .\templates\admin\templates\unfold_crispy\layout\table_inline_formset.html:65
+msgid "Add row"
+msgstr ""
+
+#: .\users\validators.py:8
+msgid "La contraseña debe tener al menos 8 caracteres."
+msgstr ""
+
+#: .\users\validators.py:11
+msgid "La contraseña debe contener al menos una letra mayúscula."
+msgstr ""
+
+#: .\users\validators.py:14
+msgid "La contraseña debe contener al menos un número."
+msgstr ""
+
+#: .\users\validators.py:17
+msgid "La contraseña debe contener al menos un carácter especial."
+msgstr ""
+
+#: .\users\validators.py:21
+msgid ""
+"La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y "
+"un carácter especial."
+msgstr ""

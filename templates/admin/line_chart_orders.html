@@ -1,0 +1,31 @@
+{% load unfold %}
+
+<div class="mt-4 flex gap-4 flex-wrap">
+    {% component "unfold/components/card.html" with title="Metricas de tu negocio" %}
+        <div class="hide-scrollbar-webkit" style="display: flex; gap: 8px; margin-bottom: 16px; overflow-x: scroll;::web">
+            {% for type,data in buttons_chart.items %}
+                {% if not request.GET.line_type and forloop.first %}
+                    {% component "unfold/components/button.html" with href=data.href variant=variant %}
+                        {{ data.label }}
+                    {% endcomponent %}
+                {% elif request.GET.line_type == type %}
+                    {% component "unfold/components/button.html" with href=data.href variant=variant %}
+                        {{ data.label }}
+                    {% endcomponent %}
+                {% else %}
+                    {% with variant="default" %}
+                    {% component "unfold/components/button.html" with href=data.href variant=variant %}
+                        {{ data.label }}
+                    {% endcomponent %}
+                    {% endwith %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% component "unfold/components/chart/bar.html" with component_class="BarChartMetricas" periodo=periodo_actual line_type=line_type %}{% endcomponent %}
+    {% endcomponent %}
+    <div class="table-orders-admin">
+        {% component "unfold/components/card.html" with title="Ordenes recientes" class="h-full" %}
+            {% component "unfold/components/table.html" with table=table_data card_included=1 striped=1 %}{% endcomponent %}
+        {% endcomponent %}
+    </div>
+</div>

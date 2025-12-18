@@ -6,7 +6,7 @@
 {% endblock meta %}
 
 {% block head %}
-<title>Facturacion - Twinstore</title>
+<title>Facturacion - {{config.nombre_tienda}}</title>
 {% endblock head %}
 
 {% block contenidomain %}
@@ -167,8 +167,8 @@
                 <section id="pagoEmpty">Seleccioná un método de pago</section>
                 <section id="pagoEfectivo" class="details-msg hide">
                     <h4>Efectivo</h4>
-                    <p>En TwinStore ofrecemos la opción de pago en efectivo. Podes abonar al momento de retirar tu pedido en nuestro punto de retiro.<br>
-                    Algunos productos pueden requerir un pago anticipado para asegurar su disponibilidad. En estos casos, la coordinación será gestionada por TwinStore, donde te indicaremos los pasos a seguir. Este anticipo podrá ser abonado en nuestro punto de retiro o coordinado con el cliente.</p>
+                    <p>En {{config.nombre_tienda}} ofrecemos la opción de pago en efectivo. Podes abonar al momento de retirar tu pedido en nuestro punto de retiro.<br>
+                    Algunos productos pueden requerir un pago anticipado para asegurar su disponibilidad. En estos casos, la coordinación será gestionada por {{config.nombre_tienda}}, donde te indicaremos los pasos a seguir. Este anticipo podrá ser abonado en nuestro punto de retiro o coordinado con el cliente.</p>
                 </section>
                 <section id="pagoTransferencia" class="details-msg hide">
                     <h4>Transferencia</h4>
@@ -207,14 +207,14 @@
                             </li>
                             <li>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
-                                Serás redirigido nuevamente a TwinStore una vez finalizado el pago y veras el estado final de tu compra.
+                                Serás redirigido nuevamente a {{config.nombre_tienda}} una vez finalizado el pago y veras el estado final de tu compra.
                             </li>
                         </ul>
                     </div>
                 </section>
                 <section id="pagoMix" class="details-msg hide">
                     <h4>Pago Mixto</h4>
-                    <p>En TwinStore puedes combinar diferentes métodos de pago. Estamos inaugurando el pago mixto, un metodo de pago que combina transferencia bancaria y Mercado Pago. Aprovecha, combina tus métodos de pago y disfruta de mayor flexibilidad.<br>Los pagos realizados mediante Mercado Pago cuentan con un recargo del 6,42% más IVA. Puedes volver a generar el link de pago en "Mi cuenta", en el apartado "Mis pedidos". El Ticket de pago cuenta con treinta (30) minutos de vencimiento.</p>
+                    <p>En {{config.nombre_tienda}} puedes combinar diferentes métodos de pago. Estamos inaugurando el pago mixto, un metodo de pago que combina transferencia bancaria y Mercado Pago. Aprovecha, combina tus métodos de pago y disfruta de mayor flexibilidad.<br>Los pagos realizados mediante Mercado Pago cuentan con un recargo del 6,42% más IVA. Puedes volver a generar el link de pago en "Mi cuenta", en el apartado "Mis pedidos". El Ticket de pago cuenta con treinta (30) minutos de vencimiento.</p>
                     <div class="generic-input">
                         <label for="id_montomixto">Ingresá el monto a transferir</label>
                         <div class="billing-aplicar-row" id="montomixto">
@@ -427,7 +427,7 @@
             <input type="button" value="Pagar" class="card-sumbit-btn">
             <br><br>
             <p class="billing-secure">
-                En <strong>Twinstore</strong> no almacenamos ni procesamos los datos de tu tarjeta. La operación es 100% segura y es gestionada directamente por <strong>Payway</strong>, una pasarela certificada con estándares internacionales de seguridad.
+                En <strong>{{config.nombre_tienda}}</strong> no almacenamos ni procesamos los datos de tu tarjeta. La operación es 100% segura y es gestionada directamente por <strong>Payway</strong>, una pasarela certificada con estándares internacionales de seguridad.
                 <a href="https://www.payway.com.ar/" target="_blank">Conocé más sobre Payway.</a>
             </p>
         </form>

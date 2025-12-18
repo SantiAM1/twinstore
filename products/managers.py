@@ -1,9 +1,7 @@
 from django.db import models
-from django.db.models import Prefetch
-from django.utils import timezone
-from core.models import EventosPromociones
-from django.db.models import F, Case, When, Value, DecimalField,Q, Subquery, OuterRef,Count
-from django.db.models.functions import Round
+
+from core.utils import get_configuracion_tienda
+from django.db.models import Value,Q , Count, Prefetch, Sum
 from django.db.models.functions import Coalesce
 from .types import GridContext
 
@@ -25,12 +23,41 @@ class ProductQuerySet(models.QuerySet):
         )
 
     def precargado(self):
-        return (
-            self.select_related("sub_categoria","marca",)
-            .prefetch_related(
-                "colores__imagenes_color",
-                "imagenes_producto",
+        from products.models import ColorProducto
+        config = get_configuracion_tienda()
+        modo_estricto = config.get('modo_stock') == 'estricto'
+
+        qs = self.select_related("sub_categoria", "marca","evento")
+        prefetchs_comunes = ["imagenes_producto", "colores__imagenes_color"]
+
+        if modo_estricto:
+            colores_con_stock = ColorProducto.objects.annotate(
+                _stock_cache=Coalesce(
+                    Sum(
+                        'ingresos_stock__lotes__cantidad_disponible',
+                        filter=Q(ingresos_stock__lotes__cantidad_disponible__gt=0)
+                    ),
+                    Value(0)
                 )
+            )
+
+            return qs.annotate(
+                _total_stock_cache=Coalesce(
+                    Sum(
+                        'ingresos_stock__lotes__cantidad_disponible',
+                        filter=Q(ingresos_stock__lotes__cantidad_disponible__gt=0)
+                    ),
+                    Value(0)
+                )
+            ).prefetch_related(
+                Prefetch('colores', queryset=colores_con_stock),
+                *prefetchs_comunes
+            )
+        
+        else:
+            return qs.prefetch_related(
+                'colores', 
+                *prefetchs_comunes
             )
 
     def de_evento(self, evento):

@@ -1,0 +1,26 @@
+<div class="flex flex-col gap-1">
+    <div class="font-semibold text-2xl text-font-important-light tracking-tight dark:text-font-important-dark">
+        Dashboard
+    </div>
+    <p class="leading-relaxed mb-0 text-sm">
+        Bienvenido! Estas son las ultimas metricas de tu sitio
+    </p>
+</div>
+
+{% include 'admin/divider.html' %}
+
+<div class="mb-6">
+    <nav class="-mb-px flex gap-2 overflow-x-auto" aria-label="Tabs">
+        {% for tab in tabs %}
+        <a href="?param={{ tab.param }}"
+           class="whitespace-nowrap p-2 text-sm font-medium transition-colors duration-200 rounded-md
+                  {% if tab.active %}
+                    bg-primary-100 text-primary-600 dark:text-primary-50
+                  {% else %}
+                    text-gray-500  dark:text-gray-400
+                  {% endif %}">
+            {{ tab.name }}
+        </a>
+        {% endfor %}
+    </nav>
+</div>

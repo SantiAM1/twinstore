@@ -24,11 +24,11 @@ class Tienda(models.Model):
     fecha_actualizacion_config = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Configuración"
-        verbose_name_plural = "Configuraciones"
+        verbose_name = "Mi Tienda"
+        verbose_name_plural = "Mi Tienda"
 
     def __str__(self):
-        return f"Configuración de la tienda: {self.nombre_tienda}"
+        return f"{self.nombre_tienda}"
     
 class EventosPromociones(models.Model):
     """

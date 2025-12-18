@@ -1,0 +1,15 @@
+{% load unfold %}
+<div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+{% for _,data in kpi_list.items %}
+    {% component "unfold/components/card.html" with icon=data.icon %}
+    <p class="mb-2">{{data.title}}</p>
+    <span class="text-2xl font-semibold">{{data.value}}</span>
+    {% if not request.GET.param == "siempre" %}
+    <div class="flex items-center gap-1 mt-2" style="color:{% if data.pasado > 0%}#16a34a{% elif data.pasado == 0 %}var(--text-gray-500){% else %}#dc2626{% endif %}">
+        <span class="material-symbols-outlined">arrow_circle_{% if data.pasado > 0%}up{% else %}down{% endif %}</span>
+        <strong>% {{data.pasado}}</strong>
+    </div>
+    {% endif %}
+    {% endcomponent %}
+{% endfor %}
+</div>

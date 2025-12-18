@@ -11,7 +11,7 @@
 <meta property="og:title" content="{{ meta.og.title }}">
 <meta property="og:description" content="{{ meta.og.description }}">
 <meta property="og:url" content="{{ meta.og.url }}">
-<meta property="og:site_name" content="Twinstore">
+<meta property="og:site_name" content="{{config.nombre_tienda}}">
 <meta property="og:image" content="{{ meta.og.image }}">
 
 <!-- Twitter -->
@@ -28,7 +28,7 @@
 
 
 {% block head %}
-<title>{{producto.nombre}} - Twinstore</title>
+<title>{{producto.nombre}} - {{config.nombre_tienda}}</title>
 <link rel="stylesheet" href="{% static 'css/libs/swiper-bundle.min.css' %}">
 {% endblock head %}
 
@@ -41,10 +41,14 @@
             {% include 'components/prod-swipers.html' %}
         </div>
         <div class="product-info">
-            <h1>{{producto.nombre}}</h1>
-            {% if user.is_staff %}
-                <a href="{% url 'products:editar_producto' producto.id %}" class="generic-button btn-2">Editar producto</a>
-            {% endif %}
+            <h1 {% if user.is_staff %}style="position: relative;"{% endif %}>{{producto.nombre}}
+                {% if user.is_staff %}
+                    <a href="{% url 'admin:products_producto_change' producto.id %}" target="_blank" class="generic-button btn-2" style="position: absolute; top: 20px; right: 0;display: flex; width: 44px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-edit"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" /><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" /><path d="M16 5l3 3" /></svg>
+                    </a>
+                {% endif %}
+            </h1>
+            <span class="producto-sku">SKU: {{producto.sku}}</span>
             <p class="product-description">{{producto.descripcion_seo}}</p>
             <div class="product-prices">
                 {% if producto.banner %}
@@ -59,12 +63,59 @@
             <div class="product-colors">
             {% if producto.colores.exists %}
                 {% for color_id,data in imagenes_dict.items %}
-                <div class="dot-ring {% if forloop.first %}selected{% endif %}" data-index="{{forloop.counter}}" data-colorId="{{color_id|signing_data}}"><div class="dot" style="background-color: {{data.hex}}"></div></div>
+                <div class="dot-ring {% if forloop.first %}selected{% endif %}" data-index="{{forloop.counter}}" data-colorId="{{color_id|signing_data}}" data-hex="{{data.hex}}"><div class="dot" style="background-color: {{data.hex}}"></div></div>
                 {% endfor %}
             {% endif %}
             </div>
+            {% if config.modo_stock == 'estricto' and config.mostrar_stock_en_front %}
+            <input type="hidden" name="stock-front" value="True">
+            {% with data=producto.obtener_stock_dict %}
+                {% if data.total >= 0 %}
+                    {% if data.total == 0 %}
+                        <span class="stock-status no-stock">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+                            Sin stock disponible
+                        </span>
+                    {% elif data.total <= 3 %}
+                        <span class="stock-status low-stock">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-minus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /></svg>
+                            Ultimas unidades disponibles
+                        </span>
+                    {% else %}
+                        <span class="stock-status in-stock">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                            Stock disponible
+                        </span>
+                    {% endif %}
+                {% else %}
+                {% for color_hex, stock in data.items %}
+                    {% with bool=forloop.first %}
+                    {% if stock == 0 %}
+                        <span class="stock-status no-stock {% if not bool %}hide{% endif %}" data-hex="{{color_hex}}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+                            Sin stock disponible
+                        </span>
+                    {% elif stock <= 3 %}
+                        <span class="stock-status low-stock {% if not bool %}hide{% endif %}" data-hex="{{color_hex}}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-minus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /></svg>
+                            Ultimas unidades disponibles
+                        </span>
+                    {% else %}
+                        <span class="stock-status in-stock {% if not bool %}hide{% endif %}" data-hex="{{color_hex}}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                            Stock disponible
+                        </span>
+                    {% endif %}
+                    {% endwith %}
+                {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% endif %}
             <button type="button" class="product-pay-method generic-modal-open" data-modalId="prodSpecs">Conocé nuestros medios de pago</button>
             <button type="button" class="product-add-cart" data-productoId="{{producto.id|signing_data}}">
+                {% if config.modo_stock == 'estricto' %}
+                {{producto.obtener_stock_dict|json_script:"stock-data" }}
+                {% endif %}
                 <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17h-11v-14h-2" /><path d="M6 5l14 1l-1 7h-13" /></svg>
                 Agregar al carrito
             </button>

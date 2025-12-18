@@ -1,12 +1,155 @@
 from functools import wraps
-from django.core.cache import cache
-from products.models import Categoria,Atributo,Producto,SubCategoria
+import json
 from collections import defaultdict
+
+from django.http import HttpRequest
 from django.db.models import Count,QuerySet
 from django.conf import settings
+from django.core.cache import cache
+
+from core.models import EventosPromociones
 from payment.templatetags.custom_filters import formato_pesos
-from django.http import HttpRequest
-import json
+
+from import_export import resources
+from import_export.widgets import ManyToManyWidget, ForeignKeyWidget,DecimalWidget
+from import_export import fields
+
+from products.models import (
+    Categoria,
+    Atributo,
+    Producto,
+    SubCategoria,
+    Etiquetas,
+    Marca,
+    ColorProducto,
+    Proveedor,
+    IngresoStock
+)
+
+import locale
+from decimal import Decimal
+
+try:
+    locale.setlocale(locale.LC_NUMERIC, 'es_AR.UTF-8') 
+except locale.Error:
+    locale.setlocale(locale.LC_NUMERIC, 'es_ES.UTF-8') 
+
+class DecimalTwoPlacesWidget(DecimalWidget):
+    
+    def render(self, value, obj=None, **kwargs):
+        if value is None:
+            return ""
+        
+        if not isinstance(value, Decimal):
+             value = Decimal(value)
+
+        return locale.format_string("%.2f", value, grouping=True)
+
+class IngresoStockResource(resources.ModelResource):
+    producto = fields.Field(
+        column_name='Nombre Producto',
+        attribute='producto',
+        widget=ForeignKeyWidget(Producto, field='nombre')
+    )
+    producto_color = fields.Field(
+        column_name='Color Producto',
+        attribute='producto_color',
+        widget=ForeignKeyWidget(ColorProducto, field='nombre')
+    )
+    proveedor = fields.Field(
+        column_name='Nombre Proveedor',
+        attribute='proveedor',
+        widget=ForeignKeyWidget(Proveedor, field='nombre')
+    )
+
+    costo_unitario = fields.Field(
+        column_name='Costo Unitario',
+        attribute='costo_unitario',
+        widget=DecimalTwoPlacesWidget()
+        )
+
+    def before_save_instance(self, instance, row, **kwargs):
+        print(instance, row, kwargs)
+        request = kwargs.get('request','')
+        if request and hasattr(request, 'user'):
+            instance.creado_por = request.user
+
+    def skip_row(self, instance, original, row,*args, **kwargs):
+        if instance.fecha_ingreso is not None:
+            return True 
+        return False
+
+    class Meta:
+        model = IngresoStock
+        import_id_fields = ('id',) 
+        
+        fields = (
+            'id',
+            'producto',
+            'producto_color',
+            'costo_unitario',
+            'cantidad',
+            'proveedor',
+        )
+
+        exclude = ('fecha_ingreso', 'creado_por')
+
+class ProductoResource(resources.ModelResource):
+    sub_categoria = fields.Field(
+        column_name='Sub Categoría',
+        attribute='sub_categoria',
+        widget=ForeignKeyWidget(SubCategoria, field='nombre')
+    )
+    marca = fields.Field(
+        column_name='Marca',
+        attribute='marca',
+        widget=ForeignKeyWidget(Marca, field='nombre')
+    )
+
+    evento = fields.Field(
+        column_name='Nombre Evento',
+        attribute='evento',
+        widget=ForeignKeyWidget(EventosPromociones, field='nombre_evento')
+    )
+    
+    etiquetas = fields.Field(
+        column_name='Etiquetas (Separadas por coma)', 
+        attribute='etiquetas', 
+        widget=ManyToManyWidget(Etiquetas, field='nombre', separator=',')
+    )
+
+    precio_divisa = fields.Field(
+        column_name='Precio USD/ARS',
+        attribute='precio_divisa',
+        widget=DecimalTwoPlacesWidget()
+    )
+
+    nombre = fields.Field(
+        column_name='Nombre Producto',
+        attribute='nombre'
+    )
+
+    def skip_row(self, instance, original, row,*args, **kwargs):
+        if instance.slug is None:
+            return True
+        return False
+
+    class Meta:
+        model = Producto
+        import_id_fields = ('nombre',) 
+        
+        fields = (
+            'nombre', 
+            'sub_categoria',
+            'marca', 
+            'precio_divisa', 
+            'descuento', 
+            'inhabilitar',
+            'etiquetas',
+            'evento'
+        )
+
+        exclude = ('id', 'created_at', 'updated_at')
 
 def inject_categorias_subcategorias(view_func):
     """

@@ -13,6 +13,7 @@
   --error: #ee1919;
   --success: #59f06d;
   --success-dark: #28a745;
+  --last-units: #ffb400;
   --size-dot: 10px;
   --size-ring: 14px;
   --bg: #ededed;
@@ -2402,8 +2403,15 @@ main.main-content {
   padding: 0.5rem;
   gap: 0.5rem;
   align-items: center;
+  transition: background-color 0.4s ease, opacity 0.4s ease;
 
   &:hover {
+    opacity: 0.7;
+  }
+
+  &.disabled {
+    background-color: var(--color-gray-4);
+    cursor: not-allowed;
     opacity: 0.7;
   }
 }
@@ -2900,6 +2908,27 @@ main.main-content {
   }
 }
 
+.stock-status {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+
+  &.no-stock {
+    color: var(--error);
+  }
+
+  &.low-stock {
+    color: var(--last-units);
+  }
+
+  &.in-stock {
+    color: var(--success-dark);
+  }
+}
+
 .product-add-cart {
   background-color: #202020;
   padding: 0.75rem 1rem;
@@ -2912,12 +2941,19 @@ main.main-content {
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  transition: opacity 0.4s ease, background-color 0.4s ease;
 
   &:hover {
     opacity: 0.9;
   }
   &:active {
     transform: translateY(1px);
+  }
+
+  &.disabled {
+    background-color: var(--color-gray-4);
+    cursor: not-allowed;
+    opacity: 0.7;
   }
 }
 
@@ -2936,8 +2972,24 @@ main.main-content {
 .product-description {
   color: #252525;
   margin-top: 0.5rem;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
   min-height: 50px;
+}
+
+.producto-sku {
+  font-size: 0.7rem;
+  color: var(--color-gray-1);
+  background-color: var(--color-gray-3);
+  padding: 0.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  display: block;
+  width: fit-content;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: var(--color-gray-2);
+  }
 }
 
 .product-prices {
