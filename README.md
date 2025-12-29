@@ -45,7 +45,7 @@ Es un proyecto generalista con funcionalidades completas para la gestión de pro
 
 ## Como se ve el proyecto?
 
-![Video de demostración](preview-compress.mp4)
+![Video de demostración](preview.mp4)
 
 ## Cómo desplegar el proyecto en local
 
