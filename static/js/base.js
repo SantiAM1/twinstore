@@ -251,3 +251,66 @@ if (backBtn && window.location.pathname !== "/carro/finalizar-compra/") {
     }
   });
 }
+
+const themeToggleBtn = document.getElementById("theme-toggle");
+const body = document.body;
+const lightTheme = document.querySelector(".theme-light");
+const darkTheme = document.querySelector(".theme-dark");
+
+const savedTheme = localStorage.getItem("theme") || "light";
+setTheme(savedTheme);
+
+function setTheme(theme) {
+  if (theme === "dark") {
+    body.setAttribute("data-theme", "dark");
+    darkTheme.classList.add("hide");
+    lightTheme.classList.remove("hide");
+  } else {
+    body.setAttribute("data-theme", "light");
+    darkTheme.classList.remove("hide");
+    lightTheme.classList.add("hide");
+  }
+}
+
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const currentTheme = body.getAttribute("data-theme");
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const container = document.querySelector(".navbar-cart-user");
+
+  if (!container) return;
+
+  const updateScrollMask = () => {
+    const isAtStart = container.scrollLeft <= 1;
+    const isAtEnd =
+      Math.abs(
+        container.scrollWidth - container.clientWidth - container.scrollLeft
+      ) <= 1;
+    const hasOverflow = container.scrollWidth > container.clientWidth;
+
+    container.classList.remove("mask-left", "mask-right", "mask-both");
+
+    if (!hasOverflow) return;
+
+    if (!isAtStart && !isAtEnd) {
+      container.classList.add("mask-both");
+    } else if (isAtStart) {
+      container.classList.add("mask-right");
+    } else if (isAtEnd) {
+      container.classList.add("mask-left");
+    }
+  };
+
+  container.addEventListener("scroll", updateScrollMask);
+  window.addEventListener("resize", updateScrollMask);
+
+  updateScrollMask();
+});

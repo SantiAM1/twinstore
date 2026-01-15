@@ -86,6 +86,40 @@ class EventosPromociones(models.Model):
         estado = "Activo" if self.activo else "Inactivo"
         return f"{self.nombre_evento} ({estado}) - Desde {localtime(self.fecha_inicio).strftime('%d/%m/%Y')} hasta {localtime(self.fecha_fin).strftime('%d/%m/%Y')}"
 
+class DatosBancarios(models.Model):
+    """
+    Información bancaria para pagos.
+    """
+    banco = models.CharField(max_length=100)
+    titular_cuenta = models.CharField(max_length=100)
+    numero_cuenta = models.CharField(max_length=50)
+    cbu = models.CharField(max_length=50)
+    alias = models.CharField(max_length=50)
+    imagen_banco = models.ImageField(upload_to='bancos_logos/', help_text="Logo del banco. (Opcional)", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Dato Bancario"
+        verbose_name_plural = "Datos Bancarios"
+
+    def __str__(self):
+        return f"{self.banco} - {self.titular_cuenta}"
+
+class MercadoPagoConfig(models.Model):
+    """
+    Configuración de MercadoPago.
+    """
+    modo_sandbox = models.BooleanField(default=True, help_text="Indica si se está en modo sandbox (pruebas).")
+    public_key = models.CharField(max_length=200, help_text="Clave pública de MercadoPago.")
+    access_token = models.CharField(max_length=200, help_text="Token de acceso de MercadoPago.")
+
+    class Meta:
+        verbose_name = "Configuración de MercadoPago"
+        verbose_name_plural = "Configuraciones de MercadoPago"
+
+    def __str__(self):
+        entorno = "Sandbox" if self.modo_sandbox else "Producción"
+        return f"MercadoPago ({entorno})"
+
 class HomeSection(models.Model):
     """
     Configuración de secciones en la página de inicio.

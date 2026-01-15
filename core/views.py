@@ -159,41 +159,10 @@ def cache_clear(request):
 
 @staff_member_required
 def test(request):
-    from django.db.models import Count
-    from django.db.models.functions import TruncDay, TruncMonth, TruncYear,TruncHour
-    from django.db.models import DateField, TimeField
-    from payment.models import Venta
-    from django.utils import timezone
-    from datetime import timedelta
-    def ventas_query(periodo:str = "30dias"):
-        if periodo == "24horas":
-            annotated = TruncHour('fecha_compra', output_field=TimeField())
-            delta = timedelta(hours=24)
 
-        elif periodo == "30dias":
-            annotated = TruncDay('fecha_compra', output_field=DateField())
-            delta = timedelta(days=30)
-
-        elif periodo == "1año":
-            annotated = TruncMonth('fecha_compra', output_field=DateField())
-            delta = timedelta(days=365)
-
-        elif periodo == "siempre":
-            annotated = TruncYear('fecha_compra', output_field=DateField())
-            delta = None
-        
-        ventas_agregadas = (
-            Venta.objects
-            .filter(fecha_compra__gte=timezone.localtime() - delta) if delta else Venta.objects.all()
-            .annotate(data=annotated)
-            .values('data')
-            .annotate(total=Count('id'))
-            .order_by('data')
-        )
-
-        return ventas_agregadas
-    
-    print(ventas_query("siempre"))
+    messages.info(request,"Esto es un mensaje de prueba.")
+    messages.success(request, "Mensaje de exito!")
+    messages.error(request, "Mensaje de error")
 
     return render(request, "core/test.html", {})
 
