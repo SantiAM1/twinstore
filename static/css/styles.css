@@ -24,7 +24,10 @@
   --color-gray-3: #eeeeee;
   --color-gray-4: #818181;
   --color-gray-5: #222222;
+  --color-gray-6: #4e4e4e;
+  --cart-border: rgba(20, 109, 241, 0.3);
 
+  --bg-glass: rgba(255, 255, 255, 0.7);
   --discount: #ff4d4d;
 
   /* - Items -*/
@@ -34,6 +37,34 @@
   /* - Error - */
   --border-error: rgba(255, 2, 2, 0.3);
   --msg-error: #ff7c7c;
+}
+
+body[data-theme="dark"] {
+  /* Fondos */
+  --bg: #121212; /* Fondo general muy oscuro */
+  --bg-prod: #1a1a1a; /* Fondo de productos oscuro */
+  --bg-white: #252525; /* Las tarjetas (cards) ahora serán gris oscuro */
+
+  /* Textos */
+  --color-gray-1: #e0e0e0; /* Título principal (antes oscuro, ahora claro) */
+  --color-gray-2: #444444; /* Bordes o elementos secundarios */
+  --color-gray-3: #333333; /* Fondos suaves */
+  --color-gray-4: #a0a0a0; /* Textos secundarios */
+  --color-gray-5: #ffffff; /* Textos muy oscuros pasan a blanco puro */
+  --color-gray-6: #b0b0b0;
+
+  --cart-border: rgba(20, 109, 241, 1);
+  --bg-glass: rgba(30, 30, 30, 0.8);
+
+  /* Bordes y detalles */
+  --border-1: #444444;
+  --border-2: #555555;
+
+  /* Ajustes opcionales de color */
+  --primary-color: #4da3ff; /* Aclaramos un poco el azul para que contraste mejor */
+
+  /* Sombras (En modo noche las sombras negras se ven poco, a veces se quitan) */
+  --box-shadow-card: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .position-relative {
@@ -112,7 +143,7 @@ main.main-content {
 
   label {
     display: block;
-    color: #999;
+    color: var(--color-gray-4);
     padding-bottom: 2px;
     transition: color 0.3s ease, padding-left 0.3s ease;
   }
@@ -122,10 +153,12 @@ main.main-content {
     width: 100%;
     padding: 10px;
     border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-1);
     outline: none;
     transition: border-bottom 0.1s ease;
     font-size: 0.9rem;
+    background-color: var(--bg-white);
+    color: var(--color-gray-5);
   }
 
   input:focus {
@@ -172,13 +205,8 @@ main.main-content {
   height: 50px;
   display: flex;
   align-items: end;
+  background-color: var(--color-gray-3);
 
-  &:hover {
-    background-color: #ebebeb;
-  }
-  &:hover input {
-    background-color: #ebebeb;
-  }
   &.error {
     input {
       border-bottom: 1px solid var(--border-error);
@@ -204,7 +232,7 @@ main.main-content {
     border-bottom: 1px solid rgba(0, 0, 0, 0.3);
     outline: none;
     transition: border-bottom 0.1s ease;
-
+    background-color: var(--color-gray-3);
     color: #585858;
     font-size: 1rem;
   }
@@ -248,7 +276,7 @@ main.main-content {
   a {
     font-size: 1.5rem;
     color: var(--blue-ts);
-    background-color: #e0e0e0;
+    background-color: var(--color-gray-2);
     text-align: center;
     width: 30px;
     border-radius: 10px;
@@ -318,7 +346,7 @@ main.main-content {
 
       a.active {
         border-bottom: 2px solid var(--blue-ts);
-        color: #000;
+        color: var(--color-gray-5);
         pointer-events: none;
       }
       a:hover {
@@ -364,7 +392,7 @@ main.main-content {
   align-items: center;
   padding: 0.5rem;
   border: none;
-  color: #4e4e4e;
+  color: var(--color-gray-1);
   border-bottom: 1px solid #888888;
   cursor: pointer;
 }
@@ -390,7 +418,7 @@ main.main-content {
     margin-top: 0.3rem;
   }
   h1 {
-    color: #1d1d1d;
+    color: var(--color-gray-5);
     font-size: 2rem;
     font-weight: 500;
   }
@@ -560,7 +588,7 @@ main.main-content {
     }
 
     p a {
-      color: #1987ee;
+      color: var(--blue-ts);
       text-decoration: none;
     }
   }
@@ -760,14 +788,14 @@ main.main-content {
 
 .generic-list-item {
   text-decoration: none;
-  color: #424242;
+  color: var(--color-gray-1);
   width: 100%;
   display: block;
   padding: 0.5rem;
   border-radius: 5px;
 
   &:hover {
-    background-color: #f0f0f0;
+    background-color: var(--color-gray-3);
   }
 }
 
@@ -859,7 +887,7 @@ main.main-content {
 
   &.btn-2 {
     background-color: var(--blue-ts);
-    color: var(--bg-white);
+    color: #fff;
 
     &.warning {
       background-color: var(--msg-error);
@@ -901,13 +929,13 @@ main.main-content {
   top: 5px;
 
   svg {
-    color: #585858;
+    color: var(--color-gray-4);
     cursor: pointer;
     padding: 5px;
     border-radius: 50%;
   }
   svg:hover {
-    background-color: rgb(211, 211, 211);
+    background-color: var(--color-gray-2);
   }
 }
 
@@ -1079,6 +1107,7 @@ main.main-content {
   margin-top: 0.5rem;
   border-top: 1px solid var(--border-2);
   padding-top: 0.5rem;
+  color: var(--color-gray-5);
 }
 
 .billing-resume-sub {
@@ -1099,7 +1128,7 @@ main.main-content {
     display: none;
   }
   label {
-    background-color: rgb(231, 231, 231);
+    background-color: var(--bg-prod);
     border-radius: 5px;
     padding: 10px;
     color: var(--color-gray-1);
@@ -1110,10 +1139,10 @@ main.main-content {
     cursor: pointer;
   }
   label:hover {
-    background-color: rgb(209, 209, 209);
+    background-color: var(--color-gray-2);
   }
   input:checked + label {
-    background-color: rgb(148, 203, 255);
+    background-color: var(--cart-border);
     padding-left: 1.3rem;
   }
 }
@@ -1133,7 +1162,7 @@ main.main-content {
 
   span {
     font-size: 0.9rem;
-    color: #414141;
+    color: var(--color-gray-6);
     margin-top: 0.5rem;
     width: 100%;
 
@@ -1175,11 +1204,12 @@ main.main-content {
     font-weight: 400;
     font-size: 1.3rem;
     text-align: end;
+    color: var(--color-gray-5);
   }
   tr:last-child td,
   tr:last-child th {
     font-weight: 600;
-    border-top: 1px solid #d8d8d8;
+    border-top: 1px solid var(--border-2);
   }
 }
 
@@ -1224,6 +1254,8 @@ main.main-content {
   justify-content: center;
   align-items: flex-start;
   background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 
   &.card-checkout {
     align-items: flex-start;
@@ -1263,7 +1295,7 @@ main.main-content {
 
 .generic-modal-close-2 {
   position: absolute;
-  color: #414141;
+  color: var(--color-gray-6);
   z-index: 10000;
   background-color: transparent;
   border: none;
@@ -1684,7 +1716,7 @@ main.main-content {
     z-index: 100;
     text-align: center;
     font-weight: 500;
-    color: var(--bg-white);
+    color: #fff;
     font-size: 1.1rem;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -1728,15 +1760,6 @@ main.main-content {
   overflow: hidden;
   padding-bottom: 30px !important;
 
-  .swiper-pagination-bullet {
-    transition: width 0.3s ease;
-  }
-
-  .swiper-pagination-bullet-active {
-    width: 20px;
-    border-radius: 5px;
-  }
-
   .swiper-slide {
     height: auto;
 
@@ -1747,6 +1770,17 @@ main.main-content {
       display: block;
     }
   }
+}
+
+.swiper-pagination-bullet.swiper-pagination-bullet {
+  background-color: var(--color-gray-6);
+  transition: width 0.3s ease;
+}
+
+.swiper-pagination-bullet-active.swiper-pagination-bullet-active {
+  width: 20px;
+  border-radius: 5px;
+  background-color: var(--blue-ts);
 }
 
 @media (max-width: 720px) {
@@ -1787,7 +1821,7 @@ main.main-content {
   position: relative;
   margin: 0.5rem 0;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #e4e4e4;
+  border-bottom: 2px solid var(--border-2);
 
   img {
     border-radius: 5px;
@@ -1795,7 +1829,7 @@ main.main-content {
 
   span {
     font-size: 1rem;
-    color: #414141;
+    color: var(--color-gray-1);
     margin-top: 0.5rem;
   }
   .cart-item-price {
@@ -1805,13 +1839,14 @@ main.main-content {
   }
   .cart-item-price strong {
     font-weight: 500;
+    color: var(--color-gray-1);
   }
   .cart-item-price p {
     font-weight: 400;
     font-size: 0.9rem;
     text-align: end;
     text-decoration: line-through;
-    color: #7e7e7e;
+    color: var(--color-gray-4);
   }
   nav {
     display: flex;
@@ -1821,11 +1856,11 @@ main.main-content {
     border: none;
     padding: 0.5rem;
     background-color: transparent;
-    color: #125492;
+    color: var(--primary-color);
   }
   nav > button:first-child {
     border-radius: 5px;
-    border: 1px solid rgba(20, 109, 241, 0.3);
+    border: 1px solid var(--cart-border);
   }
   button:hover,
   nav > button:first-child:hover {
@@ -1833,11 +1868,12 @@ main.main-content {
   }
   .quantity-controls {
     border-radius: 5px;
-    border: 1px solid rgba(20, 109, 241, 0.3);
+    border: 1px solid var(--cart-border);
     display: flex;
     align-items: center;
     p {
       display: inline-block;
+      color: var(--color-gray-1);
       font-weight: 500;
       padding: 0 0.5rem;
     }
@@ -1876,9 +1912,10 @@ main.main-content {
     display: flex;
     justify-content: space-between;
     margin-top: 0.5rem;
+    color: var(--color-gray-5);
   }
   .cart-prod-resume p {
-    color: #464646;
+    color: var(--color-gray-6);
   }
   .cart-total-price {
     border-top: 1px solid #d8d8d8;
@@ -1891,6 +1928,7 @@ main.main-content {
   .cart-total-price {
     span {
       font-size: 1.3rem;
+      color: var(--color-gray-5);
     }
     strong {
       font-size: 1.2rem;
@@ -1927,7 +1965,7 @@ main.main-content {
 .navbar-header {
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--bg-glass);
   backdrop-filter: blur(5px);
   padding: 1rem;
   align-items: center;
@@ -1945,13 +1983,19 @@ main.main-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   width: 100%;
   max-width: 1024px;
   border-bottom: 1px solid var(--color-gray-2);
   padding-bottom: 0.5rem;
   gap: 1rem;
   transition: all 0.3s ease;
+
+  & .navbar-search {
+    label {
+      color: var(--color-gray-1);
+    }
+  }
 }
 
 .navbar-name-menu {
@@ -1959,12 +2003,15 @@ main.main-content {
   align-items: center;
   justify-content: center;
   gap: 1rem;
+  margin-right: 5px;
+  flex-shrink: 0;
 
   button {
     background-color: transparent;
     border: none;
     cursor: pointer;
     display: none;
+    color: var(--color-gray-1);
   }
   span {
     color: var(--color-gray-1);
@@ -1995,12 +2042,11 @@ main.main-content {
     border: none;
     outline: none;
     font-size: 1rem;
-
+    color: var(--color-gray-1);
     margin-right: 0.5rem;
     background-color: transparent;
   }
   label {
-    color: #585858;
     font-size: 0.1rem;
   }
 
@@ -2115,6 +2161,35 @@ main.main-content {
   flex: 0 0 auto;
   order: 3;
 
+  transition: -webkit-mask-image 0.3s ease, mask-image 0.3s ease;
+
+  &.mask-right {
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
+
+  &.mask-left {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%);
+    mask-image: linear-gradient(to right, transparent 0%, black 15%);
+  }
+
+  &.mask-both {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 15%,
+      black 85%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 15%,
+      black 85%,
+      transparent 100%
+    );
+  }
+
   button,
   a {
     color: var(--color-gray-1);
@@ -2136,11 +2211,15 @@ main.main-content {
   }
 }
 
+.navbar-cart-user > *:first-child {
+  margin-left: auto;
+}
+
 .navbar-carrito {
   position: relative;
 
   span {
-    color: var(--bg-white);
+    color: #fff;
     background-color: var(--blue-ts);
     position: absolute;
     top: 0;
@@ -2166,7 +2245,7 @@ main.main-content {
 
   a {
     text-align: center;
-    color: #303030;
+    color: var(--color-gray-1);
 
     font-size: 0.9rem;
     transition: color 0.3s ease;
@@ -2242,7 +2321,7 @@ main.main-content {
   & .card-product-discount {
     position: absolute;
     background: var(--discount);
-    color: var(--bg-white);
+    color: #fff;
     font-size: 1.2rem;
     font-weight: 700;
     padding: 0.4rem 1rem;
@@ -2329,7 +2408,7 @@ main.main-content {
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 5px 1px var(--color-gray-2);
   }
 }
 
@@ -2381,14 +2460,14 @@ main.main-content {
 .price--current {
   font-size: 1.5rem;
   font-weight: 500;
-  color: #1d1d1d;
+  color: var(--color-gray-5);
 }
 
 .price--old {
   position: absolute;
   top: -15px;
   left: 0;
-  color: #696969;
+  color: var(--color-gray-4);
   text-decoration: line-through;
 }
 
@@ -2396,7 +2475,7 @@ main.main-content {
   background-color: transparent;
   border: none;
   background-color: var(--primary-color);
-  color: var(--bg-white);
+  color: #fff;
   border-radius: 10px;
   cursor: pointer;
   display: flex;
@@ -2431,16 +2510,17 @@ main.main-content {
   }
   a {
     text-decoration: none;
-    color: #5e5e5e;
+    /* color: #5e5e5e; */
+    color: var(--color-gray-4);
     font-size: 0.9rem;
   }
   span {
-    color: #777777;
+    color: var(--color-gray-4);
     display: block;
     padding-top: 1.2rem;
   }
   p {
-    color: #777777;
+    color: var(--color-gray-4);
     font-size: 0.9rem;
   }
   section:first-child h3 {
@@ -2474,7 +2554,7 @@ main.main-content {
 
   a {
     width: 30px;
-    color: #202020;
+    color: var(--color-gray-5);
   }
 }
 
@@ -2607,7 +2687,7 @@ main.main-content {
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  color: #252525;
+  color: var(--color-gray-5);
   padding-left: 1rem;
 }
 
@@ -2616,7 +2696,7 @@ main.main-content {
   gap: 0.5rem;
 
   &:hover {
-    background-color: #e2e2e2;
+    background-color: var(--color-gray-2);
   }
   svg {
     color: var(--blue-ts);
@@ -2627,7 +2707,7 @@ main.main-content {
   list-style: none;
 
   a {
-    color: #474747;
+    color: var(--color-gray-4);
     font-size: 0.9rem;
     text-decoration: none;
   }
@@ -2805,7 +2885,7 @@ main.main-content {
   .prod-payment-btn {
     background-color: transparent;
     border: none;
-    border-bottom: 1px solid #4d4d4d;
+    border-bottom: 1px solid var(--color-gray-4);
     padding: 0.25rem 0.5rem;
     width: 100%;
     display: flex;
@@ -2814,11 +2894,11 @@ main.main-content {
     position: relative;
   }
   button:hover {
-    background-color: #eeeeee;
+    background-color: var(--color-gray-3);
   }
   svg,
   p {
-    color: #4d4d4d;
+    color: var(--color-gray-4);
     font-size: 0.9rem;
   }
 }
@@ -2840,7 +2920,7 @@ main.main-content {
 
     background-color: transparent;
     border: none;
-    color: #4d4d4d;
+    color: var(--color-gray-1);
     border-radius: 12px;
     cursor: pointer;
   }
@@ -2930,7 +3010,7 @@ main.main-content {
 }
 
 .product-add-cart {
-  background-color: #202020;
+  background-color: var(--color-gray-5);
   padding: 0.75rem 1rem;
   border-radius: 10px;
   width: 100%;
@@ -2963,14 +3043,14 @@ main.main-content {
   button {
   }
   h1 {
-    color: var(--color-gray-1);
+    color: var(--color-gray-5);
     font-size: 2rem;
     padding-top: 2rem;
   }
 }
 
 .product-description {
-  color: #252525;
+  color: var(--color-gray-1);
   margin-top: 0.5rem;
   margin-bottom: 2rem;
   min-height: 50px;
@@ -3001,24 +3081,24 @@ main.main-content {
     z-index: 10;
   }
   h2 {
-    color: #2b2b2b;
+    color: var(--color-gray-1);
     font-size: 2rem;
   }
   p {
     display: inline;
-    color: #585858;
+    color: var(--color-gray-4);
     text-decoration: line-through;
   }
   span {
     padding: 0.25rem 1rem;
     background-color: #e53935;
-    color: var(--bg-white);
+    color: #fff;
     margin-left: 1rem;
     font-weight: bold;
     border-radius: 12px;
   }
   aside {
-    color: #2b2b2b;
+    color: var(--color-gray-1);
     font-size: 0.65rem;
   }
 }
@@ -3047,11 +3127,12 @@ main.main-content {
 .product-warranty-info {
   span {
     font-weight: 500;
+    color: var(--color-gray-1);
   }
   p {
     font-weight: 400;
     font-size: 0.9rem;
-    color: #4e4e4e;
+    color: var(--color-gray-6);
   }
 }
 
@@ -3123,11 +3204,11 @@ main.main-content {
 .product-specs,
 .product-clients {
   width: 100%;
-  color: #303030;
+  color: var(--color-gray-5);
 }
 
 .specs-list:first-of-type {
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid var(--border-2);
   margin-top: 1rem;
 }
 
@@ -3136,7 +3217,7 @@ main.main-content {
   grid-template-columns: 1fr 2fr;
   gap: 1rem;
   padding: 1rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--border-2);
 
   &.nospecs {
     grid-template-columns: 1fr;
@@ -3159,7 +3240,7 @@ main.main-content {
 
 .specs-term {
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--color-gray-6);
 }
 
 .specs-desc {
@@ -3184,7 +3265,7 @@ main.main-content {
 
 .methods-term {
   font-weight: 500;
-  color: #353535;
+  color: var(--color-gray-1);
 
   &.mipyme {
     color: #0c549b;
@@ -3192,13 +3273,13 @@ main.main-content {
 }
 
 .methods-desc {
-  color: #272727;
+  color: var(--color-gray-1);
   font-size: 1rem;
   font-weight: 500;
 }
 
 .methods-msg {
-  color: #272727;
+  color: var(--color-gray-1);
   font-size: 0.9rem;
   margin-top: 1rem;
 }
@@ -3258,7 +3339,7 @@ main.main-content {
 
 .bar__track {
   height: 10px;
-  background: #eee;
+  background: var(--color-gray-3);
   border-radius: 6px;
   overflow: hidden;
 }
@@ -3285,7 +3366,7 @@ main.main-content {
     margin-top: 1rem;
     font-size: 1rem;
     font-weight: 500;
-    color: #252525;
+    color: var(--color-gray-5);
   }
 }
 
@@ -3307,7 +3388,7 @@ main.main-content {
   }
   a {
     text-decoration: none;
-    color: #252525;
+    color: var(--color-gray-5);
     display: block;
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
@@ -3318,7 +3399,7 @@ main.main-content {
   }
   a.selected {
     background-color: var(--primary-color);
-    color: var(--bg-white);
+    color: #fff;
     pointer-events: none;
   }
 }
@@ -3329,6 +3410,7 @@ details.faq {
   margin: 0 auto;
   margin-top: 1rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  background-color: var(--color-gray-3);
 
   & > summary {
     padding: 16px;
@@ -3361,7 +3443,7 @@ details.faq {
 
 .faq__title {
   font-weight: 500;
-  color: #1f2937;
+  color: var(--color-gray-5);
   margin: 0;
   font-size: 1rem;
 }
@@ -3378,7 +3460,7 @@ details.faq {
 }
 
 .faq__content {
-  color: #6b7280;
+  color: var(--color-gray-6);
   line-height: 1.55;
   font-size: 0.9rem;
   padding: 16px;
@@ -3386,7 +3468,7 @@ details.faq {
 }
 
 .faq__description {
-  color: #303030;
+  color: var(--color-gray-6);
   margin: 1rem 0;
 
   strong {
@@ -3462,27 +3544,25 @@ details.faq {
 
   button,
   a {
-    background-color: #f3f3f3;
+    background-color: var(--color-gray-3);
     border: none;
     padding: 0.5rem;
     border-radius: 5px;
     display: flex;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
+    color: var(--color-gray-5);
 
     svg {
       transition: transform 0.3s ease;
     }
-
-    &.help-btn:hover {
-      background-color: color-mix(in srgb, #d1ecf1, #bee5eb);
-    }
   }
-  button:hover {
-    background-color: #e2e2e2;
+  button:hover,
+  a:hover {
+    background-color: var(--color-gray-2);
   }
   button.active {
-    background-color: #d1ebfd;
+    background-color: var(--color-gray-2);
     color: var(--blue-ts);
   }
   button:last-child.active svg {
@@ -3506,17 +3586,17 @@ details.faq {
     transition: opacity 0.3s ease, scale 0.3s ease;
 
     &.comprobante {
-      color: var(--bg-white);
+      color: #fff;
       background-color: var(--color-gray-5);
     }
 
     &.arrepentimiento {
-      color: var(--bg-white);
+      color: #fff;
       background-color: var(--discount);
     }
 
     &.mercadopago {
-      color: var(--bg-white);
+      color: #fff;
       background-color: color-mix(in srgb, var(--blue-ts) 70%, transparent);
     }
 
@@ -3538,6 +3618,12 @@ details.faq {
 
 .generic-hover:hover {
   color: var(--primary-color);
+}
+
+@media (max-width: 1200px) {
+  .product-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 1000px) {
@@ -3574,11 +3660,9 @@ details.faq {
   .footer-fiscal {
     display: block;
   }
-  .product-grid {
-    grid-template-columns: 1fr 1fr;
-  }
   .product-nav {
     width: 100%;
+    max-width: unset;
   }
   .generic-header-nav {
     margin-bottom: 0.5rem;
@@ -3635,9 +3719,9 @@ details.faq {
     width: 100%;
   }
   .product-title.flip {
-    background-color: #dadada;
-    color: #3d3d3d;
-    border-color: #202020;
+    background-color: var(--color-gray-2);
+    color: var(--color-gray-5);
+    border-color: var(--color-gray-4);
   }
   .product-filters.expand {
     padding: 1rem 1rem 0 1rem;
@@ -3671,7 +3755,7 @@ details.faq {
     padding: 0.5rem 1rem;
   }
   .navbar-top {
-    gap: 0;
+    gap: 0.5rem;
     border: none;
     padding: 0;
   }
@@ -3680,6 +3764,12 @@ details.faq {
   }
   .navbar-cart-user {
     order: 2;
+
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+    padding-right: 5px;
+
     button {
       display: flex;
     }
@@ -3849,7 +3939,7 @@ details.faq {
 
 /* ---- Reseñas ---- */
 .review-box {
-  border: 1px solid #dcdcdc;
+  border: 1px solid var(--border-1);
   border-radius: 12px;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -3861,7 +3951,7 @@ details.faq {
 
   .review-divider {
     height: 1px;
-    background-color: #e0e0e0;
+    background-color: var(--color-gray-2);
     margin: 1rem 0;
   }
 
@@ -3921,13 +4011,15 @@ details.faq {
 
   textarea {
     width: 100%;
-    border: 1px solid #bdbdbd;
+    border: 1px solid var(--border-1);
     border-radius: 8px;
     padding: 0.5rem;
     font-size: 0.9rem;
     resize: vertical;
     min-height: 80px;
     max-height: 150px;
+    background-color: var(--bg-white);
+    color: var(--color-gray-5);
 
     &:focus {
       outline: none;
@@ -3938,7 +4030,7 @@ details.faq {
 }
 
 .msg-default {
-  background-color: #fff;
+  background-color: var(--bg-white);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   border-radius: 5px;
   font-family: Arial, sans-serif;
@@ -3954,7 +4046,7 @@ details.faq {
   position: relative;
 
   span {
-    border: 2px solid #c7e5f7;
+    border: 2px solid var(--color-gray-2);
     border-radius: 5px;
     position: absolute;
     bottom: 0;
@@ -3965,7 +4057,7 @@ details.faq {
 
   p {
     margin: 0;
-    color: #333;
+    color: var(--color-gray-1);
     display: flex;
     align-items: center;
     gap: 10px;
