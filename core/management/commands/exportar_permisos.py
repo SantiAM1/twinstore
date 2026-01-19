@@ -5,11 +5,8 @@ import json
 class Command(BaseCommand):
     help = 'Exporta los permisos de un grupo específico'
 
-    def add_arguments(self, parser):
-        parser.add_argument('group_name', type=str, help='Nombre del grupo')
-
     def handle(self, *args, **kwargs):
-        group_name = kwargs['group_name']
+        group_name = "Gestores"
         try:
             group = Group.objects.get(name=group_name)
             permissions = list(group.permissions.values_list('codename', flat=True))
