@@ -4,6 +4,12 @@ from django.utils.text import slugify
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
+def validate_image_size(image):
+    file_size = image.size
+    limit_mb = 2
+    if file_size > limit_mb * 1024 * 1024:
+        raise ValidationError(f"La imagen es demasiado pesada. El límite es {limit_mb}MB.")
+
 class Tienda(models.Model):
     """
     Configuración general de la tienda.
@@ -173,8 +179,8 @@ class HomeBanner(models.Model):
         related_name="banners"
     )
 
-    imagen_desktop = models.ImageField(upload_to="home/banners/")
-    imagen_mobile = models.ImageField(upload_to="home/banners/mobile/")
+    imagen_desktop = models.ImageField(upload_to="home/banners/",validators=[validate_image_size])
+    imagen_mobile = models.ImageField(upload_to="home/banners/mobile/",validators=[validate_image_size])
     url = models.URLField(blank=True, null=True)
     orden = models.PositiveIntegerField(default=0)
 
@@ -267,7 +273,7 @@ class HomeCarouselBento(models.Model):
         null=True
     )
 
-    imagen = models.ImageField(upload_to="home/categorias/")
+    imagen = models.ImageField(upload_to="home/categorias/",validators=[validate_image_size])
 
     class Tamano(models.TextChoices):
         DEFAULT = "default", "Standard ■"
@@ -349,7 +355,7 @@ class HomeStaticBento(models.Model):
         null=True
     )
 
-    imagen = models.ImageField(upload_to="home/categorias/")
+    imagen = models.ImageField(upload_to="home/categorias/",validators=[validate_image_size])
     color_fondo = models.CharField(default="#ffffff",max_length=7, help_text="Color HEX (ej: #2e6fc3)")
     orden = models.PositiveIntegerField(default=0)
 

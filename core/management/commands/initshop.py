@@ -16,7 +16,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         steps = 3 if not kwargs['products'] else 4
-        # Aquí puedes agregar la lógica para iniciar la tienda
         Tienda.objects.get_or_create()
         Proveedor.objects.get_or_create(nombre='Generico')
         gestores_group, _ = Group.objects.get_or_create(name='Gestores')
