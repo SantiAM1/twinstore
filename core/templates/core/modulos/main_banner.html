@@ -1,0 +1,15 @@
+<section class="swiper banner-swiper">
+    <div class="swiper-wrapper">
+        {% for banner in seccion.banners.all %}
+            <div class="swiper-slide">
+                <a href="{{ banner.url|default:'#' }}">
+                    <picture>
+                        <source srcset="{{ banner.imagen_mobile.url }}" media="(max-width: 720px)">
+                        <img src="{{ banner.imagen_desktop.url }}" alt="{{ banner.titulo }}">
+                    </picture>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="swiper-pagination banner-pag"></div>
+</section>

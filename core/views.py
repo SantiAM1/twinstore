@@ -1,29 +1,21 @@
-from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.utils.safestring import mark_safe
 from django.http import HttpRequest
 from django.core.cache import cache
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.cache import cache_page
-from django.utils import timezone
 
 from .throttling import PrediccionBusquedaThrottle
 from .utils import get_configuracion_tienda
-from .forms import ExcelUploadForm,DolarActualizar
 from .permissions import BloquearSiMantenimiento
-from .models import Tienda
+from .models import Tienda,HomeSection, HomeProductGrid
 
-from products.models import Producto, Marca, SubCategoria, Atributo,Etiquetas
+from products.models import Producto
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-import pandas as pd
-import uuid
-import re
-from decimal import Decimal, InvalidOperation
 import unicodedata
 # Create your views here.
 
@@ -141,15 +133,70 @@ class BusquedaPredictivaView(APIView):
         return Response(resultados[:10])
 
 def home(request):
-    home_cache = cache.get('home_cache')
-    if not home_cache:
-        home_cache = {
-            'ofertas': Producto.objects.filter(descuento__gt=0).prefetch_related("colores__imagenes_color","imagenes_producto"),
-            'destacados': Producto.objects.filter(etiquetas__slug='destacado').prefetch_related("colores__imagenes_color","imagenes_producto"),
-        }
-        cache.set('home_cache', home_cache, 60 * 30)
+    CACHE_KEY = 'home_secciones_data'
+    CACHE_TIMEOUT = 60 * 15
 
-    return render(request,'core/inicio.html', {'destacados': home_cache['destacados'], 'ofertas': home_cache['ofertas']})
+    secciones = cache.get(CACHE_KEY)
+
+    if not secciones:
+        print("⚡ Cache miss: Consultando a la Base de Datos...")
+        
+        secciones_qs = HomeSection.objects.filter(activo=True).order_by('orden').prefetch_related(
+            'banners',
+            'banners_medios',
+            'grids_productos',
+            # Optimizaciones Bento/Carousel
+            'categorias__producto__imagenes_producto',
+            'categorias__producto__etiquetas',
+            'categorias__categoria',
+            'categorias__subcategoria__categoria',
+            'categorias__marca',
+            # Optimizaciones Bento Estático
+            'static_bento__producto__imagenes_producto',
+            'static_bento__producto__etiquetas',
+            'static_bento__categoria',
+            'static_bento__subcategoria__categoria',
+            'static_bento__marca',
+        )
+
+        secciones = list(secciones_qs)
+
+        base_products_qs = Producto.objects.all().select_related(
+            'marca', 'sub_categoria', 'evento'
+        ).prefetch_related(
+            'colores__imagenes_color', 'imagenes_producto', 'etiquetas'
+        )
+
+        for seccion in secciones:
+            if seccion.tipo == HomeSection.Tipo.GRILLA:
+                grids = list(seccion.grids_productos.all())
+                
+                if grids:
+                    grid = grids[0]
+                    productos = []
+
+                    if grid.criterio == HomeProductGrid.Criterio.DESTACADOS:
+                        productos = base_products_qs.filter(etiquetas__slug='destacados')
+                    elif grid.criterio == HomeProductGrid.Criterio.OFERTAS:
+                        productos = base_products_qs.filter(descuento__gt=0)
+                    elif grid.criterio == HomeProductGrid.Criterio.MARCA:
+                        if grid.marca_filtro_id:
+                            productos = base_products_qs.filter(marca_id=grid.marca_filtro_id)
+                    elif grid.criterio == HomeProductGrid.Criterio.ETIQUETA:
+                        if grid.etiqueta_filtro_id:
+                            productos = base_products_qs.filter(etiquetas__id=grid.etiqueta_filtro_id)
+                    elif grid.criterio == HomeProductGrid.Criterio.RECIENTES:
+                        productos = base_products_qs.order_by('-updated_at')[:12]
+
+                    seccion.productos_list = list(productos) if productos is not None else []
+
+        cache.set(CACHE_KEY, secciones, CACHE_TIMEOUT)
+    else:
+        print("🚀 Cache hit: Usando datos de memoria")
+
+    return render(request, 'core/home.html', {
+        'secciones': secciones
+    })
 
 @staff_member_required
 def cache_clear(request):

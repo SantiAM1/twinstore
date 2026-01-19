@@ -1,9 +1,19 @@
 const brands = Array.from(document.querySelectorAll(".brand"));
-const featuredNames = ["Apple", "AMD", "Intel", "Logitech"];
-const longNames = ["Samsung", "MSI", "Samsung", "Corsair"];
+const featuredNames = [
+  "staticBento1",
+  "staticBento2",
+  "staticBento3",
+  "staticBento4",
+];
+const longNames = [
+  "staticBento5",
+  "staticBento6",
+  "staticBento5",
+  "staticBento7",
+];
 
 const featuredEls = brands.filter((el) =>
-  featuredNames.includes(el.dataset.name)
+  featuredNames.includes(el.dataset.name),
 );
 const longEls = brands.filter((el) => longNames.includes(el.dataset.name));
 

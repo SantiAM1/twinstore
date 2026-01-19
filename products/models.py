@@ -17,7 +17,7 @@ class Marca(models.Model):
 
     def get_absolute_url(self):
         base_url = reverse('products:grid')
-        return f"{base_url}?Marca={self.slug}"
+        return f"{base_url}?marca={self.slug}"
 
     def save(self, *args, **kwargs):
         if not self.slug:

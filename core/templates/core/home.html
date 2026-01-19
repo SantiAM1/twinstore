@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static compress cache %}
+
+{% block meta %}
+<meta name="description" content="{{config.nombre_tienda}} es una empresa de venta de productos informáticos. Envíos a todo el país.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="{{config.nombre_tienda}} - A new Hardware Experience">
+<meta property="og:description" content="A new Hardware Experience">
+<meta property="og:image" content="{% static 'img/mail.webp' %}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<link rel="canonical" href="https://twinstore.com.ar/">
+{% endblock meta %}
+
+{% block head %}
+<title>{{config.nombre_tienda}} | Hardware, Notebooks, Celulares y Accesorios en Argentina</title>
+<link rel="stylesheet" href="{% static 'css/libs/swiper-bundle.min.css' %}">
+{% endblock head %}
+
+{% block contenidomain %}
+<h1 class="visually-hidden">{{config.nombre_tienda}} - Tienda de Hardware, Notebooks y Tecnología en Argentina</h1>
+<div class="generic-box landing">
+
+{% for seccion in secciones %}
+
+    {% if seccion.tipo == "banner_principal" %}
+    <!-- > Banner Principal -->
+        {% include 'core/modulos/main_banner.html' %}
+    
+    {% elif seccion.tipo == "banner_medio" %}
+    <!-- > Banners Medios -->
+        {% include 'core/modulos/medium_banners.html' %}
+    
+    {% elif seccion.tipo == 'grilla' %}
+    <!-- > Grilla de Productos -->
+        {% include 'core/modulos/grilla.html' %}
+    
+    {% elif seccion.tipo == 'bento' %}
+    <!-- > Grilla Bento -->
+        {% include 'core/modulos/bento.html' %}
+    
+    {% elif seccion.tipo == 'static_bento' %}
+    <!-- > Bento Estatico -->
+        {% include 'core/modulos/staticbento.html' %}
+        
+    {% endif %}
+
+{% endfor %}
+    
+</div>
+{% endblock contenidomain %}
+
+{% block myscripts %}
+<script src="{% static 'js/libs/swiper.js' %}"></script>
+{% compress js %}
+<script src="{% static 'js/landing.js' %}"></script>
+{% endcompress %}
+<script nonce="{{ request.csp_nonce }}">
+function generateSwiper(data) {
+    const gripConf = {
+        slidesPerView: 3,
+        grid: {
+        rows: 2,
+        fill: "row",
+        },
+        pagination: {
+        el: data.pagination,
+        dynamicBullets: true,
+        dynamicMainBullets: parseInt(data.bullets),
+        clickable: true,
+        },
+        spaceBetween: 10,
+        loop: false,
+        autoplay: {
+        delay: data.delay,
+        disableOnInteraction: false,
+        },
+        speed: data.speed,
+        grabCursor: true,
+        breakpoints: {
+        0: { slidesPerView: 1, grid: { rows: 2 } },
+        740: { slidesPerView: 2, grid: { rows: 2 } },
+        1050: { slidesPerView: 3, grid: { rows: 2 } },
+        },
+    }
+    return gripConf;
+}
+
+document.querySelectorAll(".products-swiper").forEach(swp => {
+    const config = generateSwiper(swp.dataset)
+    const swiper = new Swiper(swp, config);
+})
+
+const swiperCat = new Swiper(".categories-swiper", {
+    slidesPerView: 1,
+    spaceBetween: 0,
+    pagination: {
+        el: ".category-pag",
+        clickable: true,
+    },
+    autoplay: {
+        delay: 3500,
+        disableOnInteraction: false,
+    },
+    speed: 800,
+    grabCursor: true,
+    breakpoints: {
+    1050: { slidesPerView: 2},
+    },
+    });
+
+const swiperBanner = new Swiper(".banner-swiper", {
+    slidesPerView: 1,
+    spaceBetween: 10,
+    loop: true,
+    autoplay: {
+        delay: 6000,
+        disableOnInteraction: false,
+    },
+    pagination: {
+        el: ".banner-pag",
+        clickable: true,
+    },
+    speed: 1000,
+});
+
+</script>
+{% endblock myscripts %}
