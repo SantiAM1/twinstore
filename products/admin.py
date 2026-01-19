@@ -85,7 +85,6 @@ class IngresarStockInline(NonrelatedTabularInline):
         Extra save method which can for example update inline instances based on current
         main model object. Method must be implemented.
         """
-        from django.contrib.auth.models import User
         instance.creado_por = self.request.user
         instance.producto = parent
         instance.save()
@@ -106,7 +105,7 @@ class ReseñasInline(TabularInline):
     extra = 0
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('usuario', 'usuario__user')
+        return super().get_queryset(request).select_related('usuario')
         
     raw_id_fields = ('usuario',)
 

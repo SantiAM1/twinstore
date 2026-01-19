@@ -1,29 +1,28 @@
 from django.conf import settings
-from django.contrib.auth.models import User
 from .tasks import enviar_mail_compra,enviar_mail_confirm_user,enviar_mail_estado_pedido,enviar_mail_comprobante_obs,enviar_mail_recuperar_cuenta,enviar_reseña_token_html
 from .decorators import debug_pass
 
 @debug_pass
-def mail_confirm_user_html(usuario:User) -> None:
+def mail_confirm_user_html(usuario) -> None:
     """
     Envía el mail de confirmación de cuenta
     """
     token = usuario.token_usuario.latest('creado')
     mail_data = {
         'codigo' : token.codigo,
-        'username': usuario.perfil.nombre
+        'username': usuario.first_name
     }
     enviar_mail_confirm_user.delay(mail_data,user_email=usuario.email)
 
 @debug_pass
-def mail_recuperar_cuenta_html(usuario:User) -> None:
+def mail_recuperar_cuenta_html(usuario) -> None:
     """
     Envía el mail de recuperación de cuenta
     """
     token = usuario.token_usuario.latest('creado')
     mail_data = {
         'codigo' : token.codigo,
-        'username': usuario.perfil.nombre
+        'username': usuario.first_name
     }
     enviar_mail_recuperar_cuenta.delay(mail_data,user_email=usuario.email)
 

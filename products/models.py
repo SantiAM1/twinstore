@@ -1,15 +1,14 @@
-from django.db import models,transaction
+from django.db import models
 from django.db.models import Sum
 from core.utils import get_configuracion_tienda
 from django.utils.text import slugify
 from django.urls import reverse
 from django.templatetags.static import static
-from django.core.cache import cache
 import uuid
 from decimal import Decimal
 from .managers import ProductoManager
 from products.utils_debug import debug_queries
-from django.contrib.auth.models import User
+from django.conf import settings
 
 class Marca(models.Model):
     nombre = models.CharField(max_length=30)
@@ -374,7 +373,7 @@ class EspecificacionTecnica(models.Model):
 
 class ReseñaProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='reseñas')
-    usuario = models.ForeignKey("users.PerfilUsuario", on_delete=models.CASCADE, null=True, blank=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     comentario = models.TextField(max_length=250)
     calificacion = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)])
     creado_en = models.DateTimeField(auto_now_add=True)
@@ -393,7 +392,7 @@ class ReseñaProducto(models.Model):
 
 class TokenReseña(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    usuario = models.ForeignKey("users.PerfilUsuario", on_delete=models.CASCADE)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     token = models.UUIDField(unique=True,blank=True,editable=False)
 
     def save(self, *args, **kwargs):
@@ -425,7 +424,7 @@ class IngresoStock(models.Model):
     cantidad = models.PositiveIntegerField()
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
-    creado_por = models.ForeignKey(User, on_delete=models.CASCADE)
+    creado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     fecha_ingreso = models.DateTimeField(auto_now_add=True)
 
     class Meta:
