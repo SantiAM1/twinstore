@@ -70,16 +70,16 @@ class EventosPromociones(models.Model):
     def clean(self):
         """Validaciones de fechas."""
         if self.fecha_fin <= self.fecha_inicio:
-            raise ValueError("La fecha de fin debe ser posterior a la fecha de inicio.")
+            raise ValidationError("La fecha de fin debe ser posterior a la fecha de inicio.")
         if self.descuento_fijo and self.descuento_porcentaje:
-            raise ValueError("Solo se puede definir un tipo de descuento: fijo o porcentaje.")
+            raise ValidationError("Solo se puede definir un tipo de descuento: fijo o porcentaje.")
 
     def save(self, *args, **kwargs):
         """
         Genera slug automáticamente y valida la coherencia de fechas.
         """
-        self.slug = slugify(self.nombre_evento)
         self.clean()
+        self.slug = slugify(self.nombre_evento)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -126,15 +126,12 @@ class HomeSection(models.Model):
     """
     class Tipo(models.TextChoices):
         BANNER_PRINCIPAL = 'banner_principal', 'Banner Principal'
-        OFERTAS = 'ofertas', 'Ofertas'
-        PRODUCTOS_DESTACADOS = 'productos_destacados', 'Productos Destacados'
-        CATEGORIAS = 'categorias', 'Categorías'
-        NUEVOS_PRODUCTOS = 'nuevos_productos', 'Nuevos Productos'
+        GRILLA = 'grilla', 'Grilla de Productos'
+        BENTO = 'bento', 'Carousel Tipo Bento'
+        STATIC_BENTO = 'static_bento', 'Bento Estático'
         BANNER_MEDIO = "banner_medio", "Banner Intermedio"
         MARCAS = "marcas", "Marcas Destacadas"
         TEXTO_SEO = "texto_seo", "Texto SEO"
-        PERSONALIZADO1 = "custom1", "Personalizado 1"
-        PERSONALIZADO2 = "custom2", "Personalizado 2"
 
     tipo = models.CharField(max_length=50, choices=Tipo.choices)
     orden = models.PositiveIntegerField(default=0, help_text="Orden de aparición en la página de inicio.")
@@ -149,6 +146,25 @@ class HomeSection(models.Model):
 
     def __str__(self):
         return f"{self.orden} - {self.get_tipo_display()}"
+
+class HomeProductGrid(models.Model):
+
+    class Criterio(models.TextChoices):
+        RECIENTES = 'recientes', 'Nuevos Ingresos'
+        OFERTAS = 'ofertas', 'Con Descuento'
+        DESTACADOS = 'destacados', 'Destacados (Manual)'
+        ETIQUETA = 'etiqueta', 'Por Etiqueta Específica'
+        MARCA = 'marca', 'Por Marca Específica'
+
+    seccion = models.ForeignKey(HomeSection, on_delete=models.CASCADE, related_name="grids_productos")
+    criterio = models.CharField(max_length=20, choices=Criterio.choices)
+    
+    etiqueta_filtro = models.ForeignKey('products.Etiquetas', null=True, blank=True, on_delete=models.SET_NULL)
+    marca_filtro = models.ForeignKey('products.Marca', null=True, blank=True, on_delete=models.SET_NULL)
+    
+    class Meta:
+        verbose_name = "Grilla de productos"
+        verbose_name_plural = "Grillas de productos"
 
 class HomeBanner(models.Model):
     seccion = models.ForeignKey(
@@ -167,6 +183,23 @@ class HomeBanner(models.Model):
         verbose_name = "Banner de la Página de Inicio"
         verbose_name_plural = "Banners de la Página de Inicio"
 
+    def save(self, *args, **kwargs):
+        from .utils import compress_image
+        if self.pk:
+            old = HomeBanner.objects.filter(pk=self.pk).first()
+            if old and old.imagen_desktop != self.imagen_desktop:
+                self.imagen_desktop = compress_image(self.imagen_desktop, max_width=1200, is_banner=True)
+            
+            if old and old.imagen_mobile != self.imagen_mobile:
+                self.imagen_mobile = compress_image(self.imagen_mobile, max_width=600, is_banner=True)
+        else:
+            if self.imagen_desktop:
+                self.imagen_desktop = compress_image(self.imagen_desktop, max_width=1200, is_banner=True)
+            if self.imagen_mobile:
+                self.imagen_mobile = compress_image(self.imagen_mobile, max_width=600, is_banner=True)
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Banner de {self.seccion} ({self.orden})"
 
@@ -184,7 +217,7 @@ class HomeBannerMedio(models.Model):
             raise ValidationError("Atributos con eventos no permitidos.")
 
     seccion = models.ForeignKey(HomeSection,on_delete=models.CASCADE,related_name="banners_medios")
-    svg = models.TextField(help_text="Código SVG para el ícono del banner.",validators=[validate_svg],default="")
+    svg = models.TextField(help_text="Código SVG para el ícono del banner.",validators=[validate_svg],default="",null=True,blank=True)
     tipo = models.CharField(max_length=20, choices=Tipo.choices, unique=True)
     titulo = models.CharField(max_length=40)
     descripcion = models.CharField(max_length=100)
@@ -198,7 +231,7 @@ class HomeBannerMedio(models.Model):
     def __str__(self):
         return "Banner Medio de la Página de Inicio"
 
-class HomeCategoryItem(models.Model):
+class HomeCarouselBento(models.Model):
     seccion = models.ForeignKey(
         HomeSection,
         on_delete=models.CASCADE,
@@ -208,10 +241,26 @@ class HomeCategoryItem(models.Model):
     categoria = models.ForeignKey(
         'products.Categoria',
         on_delete=models.CASCADE,
-        related_name="home_items"
+        related_name="home_items",
+        blank=True,
+        null=True
     )
     subcategoria = models.ForeignKey(
         'products.SubCategoria',
+        on_delete=models.CASCADE,
+        related_name="home_items",
+        blank=True,
+        null=True
+    )
+    marca = models.ForeignKey(
+        'products.Marca',
+        on_delete=models.CASCADE,
+        related_name="home_items",
+        blank=True,
+        null=True
+    )
+    producto = models.ForeignKey(
+        'products.Producto',
         on_delete=models.CASCADE,
         related_name="home_items",
         blank=True,
@@ -221,10 +270,10 @@ class HomeCategoryItem(models.Model):
     imagen = models.ImageField(upload_to="home/categorias/")
 
     class Tamano(models.TextChoices):
-        DEFAULT = "default", "Standard"
-        LARGE = "large", "Grande"
-        TALL = "tall", "Alta"
-        WIDE = "wide", "Ancha"
+        DEFAULT = "default", "Standard ■"
+        LARGE = "large", "Grande ▉"
+        TALL = "tall", "Alta ▐"
+        WIDE = "wide", "Ancha ▃"
 
     tamano = models.CharField(
         max_length=20, choices=Tamano.choices, default=Tamano.DEFAULT
@@ -235,51 +284,99 @@ class HomeCategoryItem(models.Model):
 
     class Meta:
         ordering = ["slide", "orden"]
-        verbose_name = "Carousel de Categorías|Subcategorias"
-        verbose_name_plural = "Carousel de Categorías|Subcategorias"
+        verbose_name = "Carousel tipo Bento"
+        verbose_name_plural = "Carousel tipo Bento"
+    
+    @property
+    def link(self):
+        return self.producto or self.categoria or self.marca or self.subcategoria
+    
+    def clean(self):
+        opciones_elegidas = [
+            self.producto, 
+            self.categoria, 
+            self.subcategoria, 
+            self.marca
+        ]
 
+        elegidos = [x for x in opciones_elegidas if x is not None]
+
+        if len(elegidos) > 1:
+            raise ValidationError("¡Error! Solo puedes vincular un destino a la vez (ej: O eliges Producto O eliges Marca, no ambos).")
+        if len(elegidos) == 0:
+            raise ValidationError("Debes seleccionar al menos un destino para el banner.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+    
     def __str__(self):
-        return f"{self.nombre} (Slide {self.slide})"
+        return f"(Slide {self.slide})"
 
-class HomeReseñas(models.Model):
-    """
-    Configuración de la sección de reseñas en la página de inicio.
-    """
-    section = models.ForeignKey(
-        HomeSection,
-        on_delete=models.CASCADE,
-        related_name="reseñas"
-    )
-    titulo = models.CharField(max_length=100, blank=True, null=True)
-    subtitulo = models.CharField(max_length=150, blank=True, null=True)
-    calificaciones = models.PositiveBigIntegerField(default=0, help_text="Calificacion minima para mostrar reseñas. (0 incluye todo tipo de reseñas)")
-
-    class Meta:
-        verbose_name = "Reseñas de Clientes"
-        verbose_name_plural = "Reseñas de Clientes"
-
-    def __str__(self):
-        return "Sección de Reseñas en la Página de Inicio"
-
-class HomeCarousel(models.Model):
-    """
-    Configuración de carruseles personalizados en la página de inicio.
-    """
+class HomeStaticBento(models.Model):
     seccion = models.ForeignKey(
         HomeSection,
         on_delete=models.CASCADE,
-        related_name="carouseles"
+        related_name="static_bento"
     )
-    titulo = models.CharField(max_length=100, blank=True, null=True)
-    subtitulo = models.CharField(max_length=150, blank=True, null=True)
-    etiqueta = models.ManyToManyField(
-        'products.Etiquetas',
-        related_name="carouseles_home"
+
+    categoria = models.ForeignKey(
+        'products.Categoria',
+        on_delete=models.CASCADE,
+        related_name="static_home_items",
+        blank=True,
+        null=True
     )
+    subcategoria = models.ForeignKey(
+        'products.SubCategoria',
+        on_delete=models.CASCADE,
+        related_name="static_home_items",
+        blank=True,
+        null=True
+    )
+    marca = models.ForeignKey(
+        'products.Marca',
+        on_delete=models.CASCADE,
+        related_name="static_home_items",
+        blank=True,
+        null=True
+    )
+    producto = models.ForeignKey(
+        'products.Producto',
+        on_delete=models.CASCADE,
+        related_name="static_home_items",
+        blank=True,
+        null=True
+    )
+
+    imagen = models.ImageField(upload_to="home/categorias/")
+    color_fondo = models.CharField(default="#ffffff",max_length=7, help_text="Color HEX (ej: #2e6fc3)")
+    orden = models.PositiveIntegerField(default=0)
 
     class Meta:
-        verbose_name = "Carrusel Personalizado"
-        verbose_name_plural = "Carruseles Personalizados"
+        ordering = ["orden"]
+        verbose_name = "Bento Estatico"
+        verbose_name_plural = "Bento Estatico"
 
-    def __str__(self):
-        return f"Carrusel de {self.seccion}"
+    @property
+    def link(self):
+        return self.producto or self.categoria or self.marca or self.subcategoria
+    
+    def clean(self):
+        opciones_elegidas = [
+            self.producto, 
+            self.categoria, 
+            self.subcategoria, 
+            self.marca
+        ]
+
+        elegidos = [x for x in opciones_elegidas if x is not None]
+
+        if len(elegidos) > 1:
+            raise ValidationError("¡Error! Solo puedes vincular un destino a la vez (ej: O eliges Producto O eliges Marca, no ambos).")
+        if len(elegidos) == 0:
+            raise ValidationError("Debes seleccionar al menos un destino para el banner.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)

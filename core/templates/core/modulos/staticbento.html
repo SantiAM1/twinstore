@@ -1,0 +1,10 @@
+<section class="brands-grid-box">
+    <h2 class="landing-title">{{seccion.titulo}} <strong>{{seccion.subtitulo}}</strong></h2>
+    <div class="brands-grid">
+        {% for item in seccion.static_bento.all %}
+            <a href="{{item.link|default:"#"}}" class="brand" data-name="staticBento{{forloop.counter}}" rel="nofollow" style="--bento-color:{{item.color_fondo|default:'#ffffff'}}">
+                <img src="{{item.imagen.url}}" alt="Imagen Bento Estatico {{forloop.counter}}" loading="lazy">
+            </a>
+        {% endfor %}
+    </div>
+</section>

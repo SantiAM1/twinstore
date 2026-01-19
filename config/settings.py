@@ -208,37 +208,16 @@ REST_FRAMEWORK = {
 }
 
 # Database
-if DEBUG:
-    import subprocess
-
-    def get_current_branch():
-        try:
-            branch = subprocess.check_output(
-                ["git", "rev-parse", "--abbrev-ref", "HEAD"]
-            ).decode().strip()
-            return branch.replace("/", "_")
-        except:
-            return "default"
-
-    current_branch = get_current_branch()
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / f"db_{current_branch}.sqlite3",
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env("DB_NAME"),
+        'USER': env("DB_USER"),
+        'PASSWORD': env("DB_PASSWORD"),
+        'HOST': env("DB_HOST"),
+        'PORT': env("DB_PORT"),
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env("DB_NAME"),
-            'USER': env("DB_USER"),
-            'PASSWORD': env("DB_PASSWORD"),
-            'HOST': env("DB_HOST"),
-            'PORT': env("DB_PORT"),
-        }
-    }
+}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -588,6 +567,28 @@ UNFOLD = {
                     }
                 ]
             },
+            {
+                "title": _("Configuraciónes avanzadas"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Pagina de inicio"),
+                        "icon": "home",
+                        "link": reverse_lazy('admin:core_homesection_changelist'),
+                    },
+                    {
+                        "title": _("Tus datos bancarios"),
+                        "icon": "account_balance",
+                        "link": reverse_lazy('admin:core_datosbancarios_changelist'),
+                    },
+                    {
+                        "title": _("Mercado Pago"),
+                        "icon": "payment",
+                        "link": reverse_lazy('admin:core_mercadopagoconfig_changelist'),
+                    },
+                ]
+            }
         ],
     },
 }

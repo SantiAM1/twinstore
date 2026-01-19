@@ -38,15 +38,15 @@ class TokenReseñaAdmin(ModelAdmin):
 
 @admin.register(Categoria)
 class CategoriaAdmin(ModelAdmin):
-    pass
+    search_fields = ['nombre']
 
 @admin.register(SubCategoria)
 class SubCategoriaAdmin(ModelAdmin):
-    pass
+    search_fields = ['nombre']
 
 @admin.register(Marca)
 class MarcaAdmin(ModelAdmin):
-    pass
+    search_fields = ['nombre']
 
 @admin.register(Etiquetas)
 class EtiquetasAdmin(ModelAdmin):

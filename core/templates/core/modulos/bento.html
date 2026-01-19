@@ -1,0 +1,28 @@
+{% load static %}
+<section class="swiper categories-swiper">
+    <h2 class="landing-title">{{seccion.titulo}} <strong>{{seccion.subtitulo}}</strong></h2>
+    <div class="swiper-wrapper">
+        {% regroup seccion.categorias.all by slide as slides_list %}
+        {% for slide_group in slides_list %}
+        <div class="swiper-slide">
+            <div class="cat-grid">
+                {% for item in slide_group.list %}
+                    {% with link=item.link %}
+                        <a href="{{ link.get_absolute_url }}" 
+                            class="cat {% if item.tamano != 'default' %}{{ item.tamano }}{% endif %}" 
+                            data-name="{{ link.nombre }}">
+                            {% if item.imagen %}
+                                <img src="{{ item.imagen.url }}" alt="Categoría {{ link.nombre }}">
+                            {% else %}
+                                <img src="{% static 'img/no-image.webp' %}" alt="Sin imagen">
+                            {% endif %}
+                            <span>{{ link.nombre }}</span>
+                        </a>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="swiper-pagination category-pag"></div>
+</section>
