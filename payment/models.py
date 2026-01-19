@@ -1,12 +1,12 @@
 from decimal import Decimal
 from django.db import models
-from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
 import string
 import secrets
 import re
 from django.core import signing
+from django.conf import settings
 from products.models import TokenReseña, Producto,ReseñaProducto,ColorProducto
 
 class Venta(models.Model):
@@ -26,7 +26,7 @@ class Venta(models.Model):
         MIXTO = "mixto", "Mixto"
         TARJETA = "tarjeta", "Tarjeta"
 
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ventas')
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='ventas')
     total_compra = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_compra = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.PENDIENTE)
@@ -177,10 +177,10 @@ class Venta(models.Model):
         """
         for detalle in self.detalles.all():
             producto = detalle.producto
-            if ReseñaProducto.objects.filter(usuario=self.usuario.perfil,producto=producto).exists():
+            if ReseñaProducto.objects.filter(usuario=self.usuario,producto=producto).exists():
                 return None
             TokenReseña.objects.get_or_create(
-                usuario=self.usuario.perfil,
+                usuario=self.usuario,
                 producto=producto,
             )
 

@@ -1,12 +1,14 @@
 from django.core.management.base import BaseCommand
 from core.models import Tienda
 from django.contrib.auth.models import Group, Permission
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from products.models import Proveedor, SubCategoria, Categoria, Marca, Etiquetas, Producto
 import json
 import os
 from django.conf import settings
 from django.utils.text import slugify
+
+User = get_user_model()
 
 class Command(BaseCommand):
     help = 'Inicia la tienda configurando los parámetros iniciales'
@@ -21,13 +23,13 @@ class Command(BaseCommand):
         gestores_group, _ = Group.objects.get_or_create(name='Gestores')
 
         if not User.objects.exists():
-            staff_user = User.objects.create_user(username='gestor@ts.ar', password='admin123', is_staff=True, email='gestor@ts.ar')
-            admin = User.objects.create_superuser(username='superadmin@ts.ar', password='superadmin123', is_superuser=True, is_staff=True, email='superadmin@ts.ar')
+            staff_user = User.objects.create_user(email='gestor@ts.ar', password='admin123', is_staff=True)
+            admin = User.objects.create_superuser(email='superadmin@ts.ar', password='superadmin123', is_superuser=True, is_staff=True)
             staff_user.groups.add(gestores_group)
-            staff_user.perfil.email_verificado = True
-            admin.perfil.email_verificado = True
-            staff_user.perfil.save()
-            admin.perfil.save()
+            staff_user.email_verificado = True
+            admin.email_verificado = True
+            staff_user.save()
+            admin.save()
 
         self.stdout.write(self.style.SUCCESS(f'✅ (1/{steps}) Tienda iniciada correctamente'))
 

@@ -245,6 +245,8 @@ STATICFILES_FINDERS = [
     'compressor.finders.CompressorFinder',
 ]
 
+AUTH_USER_MODEL = 'users.User'
+
 COMPRESS_ENABLED = not DEBUG
 COMPRESS_OFFLINE = not DEBUG
 
@@ -426,22 +428,6 @@ UNFOLD = {
             {
                 "items": [
                     {
-                        "title": _("Users"),
-                        "icon": "person",
-                        "link": reverse_lazy("admin:auth_user_changelist"),
-                        "permission": lambda request: request.user.is_superuser,
-                    },
-                    {
-                        "title": _("Grupos"),
-                        "icon": "group",
-                        "link": reverse_lazy("admin:auth_group_changelist"),
-                        "permission": lambda request: request.user.is_superuser,
-                    },
-                ],
-            },
-            {
-                "items": [
-                    {
                         "title": _("Dashboard"),
                         "icon": "dashboard",
                         "link": reverse_lazy("admin:index"),
@@ -480,15 +466,6 @@ UNFOLD = {
                         "badge": "dashboard.views.ventas_verificacion",
                         "badge_variant": "info",
                         "badge_style": "solid",
-                    },
-                ]
-            },
-            {
-                "items": [
-                    {
-                        "title": _("Usuarios"),
-                        "icon": "manage_accounts",
-                        "link": reverse_lazy('admin:users_perfilusuario_changelist'),
                     },
                 ]
             },

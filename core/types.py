@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional, Dict, Any
+from typing import TypedDict
 
 class ConfigDict(TypedDict):
     nombre_tienda: str

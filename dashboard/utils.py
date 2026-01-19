@@ -6,12 +6,14 @@ from django.utils import timezone
 from django.urls import reverse_lazy
 from django.utils.html import format_html
 from django.db.models import QuerySet,TimeField,DateField,Count,Sum,OuterRef, Subquery,F,Sum,Value
-from django.contrib.auth.models import User
 from django.db.models.functions import TruncHour,TruncDay,TruncMonth,TruncYear,Coalesce
 from core.utils import get_configuracion_tienda
 from payment.models import Venta,VentaDetalle
 from payment.templatetags.custom_filters import formato_pesos
 from products.models import MovimientoStock,LoteStock,Producto
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 INFO = "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400"
 DANGER = "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400"

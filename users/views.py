@@ -1,4 +1,4 @@
-from .models import PerfilUsuario,TokenUsers
+from .models import TokenUsers
 from .decorators import login_required_modal
 from .emails import mail_recuperar_cuenta_html
 
@@ -9,8 +9,7 @@ from core.throttling import ModalUsers,MiCuentaThrottle
 from products.models import ReseñaProducto, TokenReseña
 
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login,logout
+from django.contrib.auth import authenticate, login,logout, get_user_model
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext_lazy as _
@@ -23,6 +22,12 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .serializers import PedidoSerializer,LoginSerializer,RegisterSerializer,TokenSerializer, MiCuentaSerializer,RecuperarCuentaSerializer,NuevaContraseñaSerializer,ReseñaSerializer
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from users.models import User as UserType
+
+User = get_user_model()
+
 class LoginAPIView(APIView):
     permission_classes = [BloquearSiMantenimiento]
     throttle_classes = [ModalUsers]
@@ -34,17 +39,15 @@ class LoginAPIView(APIView):
         email = serializer.validated_data["email"]
         password = serializer.validated_data["password"]
 
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response({"error": "El email no está registrado."},status=status.HTTP_404_NOT_FOUND)
+        user = authenticate(request, email=email, password=password)
 
-        user = authenticate(request, username=email, password=password)
         if user is None:
-            return Response({"error": "Credenciales incorrectas."},status=status.HTTP_400_BAD_REQUEST)
+            # Verificamos si es que no existe o si la clave es mal
+            if not User.objects.filter(email=email).exists():
+                return Response({"error": "El email no está registrado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Credenciales incorrectas."}, status=status.HTTP_400_BAD_REQUEST)
 
-        perfil:PerfilUsuario = getattr(user, "perfil", None)
-        if perfil and not perfil.email_verificado:
+        if not user.email_verificado:
             tiene_token = TokenUsers.objects.filter(user=user,tipo="verificar").first()
             if tiene_token and tiene_token.expirado():
                 tiene_token.delete()
@@ -71,19 +74,14 @@ class RegisterView(APIView):
         serializer.is_valid(raise_exception=True)
 
         user = User.objects.create_user(
-            username=serializer.validated_data["email"],
             email=serializer.validated_data["email"],
-            password=serializer.validated_data["password"]
+            password=serializer.validated_data["password"],
+            first_name=serializer.validated_data.get("nombre", ""),
+            last_name=serializer.validated_data.get("apellido", ""),
+            telefono=serializer.validated_data.get("telefono", ""),
         )
 
-        perfil:PerfilUsuario = user.perfil
-
-        perfil.telefono = serializer.validated_data["telefono"]
-        perfil.nombre = serializer.validated_data["nombre"]
-        perfil.apellido = serializer.validated_data["apellido"]
-        perfil.save()
-
-        token = TokenUsers.objects.create(
+        TokenUsers.objects.create(
             user=user,
             tipo="verificar"
         )
@@ -104,8 +102,7 @@ class RecuperarCuentaView(APIView):
         if not user:
             return Response({"error": "No existe un usuario con ese email."}, status=status.HTTP_404_NOT_FOUND)
         
-        perfil:PerfilUsuario = user.perfil
-        if not perfil.email_verificado:
+        if not user.email_verificado:
             return Response({"error": "El email no ha sido verificado. No se puede recuperar la cuenta."}, status=status.HTTP_400_BAD_REQUEST)
         
         tiene_token = TokenUsers.objects.filter(user=user,tipo="recuperar").first()
@@ -197,19 +194,19 @@ class MiCuentaView(APIView):
     permission_classes = [IsAuthenticated, BloquearSiMantenimiento]
     throttle_classes = [MiCuentaThrottle]
     def get(self, request:HttpRequest):
-        perfil:PerfilUsuario = request.user.perfil
+        user: UserType = request.user
         data = {
-            "nombre": perfil.nombre,
-            "apellido": perfil.apellido,
-            "telefono": perfil.telefono,
-            "email":perfil.user.email,
-            "dni_cuit": perfil.dni_cuit,
-            "codigo_postal": perfil.codigo_postal,
-            "direccion": perfil.direccion,
-            "localidad": perfil.localidad,
-            "provincia": perfil.provincia,
-            "razon_social": perfil.razon_social,
-            "condicion_iva": perfil.condicion_iva,
+            "nombre": user.first_name,
+            "apellido": user.last_name,
+            "telefono": user.telefono,
+            "email":user.email,
+            "dni_cuit": user.dni_cuit,
+            "codigo_postal": user.codigo_postal,
+            "direccion": user.direccion,
+            "localidad": user.localidad,
+            "provincia": user.provincia,
+            "razon_social": user.razon_social,
+            "condicion_iva": user.condicion_iva,
         }
         return Response(data, status=status.HTTP_200_OK)
     
@@ -219,15 +216,16 @@ class MiCuentaView(APIView):
 
         data = serializer.validated_data
 
-        perfil:PerfilUsuario = request.user.perfil
-        perfil.condicion_iva = data.get("condicion_iva", perfil.condicion_iva)
-        perfil.dni_cuit = data.get("dni_cuit", perfil.dni_cuit)
-        perfil.razon_social = data.get("razon_social", perfil.razon_social)
-        perfil.direccion = data.get("direccion", perfil.direccion)
-        perfil.codigo_postal = data.get("codigo_postal", perfil.codigo_postal)
-        perfil.localidad = data.get("localidad", perfil.localidad)
-        perfil.provincia = data.get("provincia", perfil.provincia)
-        perfil.save()
+        user:UserType = request.user
+
+        user.condicion_iva = data.get("condicion_iva", user.condicion_iva)
+        user.dni_cuit = data.get("dni_cuit", user.dni_cuit)
+        user.razon_social = data.get("razon_social", user.razon_social)
+        user.direccion = data.get("direccion", user.direccion)
+        user.codigo_postal = data.get("codigo_postal", user.codigo_postal)
+        user.localidad = data.get("localidad", user.localidad)
+        user.provincia = data.get("provincia", user.provincia)
+        user.save()
 
         return Response({"success": True}, status=status.HTTP_200_OK)
 
@@ -264,7 +262,7 @@ class CrearReseñaView(APIView):
 
         reseña = ReseñaProducto.objects.create(
             producto=token_obj.producto,
-            usuario=request.user.perfil,
+            usuario=request.user,
             calificacion=rating,
             comentario=review_text
         )

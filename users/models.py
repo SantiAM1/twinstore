@@ -1,68 +1,77 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 import random
-from django.db import models
 from django.utils import timezone
 from datetime import timedelta
+from .managers import CustomUserManager
 
-class PerfilUsuario(models.Model):
-    FACTURA_CHOICES = [
-        ('A', 'Resp Insc.'),
-        ('B', 'Consumidor final'),
-        ('C', 'Mono'),
-    ]
+class User(AbstractUser):
+    class CondicionIVA(models.TextChoices):
+        RESP_INSC = 'A', 'Responsable Inscripto'
+        CONSUMIDOR_FINAL = 'B', 'Consumidor Final'
+        MONOTRIBUTO = 'C', 'Monotributo'
+        EXENTO = 'E', 'Exento'
+        NO_RESPONSABLE = 'N', 'No Responsable'
+    
+    class Provincia(models.TextChoices):
+        CABA = 'A', 'Ciudad Autónoma de Buenos Aires'
+        BUENOS_AIRES = 'B', 'Buenos Aires'
+        CATAMARCA = 'C', 'Catamarca'
+        CHACO = 'H', 'Chaco'
+        CHUBUT = 'U', 'Chubut'
+        CORDOBA = 'X', 'Córdoba'
+        CORRIENTES = 'W', 'Corrientes'
+        ENTRE_RIOS = 'E', 'Entre Ríos'
+        FORMOSA = 'P', 'Formosa'
+        JUJUY = 'Y', 'Jujuy'
+        LA_PAMPA = 'L', 'La Pampa'
+        LA_RIOJA = 'F', 'La Rioja'
+        MENDOZA = 'M', 'Mendoza'
+        MISIONES = 'N', 'Misiones'
+        NEUQUEN = 'Q', 'Neuquén'
+        RIO_NEGRO = 'R', 'Río Negro'
+        SALTA = 'I', 'Salta'
+        SAN_JUAN = 'J', 'San Juan'
+        SAN_LUIS = 'D', 'San Luis'
+        SANTA_CRUZ = 'Z', 'Santa Cruz'
+        SANTA_FE = 'S', 'Santa Fe'
+        SANTIAGO_ESTERO = 'G', 'Santiago del Estero'
+        TIERRA_FUEGO = 'V', 'Tierra del Fuego'
+        TUCUMAN = 'T', 'Tucumán'
 
-    PROVINCIA_CHOICES = [
-        ('A', 'Ciudad Autónoma de Buenos Aires'),
-        ('B', 'Buenos Aires'),
-        ('C', 'Catamarca'),
-        ('D', 'Chaco'),
-        ('E', 'Chubut'),
-        ('F', 'Córdoba'),
-        ('G', 'Corrientes'),
-        ('H', 'Entre Ríos'),
-        ('I', 'Formosa'),
-        ('J', 'Jujuy'),
-        ('K', 'La Pampa'),
-        ('L', 'La Rioja'),
-        ('M', 'Mendoza'),
-        ('N', 'Misiones'),
-        ('O', 'Neuquén'),
-        ('P', 'Río Negro'),
-        ('Q', 'Salta'),
-        ('R', 'San Juan'),
-        ('S', 'San Luis'),
-        ('T', 'Santa Cruz'),
-        ('U', 'Santa Fe'),
-        ('V', 'Santiago del Estero'),
-        ('W', 'Tierra del Fuego'),
-        ('X', 'Tucumán'),
-    ]
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="perfil")
-    nombre = models.CharField(max_length=50, blank=True, default="")
-    apellido = models.CharField(max_length=50, blank=True, default="")
+    username = None
+    email = models.EmailField("Dirección de email",unique=True)
     razon_social = models.CharField(max_length=255, blank=True, default="")
     dni_cuit = models.CharField(max_length=20, blank=True, default="")
-    condicion_iva = models.CharField(max_length=1, choices=FACTURA_CHOICES)
-    email_verificado = models.BooleanField(default=False)
+    condicion_iva = models.CharField(max_length=1, choices=CondicionIVA.choices, default=CondicionIVA.CONSUMIDOR_FINAL)
     telefono = models.CharField(max_length=20, blank=True, default="")
     codigo_postal = models.CharField(max_length=10, blank=True, default="")
-    provincia = models.CharField(max_length=1, choices=PROVINCIA_CHOICES, blank=True, default="")
+    provincia = models.CharField(max_length=1, choices=Provincia.choices, blank=True, default="")
     direccion = models.CharField(max_length=255, blank=True, default="")
     localidad = models.CharField(max_length=255, blank=True, default="")
+    email_verificado = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
 
     def __str__(self):
-        return f"Perfil de {self.user.username}"
+        # Muestra el email y, si tiene, la razón social o nombre
+        identidad = self.razon_social or f"{self.first_name} {self.last_name}"
+        if identidad.strip():
+            return f"{self.email} ({identidad})"
+        return self.email
+
+    @property
+    def nombre_completo(self):
+        """Helper para obtener el nombre real o la razón social"""
+        if self.razon_social:
+            return self.razon_social
+        return f"{self.first_name} {self.last_name}".strip()
 
 class DatosFacturacion(models.Model):
-    FACTURA_CHOICES = [
-        ('A', 'Resp Insc.'),
-        ('B', 'Consumidor final'),
-        ('C', 'Mono'),
-    ]
-
-    PROVINCIA_CHOICES = PerfilUsuario.PROVINCIA_CHOICES
 
     venta = models.OneToOneField("payment.Venta", on_delete=models.CASCADE, related_name="facturacion")
 
@@ -70,11 +79,11 @@ class DatosFacturacion(models.Model):
     apellido = models.CharField(max_length=50)
     razon_social = models.CharField(max_length=255, blank=True)
     dni_cuit = models.CharField(max_length=20)
-    condicion_iva = models.CharField(max_length=1, choices=FACTURA_CHOICES)
+    condicion_iva = models.CharField(max_length=1, choices=User.CondicionIVA.choices)
     telefono = models.CharField(max_length=20, blank=True)
     email = models.EmailField()
     codigo_postal = models.CharField(max_length=10)
-    provincia = models.CharField(max_length=1, choices=PROVINCIA_CHOICES)
+    provincia = models.CharField(max_length=1, choices=User.Provincia.choices)
     direccion = models.CharField(max_length=255)
     localidad = models.CharField(max_length=255,null=True, blank=True)
 

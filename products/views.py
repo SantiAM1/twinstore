@@ -6,7 +6,6 @@ from .utils import inject_categorias_subcategorias,filters,ordenby,cuotas_mp,gri
 from .types import GridContext
 from django.db.models import Q
 from django.template.loader import render_to_string
-from .forms import EditarProducto
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages

@@ -50,39 +50,6 @@ from rest_framework.permissions import IsAuthenticated
 from decimal import Decimal
 
 # ----- APIS ----- #
-class EnviarWtapView(APIView):
-    permission_classes = [BloquearSiMantenimiento]
-    throttle_classes = [EnviarWtapThrottle]
-    def get(self,request):
-        productos = []
-
-        if request.user.is_authenticated:
-            carrito = get_object_or_404(Carrito, usuario=request.user)
-            pedidos = carrito.pedidos.select_related('producto')
-            direccion = request.user.perfil.calle
-            codigo_postal = request.user.perfil.codigo_postal
-            for pedido in pedidos:
-                productos.append({
-                    "nombre": pedido.producto.nombre,
-                    "cantidad": pedido.cantidad
-                })
-        else:
-            direccion = ""
-            codigo_postal = ""
-            carrito_sesion = request.session.get('carrito', {})
-            for pedido_id, cantidad in carrito_sesion.items():
-                try:
-                    producto_id, color_str = pedido_id.split('-') 
-                    producto = Producto.objects.get(id=int(producto_id))
-                    productos.append({
-                        "nombre": producto.nombre,
-                        "cantidad": cantidad,
-                    })
-                except Producto.DoesNotExist:
-                    continue
-
-        return Response({"productos": productos,'direccion':direccion,'codigo_postal':codigo_postal})
-    
 class ActualizarPedidoView(APIView):
     permission_classes = [TieneCarrito, BloquearSiMantenimiento]
     throttle_classes = [CarritoThrottle]
