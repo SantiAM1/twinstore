@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from core.models import Tienda
+from core.models import Tienda,DatosBancarios,MercadoPagoConfig
 from django.contrib.auth.models import Group, Permission
 from django.contrib.auth import get_user_model
 from products.models import Proveedor, SubCategoria, Categoria, Marca, Etiquetas, Producto
@@ -17,7 +17,7 @@ class Command(BaseCommand):
         parser.add_argument('--products', action='store_true', help='Crear productos de ejemplo')
 
     def handle(self, *args, **kwargs):
-        steps = 3 if not kwargs['products'] else 4
+        steps = 4 if not kwargs['products'] else 5
         Tienda.objects.get_or_create()
         Proveedor.objects.get_or_create(nombre='Generico')
         gestores_group, _ = Group.objects.get_or_create(name='Gestores')
@@ -81,6 +81,11 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f"✅ (3/{steps}) Categorías importadas correctamente."))
 
+        DatosBancarios.objects.get_or_create()
+        MercadoPagoConfig.objects.get_or_create()
+
+        self.stdout.write(self.style.SUCCESS(f"✅ (4/{steps}) Datos bancarios y claves MP creadas."))
+
         if kwargs['products']:
             marca, _ = Marca.objects.get_or_create(nombre='Logitech')
             etiqueta, _ = Etiquetas.objects.get_or_create(nombre='destacados')
@@ -89,4 +94,4 @@ class Command(BaseCommand):
             producto3, _ = Producto.objects.get_or_create(nombre='Producto 3', precio_divisa=300, marca=marca)
             producto3.etiquetas.set([etiqueta])
 
-            self.stdout.write(self.style.SUCCESS(f"✅ (4/{steps}) Productos de prueba creados correctamente"))
+            self.stdout.write(self.style.SUCCESS(f"✅ (5/{steps}) Productos de prueba creados correctamente"))

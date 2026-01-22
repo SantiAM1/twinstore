@@ -5,6 +5,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.cache import cache_page
+from .utils import gen_cache_key
 
 from .throttling import PrediccionBusquedaThrottle
 from .utils import get_configuracion_tienda
@@ -66,8 +67,10 @@ def normalize_text(text: str) -> str:
 class BusquedaPredictivaView(APIView):
     throttle_classes = [PrediccionBusquedaThrottle]
     permission_classes = [BloquearSiMantenimiento]
+    
 
     def get(self, request):
+        CACHE_KEY = gen_cache_key('productos_busqueda',request)
         q = request.GET.get('q', '').strip()
         if not q or len(q) < 2:
             return Response([])
@@ -75,7 +78,7 @@ class BusquedaPredictivaView(APIView):
         q = normalize_text(q)
         tokens = [t for t in q.replace("-", " ").split() if t]
 
-        productos = cache.get('productos_busqueda')
+        productos = cache.get(CACHE_KEY)
 
         if not productos:
             productos_raw = list(
@@ -104,7 +107,7 @@ class BusquedaPredictivaView(APIView):
 
                 p["search"] = normalize_text(f"{p['nombre']} {p['slug']}")
 
-            cache.set('productos_busqueda', productos, 300)
+            cache.set(CACHE_KEY, productos, 300)
 
         resultados = []
         for p in productos:
@@ -132,8 +135,8 @@ class BusquedaPredictivaView(APIView):
 
         return Response(resultados[:10])
 
-def home(request):
-    CACHE_KEY = 'home_secciones_data'
+def home(request: HttpRequest):
+    CACHE_KEY = gen_cache_key('home_secciones_data',request)
     CACHE_TIMEOUT = 60 * 15
 
     secciones = cache.get(CACHE_KEY)
@@ -187,6 +190,13 @@ def home(request):
                             productos = base_products_qs.filter(etiquetas__id=grid.etiqueta_filtro_id)
                     elif grid.criterio == HomeProductGrid.Criterio.RECIENTES:
                         productos = base_products_qs.order_by('-updated_at')[:12]
+                    elif grid.criterio == HomeProductGrid.Criterio.EVENTO:
+                        from core.models import EventosPromociones
+                        evento = EventosPromociones.objects.first()
+                        if evento and evento.esta_activo:
+                            productos = base_products_qs.filter(evento=evento)
+                        else:
+                            productos = base_products_qs.order_by('-updated_at')[:12]
 
                     seccion.productos_list = list(productos) if productos is not None else []
 
@@ -220,7 +230,8 @@ def toggle_mantenimiento(request: HttpRequest):
         config = Tienda.objects.create()
     config.mantenimiento = not config.mantenimiento
     config.save()
-    cache.delete('modo_mantenimiento')
+    MANTENIMIENTO_CACHE_KEY = gen_cache_key('modo_mantenimiento',request)
+    cache.delete(MANTENIMIENTO_CACHE_KEY)
     if config.mantenimiento:
         messages.success(request, "El sitio ha sido puesto en modo mantenimiento.")
     else:

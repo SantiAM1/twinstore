@@ -63,7 +63,7 @@ class ActualizarPedidoView(APIView):
         pedido_id = signing.loads(data["pedido_id"])
         cantidad = 0
 
-        config = get_configuracion_tienda()
+        config = get_configuracion_tienda(request)
         stock_flag = config['modo_stock'] == "estricto"
         maximo_compra = config['maximo_compra']
 
@@ -136,7 +136,7 @@ class AgregarAlCarritoView(APIView):
         else:
             color = None
         
-        config = get_configuracion_tienda()
+        config = get_configuracion_tienda(request)
         stock = producto.obtener_stock(color) if config['modo_stock'] == "estricto" else config['maximo_compra']
 
         sumar_carrito(request,producto,stock,color)
@@ -237,7 +237,7 @@ class CheckoutView(APIView):
             return Response(forma_pago.errors,status=400)
         
         carrito = obtener_carrito(request)
-        config = get_configuracion_tienda()
+        config = get_configuracion_tienda(request)
         if not validar_compra(carrito,request,config):
             return Response({"reload": True},status=400)
         
@@ -297,13 +297,16 @@ class AdicionalesCheckoutView(APIView):
 @requiere_carrito
 @bloquear_si_mantenimiento
 def finalizar_compra(request: HttpRequest):
+    from core.utils import get_datos_banc
+    datos_bancarios = get_datos_banc()
     carrito = obtener_carrito(request)
     precio_total,precio_subtotal,descuento = obtener_total(carrito)
     return render(request, 'cart/finalizar_compra.html',{
         'carrito':carrito,
         'precio_total':precio_total,
         'precio_subtotal':precio_subtotal,
-        'descuento':descuento
+        'descuento':descuento,
+        'datos_bancarios':datos_bancarios
         })
 
 # ----- Ver el carro -----#

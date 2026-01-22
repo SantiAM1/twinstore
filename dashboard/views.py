@@ -21,7 +21,7 @@ def dashboard_callback(request: HttpRequest, context: dict) -> dict:
     tabs_data = dashboard_tabs(periodo)
     ventas_all = Venta.objects.all()
     
-    kpi_data = kpi_dashboard(fecha_inicio, fecha_anterior,ventas_all)
+    kpi_data = kpi_dashboard(request,fecha_inicio, fecha_anterior,ventas_all)
 
     buttons_chart_data = buttons_chart(request)
 
@@ -52,7 +52,10 @@ def ventas_verificacion(request: HttpRequest) -> int:
     return count
 
 def environment_callback(request: HttpRequest) -> list[str]:
+    if request.tenant.schema_name == 'public':
+        return []
     from core.utils import get_configuracion_tienda
-    config = get_configuracion_tienda()
+    
+    config = get_configuracion_tienda(request)
 
     return ["Mantenimiento", "danger"] if config['mantenimiento'] else ["Sitio Activo", "success"]

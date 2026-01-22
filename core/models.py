@@ -3,6 +3,9 @@ from django.utils.timezone import localtime
 from django.utils.text import slugify
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from colorfield.fields import ColorField
+from django.utils.html import format_html
+from django.templatetags.static import static
 
 def validate_image_size(image):
     file_size = image.size
@@ -19,6 +22,8 @@ class Tienda(models.Model):
         USD = 'USD', 'Dólares Estadounidenses (USD)'
 
     nombre_tienda = models.CharField(max_length=100, default="Mi Tienda")
+    color_primario = ColorField(default="#1173d4",verbose_name="Color Primario")
+    color_secundario = ColorField(default="#1987ee",verbose_name="Color Secundario")
     modo_stock = models.CharField(max_length=20, choices=[('libre', 'Sin control de stock'), ('estricto', 'Control de stock')], default='libre')
     mostrar_stock_en_front = models.BooleanField(default=False, help_text="Mostrar cantidad de stock en el sitio.")
     borrar_cupon = models.BooleanField(default=False, help_text="Borrar el cupón después de su uso.")
@@ -96,11 +101,11 @@ class DatosBancarios(models.Model):
     """
     Información bancaria para pagos.
     """
-    banco = models.CharField(max_length=100)
-    titular_cuenta = models.CharField(max_length=100)
-    numero_cuenta = models.CharField(max_length=50)
-    cbu = models.CharField(max_length=50)
-    alias = models.CharField(max_length=50)
+    banco = models.CharField(max_length=100,default="")
+    titular_cuenta = models.CharField(max_length=100,default="")
+    numero_cuenta = models.CharField(max_length=50,default="")
+    cbu = models.CharField(max_length=50,default="")
+    alias = models.CharField(max_length=50,default="")
     imagen_banco = models.ImageField(upload_to='bancos_logos/', help_text="Logo del banco. (Opcional)", null=True, blank=True)
 
     class Meta:
@@ -114,30 +119,28 @@ class MercadoPagoConfig(models.Model):
     """
     Configuración de MercadoPago.
     """
-    modo_sandbox = models.BooleanField(default=True, help_text="Indica si se está en modo sandbox (pruebas).")
-    public_key = models.CharField(max_length=200, help_text="Clave pública de MercadoPago.")
-    access_token = models.CharField(max_length=200, help_text="Token de acceso de MercadoPago.")
+    public_key = models.CharField(max_length=200, default="", help_text="Clave pública de MercadoPago.")
+    access_token = models.CharField(max_length=200, default="", help_text="Token de acceso de MercadoPago.")
+    webhook_key = models.CharField(max_length=200, default="", help_text="Clave para poder recibir pagos.")
 
     class Meta:
         verbose_name = "Configuración de MercadoPago"
         verbose_name_plural = "Configuraciones de MercadoPago"
 
     def __str__(self):
-        entorno = "Sandbox" if self.modo_sandbox else "Producción"
-        return f"MercadoPago ({entorno})"
+        return "MercadoPago"
 
 class HomeSection(models.Model):
     """
     Configuración de secciones en la página de inicio.
     """
     class Tipo(models.TextChoices):
+        EMPTY = 'empty', 'Seleccioná una opción'
         BANNER_PRINCIPAL = 'banner_principal', 'Banner Principal'
         GRILLA = 'grilla', 'Grilla de Productos'
         BENTO = 'bento', 'Carousel Tipo Bento'
         STATIC_BENTO = 'static_bento', 'Bento Estático'
-        BANNER_MEDIO = "banner_medio", "Banner Intermedio"
-        MARCAS = "marcas", "Marcas Destacadas"
-        TEXTO_SEO = "texto_seo", "Texto SEO"
+        BANNER_MEDIO = "banner_medio", "Banner Pequeño"
 
     tipo = models.CharField(max_length=50, choices=Tipo.choices)
     orden = models.PositiveIntegerField(default=0, help_text="Orden de aparición en la página de inicio.")
@@ -150,6 +153,26 @@ class HomeSection(models.Model):
         verbose_name = "Sección(Pagina de Inicio)"
         verbose_name_plural = "Secciones(Pagina de Inicio)"
 
+    def clean(self):
+        if self.tipo == self.Tipo.EMPTY:
+            raise ValidationError("Selecciona un tipo para continuar")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super().save(*args, **kwargs)
+
+    TEMPLATES = {
+        'banner_principal': 'core/modulos/main_banner.html',
+        'grilla': 'core/modulos/grilla.html',
+        'bento': 'core/modulos/bento.html',
+        'static_bento': 'core/modulos/staticbento.html',
+        'banner_medio': 'core/modulos/medium_banners.html'
+    } 
+
+    def template(self):
+        template = self.TEMPLATES.get(self.tipo)
+        return template
+
     def __str__(self):
         return f"{self.orden} - {self.get_tipo_display()}"
 
@@ -161,12 +184,20 @@ class HomeProductGrid(models.Model):
         DESTACADOS = 'destacados', 'Destacados (Manual)'
         ETIQUETA = 'etiqueta', 'Por Etiqueta Específica'
         MARCA = 'marca', 'Por Marca Específica'
+        EVENTO = 'evento', 'Por evento activo'
 
     seccion = models.ForeignKey(HomeSection, on_delete=models.CASCADE, related_name="grids_productos")
     criterio = models.CharField(max_length=20, choices=Criterio.choices)
     
     etiqueta_filtro = models.ForeignKey('products.Etiquetas', null=True, blank=True, on_delete=models.SET_NULL)
     marca_filtro = models.ForeignKey('products.Marca', null=True, blank=True, on_delete=models.SET_NULL)
+    
+    def admin_portada(self):
+        img_url = static('img/admin/home/grilla.png')
+        return format_html(
+            "<img src='{}' width='600' style='object-fit: cover;border-radius: 5px;' />",
+            img_url
+        )
     
     class Meta:
         verbose_name = "Grilla de productos"
@@ -188,6 +219,13 @@ class HomeBanner(models.Model):
         ordering = ["orden"]
         verbose_name = "Banner de la Página de Inicio"
         verbose_name_plural = "Banners de la Página de Inicio"
+
+    def admin_portada(self):
+        img_url = self.imagen_desktop.url if self.imagen_desktop else ''
+        return format_html(
+            "<img src='{}' width='600' style='object-fit: cover;border-radius: 5px;' />",
+            img_url
+        )
 
     def save(self, *args, **kwargs):
         from .utils import compress_image
@@ -233,6 +271,19 @@ class HomeBannerMedio(models.Model):
         ordering = ["orden"]
         verbose_name = "Banner Medio(Garantia, Envío, Cuotas, Personalizado)"
         verbose_name_plural = "Banners Medios(Garantia, Envío, Cuotas, Personalizado)"
+
+    CONFIG = {
+        'cuotas': '<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.5"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-credit-card"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 5m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" /><path d="M3 10l18 0" /><path d="M7 15l.01 0" /><path d="M11 15l2 0" /></svg>',
+        'garantia': '<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.5"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shield"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /></svg>',
+        'envio': '<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.5"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-truck"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" /></svg>',
+        'personalizado': 'custom'
+    }
+
+    def admin_portada(self):
+        svg = self.CONFIG.get(self.tipo,{})
+        if svg == 'custom':
+            svg = self.svg
+        return format_html(svg)
 
     def __str__(self):
         return "Banner Medio de la Página de Inicio"
@@ -297,6 +348,13 @@ class HomeCarouselBento(models.Model):
     def link(self):
         return self.producto or self.categoria or self.marca or self.subcategoria
     
+    def admin_portada(self):
+        img_url = self.imagen.url if self.imagen else ''
+        return format_html(
+            "<img src='{}' width='150' style='object-fit: cover;border-radius: 5px;' />",
+            img_url
+        )
+
     def clean(self):
         opciones_elegidas = [
             self.producto, 
@@ -315,7 +373,7 @@ class HomeCarouselBento(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
-    
+
     def __str__(self):
         return f"(Slide {self.slide})"
 
@@ -367,6 +425,13 @@ class HomeStaticBento(models.Model):
     @property
     def link(self):
         return self.producto or self.categoria or self.marca or self.subcategoria
+
+    def admin_portada(self):
+        img_url = self.imagen.url if self.imagen else ''
+        return format_html(
+            "<img src='{}' width='150' style='object-fit: cover;border-radius: 5px;' />",
+            img_url
+        )
     
     def clean(self):
         opciones_elegidas = [

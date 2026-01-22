@@ -1,13 +1,14 @@
-from django.contrib import admin
+from django.contrib import admin,messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
-from .models import Venta,PagoRecibidoMP,ComprobanteTransferencia,EstadoPedido,Cupon,TicketDePago,VentaDetalle
+
+from .models import Venta,ComprobanteTransferencia,EstadoPedido,Cupon,TicketDePago,VentaDetalle
 from users.models import DatosFacturacion
 
 from unfold.admin import ModelAdmin,TabularInline,StackedInline
 from unfold.decorators import display
 from unfold.sections import TableSection
-from unfold.paginator import InfinitePaginator
+from unfold.decorators import action
 
 class DatosFacturacionInline(StackedInline):
     model = DatosFacturacion
@@ -65,6 +66,7 @@ class VentaAdmin(ModelAdmin):
     list_sections = [
         DetalleCompraSection,
     ]
+    actions = ['quitar_revision']
 
     inlines = [VentaDetalleInline,DatosFacturacionInline, ComprobanteTransferenciaInline, EstadoPedidoInline,TicketDePagoInline]
 
@@ -76,6 +78,28 @@ class VentaAdmin(ModelAdmin):
             'fields': ('fecha_compra','fecha_finalizado'),
         }),
     )
+
+    @action(description="Quitar revisión",icon="check",url_path="quitar-revision")
+    def quitar_revision(self, request, queryset):
+        modificados = 0
+        for venta in queryset:
+            if venta.requiere_revision:
+                venta.requiere_revision = False
+                venta.save()
+                modificados += 1
+        
+        if modificados > 0:
+            self.message_user(
+                request, 
+                f"✅ {modificados} pedido/s se les quitó la revisión", 
+                messages.SUCCESS
+            )
+        else:
+            self.message_user(
+                request, 
+                "⚠️ No hubo cambios (los pedidos ya fueron revisados).", 
+                messages.WARNING
+            )
 
     @display(
         description="Estado",

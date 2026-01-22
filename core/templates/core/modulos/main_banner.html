@@ -1,4 +1,5 @@
-<section class="swiper banner-swiper">
+<!-- > Banner Principal -->
+<section class="swiper banner-swiper" data-pagination=".pagination-banner-{{seccion.id}}">
     <div class="swiper-wrapper">
         {% for banner in seccion.banners.all %}
             <div class="swiper-slide">
@@ -11,5 +12,5 @@
             </div>
         {% endfor %}
     </div>
-    <div class="swiper-pagination banner-pag"></div>
+    <div class="swiper-pagination pagination-banner-{{seccion.id}}"></div>
 </section>

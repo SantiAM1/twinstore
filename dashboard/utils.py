@@ -78,14 +78,14 @@ def label_estado(venta: Venta) -> str:
         f'<span class="inline-block font-semibold h-6 leading-6 px-2 rounded-default text-[11px] uppercase whitespace-nowrap {classes}">{venta.get_estado_display()}</span>'
         )
 
-def kpi_dashboard(fecha_inicio: timedelta, fecha_anterior: timedelta, ventas_all: QuerySet[Venta]) -> dict[str, dict[str, str | float]]:
+def kpi_dashboard(request, fecha_inicio: timedelta, fecha_anterior: timedelta, ventas_all: QuerySet[Venta]) -> dict[str, dict[str, str | float]]:
     estados_validos = [
         Venta.Estado.CONFIRMADO,
         Venta.Estado.ENVIADO,
         Venta.Estado.FINALIZADO,
         Venta.Estado.LISTO_PARA_RETIRAR,
     ]
-    config = get_configuracion_tienda()
+    config = get_configuracion_tienda(request)
     # --- 1. Filtrado de Ventas y Usuarios ---
     if fecha_inicio:
         ventas = ventas_all.filter(

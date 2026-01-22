@@ -14,7 +14,7 @@ def bloquear_si_mantenimiento(view_func):
         modo_mantenimiento = cache.get('modo_mantenimiento')
         if modo_mantenimiento is None:
             try:
-                config = get_configuracion_tienda()
+                config = get_configuracion_tienda(request)
                 modo_mantenimiento = config['mantenimiento']
                 cache.set('modo_mantenimiento', modo_mantenimiento, 10)
             except:

@@ -158,7 +158,9 @@ def inject_categorias_subcategorias(view_func):
     """
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
-        categorias_data = cache.get('categorias_con_subcategorias')
+        from core.utils import gen_cache_key
+        CAT_CACHE_KEY = gen_cache_key('categoty_subcat', request)
+        categorias_data = cache.get(CAT_CACHE_KEY)
         if not categorias_data:
             categorias = Categoria.objects.prefetch_related('subcategorias').all()
             categorias_data = [
@@ -172,7 +174,7 @@ def inject_categorias_subcategorias(view_func):
                     ],
                 } for c in categorias
             ]
-            cache.set('categorias_con_subcategorias', categorias_data, 60 * 60 * 12)
+            cache.set(CAT_CACHE_KEY, categorias_data, 60 * 60 * 12)
 
         request.categorias_data = categorias_data
 

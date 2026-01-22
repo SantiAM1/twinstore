@@ -22,7 +22,7 @@ def sitemap_view(request):
 
 
 urlpatterns = [
-    path('panel-admin-twinstore/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('',include('core.urls')),
     path('productos/',include('products.urls')),
     path('carro/',include('cart.urls')),

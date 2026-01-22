@@ -21,10 +21,8 @@ env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 #  * Cargar la variable de entorno del archivo .env
-MERCADOPAGO_ACCESS_TOKEN = env("MERCADOPAGO_ACCESS_TOKEN")
 MERCADOPAGO_PERCENTAJE = 0.0642
 MERCADOPAGO_COMMISSION = (MERCADOPAGO_PERCENTAJE*(1.315))+1
-MP_WEBHOOK_KEY = env("MP_WEBHOOK_KEY")
 DJANGO_SECRET_KEY = env("DJANGO_SECRET_KEY")
 SECRET_KEY = DJANGO_SECRET_KEY
 
@@ -39,7 +37,7 @@ NGROK_URL = None
 # * Host
 SITE_URL = "twinstore.com.ar"
 
-ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(",")
+ALLOWED_HOSTS = ['.localhost', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
     f"https://twinstore.com.ar", "https://www.twinstore.com.ar",
@@ -72,34 +70,8 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = False
 
-# Application definition
-
-INSTALLED_APPS = [
-    'unfold',
-    'unfold.contrib.import_export',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sitemaps',
-    'django_extensions',
-    'axes',
-    'django_cleanup.apps.CleanupConfig',
-    'rest_framework',
-    'csp',
-    'products',
-    'core',
-    'cart',
-    'users',
-    'payment',
-    'dashboard',
-    'import_export',
-    'compressor'
-]
-
 MIDDLEWARE = [
+    'django_tenants.middleware.main.TenantMainMiddleware',
     'axes.middleware.AxesMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -110,8 +82,51 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
     'core.middleware.mantenimiento.MantenimientoGlobalMiddleware',
-
 ]
+
+SHARED_APPS = (
+    'django_tenants',
+    'customers',
+    'website',
+    
+    'django.contrib.contenttypes',
+    'django.contrib.staticfiles',
+    
+    'django_cleanup.apps.CleanupConfig',
+    'compressor',
+    'django_extensions',
+    'csp',
+    'colorfield'
+)
+
+if DEBUG:
+    SHARED_APPS += ("debug_toolbar",)
+    MIDDLEWARE.insert(1, "debug_toolbar.middleware.DebugToolbarMiddleware")
+
+TENANT_APPS = (
+    'unfold',
+    'unfold.contrib.import_export',
+    'django.contrib.admin',
+    
+    'django.contrib.auth',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'axes',
+    
+    'rest_framework',
+
+    'import_export',
+    'django.contrib.sitemaps',
+
+    'users',
+    'core',
+    'products',
+    'cart',
+    'payment',
+    'dashboard',
+)
+
+INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesBackend',
@@ -154,7 +169,8 @@ CONTENT_SECURITY_POLICY = {
     }
 }
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'config.urls_tenants'
+PUBLIC_SCHEMA_URLCONF = 'config.urls_public'
 
 TEMPLATES = [
     {
@@ -210,7 +226,7 @@ REST_FRAMEWORK = {
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django_tenants.postgresql_backend',
         'NAME': env("DB_NAME"),
         'USER': env("DB_USER"),
         'PASSWORD': env("DB_PASSWORD"),
@@ -218,6 +234,13 @@ DATABASES = {
         'PORT': env("DB_PORT"),
     }
 }
+
+TENANT_MODEL = "customers.Client"
+TENANT_DOMAIN_MODEL = "customers.Domain"
+
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -301,6 +324,7 @@ if DEBUG:
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'unique-twinstore-cache',
+        'KEY_FUNCTION': 'core.utils.make_tenant_key',
     }
 }
 else:
@@ -308,6 +332,7 @@ else:
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
             'LOCATION': 'redis://redis:6379/1',
+            'KEY_FUNCTION': 'core.utils.make_tenant_key',
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
                 'IGNORE_EXCEPTIONS': True,
@@ -352,10 +377,6 @@ LOGGING = {
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
-
-if DEBUG:
-    INSTALLED_APPS += ["debug_toolbar"]
-    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 from django.templatetags.static import static
 from django.urls import reverse_lazy
@@ -424,6 +445,7 @@ UNFOLD = {
         },
     },
     "SIDEBAR": {
+        "show_all_applications": True,
         "navigation": [
             {
                 "items": [
@@ -557,15 +579,32 @@ UNFOLD = {
                     {
                         "title": _("Tus datos bancarios"),
                         "icon": "account_balance",
-                        "link": reverse_lazy('admin:core_datosbancarios_changelist'),
+                        "link": reverse_lazy('admin:core_datosbancarios_change',args=[1]),
                     },
                     {
                         "title": _("Mercado Pago"),
                         "icon": "payment",
-                        "link": reverse_lazy('admin:core_mercadopagoconfig_changelist'),
+                        "link": reverse_lazy('admin:core_mercadopagoconfig_change',args=[1]),
                     },
                 ]
-            }
+            },
+            {
+                "title": "Super admin",
+                "items": [
+                    {
+                        "title": "Clientes",
+                        "icon": "identity_platform",
+                        "link": reverse_lazy("admin:customers_client_changelist"),
+                        "permission": lambda request: request.user.is_superuser
+                    },
+                    {
+                        "title": "Dominios",
+                        "icon": "cloud",
+                        "link": reverse_lazy("admin:customers_domain_changelist"),
+                        "permission": lambda request: request.user.is_superuser
+                    }
+                ]
+            },
         ],
     },
 }
