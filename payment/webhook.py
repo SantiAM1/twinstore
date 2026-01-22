@@ -45,7 +45,9 @@ def check_hmac_signature(request) -> bool:
         logger.warning("Firma HMAC inválida")
         return False
 
-    secret = f"{settings.MP_WEBHOOK_KEY}"
+    from core.utils import get_mp_config
+    mp_config = get_mp_config()
+    secret = f"{mp_config['webhook']}"
     manifest = f"id:{dataID};request-id:{xRequestId};ts:{ts};"
 
     hmac_obj = hmac.new(secret.encode(), msg=manifest.encode(), digestmod=hashlib.sha256)
@@ -57,13 +59,14 @@ def check_hmac_signature(request) -> bool:
     return True
 
 def requests_header(request):
+    from core.utils import get_mp_config
     payment_id = request.GET.get("data.id") or request.GET.get("id")
     topic = request.GET.get("topic") or request.GET.get("type")
     if topic == "payment" and payment_id:
-
+        mp_config = get_mp_config()
         url = f"https://api.mercadopago.com/v1/payments/{payment_id}"
         headers = {
-            "Authorization": f"Bearer {settings.MERCADOPAGO_ACCESS_TOKEN}"
+            "Authorization": f"Bearer {mp_config['access']}"
         }
         response = requests.get(url, headers=headers)
         pago_info = response.json()

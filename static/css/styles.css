@@ -8,8 +8,8 @@
 :root {
   /* -- Palet -- */
   --gradient: linear-gradient(45deg, blue, rgb(56, 201, 226));
-  --blue-ts: #1987ee;
   --primary-color: #1173d4;
+  --primary-color-2: #1987ee;
   --error: #ee1919;
   --success: #59f06d;
   --success-dark: #28a745;
@@ -25,7 +25,6 @@
   --color-gray-4: #818181;
   --color-gray-5: #222222;
   --color-gray-6: #4e4e4e;
-  --cart-border: rgba(20, 109, 241, 0.3);
 
   --bg-glass: rgba(255, 255, 255, 0.7);
   --discount: #ff4d4d;
@@ -37,6 +36,8 @@
   /* - Error - */
   --border-error: rgba(255, 2, 2, 0.3);
   --msg-error: #ff7c7c;
+
+  --cart-border: color-mix(in srgb, var(--primary-color-2), transparent 30%);
 }
 
 body[data-theme="dark"] {
@@ -54,6 +55,7 @@ body[data-theme="dark"] {
   --color-gray-6: #b0b0b0;
 
   --cart-border: rgba(20, 109, 241, 1);
+  --cart-border: color-mix(in srgb, var(--primary-color-2), transparent 0%);
   --bg-glass: rgba(30, 30, 30, 0.8);
 
   /* Bordes y detalles */
@@ -61,8 +63,7 @@ body[data-theme="dark"] {
   --border-2: #555555;
 
   /* Ajustes opcionales de color */
-  --primary-color: #4da3ff; /* Aclaramos un poco el azul para que contraste mejor */
-
+  --primary-color: color-mix(in srgb, var(--primary-color-2), transparent 10%);
   /* Sombras (En modo noche las sombras negras se ven poco, a veces se quitan) */
   --box-shadow-card: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
@@ -164,12 +165,12 @@ main.main-content {
   }
 
   input:focus {
-    border-bottom: 2px solid var(--blue-ts);
+    border-bottom: 2px solid var(--primary-color-2);
     box-shadow: 0 5px 5px rgba(0, 0, 0, 0.15);
   }
 
   &.active label {
-    color: var(--blue-ts);
+    color: var(--primary-color-2);
     padding-left: 0.5rem;
   }
 
@@ -244,14 +245,14 @@ main.main-content {
     bottom: 0;
     width: 0;
     height: 2px;
-    background-color: var(--blue-ts);
+    background-color: var(--primary-color-2);
     transition: 0.3s ease;
   }
   input:focus {
     box-shadow: 0 5px 5px rgba(0, 0, 0, 0.15);
   }
   input:focus ~ label {
-    color: var(--blue-ts);
+    color: var(--primary-color-2);
   }
   input:focus ~ label,
   input:not(:placeholder-shown) ~ label {
@@ -277,7 +278,7 @@ main.main-content {
 
   a {
     font-size: 1.5rem;
-    color: var(--blue-ts);
+    color: var(--primary-color-2);
     background-color: var(--color-gray-2);
     text-align: center;
     width: 30px;
@@ -347,12 +348,12 @@ main.main-content {
       margin-bottom: 1rem;
 
       a.active {
-        border-bottom: 2px solid var(--blue-ts);
+        border-bottom: 2px solid var(--primary-color-2);
         color: var(--color-gray-5);
         pointer-events: none;
       }
       a:hover {
-        border-bottom: 2px solid var(--blue-ts);
+        border-bottom: 2px solid var(--primary-color-2);
       }
       a:last-child {
         margin-left: auto;
@@ -471,7 +472,7 @@ main.main-content {
           margin-left: 1rem;
 
           &.correo {
-            color: var(--blue-ts);
+            color: var(--primary-color-2);
           }
           &.wtap {
             color: #25d366;
@@ -514,6 +515,10 @@ main.main-content {
       flex-direction: column;
       align-items: center;
       justify-content: center;
+
+      svg {
+        color: var(--primary-color-2);
+      }
     }
   }
   .orders h3 {
@@ -534,7 +539,7 @@ main.main-content {
     padding-top: 0;
 
     span {
-      color: var(--blue-ts);
+      color: var(--primary-color-2);
       font-size: 0.9rem;
       display: block;
       min-width: 120px;
@@ -551,7 +556,7 @@ main.main-content {
     padding-top: 0;
 
     span {
-      color: var(--blue-ts);
+      color: var(--primary-color-2);
       font-size: 0.9rem;
       display: block;
       margin-top: 0.6rem;
@@ -590,7 +595,7 @@ main.main-content {
     }
 
     p a {
-      color: var(--blue-ts);
+      color: var(--primary-color-2);
       text-decoration: none;
     }
   }
@@ -638,7 +643,11 @@ main.main-content {
     }
 
     svg {
-      background-color: color-mix(in srgb, var(--blue-ts) 20%, transparent 90%);
+      background-color: color-mix(
+        in srgb,
+        var(--primary-color-2) 20%,
+        transparent 90%
+      );
       padding: 1rem;
       width: 80px;
       color: var(--primary-color);
@@ -712,7 +721,7 @@ main.main-content {
         }
 
         &.active {
-          border-color: var(--blue-ts);
+          border-color: var(--primary-color-2);
 
           p,
           svg {
@@ -744,7 +753,7 @@ main.main-content {
 
           .importe-transferencia {
             font-weight: 600;
-            color: var(--blue-ts);
+            color: var(--primary-color-2);
           }
 
           &:last-child {
@@ -784,8 +793,11 @@ main.main-content {
   }
 }
 
-.cupon-row {
-  color: var(--blue-ts);
+.cupon-row.cupon-row {
+  td,
+  th {
+    color: var(--primary-color-2);
+  }
 }
 
 .generic-list-item {
@@ -860,9 +872,9 @@ main.main-content {
   }
 
   &.btn-1 {
-    border: 1px solid var(--blue-ts);
+    border: 1px solid var(--primary-color-2);
     background-color: var(--bg-white);
-    color: var(--blue-ts);
+    color: var(--primary-color-2);
 
     &.warning {
       border-color: var(--msg-error);
@@ -878,22 +890,26 @@ main.main-content {
     }
 
     .btn-loader {
-      border: 3px solid var(--blue-ts);
+      border: 3px solid var(--primary-color-2);
       border-top-color: var(--color-gray-3);
     }
 
     &:hover {
-      background-color: rgba(31, 122, 207, 0.1);
+      background-color: color-mix(
+        in srgb,
+        var(--primary-color),
+        transparent 90%
+      );
     }
   }
 
   &.btn-2 {
-    background-color: var(--blue-ts);
+    background-color: var(--primary-color-2);
     color: #fff;
 
     &.warning {
       background-color: var(--msg-error);
-      color: var(--bg-white);
+      color: #fff;
 
       &:hover {
         background-color: color-mix(
@@ -910,8 +926,12 @@ main.main-content {
     }
 
     &:hover {
-      background-color: rgba(31, 122, 207, 0.8);
-      color: var(--bg-white);
+      background-color: color-mix(
+        in srgb,
+        var(--primary-color-2),
+        transparent 20%
+      );
+      color: #fff;
     }
   }
 
@@ -1021,7 +1041,7 @@ main.main-content {
     strong {
       font-weight: 600;
       margin-left: 0.3rem;
-      color: var(--blue-ts);
+      color: var(--primary-color-2);
     }
   }
 
@@ -1049,7 +1069,7 @@ main.main-content {
       svg {
         min-width: 25px;
         min-height: 25px;
-        color: var(--blue-ts);
+        color: var(--primary-color-2);
       }
     }
   }
@@ -1529,7 +1549,7 @@ main.main-content {
     }
 
     svg {
-      color: var(--blue-ts);
+      color: var(--primary-color-2);
       height: 70px;
       width: 70px;
     }
@@ -1636,7 +1656,7 @@ main.main-content {
   }
 }
 
-.categories-swiper {
+.bento-swiper {
   width: 100%;
   max-width: 1200px;
   margin: auto;
@@ -1723,7 +1743,7 @@ main.main-content {
 }
 
 @media (max-width: 1050px) {
-  .categories-swiper {
+  .bento-swiper {
     max-width: 600px;
   }
 }
@@ -1756,7 +1776,7 @@ main.main-content {
 .swiper-pagination-bullet-active.swiper-pagination-bullet-active {
   width: 20px;
   border-radius: 5px;
-  background-color: var(--blue-ts);
+  background-color: var(--primary-color-2);
 }
 
 @media (max-width: 720px) {
@@ -1846,7 +1866,11 @@ main.main-content {
   }
   button:hover,
   nav > button:first-child:hover {
-    background-color: rgba(20, 109, 241, 0.15);
+    background-color: color-mix(
+      in srgb,
+      var(--primary-color-2),
+      transparent 90%
+    );
   }
   .quantity-controls {
     border-radius: 5px;
@@ -2061,7 +2085,7 @@ main.main-content {
         width: 8px;
       }
       &::-webkit-scrollbar-thumb {
-        background-color: var(--blue-ts);
+        background-color: var(--primary-color-2);
         border-radius: 4px;
         height: 200px;
       }
@@ -2069,7 +2093,11 @@ main.main-content {
         background-color: var(--primary-color);
       }
       &::-webkit-scrollbar-track {
-        background-color: color-mix(in srgb, var(--blue-ts), 80% transparent);
+        background-color: color-mix(
+          in srgb,
+          var(--primary-color-2),
+          80% transparent
+        );
       }
 
       li {
@@ -2193,7 +2221,11 @@ main.main-content {
   button:hover,
   a:hover {
     color: var(--primary-color);
-    background-color: rgba(72, 146, 231, 0.082);
+    background-color: color-mix(
+      in srgb,
+      var(--primary-color-2),
+      transparent 92%
+    );
   }
 }
 
@@ -2206,7 +2238,7 @@ main.main-content {
 
   span {
     color: #fff;
-    background-color: var(--blue-ts);
+    background-color: var(--primary-color-2);
     position: absolute;
     top: 0;
     left: 50%;
@@ -2605,7 +2637,7 @@ main.main-content {
 
   button {
     padding: 0.5rem 0.75rem;
-    background-color: var(--blue-ts);
+    background-color: var(--primary-color-2);
     border: none;
     color: var(--bg-white);
     border-radius: 12px;
@@ -2621,8 +2653,8 @@ main.main-content {
 
   .product-category-active {
     background-color: var(--bg-white);
-    border: 1px solid var(--blue-ts);
-    color: var(--blue-ts);
+    border: 1px solid var(--primary-color-2);
+    color: var(--primary-color-2);
     border-radius: 12px;
   }
 }
@@ -2645,7 +2677,7 @@ main.main-content {
   svg {
     min-width: 24px;
     min-height: 24px;
-    color: var(--blue-ts);
+    color: var(--primary-color-2);
   }
 }
 
@@ -2693,7 +2725,7 @@ main.main-content {
     background-color: var(--color-gray-2);
   }
   svg {
-    color: var(--blue-ts);
+    color: var(--primary-color-2);
   }
 }
 
@@ -2739,7 +2771,7 @@ main.main-content {
   }
 
   svg {
-    color: var(--blue-ts);
+    color: var(--primary-color-2);
   }
 }
 
@@ -2814,7 +2846,7 @@ main.main-content {
 
 .evento-icon {
   font-size: 24px;
-  color: var(--blue-ts);
+  color: var(--primary-color-2);
   display: flex;
 }
 
@@ -2939,7 +2971,7 @@ main.main-content {
 }
 
 .product-pay-method {
-  color: var(--blue-ts);
+  color: var(--primary-color-2);
   display: block;
   margin-top: 0.5rem;
 }
@@ -3117,7 +3149,7 @@ main.main-content {
   svg {
     min-width: 24px;
     margin-top: 1rem;
-    color: var(--blue-ts);
+    color: var(--primary-color-2);
   }
 }
 
@@ -3226,7 +3258,7 @@ main.main-content {
 .specs-more {
   display: block;
   width: 100%;
-  color: var(--blue-ts);
+  color: var(--primary-color-2);
   text-align: center;
   padding: 0.5rem;
   border-radius: 12px;
@@ -3435,7 +3467,7 @@ details.faq {
     }
     span,
     svg {
-      color: var(--blue-ts);
+      color: var(--primary-color-2);
     }
   }
 }
@@ -3481,7 +3513,7 @@ details.faq {
 
 .generic-link {
   text-decoration: none;
-  color: var(--blue-ts);
+  color: var(--primary-color-2);
 
   &.wtap {
     color: #00b837;
@@ -3569,7 +3601,7 @@ details.faq {
   }
   button.active {
     background-color: var(--color-gray-2);
-    color: var(--blue-ts);
+    color: var(--primary-color-2);
   }
   button:last-child.active svg {
     transform: rotate(180deg);
@@ -3605,7 +3637,11 @@ details.faq {
 
     &.mercadopago {
       color: #fff;
-      background-color: color-mix(in srgb, var(--blue-ts) 70%, transparent);
+      background-color: color-mix(
+        in srgb,
+        var(--primary-color-2) 70%,
+        transparent
+      );
     }
 
     &:hover {
@@ -3692,14 +3728,14 @@ details.faq {
     border: none;
   }
   .product-title {
-    border: 1px solid var(--blue-ts);
+    border: 1px solid var(--primary-color-2);
     width: 150px;
     justify-content: center;
     padding-left: 0;
     gap: 0;
     padding: 0.5rem;
     border-radius: 15px;
-    color: var(--blue-ts);
+    color: var(--primary-color-2);
     font-weight: 400;
     width: 100%;
   }
@@ -4013,7 +4049,7 @@ details.faq {
     cursor: pointer;
 
     &.active {
-      color: var(--blue-ts);
+      color: var(--primary-color-2);
     }
   }
 
@@ -4032,7 +4068,8 @@ details.faq {
     &:focus {
       outline: none;
       border-color: var(--primary-color);
-      box-shadow: 0 0 5px color-mix(in srgb, var(--blue-ts), transparent 60%);
+      box-shadow: 0 0 5px
+        color-mix(in srgb, var(--primary-color-2), transparent 60%);
     }
   }
 }
@@ -4082,7 +4119,7 @@ details.faq {
       color: var(--error);
     }
     svg.info {
-      color: var(--blue-ts);
+      color: var(--primary-color-2);
     }
   }
 }

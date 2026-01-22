@@ -2,7 +2,7 @@ from .models import Tienda,EventosPromociones
 from products.models import Producto
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .utils import actualizar_precio_final,CACHE_KEY_CONFIG,resize_to_size
+from .utils import actualizar_precio_final,resize_to_size,gen_cache_key
 from django.core.cache import cache
 
 @receiver(post_save, sender=Tienda)
@@ -13,6 +13,7 @@ def actualizar_precios(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Tienda)
 def limpiar_cache_configuracion(sender, instance, **kwargs):
+    CACHE_KEY_CONFIG = gen_cache_key("configuracion_tienda")
     cache.delete(CACHE_KEY_CONFIG)
     cache.delete('modo_mantenimiento')
 

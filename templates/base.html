@@ -20,13 +20,19 @@
     {% compress css %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     {% endcompress %}
+    <style>
+        :root {
+            --primary-color: {{ config.color_primario }};
+            --primary-color-2: {{ config.color_secundario }};
+        }
+    </style>
     <!--- Head --->
     {% block head %}
     {% endblock head %}
 </head>
 <body class="layout {% block theme %}{% endblock theme %}">
     <!--- Header --->
-    {% cache 600 header_main request.user.id %}
+    {% cache 600 header_main request.tenant.schema_name|default:"public" request.user.id %}
     {% include 'header.html' %}
     {% endcache %}
     <!--- Main --->
@@ -35,7 +41,7 @@
     {% endblock contenidomain %}
     </main>
     <!--- Footer --->
-    {% cache 600 footer_main %}
+    {% cache 600 footer_main request.tenant.schema_name|default:"public" %}
         {% include 'footer.html' %}
     {% endcache %}
 </body>

@@ -11,7 +11,7 @@ class BloquearSiMantenimiento(BasePermission):
         modo_mantenimiento = cache.get('modo_mantenimiento')
         if modo_mantenimiento is None:
             try:
-                config = get_configuracion_tienda()
+                config = get_configuracion_tienda(request)
                 modo_mantenimiento = config['mantenimiento']
                 cache.set('modo_mantenimiento', modo_mantenimiento, 10)
             except:
@@ -23,5 +23,5 @@ class BloquearSiMantenimiento(BasePermission):
         return True
 
 def ingreso_stock(request: HttpRequest) -> bool:
-    config = get_configuracion_tienda()
+    config = get_configuracion_tienda(request)
     return config['modo_stock'] == 'estricto'

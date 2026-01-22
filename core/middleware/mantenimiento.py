@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from django.urls import resolve, reverse
 from django.core.cache import cache
-from core.utils import get_configuracion_tienda
+from core.utils import get_configuracion_tienda,gen_cache_key
 from django.http import HttpRequest
 
 class MantenimientoGlobalMiddleware:
@@ -9,18 +9,21 @@ class MantenimientoGlobalMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest):
+        if request.tenant.schema_name == 'public':
+            return self.get_response(request)
         es_mantenimiento = request.path.startswith('/mantenimiento')
-        es_admin = request.path.startswith('/panel-admin-twinstore')
+        es_admin = request.path.startswith('/admin')
 
         usuario = request.user
         es_staff = usuario.is_authenticated and (usuario.is_staff or usuario.is_superuser)
 
-        modo_mantenimiento = cache.get('modo_mantenimiento')
+        MANTENIMIENTO_CACHE_KEY = gen_cache_key('modo_mantenimiento',request)
+        modo_mantenimiento = cache.get(MANTENIMIENTO_CACHE_KEY)
         if modo_mantenimiento is None:
             try:
-                config = get_configuracion_tienda()
+                config = get_configuracion_tienda(request)
                 modo_mantenimiento = config['mantenimiento']
-                cache.set('modo_mantenimiento', modo_mantenimiento, 60)
+                cache.set(MANTENIMIENTO_CACHE_KEY, modo_mantenimiento, 60)
             except:
                 modo_mantenimiento = False
 

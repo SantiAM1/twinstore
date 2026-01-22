@@ -346,6 +346,12 @@ class ImagenProducto(models.Model):
         verbose_name_plural = "Imagenes"
 
 class Atributo(models.Model):
+    """
+        Ejemplo: Almacenamiento 256 GB
+        nombre: Almacenamiento
+        valor: 256 GB
+    """
+
     producto = models.ForeignKey(Producto, related_name="atributos", on_delete=models.CASCADE)
     nombre = models.CharField(max_length=255)
     valor = models.CharField(max_length=255)
@@ -384,16 +390,16 @@ class ReseñaProducto(models.Model):
         ordering = ['-creado_en']
 
     def __str__(self):
-        return f"{self.producto.nombre} - {self.usuario.nombre if self.usuario else 'Anonimo'} ({self.calificacion}★)"
+        return f"{self.producto.nombre} - {self.usuario.first_name if self.usuario else 'Anonimo'} ({self.calificacion}★)"
 
     @property
     def nombre(self):
-        return f"{self.usuario.nombre} {self.usuario.apellido}"
+        return f"{self.usuario.first_name} {self.usuario.last_name}"
 
 class TokenReseña(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    token = models.UUIDField(unique=True,blank=True,editable=False)
+    token = models.UUIDField(unique=True,blank=True)
 
     def save(self, *args, **kwargs):
         if not self.token:
@@ -401,7 +407,7 @@ class TokenReseña(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Token para {self.usuario.nombre} - {self.producto.nombre} - {self.token}"
+        return f"Token para {self.usuario.first_name} {self.usuario.last_name} - {self.producto.nombre} - {self.token}"
 
 class Proveedor(models.Model):
     nombre = models.CharField(max_length=50)

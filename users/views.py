@@ -278,8 +278,10 @@ def check_auth(request):
 
 @login_required_modal
 def mi_perfil(request):
+    from core.utils import get_datos_banc
+    datos_bancarios = get_datos_banc()
     ventas = Venta.objects.filter(usuario=request.user).order_by('-fecha_compra').prefetch_related('tickets','comprobante','detalles')
-    return render(request,'users/micuenta.html',{'ventas':ventas})
+    return render(request,'users/micuenta.html',{'ventas':ventas,'datos_bancarios':datos_bancarios})
 
 @login_required
 def cerrar_sesion(request):
@@ -299,7 +301,7 @@ def review_pedido(request:HttpRequest,token:str):
         messages.error(request,'No se encontró el token.')
         return redirect('users:perfil')
 
-    if token_obj.usuario.user != request.user:
+    if token_obj.usuario != request.user:
         messages.error(request, 'No estás autorizado para dejar una reseña para este producto.')
         return redirect('users:perfil')
 

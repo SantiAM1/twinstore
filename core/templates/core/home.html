@@ -22,27 +22,7 @@
 
 {% for seccion in secciones %}
 
-    {% if seccion.tipo == "banner_principal" %}
-    <!-- > Banner Principal -->
-        {% include 'core/modulos/main_banner.html' %}
-    
-    {% elif seccion.tipo == "banner_medio" %}
-    <!-- > Banners Medios -->
-        {% include 'core/modulos/medium_banners.html' %}
-    
-    {% elif seccion.tipo == 'grilla' %}
-    <!-- > Grilla de Productos -->
-        {% include 'core/modulos/grilla.html' %}
-    
-    {% elif seccion.tipo == 'bento' %}
-    <!-- > Grilla Bento -->
-        {% include 'core/modulos/bento.html' %}
-    
-    {% elif seccion.tipo == 'static_bento' %}
-    <!-- > Bento Estatico -->
-        {% include 'core/modulos/staticbento.html' %}
-        
-    {% endif %}
+    {% include seccion.template %}
 
 {% endfor %}
     
@@ -55,7 +35,7 @@
 <script src="{% static 'js/landing.js' %}"></script>
 {% endcompress %}
 <script nonce="{{ request.csp_nonce }}">
-function generateSwiper(data) {
+function prodSwiper(data) {
     const gripConf = {
         slidesPerView: 3,
         grid: {
@@ -85,43 +65,59 @@ function generateSwiper(data) {
     return gripConf;
 }
 
+function bannerSwiper(data) {
+    const bannerConf = {
+        slidesPerView: 1,
+        spaceBetween: 10,
+        loop: true,
+        autoplay: {
+            delay: 6000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: data.pagination,
+            clickable: true,
+        },
+        speed: 1000,
+    }
+    console.log(bannerConf)
+    return bannerConf
+}
+
+function bentoSwiper(data) {
+    const bentoConf = {
+        slidesPerView: 1,
+        spaceBetween: 0,
+        pagination: {
+            el: data.pagination,
+            clickable: true,
+        },
+        autoplay: {
+            delay: 3500,
+            disableOnInteraction: false,
+        },
+        speed: 800,
+        grabCursor: true,
+        breakpoints: {
+        1050: { slidesPerView: 2},
+        },
+    }
+    return bentoConf
+}
+
 document.querySelectorAll(".products-swiper").forEach(swp => {
-    const config = generateSwiper(swp.dataset)
+    const config = prodSwiper(swp.dataset);
     const swiper = new Swiper(swp, config);
 })
 
-const swiperCat = new Swiper(".categories-swiper", {
-    slidesPerView: 1,
-    spaceBetween: 0,
-    pagination: {
-        el: ".category-pag",
-        clickable: true,
-    },
-    autoplay: {
-        delay: 3500,
-        disableOnInteraction: false,
-    },
-    speed: 800,
-    grabCursor: true,
-    breakpoints: {
-    1050: { slidesPerView: 2},
-    },
-    });
+document.querySelectorAll(".banner-swiper").forEach(swp => {
+    const config = bannerSwiper(swp.dataset);
+    const swiper = new Swiper(swp, config);
+})
 
-const swiperBanner = new Swiper(".banner-swiper", {
-    slidesPerView: 1,
-    spaceBetween: 10,
-    loop: true,
-    autoplay: {
-        delay: 6000,
-        disableOnInteraction: false,
-    },
-    pagination: {
-        el: ".banner-pag",
-        clickable: true,
-    },
-    speed: 1000,
-});
-
+document.querySelectorAll(".bento-swiper").forEach(swp => {
+    const config = bentoSwiper(swp.dataset);
+    const swiper = new Swiper(swp,config);
+})
 </script>
 {% endblock myscripts %}

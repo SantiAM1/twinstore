@@ -243,7 +243,7 @@
                 {% endfor %}
                 {% else %}
                 <article class="generic-item orders empty">
-                    <svg style="color: rgb(31, 122, 226);" xmlns="http://www.w3.org/2000/svg"  width="48"  height="48"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.5"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-mood-sad-squint"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M14.5 16.05a3.5 3.5 0 0 0 -5 0" /><path d="M8.5 11.5l1.5 -1.5l-1.5 -1.5" /><path d="M15.5 11.5l-1.5 -1.5l1.5 -1.5" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg"  width="48"  height="48"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="1.5"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-mood-sad-squint"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M14.5 16.05a3.5 3.5 0 0 0 -5 0" /><path d="M8.5 11.5l1.5 -1.5l-1.5 -1.5" /><path d="M15.5 11.5l-1.5 -1.5l1.5 -1.5" /></svg>
                     <h3>Parece que no hay nada por aqui.</h3>
                 </article>
                 {% endif %}
@@ -258,10 +258,10 @@
             <span>Completa los siguientes datos para aprobar tu compra.</span>
             <strong>Datos bancarios</strong>
             <ul>
-                <li><code>Banco:</code><p>Santander Río</p></li>
-                <li><code>CBU:</code><p>0720000730000001234567</p></li>
-                <li><code>Alias:</code><p>twinstore.ar</p></li>
-                <li><code>Titular:</code><p>Aguirre Moretto Santiago</p></li>
+                <li><code>Banco:</code><p>{{datos_bancarios.banco}}</p></li>
+                <li><code>CBU:</code><p>{{datos_bancarios.cbu}}</p></li>
+                <li><code>Alias:</code><p>{{datos_bancarios.aliar}}</p></li>
+                <li><code>Titular:</code><p>{{datos_bancarios.titular_cuenta}}</p></li>
                 <li><code>Importe:</code><p class="importe-transferencia"></p></li>
             </ul>
             <p class="comprobante-format">Subí el comprobante de tu pago (formato PDF, JPG o PNG)</p>

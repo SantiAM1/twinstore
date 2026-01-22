@@ -17,7 +17,7 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from core.types import ConfigDict
 from cart.types import CarritoDict
-from core.utils import get_configuracion_tienda
+from core.utils import get_configuracion_tienda,gen_cache_key
 
 def crear_venta(carrito:dict,request:HttpRequest,checkout_serializer:dict,forma_pago,comprobante=None,) -> tuple[str, str|None]:
     """
@@ -64,7 +64,7 @@ def crear_venta(carrito:dict,request:HttpRequest,checkout_serializer:dict,forma_
                 pass
 
         if checkout and checkout.cupon_id:
-            borrar_cupon(checkout.cupon_id,venta)
+            borrar_cupon(request,checkout.cupon_id,venta)
 
         request.session.pop('checkout_id', None)
         request.session.modified = True
@@ -126,7 +126,9 @@ def obtener_carrito(request:HttpRequest) -> list[CarritoDict]:
         else f"carrito_anon_{request.session.session_key}"
     )
 
-    carrito = cache.get(key)
+    CART_CACHE_KEY = gen_cache_key(key,request)
+
+    carrito = cache.get(CART_CACHE_KEY)
     if carrito:
         request._cached_carrito = carrito
         return carrito
@@ -186,7 +188,7 @@ def obtener_carrito(request:HttpRequest) -> list[CarritoDict]:
                 'descuento': (producto.precio_base - producto.precio_final)*cantidad if producto.descuento > 0 else 0
             })
 
-    cache.set(key, carrito_unico , timeout=60)
+    cache.set(CART_CACHE_KEY, carrito_unico , timeout=60)
     request._cached_carrito = carrito_unico
 
     return carrito_unico if carrito_unico else None
@@ -212,12 +214,16 @@ def clear_carrito_cache(request:HttpRequest):
         if request.user.is_authenticated
         else f"carrito_anon_{request.session.session_key}"
     )
-    cache.delete(key)
+
+    CART_CACHE_KEY = gen_cache_key(key,request)
+
+    cache.delete(CART_CACHE_KEY)
     clear_cache_header(request)
 
 def clear_cache_header(request:HttpRequest):
     from django.core.cache.utils import make_template_fragment_key
-    key = make_template_fragment_key("header_main",[request.user.id])
+    key = make_template_fragment_key("header_main",[request.tenant.schema_name,request.user.id])
+    print(key)
     cache.delete(key)
 
 def borrar_carrito(request:HttpRequest):
@@ -293,11 +299,11 @@ def _generar_identificador_unico():
         if not Venta.objects.filter(merchant_order_id=nuevo_id).exists():
             return nuevo_id
 
-def borrar_cupon(cupon_id:int,venta:Venta) -> float:
+def borrar_cupon(request: HttpRequest,cupon_id:int,venta:Venta) -> float:
     """
     Elimina el cupón aplicado y registra el estado en la Venta.
     """
-    config = get_configuracion_tienda()
+    config = get_configuracion_tienda(request)
     try:
         cupon = Cupon.objects.get(id=cupon_id)
         if config['borrar_cupon']:
@@ -515,7 +521,8 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
     """
     Genera una preferencia de pago para Mercado Pago.
     """
-    site_url = f'{settings.SITE_URL}'
+    from core.utils import get_mp_config, build_absolute_uri
+    site_url = f'{build_absolute_uri()}'
 
     argentina_tz = pytz.timezone('America/Argentina/Buenos_Aires')
 
@@ -564,7 +571,8 @@ def preference_mp(numero, carrito_id, dni_cuit, ident_type, email,nombre,apellid
         "binary_mode": True,
     }
 
-    sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+    mp_config = get_mp_config()
+    sdk = mercadopago.SDK(mp_config['access'])
 
     try:
         preference_response = sdk.preference().create(preference_data)

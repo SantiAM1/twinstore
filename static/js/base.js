@@ -62,7 +62,7 @@ modalUsers?.querySelectorAll(".generic-box").forEach((form) => {
 });
 
 const pedidoView = document.querySelector(
-  ".generic-modal[data-modalId=pedidos]"
+  ".generic-modal[data-modalId=pedidos]",
 );
 
 genericApiPost(pedidoView.querySelector(".generic-box"), {
@@ -91,7 +91,7 @@ function genericApiPost(form, { onSuccess, onError, onProcess } = {}) {
 
       if (response.data.redirect)
         return (window.location.href = decodeURIComponent(
-          response.data.redirect
+          response.data.redirect,
         ));
       if (response.data.reload) return window.location.reload();
 
@@ -225,7 +225,7 @@ async function buscarProductos(query) {
                   </div>
               </a>
           </li>
-        `
+        `,
       )
       .join("");
   } catch (error) {
@@ -292,7 +292,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const isAtStart = container.scrollLeft <= 1;
     const isAtEnd =
       Math.abs(
-        container.scrollWidth - container.clientWidth - container.scrollLeft
+        container.scrollWidth - container.clientWidth - container.scrollLeft,
       ) <= 1;
     const hasOverflow = container.scrollWidth > container.clientWidth;
 

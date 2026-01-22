@@ -20,7 +20,7 @@
             {% for resena in ultimas_resenas %}
                 <div style="padding: 0.75rem; border-radius: 5px;" class="bg-base-100 dark:bg-base-800">
                     <header style="display: flex; justify-content: space-between;">
-                        <span style="font-weight: 500; font-size: 1rem;">{{resena.usuario.nombre}} {{resena.usuario.apellido}}</span>
+                        <span style="font-weight: 500; font-size: 1rem;">{{resena.usuario.first_name}} {{resena.usuario.first_name}}</span>
                         <span style="display: flex;">
                             {% for i in "12345" %}
                                 {% if forloop.counter <= resena.calificacion %}

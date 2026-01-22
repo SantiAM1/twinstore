@@ -1,6 +1,7 @@
+<!-- > Grilla de Productos -->
 <section class="swiper-box">
     <h2 class="landing-title">{{seccion.titulo}} <strong>{{seccion.subtitulo}}</strong></h2>
-    <section class="swiper products-swiper" data-speed="800" data-delay="3500" data-pagination=".pagination-destacados" data-bullets="2">
+    <section class="swiper products-swiper" data-speed="800" data-delay="3500" data-pagination=".pagination-grid-{{seccion.id}}" data-bullets="2">
         <div class="swiper-wrapper">
             {% for producto in seccion.productos_list %}
             <div class="swiper-slide">
@@ -9,5 +10,5 @@
             {% endfor %}
         </div>
     </section>
-    <div class="swiper-pagination pagination-destacados"></div>
+    <div class="swiper-pagination pagination-grid-{{seccion.id}}"></div>
 </section>

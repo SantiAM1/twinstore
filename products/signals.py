@@ -31,7 +31,7 @@ def manejar_lote_stock(sender, instance:LoteStock, created, **kwargs):
 @receiver(post_save, sender=TokenReseña)
 def notificar_token_reseña(sender, instance, created, **kwargs):
     if created:
-        reseña_token_html(instance, instance.usuario.user.email)
+        reseña_token_html(instance, instance.usuario.email)
 
 @receiver(post_save, sender=ImagenProducto)
 def generar_thumbnail(sender, instance, created, **kwargs):

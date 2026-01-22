@@ -1,14 +1,48 @@
 from decimal import Decimal
-from .models import Tienda
+from .models import Tienda,MercadoPagoConfig,DatosBancarios
 from django.core.cache import cache
 from django.conf import settings
+from django.utils.encoding import smart_str
+from django.http import HttpRequest
 from .types import ConfigDict
 from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
+from django.db import connection
+
+def gen_cache_key(key_name, request = None):
+    """Genera una key de caché única por tenant, si no hay tenant schema=public"""
+    if request and hasattr(request, 'tenant'):
+        schema = request.tenant.schema_name
+    else:
+        schema = getattr(connection, 'schema_name', 'public')
 
 
-CACHE_KEY_CONFIG = "configuracion_tienda"
+    return f"{schema}:{key_name}"
+
+def build_site_url(schema_name=None):
+    if not schema_name:
+        schema_name = getattr(connection, 'schema_name', 'public')
+
+    base_domain = settings.SITE_URL.strip("/")
+
+    if schema_name == 'public':
+        return base_domain
+
+    return f"{schema_name}.{base_domain}"
+
+def build_absolute_uri(schema_name=None, path=""):
+    """
+    Construye la URL del sitio basada en el tenant actual.
+    Si no hay tenant se envia SITE_URL
+    """
+    domain = build_site_url(schema_name)
+    protocol = "https" if not settings.DEBUG else "http"
+    
+    if path and not path.startswith("/"):
+        path = f"/{path}"
+        
+    return f"{protocol}://{domain}{path}"
 
 def actualizar_precio_final(producto) -> None:
     """
@@ -35,11 +69,12 @@ def actualizar_precio_final(producto) -> None:
         else:
             producto.precio = producto.precio_divisa
 
-def get_configuracion_tienda() -> ConfigDict:
+def get_configuracion_tienda(request: HttpRequest = None) -> ConfigDict:
     """
     Obtiene la configuración general de la tienda desde caché.
     Si no existe, la crea o la guarda automáticamente.
     """
+    CACHE_KEY_CONFIG = gen_cache_key("configuracion_tienda",request)
     config = cache.get(CACHE_KEY_CONFIG)
     if config:
         return config
@@ -50,6 +85,8 @@ def get_configuracion_tienda() -> ConfigDict:
 
     data = {
         'nombre_tienda': config.nombre_tienda,
+        'color_primario': config.color_primario,
+        'color_secundario': config.color_secundario,
         'modo_stock': config.modo_stock,
         'mostrar_stock_en_front': config.mostrar_stock_en_front,
         'borrar_cupon': config.borrar_cupon,
@@ -142,3 +179,42 @@ def compress_image(image_field, max_width=1200, quality=80, is_banner=False):
     except Exception as e:
         print(f"ERROR compress_image: {e}")
         return image_field
+
+def make_tenant_key(key, key_prefix, version):
+    """
+    Genera una llave de caché que incluye automáticamente el schema actual.
+    Ejemplo: 'nike:1:vistas.decorators.cache.cache_header..'
+    """
+    from django_tenants.utils import get_tenant_model
+    from django.db import connection
+    
+    tenant_schema = connection.schema_name 
+    
+    return ':'.join([tenant_schema, str(version), smart_str(key_prefix), smart_str(key)])
+
+def get_mp_config() -> dict[str]:
+    CACHE_MP_KEY = gen_cache_key('mercado_pago')
+    data = cache.get(CACHE_MP_KEY)
+    if not data:
+        mp_config = MercadoPagoConfig.objects.first()
+        data = {
+            "access":mp_config.access_token,
+            "public":mp_config.public_key,
+            "webhook":mp_config.webhook_key
+        }
+        cache.set(CACHE_MP_KEY, data, 43200)
+    return data
+
+def get_datos_banc() -> dict[str]:
+    CACHE_BANCO_KEY = gen_cache_key('datos_bancarios')
+    data = cache.get(CACHE_BANCO_KEY)
+    if not data:
+        banco = DatosBancarios.objects.first()
+        data = {
+            "banco": banco.banco,
+            "titular_cuenta": banco.titular_cuenta,
+            "cbu": banco.cbu,
+            "alias": banco.alias,
+        }
+        cache.set(CACHE_BANCO_KEY, data, 43200)
+    return data

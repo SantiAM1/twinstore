@@ -3,6 +3,8 @@ from django.template.loader import render_to_string
 from django.conf import settings
 import boto3
 from botocore.exceptions import ClientError
+from core.utils import build_absolute_uri
+from django_tenants.utils import schema_context
 
 def get_mail_imgs() -> dict:
     """
@@ -18,11 +20,11 @@ def get_mail_imgs() -> dict:
     }
     """
     images = {
-        'insta': f"{settings.SITE_URL}/static/img/mails/insta-64.png",
-        'tiktok': f"{settings.SITE_URL}/static/img/mails/tiktok-64.png",
-        'link': f"{settings.SITE_URL}/static/img/mails/link-64.png",
-        'success': f"{settings.SITE_URL}/static/img/mails/check-64.png",
-        'star': f"{settings.SITE_URL}/static/img/mails/star.png",
+        'insta': f"{build_absolute_uri()}/static/img/mails/insta-64.png",
+        'tiktok': f"{build_absolute_uri()}/static/img/mails/tiktok-64.png",
+        'link': f"{build_absolute_uri()}/static/img/mails/link-64.png",
+        'success': f"{build_absolute_uri()}/static/img/mails/check-64.png",
+        'star': f"{build_absolute_uri()}/static/img/mails/star.png",
     }
     return images
 
@@ -54,68 +56,72 @@ def master_mail(user_email, subject, html_content):
         return None
 
 @shared_task
-def enviar_mail_compra(venta_data, user_email):
-    context = {
-        'url': venta_data['url'],
-        'codigo': venta_data['codigo'],
-        'compra':venta_data['compra'],
-        'adicional':venta_data['adicional'],
-        'total':venta_data['total']
-    }
+def enviar_mail_compra(venta_data, user_email,schema_name):
+    with schema_context(schema_name):
+        context = {
+            'url': venta_data['url'],
+            'codigo': venta_data['codigo'],
+            'compra':venta_data['compra'],
+            'adicional':venta_data['adicional'],
+            'total':venta_data['total']
+        }
 
-    images = get_mail_imgs()
-    context.update(images)
+        images = get_mail_imgs()
+        context.update(images)
 
-    html_content = render_to_string('emails/compra.html', context)
-    subject = 'Compra recibida - Twinstore'
+        html_content = render_to_string('emails/compra.html', context)
+        subject = 'Compra recibida - Twinstore'
 
-    return master_mail(user_email,subject,html_content)
-
-@shared_task
-def enviar_mail_confirm_user(mail_data,user_email):
-    context = {
-        'codigo' : mail_data['codigo'],
-        'username': mail_data['username']
-    }
-
-    images = get_mail_imgs()
-    context.update(images)
-
-    html_content = render_to_string('emails/welcome.html', context)
-    subject="Confirmá tu cuenta en Twinstore"
-
-    return master_mail(user_email,subject,html_content)
+        return master_mail(user_email,subject,html_content)
 
 @shared_task
-def enviar_mail_recuperar_cuenta(mail_data,user_email):
-    context = {
-        'codigo' : mail_data['codigo'],
-        'username': mail_data['username']
-    }
+def enviar_mail_confirm_user(mail_data,user_email,schema_name):
+    with schema_context(schema_name):
+        context = {
+            'codigo' : mail_data['codigo'],
+            'username': mail_data['username']
+        }
 
-    images = get_mail_imgs()
-    context.update(images)
+        images = get_mail_imgs()
+        context.update(images)
 
-    html_content = render_to_string('emails/recuperar.html', context)
-    subject="Recuperá tu cuenta en Twinstore"
+        html_content = render_to_string('emails/welcome.html', context)
+        subject="Confirmá tu cuenta en Twinstore"
 
-    return master_mail(user_email,subject,html_content)
+        return master_mail(user_email,subject,html_content)
 
 @shared_task
-def enviar_mail_estado_pedido(mail_data,user_email,template):
-    context = {
-        'url' : mail_data['url'],
-        'codigo': mail_data['codigo'],
-        'estado': mail_data['estado'],
-    }
+def enviar_mail_recuperar_cuenta(mail_data,user_email,schema_name):
+    with schema_context(schema_name):
+        context = {
+            'codigo' : mail_data['codigo'],
+            'username': mail_data['username']
+        }
 
-    images = get_mail_imgs()
-    context.update(images)
+        images = get_mail_imgs()
+        context.update(images)
 
-    html_content = render_to_string(template, context)
-    subject=f'#{context["codigo"]} - Twinstore'
+        html_content = render_to_string('emails/recuperar.html', context)
+        subject="Recuperá tu cuenta en Twinstore"
 
-    return master_mail(user_email,subject,html_content)
+        return master_mail(user_email,subject,html_content)
+
+@shared_task
+def enviar_mail_estado_pedido(mail_data,user_email,template,schema_name):
+    with schema_context(schema_name):
+        context = {
+            'url' : mail_data['url'],
+            'codigo': mail_data['codigo'],
+            'estado': mail_data['estado'],
+        }
+
+        images = get_mail_imgs()
+        context.update(images)
+
+        html_content = render_to_string(template, context)
+        subject=f'#{context["codigo"]} - Twinstore'
+
+        return master_mail(user_email,subject,html_content)
 
 @shared_task
 def enviar_mail_comprobante_obs(mail_data,user_email):
@@ -132,30 +138,19 @@ def enviar_mail_comprobante_obs(mail_data,user_email):
     return master_mail(user_email,subject,html_content)
 
 @shared_task
-def enviar_reseña_token_html(mail_data,user_email,template):
-    context = {
-        'url' : mail_data['url'],
-        'producto': mail_data['producto'],
-        'username': mail_data['username'],
-        'img_prod': mail_data['img_prod'],
-    }
+def enviar_reseña_token_html(mail_data,user_email,template, schema_name):
+    with schema_context(schema_name):
+        context = {
+            'url' : mail_data['url'],
+            'producto': mail_data['producto'],
+            'username': mail_data['username'],
+            'img_prod': mail_data['img_prod'],
+        }
 
-    images = get_mail_imgs()
-    context.update(images)
+        images = get_mail_imgs()
+        context.update(images)
 
-    html_content = render_to_string(template, context)
-    subject='Dejanos tu reseña - Twinstore'
+        html_content = render_to_string(template, context)
+        subject='Dejanos tu reseña - Twinstore'
 
-    return master_mail(user_email,subject,html_content)
-
-@shared_task
-def enviar_mail_reset_password(context):
-    url = context['url']
-    user_email = context['email']
-    text_message = f"Hola, para recuperar tu contraseña hacé clic en el siguiente enlace:\n{url}"
-
-    return master_mail(
-        user_email=user_email,
-        subject='Recuperar tu contraseña - Twinstore',
-        html_content=f"<p>{text_message}</p>"
-    )
+        return master_mail(user_email,subject,html_content)

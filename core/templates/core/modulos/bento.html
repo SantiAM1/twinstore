@@ -1,6 +1,9 @@
+<!-- > Grilla Bento -->
 {% load static %}
-<section class="swiper categories-swiper">
-    <h2 class="landing-title">{{seccion.titulo}} <strong>{{seccion.subtitulo}}</strong></h2>
+<section class="swiper bento-swiper" data-pagination=".pagination-bento-{{seccion.id}}">
+    {% if seccion.titulo %}
+    <h2 class="landing-title">{{seccion.titulo}} {% if seccion.subtitulo %}<strong>{{seccion.subtitulo}}</strong>{% endif %}</h2>
+    {% endif %}
     <div class="swiper-wrapper">
         {% regroup seccion.categorias.all by slide as slides_list %}
         {% for slide_group in slides_list %}
@@ -24,5 +27,5 @@
         </div>
         {% endfor %}
     </div>
-    <div class="swiper-pagination category-pag"></div>
+    <div class="swiper-pagination pagination-bento-{{seccion.id}}"></div>
 </section>

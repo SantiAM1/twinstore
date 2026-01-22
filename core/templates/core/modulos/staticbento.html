@@ -1,5 +1,8 @@
+<!-- > Bento Estatico -->
 <section class="brands-grid-box">
-    <h2 class="landing-title">{{seccion.titulo}} <strong>{{seccion.subtitulo}}</strong></h2>
+    {% if seccion.titulo %}
+    <h2 class="landing-title">{{seccion.titulo}} {% if seccion.subtitulo %}<strong>{{seccion.subtitulo}}</strong>{% endif %}</h2>
+    {% endif %}
     <div class="brands-grid">
         {% for item in seccion.static_bento.all %}
             <a href="{{item.link|default:"#"}}" class="brand" data-name="staticBento{{forloop.counter}}" rel="nofollow" style="--bento-color:{{item.color_fondo|default:'#ffffff'}}">
