@@ -2,28 +2,7 @@
 {% load static custom_filters compress %}
 
 {% block meta %}
-<meta name="description" content="{{ meta.description }}">
-<meta name="robots" content="{{ meta.robots }}">
-<link rel="canonical" href="{{ meta.url }}">
-
-<!-- Open Graph -->
-<meta property="og:type" content="product">
-<meta property="og:title" content="{{ meta.og.title }}">
-<meta property="og:description" content="{{ meta.og.description }}">
-<meta property="og:url" content="{{ meta.og.url }}">
-<meta property="og:site_name" content="{{config.nombre_tienda}}">
-<meta property="og:image" content="{{ meta.og.image }}">
-
-<!-- Twitter -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ meta.twitter.title }}">
-<meta name="twitter:description" content="{{ meta.twitter.description }}">
-<meta name="twitter:image" content="{{ meta.twitter.image }}">
-
-<!-- Schema.org JSON-LD -->
-<script type="application/ld+json">
-{{ meta.schema|safe }}
-</script>
+{% include 'components/view/prod-meta.html' %}
 {% endblock meta %}
 
 
@@ -38,143 +17,21 @@
 <div class="grid-center">
     <section class="product-view">
         <div class="product-gallery">
-            {% include 'components/prod-swipers.html' %}
+            {% include 'components/view/prod-swipers.html' %}
         </div>
         <div class="product-info">
-            <h1 {% if user.is_staff %}style="position: relative;"{% endif %}>{{producto.nombre}}
-                {% if user.is_staff %}
-                    <a href="{% url 'admin:products_producto_change' producto.id %}" target="_blank" class="generic-button btn-2" style="position: absolute; top: 20px; right: 0;display: flex; width: 44px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-edit"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" /><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" /><path d="M16 5l3 3" /></svg>
-                    </a>
-                {% endif %}
-            </h1>
-            <span class="producto-sku">SKU: {{producto.sku}}</span>
-            <p class="product-description">{{producto.descripcion_seo}}</p>
-            <div class="product-prices">
-                {% if producto.banner %}
-                <p>{{producto.precio_base|formato_pesos}}</p><span>{{producto.banner}}</span>
-                {% endif %}
-                <h2>{{producto.precio_final|formato_pesos}}</h2>
-                <aside>Precio s/imp. nac. {{producto.precio_final|imp_nac|formato_pesos}}</aside>
-                {% if producto.evento.logo %}
-                <img src="{{producto.evento.logo.url}}" alt="{{producto.evento.nombre}}" width="70" height="70">
-                {% endif %}
-            </div>
-            <div class="product-colors">
-            {% if producto.colores.exists %}
-                {% for color_id,data in imagenes_dict.items %}
-                <div class="dot-ring {% if forloop.first %}selected{% endif %}" data-index="{{forloop.counter}}" data-colorId="{{color_id|signing_data}}" data-hex="{{data.hex}}"><div class="dot" style="background-color: {{data.hex}}"></div></div>
-                {% endfor %}
-            {% endif %}
-            </div>
-            {% if config.modo_stock == 'estricto' and config.mostrar_stock_en_front %}
-            <input type="hidden" name="stock-front" value="True">
-            {% with data=producto.obtener_stock_dict %}
-                {% if data.total >= 0 %}
-                    {% if data.total == 0 %}
-                        <span class="stock-status no-stock">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
-                            Sin stock disponible
-                        </span>
-                    {% elif data.total <= 3 %}
-                        <span class="stock-status low-stock">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-minus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /></svg>
-                            Ultimas unidades disponibles
-                        </span>
-                    {% else %}
-                        <span class="stock-status in-stock">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
-                            Stock disponible
-                        </span>
-                    {% endif %}
-                {% else %}
-                {% for color_hex, stock in data.items %}
-                    {% with bool=forloop.first %}
-                    {% if stock == 0 %}
-                        <span class="stock-status no-stock {% if not bool %}hide{% endif %}" data-hex="{{color_hex}}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
-                            Sin stock disponible
-                        </span>
-                    {% elif stock <= 3 %}
-                        <span class="stock-status low-stock {% if not bool %}hide{% endif %}" data-hex="{{color_hex}}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-minus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /></svg>
-                            Ultimas unidades disponibles
-                        </span>
-                    {% else %}
-                        <span class="stock-status in-stock {% if not bool %}hide{% endif %}" data-hex="{{color_hex}}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
-                            Stock disponible
-                        </span>
-                    {% endif %}
-                    {% endwith %}
-                {% endfor %}
-                {% endif %}
-            {% endwith %}
-            {% endif %}
-            <button type="button" class="product-pay-method generic-modal-open" data-modalId="prodSpecs">Conocé nuestros medios de pago</button>
-            <button type="button" class="product-add-cart" data-productoId="{{producto.id|signing_data}}">
-                {% if config.modo_stock == 'estricto' %}
-                {{producto.obtener_stock_dict|json_script:"stock-data" }}
-                {% endif %}
-                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17h-11v-14h-2" /><path d="M6 5l14 1l-1 7h-13" /></svg>
-                Agregar al carrito
-            </button>
-            {% include 'components/prod-warranty.html' %}
+            {% include 'components/view/prod-info.html' %}
         </div>
     </section>
     <section class="product-view specs">
         <div class="product-specs">
-            {% include 'components/prod-specs.html' %}
+            {% include 'components/view/prod-specs.html' %}
         </div>
         <div class="product-clients">
-            <h3>Reseñas de clientes</h3>
-            <div class="review-summary">
-                <div class="review-avg">
-                    <span>{{reviews.promedio}}</span>
-                    <div class="stars">
-                    {% for _ in "12345" %}
-                        {% if reviews.promedio >= forloop.counter %}
-                        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="#1987ee"  class="icon icon-tabler icons-tabler-filled icon-tabler-star"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z" /></svg>
-                        {% elif reviews.promedio > forloop.counter|sub:0.5 %}
-                        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="#1987ee"  class="icon icon-tabler icons-tabler-filled icon-tabler-star-half"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 1a.993 .993 0 0 1 .823 .443l.067 .116l2.852 5.781l6.38 .925c.741 .108 1.08 .94 .703 1.526l-.07 .095l-.078 .086l-4.624 4.499l1.09 6.355a1.001 1.001 0 0 1 -1.249 1.135l-.101 -.035l-.101 -.046l-5.693 -3l-5.706 3c-.105 .055 -.212 .09 -.32 .106l-.106 .01a1.003 1.003 0 0 1 -1.038 -1.06l.013 -.11l1.09 -6.355l-4.623 -4.5a1.001 1.001 0 0 1 .328 -1.647l.113 -.036l.114 -.023l6.379 -.925l2.853 -5.78a.968 .968 0 0 1 .904 -.56zm0 3.274v12.476a1 1 0 0 1 .239 .029l.115 .036l.112 .05l4.363 2.299l-.836 -4.873a1 1 0 0 1 .136 -.696l.07 -.099l.082 -.09l3.546 -3.453l-4.891 -.708a1 1 0 0 1 -.62 -.344l-.073 -.097l-.06 -.106l-2.183 -4.424z" /></svg>
-                        {% else %}
-                        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="#ccc"  class="icon icon-tabler icons-tabler-filled icon-tabler-star"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z" /></svg>
-                        {% endif %}
-                    {% endfor %}
-                    </div>
-                    <p>Basado en {{reviews.total}} reseña/s</p>
-                </div>
-                <ul class="review-bars">
-                    {% for star,number in porcentajes.items %}
-                    <li class="bar">
-                        <span class="bar__label">{{star}}</span>
-                        <div class="bar__track">
-                            <div class="bar__fill" style="--pct:{{number}}"></div>
-                        </div>
-                        <span class="bar__pct">{{number}}%</span>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% for review in reviews.usuarios %}
-            <article class="review-customers">
-                <strong>{{review.nombre}}</strong>
-                <span>Hace {{review.creado_en|timesince_simple}}</span>
-                <div class="stars">
-                {% for i in "12345" %}
-                    {% if forloop.counter <= review.calificacion %}
-                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="#1987ee"  class="icon icon-tabler icons-tabler-filled icon-tabler-star"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z" /></svg>
-                    {% else %}
-                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="#cccccc"  class="icon icon-tabler icons-tabler-filled icon-tabler-star"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8.243 7.34l-6.38 .925l-.113 .023a1 1 0 0 0 -.44 1.684l4.622 4.499l-1.09 6.355l-.013 .11a1 1 0 0 0 1.464 .944l5.706 -3l5.693 3l.1 .046a1 1 0 0 0 1.352 -1.1l-1.091 -6.355l4.624 -4.5l.078 -.085a1 1 0 0 0 -.633 -1.62l-6.38 -.926l-2.852 -5.78a1 1 0 0 0 -1.794 0l-2.853 5.78z" /></svg>
-                    {% endif %}
-                {% endfor %}
-                </div>
-                <p>{{review.comentario}}</p>
-            </article>
-            {% endfor %}
+            {% include 'components/view/prod-reviews.html' %}
         </div>
     </section>
-    {% include 'components/medios-pago.html' %}
+    {% include 'components/view/medios-pago.html' %}
 </div>
 {% endblock contenidomain %}
 

@@ -20,7 +20,7 @@ def evento_activo_context(request):
             "nombre_evento":evento.nombre_evento,
             "slug":evento.slug,
             "logo": evento.logo
-        }
+        } if evento else {}
 
     evento_activo = cache.get_or_set(gen_cache_key('evento_activo_context'), obtener_evento, 60)
     

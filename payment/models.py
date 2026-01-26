@@ -7,7 +7,7 @@ import secrets
 import re
 from django.core import signing
 from django.conf import settings
-from products.models import TokenReseña, Producto,ReseñaProducto,ColorProducto
+from products.models import TokenReseña, Producto,ReseñaProducto,Variante
 
 class Venta(models.Model):
     class Estado(models.TextChoices):
@@ -190,7 +190,7 @@ class Venta(models.Model):
 class VentaDetalle(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name='detalles')
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
-    color = models.ForeignKey(ColorProducto, on_delete=models.PROTECT, blank=True, null=True)
+    variante = models.ForeignKey(Variante, on_delete=models.PROTECT, blank=True, null=True)
     imagen_url = models.URLField(blank=True, null=True)
     cantidad = models.IntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)

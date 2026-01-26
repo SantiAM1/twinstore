@@ -1,0 +1,137 @@
+{% load custom_filters %}
+<!-- > Informacion primaria -->
+<h1 {% if user.is_staff %}style="position: relative;"{% endif %}>{{producto.nombre}}
+    {% if user.is_staff %}
+        <a href="{% url 'admin:products_producto_change' producto.id %}" target="_blank" class="generic-button btn-2" style="position: absolute; top: 20px; right: 0;display: flex; width: 44px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-edit"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" /><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" /><path d="M16 5l3 3" /></svg>
+        </a>
+    {% endif %}
+</h1>
+<span class="producto-sku">SKU: {{producto.sku}}</span>
+<p class="product-description">{{producto.descripcion_seo}}</p>
+<div class="product-prices">
+    {% if producto.banner %}
+    <p>{{producto.precio_base|formato_pesos}}</p><span>{{producto.banner}}</span>
+    {% endif %}
+    <h2>{{producto.precio_final|formato_pesos}}</h2>
+    <aside>Precio s/imp. nac. {{producto.precio_final|imp_nac|formato_pesos}}</aside>
+    {% if producto.evento.logo %}
+    <img src="{{producto.evento.logo.url}}" alt="{{producto.evento.nombre}}" width="70" height="70">
+    {% endif %}
+</div>
+<!-- > Variantes -->
+{% with dict=producto.obtener_variantes %}
+<div id="{% if dict %}product-variants-container{% endif %}">
+{% for key, values in dict.items %}
+    <div class="variant-group" data-attribute-name="{{key}}">
+        <span class="product-values-title">{{key}}</span>
+        <div class="product-values">
+        {% for data in values %}
+            {% if key == "Color" %}
+                <div class="dot-ring variant-option"
+                data-type="Color"
+                data-value="{{data.valor}}"
+                data-index="{{data.valor}}"
+                data-skus="{{data.skus}}"
+                data-hex="{{data.metadatos}}"><div class="dot" style="background-color: {{data.metadatos}}"></div>
+            </div>
+            {% else %}
+                <button type="button"
+                    class="variant-option"
+                    data-type="{{key}}" 
+                    data-value="{{data.valor}}"
+                    data-skus="{{data.skus}}">
+                    {{data.valor}}
+                </button>
+            {% endif %}
+        {% endfor %}
+        </div>
+    </div>
+{% endfor %}
+</div>
+{% endwith %}
+<!-- > Stock -->
+{% if config.modo_stock == 'estricto' and config.mostrar_stock_en_front %}
+<input type="hidden" name="stock-front" value="True">
+{% with data=producto.obtener_stock_dict %}
+    {% if data.total >= 0 %}
+        {% if data.total == 0 %}
+            <span class="stock-status no-stock">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+                Sin stock disponible
+            </span>
+        {% elif data.total <= 3 %}
+            <span class="stock-status low-stock">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-minus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /></svg>
+                Ultimas unidades disponibles
+            </span>
+        {% else %}
+            <span class="stock-status in-stock">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                Stock disponible
+            </span>
+        {% endif %}
+    {% else %}
+    {% for sku, stock in data.items %}
+        {% with bool=forloop.first %}
+        {% if stock == 0 %}
+            <span class="stock-status no-stock {% if not bool %}hide{% endif %}" data-sku="{{sku}}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+                Sin stock disponible
+            </span>
+        {% elif stock <= 3 %}
+            <span class="stock-status low-stock {% if not bool %}hide{% endif %}" data-sku="{{sku}}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-minus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /></svg>
+                Ultimas unidades disponibles
+            </span>
+        {% else %}
+            <span class="stock-status in-stock {% if not bool %}hide{% endif %}" data-sku="{{sku}}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                Stock disponible
+            </span>
+        {% endif %}
+        {% endwith %}
+    {% endfor %}
+    {% endif %}
+{% endwith %}
+{% endif %}
+<!-- > Botones y modales -->
+<button type="button" class="product-pay-method generic-modal-open" data-modalId="prodSpecs">Conocé nuestros medios de pago</button>
+<button type="button" class="product-add-cart" data-productoId="{{producto.id|signing_data}}">
+    {% if config.modo_stock == 'estricto' %}
+    {{producto.obtener_stock_dict|json_script:"stock-data" }}
+    {% endif %}
+    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shopping-cart"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17h-11v-14h-2" /><path d="M6 5l14 1l-1 7h-13" /></svg>
+    Agregar al carrito
+</button>
+<!-- > Garantia y seguridad -->
+<aside class="product-warranty">
+    <div class="product-warranty-item">
+        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shield-checkered"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /><path d="M12 3v18" /><path d="M3.5 12h17" /></svg>
+        <div class="product-warranty-info">
+            <span>Garantía</span>
+            <p>Cobertura completa. Se aplican términos.</p>
+        </div>
+    </div>
+    <div class="product-warranty-item">
+        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-truck"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" /></svg>
+        <div class="product-warranty-info">
+            <span><span>Envíos nacionales</span></span>
+            <p>Rápido y confiable, donde sea que estes.</p>
+        </div>
+    </div>
+    <div class="product-warranty-item">
+        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-map-pin"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" /></svg>
+        <div class="product-warranty-info">
+            <span>Punto de retiro</span>
+            <p>Retirá sin cargo.</p>
+        </div>
+    </div>
+    <div class="product-warranty-item">
+        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-credit-card"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 5m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" /><path d="M3 10l18 0" /><path d="M7 15l.01 0" /><path d="M11 15l2 0" /></svg>
+        <div class="product-warranty-info">
+            <span>Pagá como quieras</span>
+            <p>Conocé nuestros metodos de financiación.</p>
+        </div>
+    </div>
+</aside>

@@ -35,8 +35,8 @@ class VentaDetalleInline(TabularInline):
     model = VentaDetalle
     extra = 0
     tab = True
-    readonly_fields = ('portada','producto','cantidad','color','precio_unitario','subtotal')
-    fields = ('portada','producto','cantidad','color','precio_unitario','subtotal')
+    readonly_fields = ('portada','producto','variante','cantidad','precio_unitario','subtotal')
+    fields = ('portada','producto','variante','cantidad','precio_unitario','subtotal')
     hide_title = True
 
     def portada(self, instance):
@@ -51,7 +51,7 @@ class DetalleCompraSection(TableSection):
     verbose_name = _("Detalle de compra")
     height = 300
     related_name = "detalles"
-    fields = ["portada","producto", "cantidad","color","precio_unitario","subtotal"]
+    fields = ["portada","producto", "variante","cantidad","precio_unitario","subtotal"]
 
     # Custom field
     def portada(self, instance):

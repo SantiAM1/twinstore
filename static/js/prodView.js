@@ -23,47 +23,34 @@ payMethodBtn.forEach((btn) =>
       .classList.remove("hide");
     payMethodSelect.classList.add("hide");
     payMethodTitle.textContent = btn.textContent;
-  })
+  }),
 );
 
-const colorDots = document.querySelectorAll(".dot-ring");
-const imgSwipers = document.querySelectorAll(".main-swiper");
-const thumbs = document.querySelectorAll(".thumbs-swiper");
-
-colorDots?.forEach((dot) => {
-  dot.addEventListener("click", () => {
-    colorDots.forEach((dot) => {
-      dot.classList.remove("selected");
-    });
-    dot.classList.add("selected");
-
-    btnCartStockManagement(addToCart);
-    updateStockMsg(dot.dataset.hex);
-
-    imgSwipers.forEach((img) => img.classList.add("hide"));
-    thumbs.forEach((thum) => thum.classList.add("hide"));
-    const index = dot.dataset.index;
-    document
-      .querySelector(`.main-swiper[data-index="${index}"]`)
-      .classList.remove("hide");
-    document
-      .querySelector(`.thumbs-swiper[data-index="${index}"]`)
-      .classList.remove("hide");
+// > Sin stock / Ultimas unidades / Stock Disponible
+const inputFront = document.querySelector("input[name='stock-front']");
+function updateStockMsg(sku) {
+  if (!inputFront) return;
+  const stockStatus = document.querySelectorAll(".stock-status");
+  stockStatus.forEach((status) => {
+    if (status.dataset.sku === sku) {
+      status.classList.remove("hide");
+    } else {
+      status.classList.add("hide");
+    }
   });
-});
+}
 
+// > Agregar al carrito
 const addToCart = document.querySelector(".product-add-cart");
 const totalCarro = document.getElementById("carritoTotal");
 addToCart.addEventListener("click", async () => {
   const prodId = addToCart.getAttribute("data-productoId");
-  const colorId = document
-    .querySelector(".dot-ring.selected")
-    ?.getAttribute("data-colorId");
+  const sku = addToCart.getAttribute("data-sku");
 
   try {
     const response = await axios.post("/carro/api/agregar_al_carrito/", {
       producto_id: prodId,
-      color_id: colorId || null,
+      sku: sku || null,
     });
 
     if (response.data.totalProds > 0) {
@@ -75,62 +62,179 @@ addToCart.addEventListener("click", async () => {
   }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  btnCartStockManagement(addToCart);
-});
+// > Nuevo sistema de variantes
+const container = document.getElementById("product-variants-container");
+const allOptions = container?.querySelectorAll(".variant-option");
+const prodSKU = document.querySelector(".producto-sku");
+const imgSwipers = document.querySelectorAll(".main-swiper");
+const thumbs = document.querySelectorAll(".thumbs-swiper");
+document.addEventListener("DOMContentLoaded", function () {
+  if (!container) {
+    btnCartStockManagement(addToCart);
+    return;
+  }
 
-function btnCartStockManagement(button) {
-  const stockDict = button.querySelector("script[type='application/json']");
-
-  if (stockDict) {
-    const stockValue = JSON.parse(stockDict.textContent.trim());
-
-    const box = button.closest(".product-view");
-    const colorsBox = box.querySelector(".product-colors");
-    const colorDot = colorsBox.querySelector(".dot-ring.selected");
-    if (colorsBox && colorDot) {
-      const colorHex = colorDot.getAttribute("data-hex");
-      const stockDisponible = stockValue[colorHex];
-      console.log(
-        "Stock disponible para color " + colorHex + ": " + stockDisponible
-      );
-      if (stockDisponible > 0) {
-        btnEnableItem(button);
-      } else {
-        btnDisableItem(button);
-      }
-      return;
-    }
-
-    if (stockValue.total == 0) {
-      btnDisableItem(button);
+  function parseSkus(skuString) {
+    if (!skuString) return [];
+    try {
+      return JSON.parse(skuString.replace(/'/g, '"'));
+    } catch (e) {
+      return [];
     }
   }
-}
 
-function btnEnableItem(button) {
-  button.disabled = false;
-  button.classList.remove("disabled");
-  button.setAttribute("aria-disabled", "false");
-  button.removeAttribute("title");
-}
+  function updateState() {
+    const groups = Array.from(container.querySelectorAll(".variant-group"));
 
-function btnDisableItem(button) {
-  button.disabled = true;
-  button.classList.add("disabled");
-  button.setAttribute("aria-disabled", "true");
-  button.setAttribute("title", "Producto sin stock");
-}
+    // * Grupo 1 valido
+    let validSkusFromAbove = null;
 
-const inputFront = document.querySelector("input[name='stock-front']");
-function updateStockMsg(hexColor) {
-  if (!inputFront) return;
-  const stockStatus = document.querySelectorAll(".stock-status");
-  stockStatus.forEach((status) => {
-    if (status.dataset.hex === hexColor) {
-      status.classList.remove("hide");
-    } else {
-      status.classList.add("hide");
+    groups.forEach((group, index) => {
+      const options = Array.from(group.querySelectorAll(".variant-option"));
+      let selectedOption = group.querySelector(".variant-option.selected");
+
+      options.forEach((opt) => {
+        const optSkus = parseSkus(opt.dataset.skus);
+
+        let isVisible = true;
+        if (validSkusFromAbove !== null) {
+          const hasIntersection = optSkus.some((sku) =>
+            validSkusFromAbove.includes(sku),
+          );
+          if (!hasIntersection) isVisible = false;
+        }
+
+        if (isVisible) {
+          opt.classList.remove("disabled");
+          opt.disabled = false;
+        } else {
+          opt.classList.add("disabled");
+          opt.disabled = true;
+        }
+      });
+
+      // * Buscamos la primera opcion valida
+      if (selectedOption && selectedOption.classList.contains("disabled")) {
+        selectedOption.classList.remove("selected");
+        selectedOption = null;
+      }
+
+      // * Fallback
+      if (!selectedOption) {
+        const firstAvailable = group.querySelector(
+          ".variant-option:not(.disabled)",
+        );
+        if (firstAvailable) {
+          firstAvailable.classList.add("selected");
+          selectedOption = firstAvailable;
+        }
+      }
+
+      if (selectedOption) {
+        const selectedSkus = parseSkus(selectedOption.dataset.skus);
+
+        if (validSkusFromAbove === null) {
+          validSkusFromAbove = selectedSkus;
+        } else {
+          validSkusFromAbove = validSkusFromAbove.filter((sku) =>
+            selectedSkus.includes(sku),
+          );
+        }
+      } else {
+        validSkusFromAbove = [];
+      }
+    });
+
+    detectarSkuFinal(validSkusFromAbove);
+  }
+
+  function detectarSkuFinal(finalSkus) {
+    if (finalSkus && finalSkus.length > 0) {
+      if (finalSkus && finalSkus.length > 0) {
+        const skuGanador = finalSkus[0];
+        updateStockMsg(skuGanador);
+        btnCartStockManagement(addToCart, skuGanador);
+        prodSKU.textContent = `SKU: ${skuGanador}`;
+        addToCart.dataset.sku = skuGanador;
+      } else {
+        addToCart.disabled = true;
+        addToCart.classList.add("disabled");
+        addToCart.dataset.sku = "";
+        prodSKU.textContent = `SKU: Error`;
+      }
     }
+  }
+
+  allOptions.forEach((opt) => {
+    opt.addEventListener("click", (e) => {
+      if (opt.classList.contains("disabled")) return;
+
+      updateSwiper(opt);
+      const group = opt.closest(".variant-group");
+      group
+        .querySelectorAll(".variant-option")
+        .forEach((el) => el.classList.remove("selected"));
+      opt.classList.add("selected");
+
+      updateState();
+    });
   });
-}
+
+  updateState();
+
+  // > Colores e imagenes
+  function updateSwiper(opt) {
+    if (opt.dataset.type != "Color") return;
+    imgSwipers.forEach((img) => img.classList.add("hide"));
+    thumbs.forEach((thum) => thum.classList.add("hide"));
+    const index = opt.dataset.index;
+    document
+      .querySelector(`.main-swiper[data-index="${index}"]`)
+      .classList.remove("hide");
+    document
+      .querySelector(`.thumbs-swiper[data-index="${index}"]`)
+      .classList.remove("hide");
+    console.log(index);
+  }
+
+  // > Activar btn
+  function btnEnableItem(button) {
+    console.log("activando", button);
+    button.disabled = false;
+    button.classList.remove("disabled");
+    button.setAttribute("aria-disabled", "false");
+    button.removeAttribute("title");
+  }
+
+  // > Desactivar btn
+  function btnDisableItem(button) {
+    console.log("desactivando", button);
+    button.disabled = true;
+    button.classList.add("disabled");
+    button.setAttribute("aria-disabled", "true");
+    button.setAttribute("title", "Producto sin stock");
+  }
+
+  // > Manager add to cart
+  function btnCartStockManagement(button, sku = null) {
+    const stockDict = button.querySelector("script[type='application/json']");
+
+    if (stockDict) {
+      const stockValue = JSON.parse(stockDict.textContent.trim());
+      console.log(stockValue);
+
+      if (sku) {
+        const stockDisponible = stockValue[sku];
+        if (stockDisponible > 0) {
+          btnEnableItem(button);
+        } else {
+          btnDisableItem(button);
+        }
+      } else {
+        if (stockValue.total == 0) {
+          btnDisableItem(button);
+        }
+      }
+    }
+  }
+});

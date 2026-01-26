@@ -26,7 +26,6 @@ from .utils import (
     actualizar_carrito
     )
 from .models import Producto, Carrito, Pedido
-from products.models import ColorProducto
 
 from .context_processors import carrito_total
 from .permissions import TieneCarrito
@@ -123,23 +122,23 @@ class AgregarAlCarritoView(APIView):
         serializer.is_valid(raise_exception=True)
 
         data = serializer.validated_data
-        producto_id = signing.loads(data.get('producto_id'))
-        producto = get_object_or_404(Producto, id=producto_id)
 
-        color_data = data.get('color_id')
-        if color_data:
-            try:
-                color_id = signing.loads(color_data)
-                color = get_object_or_404(ColorProducto, id=int(color_id))
-            except Exception:
-                color = None
-        else:
-            color = None
+        producto = data['producto_obj']
+        variante = data.get('variante_obj',None)
         
         config = get_configuracion_tienda(request)
-        stock = producto.obtener_stock(color) if config['modo_stock'] == "estricto" else config['maximo_compra']
+        if config['modo_stock'] == 'libre':
+            stock_disponible = config['maximo_compra']
+        else:
+            obj = variante if variante else producto
+            stock_disponible = obj.obtener_stock() 
 
-        sumar_carrito(request,producto,stock,color)
+        sumar_carrito(
+            request=request,
+            producto=producto,
+            stock_maximo=stock_disponible,
+            variante=variante
+        )
         clear_carrito_cache(request)
 
         total_processor = carrito_total(request)

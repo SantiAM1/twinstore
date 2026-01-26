@@ -1,11 +1,18 @@
 from django.db import models
 
 from core.utils import get_configuracion_tienda
-from django.db.models import Value,Q , Count, Prefetch, Sum
+from django.db.models import Q , Count, QuerySet, Sum, Value, Prefetch
 from django.db.models.functions import Coalesce
 from .types import GridContext
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .models import Producto
+
 class ProductQuerySet(models.QuerySet):
+    def get(self, *args, **kwargs) -> "Producto":
+        return super().get(*args, **kwargs)
 
     def de_categoria(self, categoria):
         return self.filter(sub_categoria__in=categoria.subcategorias.all())
@@ -22,16 +29,19 @@ class ProductQuerySet(models.QuerySet):
             Q(slug__icontains=texto)
         )
 
-    def precargado(self):
-        from products.models import ColorProducto
+    def vista_prefetch(self) -> QuerySet["Producto"]:
+        prefetchs = ['variantes__valores__tipo','imagenes_producto','especificaciones','reseñas','reseñas__usuario']
+        return self.precargado(prefetchs_comunes=prefetchs)
+
+    def precargado(self,prefetchs_comunes = ["imagenes_producto"]):
+        from products.models import Variante
         config = get_configuracion_tienda()
         modo_estricto = config.get('modo_stock') == 'estricto'
 
         qs = self.select_related("sub_categoria", "marca","evento")
-        prefetchs_comunes = ["imagenes_producto", "colores__imagenes_color"]
 
         if modo_estricto:
-            colores_con_stock = ColorProducto.objects.annotate(
+            variantes_con_stock = Variante.objects.annotate(
                 _stock_cache=Coalesce(
                     Sum(
                         'ingresos_stock__lotes__cantidad_disponible',
@@ -40,7 +50,6 @@ class ProductQuerySet(models.QuerySet):
                     Value(0)
                 )
             )
-
             return qs.annotate(
                 _total_stock_cache=Coalesce(
                     Sum(
@@ -50,13 +59,12 @@ class ProductQuerySet(models.QuerySet):
                     Value(0)
                 )
             ).prefetch_related(
-                Prefetch('colores', queryset=colores_con_stock),
+                Prefetch('variantes', queryset=variantes_con_stock),
                 *prefetchs_comunes
             )
-        
         else:
             return qs.prefetch_related(
-                'colores', 
+                'variantes',
                 *prefetchs_comunes
             )
 
@@ -172,22 +180,3 @@ class ProductQuerySet(models.QuerySet):
             "atributos": atributos_unicos,
             "filtro": filtro_label,
         }
-
-class ProductoManager(models.Manager):
-    def get_queryset(self):
-        return ProductQuerySet(self.model, using=self._db)
-
-    def master_request(self, **kwargs) -> GridContext:
-        return self.get_queryset().master_request(**kwargs)
-
-    def precargado(self):
-        return self.get_queryset().precargado()
-
-    def de_evento(self, evento):
-        return self.get_queryset().de_evento(evento)
-
-    def con_precio_final(self):
-        return self.get_queryset().con_precio_final()
-
-    def ordenar(self, request):
-        return self.get_queryset().ordenar(request)

@@ -3,12 +3,14 @@ from products.models import Producto
 
 class CarritoDict(TypedDict):
     id: int
+    sku: str
     producto_id: int
-    producto: Producto
-    color_id: int | None
+    nombre: str
+    variante: str | None
+    imagen: str
+    url_producto: str
     cantidad: int
     precio: float
-    nombre: str
-    imagen: str
-    precio_anterior: float | None
-    descuento: float | None
+    tiene_descuento: bool
+    precio_anterior: float
+    ahorro: float

@@ -6,9 +6,10 @@ from django.urls import reverse
 from django.templatetags.static import static
 import uuid
 from decimal import Decimal
-from .managers import ProductoManager
 from products.utils_debug import debug_queries
 from django.conf import settings
+from .managers import ProductQuerySet
+from django.core.exceptions import ValidationError
 
 class Marca(models.Model):
     nombre = models.CharField(max_length=30)
@@ -16,6 +17,7 @@ class Marca(models.Model):
 
     def get_absolute_url(self):
         base_url = reverse('products:grid')
+        print(base_url)
         return f"{base_url}?marca={self.slug}"
 
     def save(self, *args, **kwargs):
@@ -66,6 +68,22 @@ class SubCategoria(models.Model):
     def __str__(self):
         return self.nombre
 
+class Atributo(models.Model):
+    """
+        Ejemplo: Almacenamiento 256 GB
+        nombre: Almacenamiento
+        valor: 256 GB
+    """
+    nombre = models.CharField(max_length=50,help_text="Ej: Almacemaniento, Consumo electrico")
+    valor = models.CharField(max_length=50,help_text="Ej: 256 GB, 200W")
+
+    class Meta:
+        unique_together = ('nombre', 'valor')
+        ordering = ['nombre','valor']
+
+    def __str__(self):
+        return f"{self.nombre}: {self.valor}"
+
 class Etiquetas(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=50, unique=True, blank=True)
@@ -94,8 +112,9 @@ class Producto(models.Model):
     slug = models.SlugField(max_length=100, blank=True,unique=True)
     updated_at = models.DateTimeField(auto_now=True)
     etiquetas = models.ManyToManyField(Etiquetas, blank=True, related_name='productos')
+    atributos = models.ManyToManyField(Atributo,blank=True,related_name='productos')
     evento = models.ForeignKey('core.EventosPromociones',on_delete=models.SET_NULL,blank=True,null=True)
-    objects = ProductoManager()
+    objects: ProductQuerySet = ProductQuerySet.as_manager()
 
     def get_absolute_url(self):
         return reverse('products:slug_dispatcher',args=[self.slug])
@@ -192,53 +211,37 @@ class Producto(models.Model):
 
     def obtener_stock_dict(self):
         """
-        Devuelve {color_hex: stock} si tiene colores, o {'total': stock} si no.
+        Devuelve {sku: stock} si tiene variantes, o {'total': stock} si no.
         Optimizado para usar datos precargados si existen.
         """
         stock_dict = {}
-
-        # 1. Obtenemos los colores (aprovechando el caché de prefetch si existe)
-        colores = self.colores.all()
-
-        if len(colores) > 0:
-            for color in colores:
-                if hasattr(color, '_stock_cache'):
-                    stock_dict[color.hex] = color._stock_cache
-                
-                # FALLBACK
+        variantes = self.variantes.all()
+        if len(variantes) > 0:
+            for variante in variantes:
+                if hasattr(variante, '_stock_cache'):
+                    stock_dict[variante.sku] = variante._stock_cache
                 else:
                     stock = (LoteStock.objects.filter(
-                        ingreso__producto_color=color,
+                        ingreso__variante=variante,
                         cantidad_disponible__gt=0
                     ).aggregate(t=Sum("cantidad_disponible"))["t"] or 0)
-                    stock_dict[color.hex] = stock
-            
+                    stock_dict[variante.sku] = stock
+                
             return stock_dict
-
+        
         else:
             if hasattr(self, '_total_stock_cache'):
                 return {'total': self._total_stock_cache}
-            
-            # FALLBACK
+
             total_stock = (LoteStock.objects.filter(
                 ingreso__producto=self,
                 cantidad_disponible__gt=0
             ).aggregate(t=Sum("cantidad_disponible"))["t"] or 0)
             
-            return {'total': total_stock}
+            stock_dict['total'] = total_stock
+            return stock_dict
 
-    def obtener_stock(self, color=None) -> int:
-        """
-        Obtiene el stock disponible del producto o de un color específico si se proporciona.
-        """
-        if color:
-            return (
-                LoteStock.objects.filter(
-                    ingreso__producto_color=color,
-                    cantidad_disponible__gt=0
-                ).aggregate(total=Sum("cantidad_disponible"))["total"] or 0
-            )
-
+    def obtener_stock(self) -> int:
         return (
             LoteStock.objects.filter(
                 ingreso__producto=self,
@@ -268,33 +271,8 @@ class Producto(models.Model):
             return imagen.imagen.url if imagen.imagen else None
         return static('img/prod_default.webp')
 
-    def get_portada_color_200(self):
-        """
-        Devuelve una lista de diccionarios con los colores y sus respectivas imagenes.
-        """
-        data = []
-        for color in self.colores.all():
-            imgs = color.imagenes_color.all()
-            imagen = imgs[0] if imgs else None
-            if imagen:
-                data.append({'hex': color.hex, 'url': imagen.imagen_200.url if imagen.imagen_200 else imagen.imagen.url})
-            else:
-                data.append({'hex': color.hex, 'url': static('img/prod_default.webp')})
-        return data
-
-    def get_imagen_carro(self, color_id=None):
-        """
-        Retorna la imagen del producto para el carro de compras,
-        usando datos prefetchados si existen.
-        """
-        if color_id:
-            color = next((c for c in self.colores.all() if c.id == color_id), None)
-            if color:
-                imagenes_color = list(color.imagenes_color.all())
-                if imagenes_color:
-                    imagen = imagenes_color[0]
-                    return imagen.imagen_200.url if imagen.imagen_200 else imagen.imagen.url
-
+    def get_imagen_carro(self):
+        """Producto:"""
         imagenes = list(self.imagenes_producto.all())
         if imagenes:
             imagen = imagenes[0]
@@ -302,62 +280,179 @@ class Producto(models.Model):
 
         return static('img/prod_default.webp')
 
+    def obtener_variantes(self):
+        from collections import defaultdict
+        raw_data = self.variantes.all().values(
+                    'sku', 
+                    'valores__tipo__nombre',
+                    'valores__valor',
+                    'valores__metadatos'
+                )
+        
+        agrupado = defaultdict(dict)
+        
+        for item in raw_data:
+            tipo = item['valores__tipo__nombre']
+            valor = item['valores__valor']
+            sku = item['sku']
+            
+            if not tipo or not valor: continue
+
+            if valor not in agrupado[tipo]:
+                agrupado[tipo][valor] = {
+                    'valor': valor,
+                    'metadatos': item['valores__metadatos'],
+                    'skus': []
+                }
+            
+            agrupado[tipo][valor]['skus'].append(sku)
+        
+        return {
+            tipo: list(datos.values())
+            for tipo, datos in agrupado.items()
+        }
+
     def obtener_imagenes(self):
         """
-        Retorna un diccionario con imágenes agrupadas por color, 
-        usando relaciones ya prefetchadas (sin nuevas queries).
+        Retorna un diccionario con imágenes agrupadas por color.
         """
-        if self.colores.exists():
-            data = {}
-            for color in list(self.colores.all()):
-                imagenes = list(color.imagenes_color.all())
-                data[color.id] = {
-                    'nombre': color.nombre,
-                    'hex': color.hex,
-                    'imagenes': imagenes
-                }
+        data = {}
+        todas_imagenes = list(self.imagenes_producto.all())
+        variantes = list(self.variantes.all())
+
+        if not variantes:
+            data[self.sku] = [img for img in todas_imagenes]
             return data
-        else:
-            return {'imagenes': list(self.imagenes_producto.all())}
+
+        for variante in variantes:
+            valores = list(variante.valores.all())
+            
+            color_variante = None
+            for val in valores:
+                if val.tipo.slug == "color":
+                    color_variante= val
+                    data[color_variante.valor] = []
+                    break
+
+            if color_variante:
+                for img in todas_imagenes:
+                    if img.variante_id == color_variante.id:
+                        data[color_variante.valor].append(img)
+            else:
+                data['imagenes'] = todas_imagenes
+
+        return data
 
     def __str__(self):
         return self.nombre
 
-class ColorProducto(models.Model):
-    producto = models.ForeignKey(Producto,on_delete=models.CASCADE,related_name='colores')
-    nombre = models.CharField(max_length=50)
-    hex = models.CharField(max_length=7,help_text='Color en HEXADECIMAL (#ffffff)',default='#ffffff')
+class TipoAtributo(models.Model):
+    """Ej: Color, Talle, Material, Voltaje"""
+    nombre = models.CharField(max_length=50,help_text="Ej: Color, Talle, Material, Voltaje")
+    slug = models.SlugField(blank=True)
 
-    class Meta:
-        verbose_name = "Color"
-        verbose_name_plural = "Colores"
+    def save(self, *args, **kwargs):
+        self.generar_slug()
+        return super().save(*args, **kwargs)
+
+    def generar_slug(self):
+        if self.slug:
+            return
+        self.slug = slugify(self.nombre)
 
     def __str__(self):
-        return f"{self.nombre} ({self.producto})"
+        return f"{self.nombre}"
+
+class ValorAtributo(models.Model):
+    """Ej: Rojo, XL, Plastico, 220v"""
+    tipo = models.ForeignKey(TipoAtributo, on_delete=models.CASCADE,related_name='valores')
+    valor = models.CharField(max_length=50,help_text="Ej: Blanco, XL, Plastico, 220v")
+    metadatos = models.CharField(max_length=50,blank=True, null=True,help_text="Ej: #ffffff (Para utilizar el color blanco)")
+
+    def __str__(self):
+        return f"{self.tipo}: {self.valor}"
+
+class Variante(models.Model):
+    """La entidad física que tiene stock y precio"""
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='variantes')
+    sku = models.CharField(max_length=100, unique=True, blank=True) 
+    valores = models.ManyToManyField(ValorAtributo)
+
+    def save(self, *args, **kwargs):
+        self.generar_sku()
+        return super().save(*args, **kwargs)
     
+    def resumen(self):
+        valores = self.valores.all()
+        
+        if not valores:
+            return ""
+
+        lista_resumen = [f"{v.tipo.nombre}: {v.valor}" for v in valores]
+        return " | ".join(lista_resumen)
+
+    def generar_sku(self):
+        if self.sku:
+            return
+        if not self.producto.sku:
+            self.producto.save()
+        
+        base_sku = self.producto.sku
+        suffix = uuid.uuid4().hex[:4].upper()
+        new_sku = f'{base_sku}-{suffix}'
+
+        while Variante.objects.filter(sku=new_sku).exists():
+            suffix = uuid.uuid4().hex[:4].upper()
+            new_sku = f'{base_sku}-{suffix}'
+
+        self.sku = new_sku
+
+    def get_imagen_carro(self):
+        """
+        Variante:
+        Retorna la imagen del producto para el carro de compras,
+        """
+        valores = list(self.valores.all())
+        for valor in valores:
+            if valor.tipo.slug == 'color':
+                imgs = valor.imagenes_asociadas.all()
+                if imgs:
+                    img = imgs[0]
+                    return img.imagen_200.url if img.imagen_200 else img.imagen.url
+        
+        return self.producto.get_imagen_carro()
+
+    def obtener_stock(self):
+        return (
+            LoteStock.objects.filter(
+                ingreso__variante=self,
+                cantidad_disponible__gt=0
+            ).aggregate(total=Sum("cantidad_disponible"))["total"] or 0
+        )
+
+    class Meta:
+        verbose_name = "Variante"
+        verbose_name_plural = "Variantes"
+    
+    def __str__(self):
+        return self.resumen()
+            
 class ImagenProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='imagenes_producto',  blank=True)
-    color = models.ForeignKey(ColorProducto,on_delete=models.CASCADE,related_name='imagenes_color',null=True,blank=True)
+    variante = models.ForeignKey(
+        ValorAtributo, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='imagenes_asociadas',
+        help_text="Dejar vacío si la imagen es general. Seleccionar un valor (ej: Rojo) si la imagen es específica."
+    )
     imagen = models.ImageField(upload_to='productos/imagenes/')
     imagen_200 = models.ImageField(upload_to='productos/imagenes/', null=True, blank=True,editable=False)
 
     class Meta:
         verbose_name = "Imagen"
         verbose_name_plural = "Imagenes"
-
-class Atributo(models.Model):
-    """
-        Ejemplo: Almacenamiento 256 GB
-        nombre: Almacenamiento
-        valor: 256 GB
-    """
-
-    producto = models.ForeignKey(Producto, related_name="atributos", on_delete=models.CASCADE)
-    nombre = models.CharField(max_length=255)
-    valor = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.nombre}: {self.valor}"
 
 class EspecificacionTecnica(models.Model):
     """
@@ -426,7 +521,7 @@ class Proveedor(models.Model):
 
 class IngresoStock(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='ingresos_stock')
-    producto_color = models.ForeignKey(ColorProducto, on_delete=models.CASCADE, null=True, blank=True, related_name='ingresos_stock')
+    variante = models.ForeignKey(Variante, on_delete=models.SET_NULL,null=True, blank=True, related_name='ingresos_stock')
     cantidad = models.PositiveIntegerField()
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
@@ -437,9 +532,35 @@ class IngresoStock(models.Model):
         verbose_name = "Ingreso de Stock"
         verbose_name_plural = "Ingresos de Stock"
         ordering = ['-fecha_ingreso']
+    
+    def clean(self):
+        if self.variante and self.variante.producto != self.producto:
+            raise ValidationError(f"La variante '{self.variante}' no pertenece al producto '{self.producto.nombre}'.")
+
+        if self.producto.variantes.exists() and not self.variante:
+            raise ValidationError(f"El producto '{self.producto.nombre}' tiene variantes. Debes especificar cuál estás ingresando (Color/Talle).")
+        
+        if not self.producto.variantes.exists() and self.variante:
+             raise ValidationError("Este producto es simple, no debería tener variante asignada.")
+
+    def save(self, *args, **kwargs):
+        if self.variante and not self.producto_id:
+            self.producto = self.variante.producto
+            
+        self.full_clean()
+        super().save(*args, **kwargs)
+        
+        if not self.lotes.exists():
+            LoteStock.objects.create(
+                ingreso=self,
+                cantidad_disponible=self.cantidad,
+                costo_unitario=self.costo_unitario,
+                fecha_ingreso=self.fecha_ingreso
+            )
 
     def __str__(self):
-        return f"Ingreso: {self.cantidad} x {self.producto.nombre} | {self.fecha_ingreso.strftime('%Y-%m-%d') if self.fecha_ingreso else ''}"
+        item = self.variante.sku if self.variante else self.producto.sku
+        return f"Ingreso: {self.cantidad} x {item}"
 
 class LoteStock(models.Model):
     ingreso = models.ForeignKey(IngresoStock, on_delete=models.CASCADE, related_name='lotes')
@@ -461,7 +582,7 @@ class MovimientoStock(models.Model):
         AJUSTE_NEGATIVO = "AJUSTE_NEGATIVO", "Ajuste -"
     
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
-    producto_color = models.ForeignKey(ColorProducto, on_delete=models.PROTECT, null=True, blank=True)
+    variante = models.ForeignKey(Variante, on_delete=models.SET_NULL,null=True, blank=True,)
     tipo = models.CharField(max_length=20, choices=Tipo.choices)
     cantidad = models.PositiveIntegerField()
     lote = models.ForeignKey(LoteStock, on_delete=models.SET_NULL, null=True, blank=True)
@@ -477,7 +598,7 @@ class MovimientoStock(models.Model):
 class AjusteStock(models.Model):
     venta = models.ForeignKey('payment.Venta', on_delete=models.CASCADE, related_name='ajustes_stock')
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
-    color = models.ForeignKey(ColorProducto, on_delete=models.PROTECT, null=True, blank=True)
+    variante = models.ForeignKey(Variante, on_delete=models.SET_NULL, null=True, blank=True,)
     cantidad_faltante = models.IntegerField()
     creado_en = models.DateTimeField(auto_now_add=True)
     resuelto = models.BooleanField(default=False)

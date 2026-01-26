@@ -2,7 +2,7 @@
 {% load static compress %}
 
 {% block meta %}
-{% include 'components/meta.html' %}
+{% include 'components/grid/meta.html' %}
 {% endblock meta %}
 
 {% block head %}
@@ -15,7 +15,7 @@
     <section class="generic-data products">
         <nav class="product-nav">
             {% if evento_activo %}
-            {% include 'components/evento.html' %}
+            {% include 'components/grid/evento.html' %}
             {% endif %}
             <ul class="product-filters-active">
                 {% include 'partials/active-filters.html' %}

@@ -18,9 +18,11 @@
             <h3>Productos</h3>
             {% for item in carrito %}
             <article class="cart-item">
-                <img src="{{item.imagen}}" alt="{{item.producto.nombre}}" height="80">
+                <img src="{{item.imagen}}" alt="{{item.nombre}}" height="80">
                 <div class="cart-details">
-                    <span>{{item.nombre}}</span>
+                    <a href="{{item.url_producto}}">{{item.nombre}}</a>
+                    <p class="cart-variante">{{item.variante}}</p>
+                    <p class="cart-variante">SKU: {{item.sku}}</p>
                     <nav aria-label="Acciones del producto" data-pedidoId="{{item.id|signing_data}}" class="cart-navbox">
                         <button type="button" aria-label="Eliminar del carrito" data-api="/carro/api/eliminar_pedido/">
                             <svg  xmlns="http://www.w3.org/2000/svg"  width="20"  height="20"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-trash"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
@@ -37,7 +39,7 @@
                     </nav>
                 </div>
                 <div class="cart-item-price">
-                    {% if item.descuento %}<p class="cart-item-price-old">{{item.precio_anterior|formato_pesos}}</p>{% endif %}
+                    {% if item.tiene_descuento %}<p class="cart-item-price-old">{{item.precio_anterior|formato_pesos}}</p>{% endif %}
                     <strong class="cart-item-price-now">{{item.precio|formato_pesos}}</strong>
                 </div>
             </article>

@@ -22,7 +22,7 @@ def manejar_lote_stock(sender, instance:LoteStock, created, **kwargs):
         with transaction.atomic():
             MovimientoStock.objects.create(
                 producto=instance.ingreso.producto,
-                producto_color=instance.ingreso.producto_color,
+                variante=instance.ingreso.variante,
                 tipo=MovimientoStock.Tipo.INGRESO,
                 cantidad=instance.cantidad_disponible,
                 lote=instance,
