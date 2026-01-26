@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.db.models import Sum
 from .models import LoteStock, MovimientoStock, AjusteStock
-from payment.models import Venta
+from payment.models import Venta,VentaDetalle
 
 def gestionar_stock_venta(venta: Venta) -> bool:
     """
@@ -15,17 +15,18 @@ def gestionar_stock_venta(venta: Venta) -> bool:
         faltantes = []
 
         for detalle in venta.detalles.all():
+            detalle: VentaDetalle
             producto = detalle.producto
-            color = detalle.color
+            variante = detalle.variante
             cantidad_requerida = detalle.cantidad
             
             filtros = {
                 'ingreso__producto': producto,
                 'cantidad_disponible__gt': 0
             }
-            if color:
-                filtros['ingreso__producto_color'] = color
-                
+            if variante:
+                filtros['ingreso__variante'] = variante
+            
             stock_disponible = LoteStock.objects.filter(**filtros).select_for_update().aggregate(
                 total=Sum('cantidad_disponible')
             )['total'] or 0
@@ -33,7 +34,7 @@ def gestionar_stock_venta(venta: Venta) -> bool:
             if stock_disponible < cantidad_requerida:
                 faltantes.append({
                     'producto': producto,
-                    'color': color,
+                    'variante': variante,
                     'cantidad_faltante': cantidad_requerida - stock_disponible
                 })
 
@@ -42,7 +43,7 @@ def gestionar_stock_venta(venta: Venta) -> bool:
                 AjusteStock.objects.create(
                     venta=venta,
                     producto=f['producto'],
-                    color=f['color'],
+                    variante=f['variante'],
                     cantidad_faltante=f['cantidad_faltante']
                 )
             return False
@@ -52,15 +53,16 @@ def gestionar_stock_venta(venta: Venta) -> bool:
 
         for detalle in venta.detalles.all():
             producto = detalle.producto
-            color = detalle.color
+            variante = detalle.variante
             cantidad_pendiente = detalle.cantidad
             
             filtros = {
                 'ingreso__producto': producto,
                 'cantidad_disponible__gt': 0
             }
-            if color:
-                filtros['ingreso__producto_color'] = color
+
+            if variante:
+                filtros['ingreso__variante'] = variante
             
             lotes = LoteStock.objects.filter(**filtros).select_for_update().order_by('fecha_ingreso')
             
@@ -77,7 +79,7 @@ def gestionar_stock_venta(venta: Venta) -> bool:
                 # Creamos movimiento
                 MovimientoStock.objects.create(
                     producto=producto,
-                    producto_color=color,
+                    variante=variante,
                     tipo=MovimientoStock.Tipo.SALIDA,
                     cantidad=cantidad_a_descontar,
                     lote=lote,

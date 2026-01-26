@@ -12,8 +12,8 @@ def carrito_total(request:HttpRequest):
         total_productos = carrito.pedidos.aggregate(total=Sum('cantidad'))['total'] or 0
 
     else:
-        carrito = request.session.get('carrito', {})
-        total_productos = sum(cantidad for cantidad in carrito.values())
+        carrito: dict = request.session.get('carrito', {})
+        total_productos = sum(val['cantidad'] for val in carrito.values())
 
     return {'total_productos': total_productos if total_productos > 0 else 0}
 

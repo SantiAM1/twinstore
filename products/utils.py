@@ -6,6 +6,7 @@ from django.http import HttpRequest
 from django.db.models import Count,QuerySet
 from django.conf import settings
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 
 from core.models import EventosPromociones
 from payment.templatetags.custom_filters import formato_pesos
@@ -21,9 +22,9 @@ from products.models import (
     SubCategoria,
     Etiquetas,
     Marca,
-    ColorProducto,
     Proveedor,
-    IngresoStock
+    IngresoStock,
+    Variante
 )
 
 import locale
@@ -46,16 +47,9 @@ class DecimalTwoPlacesWidget(DecimalWidget):
         return locale.format_string("%.2f", value, grouping=True)
 
 class IngresoStockResource(resources.ModelResource):
-    producto = fields.Field(
-        column_name='Nombre Producto',
-        attribute='producto',
-        widget=ForeignKeyWidget(Producto, field='nombre')
-    )
-    producto_color = fields.Field(
-        column_name='Color Producto',
-        attribute='producto_color',
-        widget=ForeignKeyWidget(ColorProducto, field='nombre')
-    )
+    sku_input = fields.Field(column_name='SKU', attribute='sku_input_temp')
+    cantidad = fields.Field(column_name='Cantidad a ingresar', attribute='cantidad')
+
     proveedor = fields.Field(
         column_name='Nombre Proveedor',
         attribute='proveedor',
@@ -68,31 +62,56 @@ class IngresoStockResource(resources.ModelResource):
         widget=DecimalTwoPlacesWidget()
         )
 
-    def before_save_instance(self, instance, row, **kwargs):
-        print(instance, row, kwargs)
-        request = kwargs.get('request','')
-        if request and hasattr(request, 'user'):
-            instance.creado_por = request.user
-
+    class Meta:
+        model = IngresoStock
+        import_id_fields = ('id',) 
+        
+        fields = ('id', 'sku_input', 'cantidad', 'costo_unitario', 'proveedor')
+        exclude = ('fecha_ingreso', 'creado_por', 'producto', 'variante')
+    
     def skip_row(self, instance, original, row,*args, **kwargs):
         if instance.fecha_ingreso is not None:
             return True 
         return False
 
-    class Meta:
-        model = IngresoStock
-        import_id_fields = ('id',) 
+    def before_save_instance(self, instance, row, **kwargs):
+        """
+        Aquí ocurre la magia: Traducimos el SKU a Objetos reales.
+        """
+        sku = row.get('SKU') # Leemos la columna cruda del Excel
+        print(sku)
+        if not sku:
+            raise ValidationError("El campo SKU es obligatorio.")
         
-        fields = (
-            'id',
-            'producto',
-            'producto_color',
-            'costo_unitario',
-            'cantidad',
-            'proveedor',
-        )
+        sku = str(sku).strip()
+        
+        # 1. Intentamos buscar como VARIANTE primero (La mayoría de los casos)
+        variante_encontrada = Variante.objects.filter(sku=sku).first()
+        
+        if variante_encontrada:
+            instance.variante = variante_encontrada
+            instance.producto = variante_encontrada.producto
+        else:
+            # 2. Si no es variante, buscamos como PRODUCTO SIMPLE
+            producto_encontrado = Producto.objects.filter(sku=sku).first()
+            
+            if producto_encontrado:
+                # VALIDACIÓN CRÍTICA:
+                # Si encontramos el producto, pero este TIENE variantes, prohibimos el ingreso.
+                # El usuario debería haber usado el SKU de la variante (ej: Rojo), no del padre.
+                if producto_encontrado.variantes.exists():
+                     raise ValidationError(f"El producto '{sku}' tiene variantes. Debes usar el SKU específico (Color/Talle), no el del padre.")
+                
+                instance.producto = producto_encontrado
+                instance.variante = None
+            else:
+                # 3. No existe nada
+                raise ValidationError(f"No se encontró ningún Producto o Variante con el SKU: {sku}")
 
-        exclude = ('fecha_ingreso', 'creado_por')
+        # Asignar usuario si está disponible
+        request = kwargs.get('request', None)
+        if request and hasattr(request, 'user'):
+            instance.creado_por = request.user
 
 class ProductoResource(resources.ModelResource):
     sub_categoria = fields.Field(
@@ -129,16 +148,17 @@ class ProductoResource(resources.ModelResource):
         attribute='nombre'
     )
 
-    def skip_row(self, instance, original, row,*args, **kwargs):
-        if instance.slug is None:
-            return True
-        return False
+    id = fields.Field(
+        column_name='ID',
+        attribute='id'
+    )
 
     class Meta:
         model = Producto
-        import_id_fields = ('nombre',) 
+        import_id_fields = ('id',)
         
         fields = (
+            'id',
             'nombre', 
             'sub_categoria',
             'marca', 
@@ -149,7 +169,7 @@ class ProductoResource(resources.ModelResource):
             'evento'
         )
 
-        exclude = ('id', 'created_at', 'updated_at')
+        exclude = ('created_at', 'updated_at')
 
 def inject_categorias_subcategorias(view_func):
     """
@@ -196,6 +216,24 @@ def ordenby(request, productos):
         filtro = 'Ordenar por'
     return productos, filtro
 
+def get_atributos_contados(productos):
+    qs = (
+        Atributo.objects
+        .filter(productos__in=productos)
+        .values('nombre', 'valor')
+        .annotate(total=Count('productos'))
+        .order_by('nombre', 'valor')
+    )
+
+    resultado = defaultdict(list)
+    for a in qs:
+        resultado[a['nombre']].append({
+            'valor': a['valor'],
+             'total': a['total']
+            })
+    
+    return dict(resultado)
+
 def filtrar_atributo(params, productos, atributos_unicos):
     """
     Filtra productos según los atributos seleccionados en el querystring (request.GET).
@@ -209,24 +247,16 @@ def filtrar_atributo(params, productos, atributos_unicos):
 
     return productos.distinct()
 
-def get_atributos_contados(productos):
-    qs = (
-        Atributo.objects
-        .filter(producto__in=productos)
-        .values('nombre', 'valor')
-        .annotate(total=Count('producto', distinct=True))
-    )
-    resultado = defaultdict(list)
-    for a in qs:
-        resultado[a['nombre']].append({'valor': a['valor'], 'total': a['total']})
-    return resultado
+def filters(request, productos):
+    atributos_totales = get_atributos_contados(productos)
+    
+    whitelist_atributos = {k: [v['valor'] for v in vals] for k, vals in atributos_totales.items()}
 
-def filters(request,productos):
-    atributos_previos = get_atributos_contados(productos)
-    productos = filtrar_atributo(request.GET, productos, {k: [v['valor'] for v in vals] for k, vals in atributos_previos.items()})
-    atributos_unicos = get_atributos_contados(productos)
+    productos_filtrados = filtrar_atributo(request.GET, productos, whitelist_atributos)
+    
+    atributos_finales = get_atributos_contados(productos_filtrados)
 
-    return productos,dict(atributos_unicos)
+    return productos_filtrados, atributos_finales
 
 def cuotas_mp(precio) -> dict:
     """
@@ -272,7 +302,7 @@ def grid_meta_data(request:HttpRequest, productos:QuerySet[Producto], title:str,
         meta = {
             "title": f"{title} | Twinstore",
             "description": description,
-            "url": request.build_absolute_uri(),
+            "url": request.build_absolute_uri(request.path),
             "image": f"{request.build_absolute_uri('/static/img/mail.webp')}",
             "robots": "index, follow",
             "count": productos.count(),

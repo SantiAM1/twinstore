@@ -77,61 +77,61 @@ categoryBtn.forEach((btn) => {
   });
 });
 
-document.querySelectorAll(".btn-card").forEach((btn) => {
-  btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  });
-});
+// document.querySelectorAll(".btn-card").forEach((btn) => {
+//   btn.addEventListener("click", (e) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+//   });
+// });
 
-const totalCarro = document.getElementById("carritoTotal");
-document.querySelectorAll(".card-product__cart").forEach((btn) => {
-  btn.addEventListener("click", async (e) => {
-    const card = btn.closest(".card-product");
+// const totalCarro = document.getElementById("carritoTotal");
+// document.querySelectorAll(".card-product__cart").forEach((btn) => {
+//   btn.addEventListener("click", async (e) => {
+//     const card = btn.closest(".card-product");
 
-    const prodId = btn.getAttribute("data-productId");
-    const colorId = card
-      .querySelector(".card-color-dot.selected")
-      ?.getAttribute("data-colorId");
+//     const prodId = btn.getAttribute("data-productId");
+//     const colorId = card
+//       .querySelector(".card-color-dot.selected")
+//       ?.getAttribute("data-colorId");
 
-    try {
-      const response = await axios.post("/carro/api/agregar_al_carrito/", {
-        producto_id: prodId,
-        color_id: colorId || null,
-      });
-      if (response.data.totalProds > 0) {
-        totalCarro.classList.add("active");
-        totalCarro.textContent = response.data.totalProds;
-      }
-    } catch (err) {
-      console.warn(err);
-    }
-  });
-});
+//     try {
+//       const response = await axios.post("/carro/api/agregar_al_carrito/", {
+//         producto_id: prodId,
+//         color_id: colorId || null,
+//       });
+//       if (response.data.totalProds > 0) {
+//         totalCarro.classList.add("active");
+//         totalCarro.textContent = response.data.totalProds;
+//       }
+//     } catch (err) {
+//       console.warn(err);
+//     }
+//   });
+// });
 
-document.querySelectorAll(".card-color-dot").forEach((dot) => {
-  dot.addEventListener("click", (e) => {
-    const selectedColor = e.target.getAttribute("data-hex");
-    const card = e.target.closest(".card-product");
-    const images = card.querySelectorAll("header.card-product__media img");
-    const btn = card.querySelector(".card-product__cart");
+// document.querySelectorAll(".card-color-dot").forEach((dot) => {
+//   dot.addEventListener("click", (e) => {
+//     const selectedColor = e.target.getAttribute("data-hex");
+//     const card = e.target.closest(".card-product");
+//     const images = card.querySelectorAll("header.card-product__media img");
+//     const btn = card.querySelector(".card-product__cart");
 
-    dot.classList.add("selected");
-    card.querySelectorAll(".card-color-dot").forEach((d) => {
-      if (d !== dot) d.classList.remove("selected");
-    });
+//     dot.classList.add("selected");
+//     card.querySelectorAll(".card-color-dot").forEach((d) => {
+//       if (d !== dot) d.classList.remove("selected");
+//     });
 
-    btnCartStockManagement(btn);
+//     btnCartStockManagement(btn);
 
-    images.forEach((img) => {
-      if (img.dataset.hex === selectedColor) {
-        img.classList.remove("hide");
-      } else {
-        img.classList.add("hide");
-      }
-    });
-  });
-});
+//     images.forEach((img) => {
+//       if (img.dataset.hex === selectedColor) {
+//         img.classList.remove("hide");
+//       } else {
+//         img.classList.add("hide");
+//       }
+//     });
+//   });
+// });
 
 function resetSubCategory() {
   subCategory.forEach((btn) => {
@@ -176,53 +176,53 @@ if (eventoTimer) {
   setInterval(actualizarContador, 1000);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const stockButtons = document.querySelectorAll(".btn-card");
-  stockButtons.forEach((button) => {
-    btnCartStockManagement(button);
-  });
-});
+// document.addEventListener("DOMContentLoaded", () => {
+//   const stockButtons = document.querySelectorAll(".btn-card");
+//   stockButtons.forEach((button) => {
+//     btnCartStockManagement(button);
+//   });
+// });
 
-function btnCartStockManagement(button) {
-  const stockDict = button.querySelector("script[type='application/json']");
+// function btnCartStockManagement(button) {
+//   const stockDict = button.querySelector("script[type='application/json']");
 
-  if (stockDict) {
-    const stockValue = JSON.parse(stockDict.textContent.trim());
+//   if (stockDict) {
+//     const stockValue = JSON.parse(stockDict.textContent.trim());
 
-    const card = button.closest(".card-product");
-    const colorsBox = card.querySelector(".card-product-colors");
-    const colorDot = colorsBox.querySelector(".card-color-dot.selected");
+//     const card = button.closest(".card-product");
+//     const colorsBox = card.querySelector(".card-product-colors");
+//     const colorDot = colorsBox.querySelector(".card-color-dot.selected");
 
-    if (colorsBox && colorDot) {
-      const colorHex = colorDot.getAttribute("data-hex");
-      const stockDisponible = stockValue[colorHex];
-      console.log(
-        "Stock disponible para color " + colorHex + ": " + stockDisponible
-      );
-      if (stockDisponible > 0) {
-        btnEnableItem(button);
-      } else {
-        btnDisableItem(button);
-      }
-      return;
-    }
+//     if (colorsBox && colorDot) {
+//       const colorHex = colorDot.getAttribute("data-hex");
+//       const stockDisponible = stockValue[colorHex];
+//       console.log(
+//         "Stock disponible para color " + colorHex + ": " + stockDisponible
+//       );
+//       if (stockDisponible > 0) {
+//         btnEnableItem(button);
+//       } else {
+//         btnDisableItem(button);
+//       }
+//       return;
+//     }
 
-    if (stockValue.total == 0) {
-      btnDisableItem(button);
-    }
-  }
-}
+//     if (stockValue.total == 0) {
+//       btnDisableItem(button);
+//     }
+//   }
+// }
 
-function btnEnableItem(button) {
-  button.disabled = false;
-  button.classList.remove("disabled");
-  button.setAttribute("aria-disabled", "false");
-  button.removeAttribute("title");
-}
+// function btnEnableItem(button) {
+//   button.disabled = false;
+//   button.classList.remove("disabled");
+//   button.setAttribute("aria-disabled", "false");
+//   button.removeAttribute("title");
+// }
 
-function btnDisableItem(button) {
-  button.disabled = true;
-  button.classList.add("disabled");
-  button.setAttribute("aria-disabled", "true");
-  button.setAttribute("title", "Producto sin stock");
-}
+// function btnDisableItem(button) {
+//   button.disabled = true;
+//   button.classList.add("disabled");
+//   button.setAttribute("aria-disabled", "true");
+//   button.setAttribute("title", "Producto sin stock");
+// }

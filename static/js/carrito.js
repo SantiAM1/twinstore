@@ -49,7 +49,8 @@ navBox.forEach((nav) => {
         }
 
         if (precio) itemPriceNow.textContent = precio;
-        if (precioAnterior) itemPriceOld.textContent = precioAnterior;
+        if (precioAnterior && itemPriceOld)
+          itemPriceOld.textContent = precioAnterior;
 
         refreshCart(totalPrecio, subTotal, totalProductos, descuento);
       } catch (err) {

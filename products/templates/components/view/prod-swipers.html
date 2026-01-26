@@ -1,0 +1,22 @@
+{% for item, imgs in imagenes_dict.items %}
+<div class="swiper main-swiper img-color-{{item}} {% if not forloop.first %}hide{% endif %}" data-index="{{item}}">
+    <div class="swiper-wrapper">
+        {% for img in imgs %}
+        <div class="swiper-slide">
+            <div class="swiper-zoom-container">
+                <img src="{{img.imagen.url}}" alt="{{producto.nombre}}">
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<div class="swiper thumbs-swiper thumbs-color-{{item}} {% if not forloop.first %}hide{% endif %}" aria-label="Miniaturas del producto" data-index="{{item}}">
+    <div class="swiper-wrapper">
+        {% for img in imgs %}
+        <div class="swiper-slide">
+            <img src="{{img.imagen_200.url}}" alt="Miniatura {{producto.nombre}}">
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}

@@ -167,7 +167,7 @@ def home(request: HttpRequest):
         base_products_qs = Producto.objects.all().select_related(
             'marca', 'sub_categoria', 'evento'
         ).prefetch_related(
-            'colores__imagenes_color', 'imagenes_producto', 'etiquetas'
+            'imagenes_producto', 'etiquetas'
         )
 
         for seccion in secciones:
@@ -196,7 +196,7 @@ def home(request: HttpRequest):
                         if evento and evento.esta_activo:
                             productos = base_products_qs.filter(evento=evento)
                         else:
-                            productos = base_products_qs.order_by('-updated_at')[:12]
+                            seccion.delete()
 
                     seccion.productos_list = list(productos) if productos is not None else []
 

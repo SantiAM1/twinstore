@@ -1,16 +1,13 @@
 from django.http import Http404, JsonResponse,HttpRequest
 from django.shortcuts import render
 
-from .models import Producto, SubCategoria,Marca,ImagenProducto,Categoria,ColorProducto
-from .utils import inject_categorias_subcategorias,filters,ordenby,cuotas_mp,grid_meta_data,prod_meta_data
+from .models import Producto, Categoria
+from .utils import inject_categorias_subcategorias,cuotas_mp,grid_meta_data,prod_meta_data
 from .types import GridContext
-from django.db.models import Q
 from django.template.loader import render_to_string
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
+from django.shortcuts import render, redirect
 from django.db import models
-from django.db.models import Count,Prefetch
+from django.db.models import Count
 
 from core.models import EventosPromociones
 from django.utils import timezone
@@ -32,16 +29,7 @@ def producto_view(request: HttpRequest, slug: str):
     """
     Vista personal del producto.
     """
-    producto = (
-        Producto.objects
-        .prefetch_related(
-            'colores__imagenes_color',
-            'imagenes_producto',
-            'especificaciones',
-            'reseñas',
-            'reseñas__usuario')
-            .get(slug=slug)
-        )
+    producto = Producto.objects.vista_prefetch().get(slug=slug)
 
     mercado_pago_cuotas = cuotas_mp(float(producto.precio_final))
 
@@ -55,6 +43,8 @@ def producto_view(request: HttpRequest, slug: str):
     distribucion = {i: 0 for i in range(1, 6)}
     for s in stats:
         distribucion[s['calificacion']] = s['total']
+
+    reviews = reseñas[:5]
 
     porcentajes = {
         k: int((v / total) * 100) if total > 0 else 0
@@ -70,7 +60,7 @@ def producto_view(request: HttpRequest, slug: str):
         'reviews':{
             'total':total,
             'promedio':promedio,
-            'usuarios':reseñas
+            'usuarios':reviews
         },
         'porcentajes':porcentajes,
         'meta':meta

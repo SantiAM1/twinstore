@@ -1,15 +1,14 @@
 from django.http import HttpRequest
 import mercadopago
-from django.conf import settings
 from django.utils import timezone
-from products.models import ColorProducto,Producto
+from products.models import Producto,Variante
 from payment.models import EstadoPedido,Cupon,Venta,ComprobanteTransferencia,VentaDetalle
-from users.models import DatosFacturacion
+from users.models import DatosFacturacion,User
 from cart.models import Carrito, CheckOutData,Pedido
 from payment.models import TicketDePago
 from django.core.cache import cache
 from django.db import transaction
-import random,string,uuid
+import random,string
 import pytz
 from datetime import timedelta
 from django.core import signing
@@ -18,6 +17,7 @@ from django.shortcuts import get_object_or_404
 from core.types import ConfigDict
 from cart.types import CarritoDict
 from core.utils import get_configuracion_tienda,gen_cache_key
+from products.utils_debug import debug_queries
 
 def crear_venta(carrito:dict,request:HttpRequest,checkout_serializer:dict,forma_pago,comprobante=None,) -> tuple[str, str|None]:
     """
@@ -79,19 +79,19 @@ def crear_detalle_venta(venta:Venta,carrito:list[CarritoDict]) -> None:
     """
     for item in carrito:
         try:
-            producto = Producto.objects.get(id=item['producto_id'])
-        except Producto.DoesNotExist:
+            if item['variante']:
+                variante = Variante.objects.filter(sku=item['sku']).select_related('producto').first()
+                producto = variante.producto
+            else:
+                producto = Producto.objects.get(sku=item['sku'])
+                variante = None
+        except (Producto.DoesNotExist,Variante.DoesNotExist):
             continue
-
-        try:
-            color = ColorProducto.objects.get(id=item['color_id'], producto=producto)
-        except ColorProducto.DoesNotExist:
-            color = None
 
         VentaDetalle.objects.create(
             venta=venta,
             producto=producto,
-            color=color,
+            variante=variante,
             cantidad=item['cantidad'],
             imagen_url = item['imagen'],
             precio_unitario=producto.precio_final,
@@ -105,16 +105,18 @@ def obtener_carrito(request:HttpRequest) -> list[CarritoDict]:
     Estructura del carrito:
     ```json
     {
-        'id':pedido.id,
-        'producto_id':producto.id,
-        'producto':producto,
-        'color_id': color.id if color else None,
-        'cantidad':pedido.cantidad,
-        'precio':pedido.get_total_precio(),
-        'nombre': pedido.get_nombre_producto(),
-        'imagen': producto.get_imagen(),
-        'precio_anterior':(producto.precio_anterior)*pedido.cantidad if producto.descuento > 0 else None,
-        'descuento':(producto.precio_anterior - producto.precio)*pedido.cantidad if producto.descuento > 0 else 0
+        "id": 1450,
+        "sku": "CAS-ROJ-XL",
+        "producto_id": 402,
+        "nombre": "Casco Rebatible Hawk", 
+        "variante": "Rojo / XL",
+        "imagen": "/media/productos/casco-rojo.jpg",
+        "url_producto": "/productos/motos/casco-rebatible-hawk/",
+        "cantidad": 2,
+        "precio": 50000,
+        "tiene_descuento": true,
+        "precio_anterior": 60000,
+        "ahorro": 20000
     }
     """
     if hasattr(request, "_cached_carrito"):
@@ -127,71 +129,210 @@ def obtener_carrito(request:HttpRequest) -> list[CarritoDict]:
     )
 
     CART_CACHE_KEY = gen_cache_key(key,request)
-
     carrito = cache.get(CART_CACHE_KEY)
+
     if carrito:
         request._cached_carrito = carrito
         return carrito
     
-    carrito_unico = []
     if request.user.is_authenticated:
-        carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
-        pedidos = carrito.pedidos.select_related('producto','color').prefetch_related('producto__colores__imagenes_color','producto__imagenes_producto')
-
-        for pedido in pedidos:
-            producto = pedido.producto
-            if pedido.producto.inhabilitar:
-                pedido.delete()
-                continue
-            carrito_unico.append({
-                'id':pedido.id,
-                'producto_id':producto.id,
-                'producto':producto,
-                'color_id': pedido.color.id if pedido.color else None,
-                'cantidad':pedido.cantidad,
-                'precio':pedido.get_total_precio(),
-                'nombre': pedido.get_nombre_producto(),
-                'imagen': producto.get_imagen_carro(color_id=pedido.color.id if pedido.color else None),
-                'precio_anterior':(producto.precio_base)*pedido.cantidad if producto.descuento > 0 else None,
-                'descuento':(producto.precio_base - producto.precio_final)*pedido.cantidad if producto.descuento > 0 else 0
-            })
+        carrito_unico = _get_user_carrito(request)
     else:
-        if 'anon_cart_id' not in request.session:
-            request.session['anon_cart_id'] = f"anon-{uuid.uuid4()}"
-        carrito_session = request.session.get('carrito', {})
-
-        ids_productos = [int(k.split('-')[0]) for k in carrito_session.keys()]
-        productos = {p.id: p for p in Producto.objects.filter(id__in=ids_productos).prefetch_related('colores__imagenes_color', 'imagenes_producto')}
-
-        ids_colores = [int(k.split('-')[1]) for k in carrito_session.keys() if k.split('-')[1] != 'null']
-        colores = {c.id: c for c in ColorProducto.objects.filter(id__in=ids_colores)}
-
-        for producto_id, cantidad in carrito_session.items():
-            producto_id_str, color_id_str = producto_id.split('-')
-            producto = productos.get(int(producto_id_str))
-            color = colores.get(int(color_id_str)) if color_id_str != 'null' else None
-
-            if not producto or producto.inhabilitar:
-                continue
-
-            nombre_producto = f"({color.nombre}) {producto.nombre}" if color else producto.nombre
-            carrito_unico.append({
-                'id': f"{producto.id}-{color_id_str}",
-                'producto_id': producto.id,
-                'producto': producto,
-                'color_id': color.id if color else None,
-                'cantidad': cantidad,
-                'precio': producto.precio_final * cantidad,
-                'nombre': nombre_producto,
-                'imagen': producto.get_imagen_carro(color_id=color.id if color else None),
-                'precio_anterior': (producto.precio_base)*cantidad if producto.descuento > 0 else None,
-                'descuento': (producto.precio_base - producto.precio_final)*cantidad if producto.descuento > 0 else 0
-            })
+        carrito_unico = _get_anon_carrito(request)
 
     cache.set(CART_CACHE_KEY, carrito_unico , timeout=60)
     request._cached_carrito = carrito_unico
 
     return carrito_unico if carrito_unico else None
+
+def _get_user_carrito(request: HttpRequest) -> list[CarritoDict]:
+    carrito_final: list[CarritoDict] = []
+    carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
+
+    pedidos = carrito.pedidos.select_related('producto','variante').prefetch_related(
+        'producto__imagenes_producto',
+        'variante__valores__tipo',
+        'variante__valores__imagenes_asociadas',
+        'variante__producto__imagenes_producto'
+        )
+    for pedido in pedidos:
+        pedido: Pedido
+        producto: Producto = pedido.producto
+        if pedido.producto.inhabilitar:
+            pedido.delete()
+            continue
+        obj = pedido.variante if pedido.variante else producto
+        carrito_final.append({
+            'id':pedido.id,
+            'sku': obj.sku,
+            'producto_id':producto.id,
+            'nombre': producto.nombre,
+            'variante':pedido.variante_resumen,
+            'imagen': obj.get_imagen_carro(),
+            'url_producto': producto.get_absolute_url(),
+            'cantidad':pedido.cantidad,
+            'precio':producto.precio_final*pedido.cantidad,
+            'tiene_descuento':producto.precio_base != producto.precio_final,
+            'precio_anterior': 0 if producto.precio_base == producto.precio_final else producto.precio_base*pedido.cantidad,
+            'ahorro':(producto.precio_base - producto.precio_final)*pedido.cantidad if producto.precio_base != producto.precio_final else 0
+        })
+    
+    return carrito_final
+
+def _map_skus(carrito_session:dict, prefetch:bool = False):
+    skus_variantes = []
+    skus_productos = []
+
+    for item_data in carrito_session.values():
+        if item_data['type'] == 'var':
+            skus_variantes.append(item_data['sku'])
+        else:
+            skus_productos.append(item_data['sku'])
+
+    if prefetch:
+        variantes_qs = list(
+            Variante.objects.filter(sku__in=skus_variantes)
+            .select_related('producto')
+            .prefetch_related(
+                'valores__tipo',
+                'producto__imagenes_producto'
+                )
+            )
+        productos_qs: list[Producto] = list(
+            Producto.objects
+            .filter(sku__in=skus_productos)
+            .prefetch_related('imagenes_producto')
+        )
+
+    else:
+        variantes_qs = list(
+            Variante.objects.filter(sku__in=skus_variantes)
+            .select_related('producto')
+            )
+        productos_qs: list[Producto] = list(
+            Producto.objects
+            .filter(sku__in=skus_productos)
+            )
+
+    map_variantes = {v.sku: v for v in variantes_qs}
+    map_productos = {p.sku: p for p in productos_qs}
+
+    return map_productos,map_variantes
+
+def _get_anon_carrito(request: HttpRequest) -> list[CarritoDict]:
+    """
+    Crea el carrito del usuario no autenticado
+    """
+    carrito_session: dict = request.session.get('carrito', {})
+    carrito_final: list[CarritoDict] = []
+
+    map_productos, map_variantes = _map_skus(carrito_session,prefetch=True)
+
+    for id, data in carrito_session.items():
+        sku = data['sku']
+        cantidad = data['cantidad']
+        variante,producto = (None,None)
+
+        if data['type'] == 'var':
+            variante = map_variantes.get(sku)
+            if variante:
+                producto = variante.producto
+        else:
+            producto = map_productos.get(sku)
+        
+        if not producto:
+            continue
+        
+        obj = variante if variante else producto
+
+        carrito_final.append({
+            'id': id,
+            'sku':sku,
+            'producto_id': producto.id,
+            'nombre':producto.nombre,
+            'variante':variante.resumen() if variante else "",
+            'imagen': obj.get_imagen_carro(),
+            'url_producto': producto.get_absolute_url(),
+            'cantidad': cantidad,
+            'precio': producto.precio_final * cantidad,
+            'tiene_descuento':producto.precio_base != producto.precio_final,
+            'precio_anterior': 0 if producto.precio_base == producto.precio_final else producto.precio_base*cantidad,
+            'ahorro':(producto.precio_base - producto.precio_final)*cantidad if producto.precio_base != producto.precio_final else 0
+        })
+
+    return carrito_final
+
+def merge_carts(request: HttpRequest, user: User) -> None:
+    """
+    Fusiona el carrito anónimo al iniciar sesión
+    """
+    carrito_session: dict = request.session.get('carrito', {})
+    if not carrito_session:
+        return
+
+    config = get_configuracion_tienda(request)
+    modo_estricto = config['modo_stock'] == 'estricto'
+    maximo_global = config['maximo_compra']
+
+    with transaction.atomic():
+        carrito, _ = Carrito.objects.get_or_create(usuario=user)
+        
+        map_productos, map_variantes = _map_skus(carrito_session)
+
+        existing_pedidos_map = {
+            (p.producto_id, p.variante_id): p 
+            for p in carrito.pedidos.all()
+        }
+
+        to_create = []
+        to_update = []
+
+        for data in carrito_session.values():
+            sku = data['sku']
+            cantidad_session = data['cantidad']
+            
+            variante, producto = (None, None)
+            if data['type'] == 'var':
+                variante = map_variantes.get(sku)
+                producto = variante.producto if variante else None
+            else:
+                producto = map_productos.get(sku)
+
+            if not producto: 
+                continue
+
+            obj = variante if variante else producto
+            stock_real = obj.obtener_stock() if modo_estricto else 999999
+            limit_stock = stock_real if modo_estricto else maximo_global
+
+            key = (producto.id, variante.id if variante else None)
+            pedido_existente = existing_pedidos_map.get(key)
+
+            if pedido_existente:
+                nueva_cantidad = min(cantidad_session + pedido_existente.cantidad, limit_stock)
+                
+                if pedido_existente.cantidad != nueva_cantidad:
+                    pedido_existente.cantidad = nueva_cantidad
+                    to_update.append(pedido_existente)
+            else:
+                nueva_cantidad = min(cantidad_session, limit_stock)
+                if nueva_cantidad > 0:
+                    to_create.append(Pedido(
+                        carrito=carrito,
+                        producto=producto,
+                        variante=variante,
+                        cantidad=nueva_cantidad
+                    ))
+
+        if to_create:
+            Pedido.objects.bulk_create(to_create)
+        
+        if to_update:
+            Pedido.objects.bulk_update(to_update, ['cantidad'])
+
+    if 'carrito' in request.session:
+        del request.session['carrito']
+    request.session.modified = True
 
 def obtener_total(carrito):
     """
@@ -202,7 +343,7 @@ def obtener_total(carrito):
         return 0,0,0
     precio_subtotal = sum(item['precio_anterior'] if item['precio_anterior'] else item['precio'] for item in carrito)
     precio_total = sum(item['precio'] for item in carrito)
-    descuento = sum(item['descuento'] for item in carrito)
+    descuento = sum(item['ahorro'] for item in carrito)
     return precio_total,precio_subtotal,descuento
 
 def clear_carrito_cache(request:HttpRequest):
@@ -223,12 +364,11 @@ def clear_carrito_cache(request:HttpRequest):
 def clear_cache_header(request:HttpRequest):
     from django.core.cache.utils import make_template_fragment_key
     key = make_template_fragment_key("header_main",[request.tenant.schema_name,request.user.id])
-    print(key)
     cache.delete(key)
 
 def borrar_carrito(request:HttpRequest):
     """
-    Borra el carrito del usuario autenticado o anónimo.
+    Borra el carrito del usuario autenticado.
     """
     try:
         carrito = Carrito.objects.get(usuario=request.user)
@@ -237,50 +377,6 @@ def borrar_carrito(request:HttpRequest):
     except Carrito.DoesNotExist:
         pass
     clear_carrito_cache(request)
-
-def merge_carts(request, user):
-    """
-    Fusiona el carrito anónimo almacenado en la sesión con el carrito del usuario autenticado.\n
-    Esto se utiliza cuando un usuario inicia sesión después de haber agregado productos a su carrito como usuario anónimo.
-    """
-    anon_cart = request.session.get('carrito', {})
-    if not anon_cart:
-        return
-
-    carrito, _ = Carrito.objects.get_or_create(usuario=user)
-
-    with transaction.atomic():
-        for key, cantidad in anon_cart.items():
-            producto_id_str, color_id_str = key.split('-')
-            producto_id = int(producto_id_str)
-            color_id = int(color_id_str) if color_id_str != 'null' else None
-
-            try:
-                producto = Producto.objects.get(id=producto_id, inhabilitar=False)
-            except Producto.DoesNotExist:
-                continue
-
-            pedido = carrito.pedidos.filter(producto_id=producto_id)
-            if color_id:
-                pedido = pedido.filter(color_id=color_id)
-            pedido = pedido.first()
-
-            nueva_cantidad = min(cantidad + (pedido.cantidad if pedido else 0), 5)
-
-            if pedido:
-                pedido.cantidad = nueva_cantidad
-                pedido.save(update_fields=['cantidad'])
-            else:
-                Pedido.objects.create(
-                    carrito=carrito,
-                    producto=producto,
-                    color_id=color_id,
-                    cantidad=nueva_cantidad,
-                )
-
-    if 'carrito' in request.session:
-        del request.session['carrito']
-    request.session.modified = True
 
 def _generar_identificador_pago():
     """
@@ -395,11 +491,16 @@ def validar_compra(carrito:list[CarritoDict],request:HttpRequest,config:ConfigDi
     """
     flag = True
     for item in carrito:
+        sku = item['sku']
+        producto,variante = (None,None)
         try:
-            id = int(item['producto_id'])
-            producto = Producto.objects.get(id=id)
-        except Producto.DoesNotExist:
-            messages.error(request, f"Producto no encontrado.")
+            if len(sku) == 12:
+                producto = Producto.objects.get(sku=sku)
+            elif len(sku) == 17:
+                variante = Variante.objects.get(sku=sku)
+                producto = variante.producto
+        except (Producto.DoesNotExist,Variante.DoesNotExist):
+            messages.error(request,f"No se encontro un producto con SKU: {sku}")
             flag = False
             continue
 
@@ -407,20 +508,11 @@ def validar_compra(carrito:list[CarritoDict],request:HttpRequest,config:ConfigDi
             messages.error(request, f"El producto {producto.nombre} está inhabilitado para la venta.")
             flag = False
             continue
-    
-        
-        if config['modo_stock'] == 'estricto':
-            color = None
-            if item['color_id']:
-                try:
-                    color_id = int(item['color_id'])
-                    color = ColorProducto.objects.get(id=color_id, producto=producto)
-                except ColorProducto.DoesNotExist:
-                    messages.error(request, f"El color seleccionado para el producto {producto.nombre} no existe.")
-                    flag = False
-                    continue
-            
-            stock_disponible = producto.obtener_stock(color)
+
+        if config['modo_stock'] == 'estricto': 
+            obj = variante if variante else producto
+            stock_disponible = obj.obtener_stock()
+
             cantidad_solicitada = int(item['cantidad'])
             if stock_disponible < cantidad_solicitada:
                 messages.error(request, f"Stock insuficiente para el producto {producto.nombre}.")
@@ -430,23 +522,42 @@ def validar_compra(carrito:list[CarritoDict],request:HttpRequest,config:ConfigDi
 
     return flag
 
-def sumar_carrito(request:HttpRequest,producto:Producto,stock: int,color:ColorProducto|None = None) -> None:
+def sumar_carrito(request:HttpRequest,producto:Producto,stock_maximo: int,variante: Variante = None) -> None:
     """
     Agrega un producto al carrito del usuario autenticado o anónimo.
-    * Verifica el stock del producto (y color si aplica).
     """
-    if 1 > stock:
+    from time import time
+    target_sku = variante.sku if variante else producto.sku
+    if 1 > stock_maximo:
         return None
     if request.user.is_authenticated:
         carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
-        carrito.agregar_producto(producto,stock,color)
+        carrito.agregar_producto(producto,stock_maximo,variante)
+        return 
     else:
-        carrito = request.session.get('carrito', {})
-        key = f"{producto.id}-{color.id if color else 'null'}"
-        carrito[key] = carrito.get(key, 0) + 1
-        if carrito[key] > stock:
-            carrito[key] = stock
+        carrito: dict = request.session.get('carrito', {})
+        item_id = None
+        for fake_id, item_data in carrito.items():
+            if item_data['sku'] == target_sku:
+                item_id = fake_id
+                break
+
+        if item_id:
+            nueva_cantidad = carrito[item_id]['cantidad'] + 1
+            if nueva_cantidad > stock_maximo:
+                nueva_cantidad = stock_maximo
+            carrito[item_id]['cantidad'] = nueva_cantidad
+        else:
+            nuevo_id = str(int(time() * 100))
+            
+            carrito[nuevo_id] = {
+                'sku': target_sku,
+                'cantidad': 1,
+                'type': "var" if variante else 'prod'
+            }
+        
         request.session['carrito'] = carrito
+        request.session.modified = True
 
 def eliminar_del_carrito(request:HttpRequest,pedido_id: str | int) -> None:
     """
@@ -461,19 +572,21 @@ def eliminar_del_carrito(request:HttpRequest,pedido_id: str | int) -> None:
         carrito.pop(str(pedido_id), None)
         request.session['carrito'] = carrito
 
-def actualizar_carrito(request:HttpRequest,pedido_id: str | int,action: str,stock_flag: bool,maximo_compra: int) -> dict:
+def actualizar_carrito(request:HttpRequest,pedido_id: str | int,action: str,stock_flag: bool,maximo_compra: int) -> int:
     """
     Actualiza el carrito del usuario autenticado o anónimo.
     """
     if request.user.is_authenticated:
         pedido = Pedido.objects.filter(
             id=pedido_id, carrito__usuario=request.user
-        ).select_related("producto").first()
+        ).select_related("producto","variante").first()
         if not pedido:
             return {'status':404,"error":"Pedido no encontrado en el carrito."}
         
         producto = pedido.producto
-        stock = producto.obtener_stock(pedido.color) if stock_flag else maximo_compra
+        variante = pedido.variante
+        obj = variante if variante else producto
+        stock = obj.obtener_stock() if stock_flag else maximo_compra
         if action == "mas" and pedido.cantidad < stock:
             pedido.cantidad += 1
             pedido.save(update_fields=["cantidad"])
@@ -487,33 +600,27 @@ def actualizar_carrito(request:HttpRequest,pedido_id: str | int,action: str,stoc
         
         cantidad = pedido.cantidad if pedido else 0
     else:
-        carrito = request.session.get("carrito", {})
+        carrito: dict = request.session.get("carrito", {})
         key = str(pedido_id)
-        try:
-            producto_id_str, color_id_str = key.split('-')
-            producto_id = int(producto_id_str)
-            color_id = int(color_id_str) if color_id_str != 'null' else None
-            producto = Producto.objects.get(id=producto_id)
-            if color_id:
-                color = ColorProducto.objects.get(id=color_id)
-            else:
-                color = None
-        except (Producto.DoesNotExist, ColorProducto.DoesNotExist, ValueError):
-            return {'status':404,"error":"Producto o color no encontrado."}
+        item = carrito[key]
+        if item['type'] == 'var':
+            obj = Variante.objects.get(sku=item['sku'])
+        else:
+            obj = Producto.objects.get(sku=item['sku'])
         
-        stock = producto.obtener_stock(color) if stock_flag else maximo_compra
+        stock = obj.obtener_stock() if stock_flag else maximo_compra
         if key in carrito:
-            if action == "mas" and carrito[key] < stock:
-                carrito[key] += 1
+            if action == "mas" and carrito[key]['cantidad'] < stock:
+                carrito[key]['cantidad'] += 1
             elif action == "menos":
-                if carrito[key] > 1:
-                    carrito[key] -= 1
+                if carrito[key]['cantidad'] > 1:
+                    carrito[key]['cantidad'] -= 1
                 else:
                     carrito.pop(key)
 
         request.session["carrito"] = carrito
         request.session.modified = True
-        cantidad = carrito.get(key, 0)
+        cantidad = carrito[key]['cantidad']
     
     return cantidad
 
