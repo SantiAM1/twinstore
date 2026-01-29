@@ -1,0 +1,15 @@
+<section class="generic-modal" data-modalId="compra-finalizada">
+    <form class="generic-box users"> 
+        <div class="generic-item compra-finalizada">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-check"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+            <h2>¡Gracias por tu compra!</h2>
+            <span>Tu pedido ha sido recibido y está siendo procesado.</span>
+            <div>
+                <p>Número de pedido:</p>
+                <strong id="merchant_order_id">#1234567890</strong>
+            </div>
+            <a href="{% url 'users:perfil' %}?section=orders" class="generic-button btn-2 margin">Ver mis pedidos</a>
+            <a href="{% url 'products:grid' %}" class="generic-button btn-1">Continuar comprando</a>
+        </div>
+    </form>
+</section>

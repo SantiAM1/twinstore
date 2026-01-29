@@ -124,6 +124,7 @@ TENANT_APPS = (
     'cart',
     'payment',
     'dashboard',
+    'shipping'
 )
 
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
@@ -586,6 +587,11 @@ UNFOLD = {
                         "icon": "payment",
                         "link": reverse_lazy('admin:core_mercadopagoconfig_change',args=[1]),
                     },
+                    {
+                        "title": _("Configuración de envíos"),
+                        "icon": "",
+                        "link": reverse_lazy("admin:shipping_shippingconfig_changelist")
+                    }
                 ]
             },
             {

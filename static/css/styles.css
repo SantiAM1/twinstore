@@ -7,7 +7,7 @@
 
 :root {
   /* -- Palet -- */
-  --gradient: linear-gradient(45deg, blue, rgb(56, 201, 226));
+  --gradient: linear-gradient(45deg, rgb(56, 144, 226), rgb(25, 106, 211));
   --primary-color: #1173d4;
   --primary-color-2: #1987ee;
   --error: #ee1919;
@@ -510,6 +510,7 @@ main.main-content {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    gap: 1rem;
 
     &.empty {
       display: flex;
@@ -528,7 +529,6 @@ main.main-content {
 
   /* --- Carrito --- */
   &.resume {
-    width: 40%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -3644,15 +3644,21 @@ details.faq {
     padding: 0.25rem 1rem;
     display: inline-block;
     border-radius: 12px;
-    margin-top: 1rem;
     font-size: 0.9rem;
+    font-weight: 300;
+    margin-left: 1rem;
   }
 }
 
 .orders-btns {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+
+  .orders-extand-help {
+    display: flex;
+    gap: 0.5rem;
+  }
 
   a {
     color: var(--color-gray-1);
@@ -3661,6 +3667,7 @@ details.faq {
   button,
   a {
     background-color: var(--color-gray-3);
+    height: max-content;
     border: none;
     padding: 0.5rem;
     border-radius: 5px;
@@ -3689,7 +3696,6 @@ details.faq {
 }
 
 .orders-manage {
-  margin-top: 1rem;
   display: flex;
   gap: 0.5rem;
 
@@ -3699,7 +3705,7 @@ details.faq {
     align-items: center;
     gap: 0.5rem;
     border-radius: 12px;
-    padding: 0.5rem;
+    padding: 0.75rem;
     cursor: pointer;
     transition:
       opacity 0.3s ease,
@@ -3712,16 +3718,20 @@ details.faq {
 
     &.arrepentimiento {
       color: #fff;
-      background-color: var(--discount);
+      border: 1px solid var(--discount);
+      background-color: transparent;
+      color: var(--discount);
     }
 
     &.mercadopago {
       color: #fff;
-      background-color: color-mix(
-        in srgb,
-        var(--primary-color-2) 70%,
-        transparent
-      );
+      background: var(--gradient);
+    }
+
+    &.factura {
+      background-color: transparent;
+      color: var(--color-gray-1);
+      border: 1px solid var(--color-gray-1);
     }
 
     &:hover {
@@ -3754,6 +3764,10 @@ details.faq {
   .generic-row-50 {
     flex-direction: column;
     gap: 0;
+  }
+  .orders-btns {
+    justify-content: space-between;
+    width: 100%;
   }
   .generic-row-50 .generic-input:last-child {
     width: 100%;
@@ -3899,6 +3913,7 @@ details.faq {
     }
   }
   .circle-stack {
+    grid-template-columns: repeat(6, 60px);
     img {
       width: 60px;
       height: 60px;
@@ -3942,6 +3957,10 @@ details.faq {
   .orders-main {
     flex-direction: column;
     gap: 0.25rem;
+
+    code {
+      display: none;
+    }
   }
   .orders-main span {
     margin-top: 0.25rem;

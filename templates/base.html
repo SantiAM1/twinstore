@@ -37,8 +37,8 @@
     {% endcache %}
     <!--- Main --->
     <main class="main-content">
-    {% block contenidomain %}
-    {% endblock contenidomain %}
+    {% block content %}
+    {% endblock content %}
     </main>
     <!--- Footer --->
     {% cache 600 footer_main request.tenant.schema_name|default:"public" %}

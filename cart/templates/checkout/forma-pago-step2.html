@@ -1,0 +1,144 @@
+{% load custom_filters %}
+<section class="generic-data payment hide" id="step2">
+    <div class="generic-item max-content-h">
+        <h3>TUS FORMAS DE PAGO</h3>
+        <div class="billing-payment-method">
+            <input type="radio" name="forma_de_pago" value="efectivo" id="formaPago1" data-info="pagoEfectivo" required data-finish="Finalizar" class="api-required">
+            <label for="formaPago1">Efectivo</label>
+            <input type="radio" name="forma_de_pago" value="transferencia" id="formaPago2" data-info="pagoTransferencia" required data-finish="Continuar" class="api-required">
+            <label for="formaPago2">Transferencia</label>
+            <!-- <input type="radio" name="forma_pago" value="tarjeta" id="formaPago3" data-info="pagoPayway" required data-finish="Pagar" class="api-required">
+            <label for="formaPago3">Tarjeta de Credito/Debito</label> -->
+            <input type="radio" name="forma_de_pago" value="mixto" id="formaPago4" data-info="pagoMix" required data-finish="Continuar" class="api-required">
+            <label for="formaPago4">Pago Mixto</label>
+            <input type="radio" name="forma_de_pago" value="mercado_pago" id="formaPago5" data-info="pagoMP" required data-finish="Pagar" class="api-required">
+            <label for="formaPago5">Mercado Pago</label>
+        </div>
+        <h3>Cupón de descuento</h3>
+        <div class="generic-input">
+            <label for="id_cupon">Ingresá el código</label>
+            <div class="billing-aplicar-row">
+                <input type="text" id="id_cupon" placeholder="XXXXXX">
+                <button type="button" class="generic-button btn-1 facturacion" id="submitCupon" data-api="{% url 'cart:validar-cupon' %}"><code>Aplicar</code><div class="btn-loader"></div></button>
+            </div>
+            <p class="msg-required"></p>
+        </div>
+    </div>
+    <div class="billing-payment-details">
+        <div class="generic-item details">
+            <h3>DETALLES</h3>
+            <section id="pagoEmpty">Seleccioná un método de pago</section>
+            <section id="pagoEfectivo" class="details-msg hide">
+                <h4>Efectivo</h4>
+                <p>En {{config.nombre_tienda}} ofrecemos la opción de pago en efectivo. Podes abonar al momento de retirar tu pedido en nuestro punto de retiro.<br>
+                Algunos productos pueden requerir un pago anticipado para asegurar su disponibilidad. En estos casos, la coordinación será gestionada por {{config.nombre_tienda}}, donde te indicaremos los pasos a seguir. Este anticipo podrá ser abonado en nuestro punto de retiro o coordinado con el cliente.</p>
+            </section>
+            <section id="pagoTransferencia" class="details-msg hide">
+                <h4>Transferencia</h4>
+                <p>Aboná tu compra mediante transferencia bancaria. Los datos bancarios serán proporcionados al momento de realizar la compra. Aprovechá este metodo abonando un precio preferencial.</p>
+                <div class="payment-info-method">
+                    <span>¿Cómo seguir?</span>
+                    <ul>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 10l2 -2v8" /></svg>
+                            Haz click en "Continuar" para ver los datos bancarios.
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /></svg>
+                            Realizá el deposito siguiendo los pasos indicados y adjunta el comprobante de transferencia.
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
+                            Nuestro equipo verificará el pago y seras notificado vía mail.
+                        </li>
+                    </ul>
+                </div>
+            </section>
+            <section id="pagoMP" class="details-msg hide">
+                <h4>Mercado Pago</h4>
+                <p>Pagá con Mercado Pago y combiná, podes abonar con multiples tarjetas y contas con hasta 24 cuotas. Los pagos realizados mediante este metodo cuentan con un recargo del 6,42% más IVA. Una vez que realices el pago, en el caso de ser rechazado puedes ingresar en el apartado "Mi cuenta" y volver a generar el pago. El Ticket de pago cuenta con treinta (30) minutos de vencimiento, luego de ese plazo la compra queda cancelada.</p>
+                <div class="payment-info-method">
+                    <span>¿Cómo seguir?</span>
+                    <ul>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 10l2 -2v8" /></svg>
+                            Haz click en "Pagar" para ser redirigido a la plataforma de Mercado Pago.
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /></svg>
+                            Realizá tu pago eligiendo el método que prefieras.
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
+                            Serás redirigido nuevamente a {{config.nombre_tienda}} una vez finalizado el pago y veras el estado final de tu compra.
+                        </li>
+                    </ul>
+                </div>
+            </section>
+            <section id="pagoMix" class="details-msg hide">
+                <h4>Pago Mixto</h4>
+                <p>En {{config.nombre_tienda}} puedes combinar diferentes métodos de pago. Estamos inaugurando el pago mixto, un metodo de pago que combina transferencia bancaria y Mercado Pago. Aprovecha, combina tus métodos de pago y disfruta de mayor flexibilidad.<br>Los pagos realizados mediante Mercado Pago cuentan con un recargo del 6,42% más IVA. Puedes volver a generar el link de pago en "Mi cuenta", en el apartado "Mis pedidos". El Ticket de pago cuenta con treinta (30) minutos de vencimiento.</p>
+                <div class="generic-input">
+                    <label for="id_montomixto">Ingresá el monto a transferir</label>
+                    <div class="billing-aplicar-row" id="montomixto">
+                        <p>$</p>
+                        <input type="text" inputmode="numeric" id="id_montomixto" placeholder="$ 0.00"> 
+                        <button type="button" class="generic-button btn-1 facturacion" id="submitMixto" data-api="{% url 'cart:api_pagomixto' %}"><code>Aplicar</code><div class="btn-loader"></div></button>
+                    </div>
+                    <p class="msg-required"></p>
+                </div>
+                <div class="payment-info-method mixto-info hide">
+                    <p>El monto a abonar mediante Mercado Pago es: <strong id="montoMixto"></strong></p>
+                    <span>¿Cómo seguir?</span>
+                    <ul>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 10l2 -2v8" /></svg>
+                            Haz click en "Continuar" para ver los datos bancarios.
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 8h3a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 0 -1 1v2a1 1 0 0 0 1 1h3" /></svg>
+                            Realizá el deposito siguiendo los pasos indicados y adjunta el comprobante de transferencia.
+                        </li>
+                        <li>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-square-number-3"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M10 9a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1" /></svg>
+                            Serás redirigido automáticamente a la plataforma de Mercado Pago para completar el pago del saldo restante.
+                        </li>
+                    </ul>
+                </div>
+            </section>
+            <!-- <section id="pagoPayway" class="details-msg hide">
+                <strong>Tarjeta de Crédito/Débito:</strong>
+                <p>Serás redirigido a la pasarela de pagos segura para completar tu compra con tarjeta.</p>
+            </section> -->
+        </div>
+        <div class="generic-item">
+            <table class="billing-prices">
+                <tbody>
+                    <tr>
+                        <td>Subtotal</td>
+                        <th>{{precio_subtotal|formato_pesos}}</th>
+                    </tr>
+                    <tr class="hide adicional-row">
+                        <td>Adicional</td>
+                        <th></th>
+                    </tr>
+                    {% if descuento %}
+                    <tr>
+                        <td>Descuento</td>
+                        <th>-{{descuento|formato_pesos}}</th>
+                    </tr>
+                    {% endif %}
+                    <tr class="cupon-row hide">
+                        <td>Cupón</td>
+                        <th></th>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Total</td>
+                        <th>{{precio_total|formato_pesos}}</th>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="submit" class="generic-button btn-1 margin not-ready btn-finish billing-next"><code>Finalizar</code><div class="btn-loader"></div></button>
+        </div>
+    </div>
+    </section>
