@@ -9,7 +9,7 @@
 <title>Mi cuenta</title>
 {% endblock head %}
 
-{% block contenidomain %}
+{% block content %}
 <section class="generic-box">
     {% include 'partials/generic-header.html' with title="Mi cuenta" %}
     <section class="generic-data">
@@ -159,60 +159,49 @@
                     <div class="orders-main">
                         <div class="circle-stack">
                         {% for detalle in venta.detalles.all %}
-                        {% for _ in detalle.get_range %}
                             <img src="{{ detalle.imagen_url }}" alt="Producto">
-                        {% endfor %}
                         {% endfor %}
                         </div>
                         <div>
-                            <h3>Pedido #{{venta.merchant_order_id}}</h3>
-                            <p>Fecha: {{venta.fecha_compra|date:"j \\d\\e F \\d\\e Y"}}</p>
-                            {% if venta.estado == 'confirmado' %}
-                                <span style="font-size: 0.9rem; color: #0f5718; background-color: #b7fcc0;">Confirmado</span>
-                            {% elif venta.estado == 'pendiente' %}
-                                <span style="font-size: 0.9rem; color: #969600; background-color: #f0f0b7;">Pendiente</span>
-                            {% elif venta.estado == 'rechazado' %}
-                                <span style="font-size: 0.9rem; color: #8b0000; background-color: #f4b7b7;">Rechazado</span>
-                            {% elif venta.estado == 'listo para retirar' %}
-                                <span style="font-size: 0.9rem; color: #004d40; background-color: #a2f0e1;">Listo para retirar</span>
-                            {% elif venta.estado == 'enviado' %}
-                                <span style="font-size: 0.9rem; color: #311b92; background-color: #cbb7f4;">Enviado</span>
-                            {% elif venta.estado == 'finalizado' %}
-                                <span style="font-size: 0.9rem; color: #263238; background-color: #b7c4c9;">Finalizado</span>
-                            {% elif venta.estado == 'arrepentido' %}
-                                <span style="font-size: 0.9rem; color: #5c0000; background-color: #fd9898;">Arrepentido</span>
-                            {% endif %}
-                            {% with buttons=venta.manage_buttons %}
-                            <div class="orders-manage">
-                                {% if buttons.solicitar_arrepentimiento %}
-                                <button type="button" class="arrepentimiento" data-pedidoId="{{venta.id|signing_data}}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-cancel"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M18.364 5.636l-12.728 12.728" /></svg>
-                                    Solicitar arrepentimiento
-                                </button>
-                                {% endif %}    
-                                {% if buttons.generar_link_pago %}
-                                <button type="button" class="mercadopago" data-ticketId="{{venta.mp_ticket_id_signed}}">
-                                    <img height="24" src="{% static 'img/mp-formadepago.webp' %}" alt="logo mercado pago">
-                                    <code>Generar link de pago</code>
-                                </button>
-                                {% endif %}
-                                {% if buttons.subir_comprobante %}
-                                <button type="button" class="comprobante" data-pedidoId="{{venta.id|signing_data}}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-file"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /></svg>
-                                    Transferencia Bancaria
-                                </button>
-                                {% endif %}
-                            </div>
-                            {% endwith %}
+                            <h3><code>Pedido </code>#{{venta.merchant_order_id}} {{venta.get_estado_venta}}</h3>
+                            <p><code>Fecha: </code>{{venta.fecha_compra|date:"j \\d\\e F \\d\\e Y"}}</p>
                         </div>
                     </div>
                     <div class="orders-btns">
-                        <a href="https://wa.me/5493413491911?text=Hola%21%20Necesito%20ayuda%20con%20mi%20pedido%20%23{{venta.merchant_order_id}}" target="_blank" class="help-btn generic-hover" title="¿Necesitas ayuda con tu pedido?">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-help"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 17l0 .01" /><path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4" /></svg>
-                        </a>
-                        <button type="button" class="orders-info-btn" title="Mas información sobre tu pedido">
-                            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-down"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg>
-                        </button>
+                        {% with buttons=venta.manage_buttons %}
+                        <div class="orders-manage">
+                            {% if buttons.solicitar_arrepentimiento %}
+                            <button type="button" class="arrepentimiento" data-pedidoId="{{venta.id|signing_data}}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-restore"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3.06 13a9 9 0 1 0 .49 -4.087" /><path d="M3 4.001v5h5" /><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg>
+                                Solicitar arrepentimiento
+                            </button>
+                            {% endif %}    
+                            {% if buttons.generar_link_pago %}
+                            <button type="button" class="mercadopago" data-ticketId="{{venta.mp_ticket_id_signed}}">
+                                <img height="24" src="{% static 'img/mp-formadepago.webp' %}" alt="logo mercado pago">
+                                <code>Pagar con Mercado Pago</code>
+                            </button>
+                            {% endif %}
+                            {% if buttons.subir_comprobante %}
+                            <button type="button" class="comprobante" data-pedidoId="{{venta.id|signing_data}}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-file"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /></svg>
+                                Transferencia Bancaria
+                            </button>
+                            {% endif %}
+                            <button type="button" class="factura hide">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-download"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 4l0 12" /></svg>
+                                Descargar factura
+                            </button>
+                        </div>
+                        {% endwith %}
+                        <div class="orders-extand-help">
+                            <a href="https://wa.me/5493413491911?text=Hola%21%20Necesito%20ayuda%20con%20mi%20pedido%20%23{{venta.merchant_order_id}}" target="_blank" class="help-btn generic-hover" title="¿Necesitas ayuda con tu pedido?">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-help"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 17l0 .01" /><path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4" /></svg>
+                            </a>
+                            <button type="button" class="orders-info-btn" title="Mas información sobre tu pedido">
+                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-down"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="generic-expand orders-info">
                         <dl class="methods-list">
@@ -321,7 +310,7 @@
         </div>
     </form>
 </section>
-{% endblock contenidomain %}
+{% endblock content %}
 
 {% block myscripts %}
 {% compress js %}

@@ -8,6 +8,7 @@ import re
 from django.core import signing
 from django.conf import settings
 from products.models import TokenReseña, Producto,ReseñaProducto,Variante
+from django.utils.html import format_html
 
 class Venta(models.Model):
     class Estado(models.TextChoices):
@@ -35,6 +36,20 @@ class Venta(models.Model):
     merchant_order_id = models.CharField(max_length=100, blank=True, null=True,unique=True)
     fecha_finalizado = models.DateTimeField(null=True,blank=True)
     requiere_revision = models.BooleanField(default=True)
+
+    STATUS = {
+        'confirmado':'<span style="font-size: 0.9rem; color: #0f5718; background-color: #b7fcc0;">Confirmado</span>',
+        'pendiente':'<span style="font-size: 0.9rem; color: #969600; background-color: #f0f0b7;">Pendiente</span>',
+        'rechazado':'<span style="font-size: 0.9rem; color: #8b0000; background-color: #f4b7b7;">Rechazado</span>',
+        'listo para retirar':'<span style="font-size: 0.9rem; color: #004d40; background-color: #a2f0e1;">Listo para retirar</span>',
+        'enviado':'<span style="font-size: 0.9rem; color: #311b92; background-color: #cbb7f4;">Enviado</span>',
+        'finalizado':'<span style="font-size: 0.9rem; color: #263238; background-color: #b7c4c9;">Finalizado</span>',
+        'arrepentido':'<span style="font-size: 0.9rem; color: #5c0000; background-color: #fd9898;">Arrepentido</span>',
+    }
+
+    def get_estado_venta(self):
+        return format_html(self.STATUS.get(self.estado))
+        
 
     def detalle_productos(self) -> list[dict[str, str | Decimal | int]]:
         """

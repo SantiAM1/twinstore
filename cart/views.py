@@ -290,7 +290,6 @@ class AdicionalesCheckoutView(APIView):
             })
 
 # Create your views here.
-# -- Preferencia MercadoPago -- #
 # ----- Finalizar pedido -----#
 @login_required_modal
 @requiere_carrito
@@ -300,7 +299,7 @@ def finalizar_compra(request: HttpRequest):
     datos_bancarios = get_datos_banc()
     carrito = obtener_carrito(request)
     precio_total,precio_subtotal,descuento = obtener_total(carrito)
-    return render(request, 'cart/finalizar_compra.html',{
+    return render(request, 'cart/new_checkout.html',{
         'carrito':carrito,
         'precio_total':precio_total,
         'precio_subtotal':precio_subtotal,

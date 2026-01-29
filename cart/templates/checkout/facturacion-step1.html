@@ -1,0 +1,126 @@
+{% load custom_filters %}
+<section class="generic-data cliente" id="step1">
+    <div class="generic-item">
+        <h3>DATOS PARA LA FACTURACIÓN</h3>
+        <div class="generic-row">
+            <div class="generic-input">
+                <label for="id_nombre">Nombre*</label>
+                <input type="text" id="id_nombre" name="nombre">
+                <p class="msg-required"></p>
+            </div>
+            <div class="generic-input">
+                <label for="id_apellido">Apellido(s)*</label>
+                <input type="text" id="id_apellido" name="apellido">
+                <p class="msg-required"></p>
+            </div>
+        </div>
+        <div class="generic-row-50">
+            <div class="generic-input">
+                <label for="id_condicion_iva">Condición frente al IVA</label>
+                <select class="api-required" id="id_condicion_iva" name="condicion_iva" required>
+                    <option value="" selected disabled>Condición frente al IVA*</option>
+                    <option value="A">Responsable Inscripto</option>
+                    <option value="B">Consumidor Final</option>
+                    <option value="C">Monotributista</option>
+                </select>
+                <p class="msg-required"></p>
+            </div>
+            <div class="generic-input">
+                <label for="id_dni_cuit">DNI/CUIT*</label>
+                <input type="text" maxlength="30" placeholder="12345678" inputmode="numeric" id="id_dni_cuit" name="dni_cuit" class="api-required" required>
+                <p class="msg-required"></p>
+            </div>
+        </div>
+        <div class="generic-input">
+            <label for="id_razon_social">Razón social (Si aplica)</label>
+            <input type="text" maxlength="30" placeholder="" id="id_razon_social" name="razon_social" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+        <h3>Dirección de facturación</h3>
+        <div class="generic-row-50">
+            <div class="generic-input">
+                <label for="id_direccion">Dirección (calle,altura y piso)*</label>
+                <input type="text" maxlength="50" placeholder="Av. Cabildo 1111 Piso 5B" id="id_direccion" name="direccion" class="api-required" required>
+                <p class="msg-required"></p>
+            </div>
+            <div class="generic-input">
+                <label for="id_codigo_postal">Código Postal*</label>
+                <input type="text" maxlength="30" placeholder="1111" inputmode="numeric" id="id_codigo_postal" name="codigo_postal" class="api-required" required>
+                <p class="msg-required"></p>
+            </div>
+        </div>
+        <div class="generic-row-50">
+            <div class="generic-input">
+                <label for="id_localidad">Localidad*</label>
+                <input type="text" maxlength="30" placeholder="CABA" id="id_localidad" name="localidad" class="api-required" required>
+                <p class="msg-required"></p>
+            </div>
+            <div class="generic-input">
+                <label for="id_provincia">Provincia*</label>
+                <select class="api-required" id="id_provincia" name="provincia" required>
+                    <option value="" selected disabled>Provincia*</option>
+                    <option value="A">Ciudad Autónoma de Buenos Aires</option>
+                    <option value="B">Buenos Aires</option>
+                    <option value="C">Catamarca</option>
+                    <option value="D">Chaco</option>
+                    <option value="E">Chubut</option>
+                    <option value="F">Córdoba</option>
+                    <option value="G">Corrientes</option>
+                    <option value="H">Entre Ríos</option>
+                    <option value="I">Formosa</option>
+                    <option value="J">Jujuy</option>
+                    <option value="K">La Pampa</option>
+                    <option value="L">La Rioja</option>
+                    <option value="M">Mendoza</option>
+                    <option value="N">Misiones</option>
+                    <option value="O">Neuquén</option>
+                    <option value="P">Río Negro</option>
+                    <option value="Q">Salta</option>
+                    <option value="R">San Juan</option>
+                    <option value="S">San Luis</option>
+                    <option value="T">Santa Cruz</option>
+                    <option value="U">Santa Fe</option>
+                    <option value="V">Santiago del Estero</option>
+                    <option value="W">Tierra del Fuego</option>
+                    <option value="X">Tucumán</option>
+                </select>
+                <p class="msg-required"></p>
+            </div>
+        </div>
+        <h3>Contacto</h3>
+        <div class="generic-row-50">
+            <div class="generic-input">
+                <label for="id_email">Email*</label>
+                <input type="text" readonly id="id_email" name="email">
+            </div>
+            <div class="generic-input">
+                <label for="id_telefono">Telefono*</label>
+                <input type="text" id="id_telefono" name="telefono" readonly>
+            </div>
+        </div>
+    </div>
+    <div class="generic-item resume">
+        <div class="billing-resume">
+            <h3>RESUMEN</h3>
+            {% for item in carrito %}
+            <article class="billing-resume-article">
+                <img src="{{item.imagen}}" alt="{{item.nombre}}" height="60" width="60">
+                <div>
+                    <span>{% if item.cantidad > 1 %}<p>{{item.cantidad}} x </p>{% endif %}{{item.nombre}}</span>
+                    <p>{{item.variante}}</p>
+                </div>
+                <aside>
+                    {% if item.precio_anterior %}<p>{{item.precio_anterior|formato_pesos}}</p>{% endif %}
+                    <strong>{{item.precio|formato_pesos}}</strong>
+                </aside>
+            </article>
+            {% endfor %}
+        </div>
+        <div class="billing-resume-end">
+            <span class="billing-resume-sub"><code>Subtotal</code><p>{{precio_subtotal|formato_pesos}}</p></span>
+            {% if descuento %}<span class="billing-resume-sub"><code>Descuento</code><p>-{{descuento|formato_pesos}}</p></span>{% endif %}
+            <span class="billing-resume-total"><code>Total</code><p>{{precio_total|formato_pesos}}</p></span>
+            <button type="button" class="generic-button btn-2 billing-next">Continuar</button>
+        </div>
+    </div>
+</section>

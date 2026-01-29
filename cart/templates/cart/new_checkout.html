@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
-{% load static custom_filters %}
+{% load static compress custom_filters %}
 
 {% block meta %}
 <meta name="robots" content="noindex, nofollow">
 {% endblock meta %}
 
 {% block head %}
-<title>Twinstore - TEST</title>
+<title>Checkout - {{config.nombre_tienda}}</title>
 {% endblock head %}
 
 {% block content %}
-{{ahora|date:"d/m/Y"}}
-
+<div class="generic-box">
+    {% include 'checkout/facturacion-step1.html' %}
+</div>
 {% endblock content %}

@@ -48,8 +48,10 @@ celerybeat-schedule.bak
 celerybeat-schedule.dat
 celerybeat-schedule.dir
 
-# ignore todo
+# ignore files
 todo.py
+response_zipnova.json
+response_zipnova_clean.json
 
 *.pem
 *.key

@@ -73,30 +73,52 @@ def crear_venta(carrito:dict,request:HttpRequest,checkout_serializer:dict,forma_
     borrar_carrito(request)
     return merchant_order_id,init_point
 
-def crear_detalle_venta(venta:Venta,carrito:list[CarritoDict]) -> None:
+def crear_detalle_venta(venta: Venta, carrito: list[CarritoDict]) -> None:
     """
-    Crea los detalles de la venta a partir del carrito proporcionado.
+    Crea los detalles de la venta masivamente (Bulk Create).
+    Reduce las consultas a la DB drásticamente.
     """
-    for item in carrito:
-        try:
-            if item['variante']:
-                variante = Variante.objects.filter(sku=item['sku']).select_related('producto').first()
-                producto = variante.producto
-            else:
-                producto = Producto.objects.get(sku=item['sku'])
-                variante = None
-        except (Producto.DoesNotExist,Variante.DoesNotExist):
-            continue
+    detalles_para_crear = []
 
-        VentaDetalle.objects.create(
+    skus_variantes = [item['sku'] for item in carrito if item['variante']]
+    skus_productos = [item['sku'] for item in carrito if not item['variante']]
+
+    objs_variantes = {
+        v.sku: v for v in Variante.objects.filter(sku__in=skus_variantes).select_related('producto')
+    }
+    
+    objs_productos = {
+        p.sku: p for p in Producto.objects.filter(sku__in=skus_productos)
+    }
+
+    for item in carrito:
+        sku = item['sku']
+        producto,variante = (None,None)
+
+        if item['variante']:
+            variante = objs_variantes.get(sku)
+            if not variante:
+                continue
+            producto = variante.producto
+        else:
+            producto = objs_productos.get(sku)
+            if not producto:
+                continue
+            variante = None
+
+        detalle = VentaDetalle(
             venta=venta,
             producto=producto,
             variante=variante,
             cantidad=item['cantidad'],
-            imagen_url = item['imagen'],
+            imagen_url=item['imagen'],
             precio_unitario=producto.precio_final,
             subtotal=item['precio'],
         )
+        detalles_para_crear.append(detalle)
+
+    if detalles_para_crear:
+        VentaDetalle.objects.bulk_create(detalles_para_crear)
 
 def obtener_carrito(request:HttpRequest) -> list[CarritoDict]:
     """
@@ -131,6 +153,7 @@ def obtener_carrito(request:HttpRequest) -> list[CarritoDict]:
     CART_CACHE_KEY = gen_cache_key(key,request)
     carrito = cache.get(CART_CACHE_KEY)
 
+    print(carrito)
     if carrito:
         request._cached_carrito = carrito
         return carrito
@@ -334,7 +357,7 @@ def merge_carts(request: HttpRequest, user: User) -> None:
         del request.session['carrito']
     request.session.modified = True
 
-def obtener_total(carrito):
+def obtener_total(carrito:list[CarritoDict]):
     """
     Calcula el total, subtotal y descuento del carrito proporcionado.\n
     Retorna una tupla con (precio_total, precio_subtotal, descuento).

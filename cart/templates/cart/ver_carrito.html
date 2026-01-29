@@ -9,7 +9,7 @@
 <title>Carrito - {{config.nombre_tienda}}</title>
 {% endblock head %}
 
-{% block contenidomain %}
+{% block content %}
 <section class="generic-box">
     {% include 'partials/generic-header.html' with title="Carrito" %}
     <section class="generic-data">
@@ -74,7 +74,7 @@
         {% endif %}
     </section>
 </section>
-{% endblock contenidomain %}
+{% endblock content %}
 
 {% block myscripts %}
 {% compress js %}
