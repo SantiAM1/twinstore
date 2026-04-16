@@ -241,9 +241,9 @@ inputSearch.addEventListener("input", (e) => {
   buscarDebounce(query);
 });
 
-const backBtn = document.getElementById("generic-header-back");
-if (backBtn && window.location.pathname !== "/carro/finalizar-compra/") {
-  backBtn.addEventListener("click", () => {
+const backBtnHeader = document.getElementById("generic-header-back");
+if (backBtnHeader && window.location.pathname !== "/carro/finalizar-compra/") {
+  backBtnHeader.addEventListener("click", () => {
     if (window.history.length > 1) {
       window.history.back();
     } else {

@@ -17,7 +17,6 @@ class Marca(models.Model):
 
     def get_absolute_url(self):
         base_url = reverse('products:grid')
-        print(base_url)
         return f"{base_url}?marca={self.slug}"
 
     def save(self, *args, **kwargs):

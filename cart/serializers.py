@@ -58,6 +58,26 @@ class CuponSerializer(serializers.Serializer):
 class PagoMixtoSerializer(serializers.Serializer):
     monto = serializers.DecimalField(decimal_places=2,max_digits=10)
 
+class ValidarPagoSerializer(serializers.Serializer):
+    forma_de_pago = serializers.CharField()
+    monto_mixto = serializers.DecimalField(decimal_places=2,max_digits=10, required=False, allow_null=True)
+
+    def validate_forma_de_pago(self, value):
+        valid_choices = ["mercado_pago", "efectivo", "transferencia", "mixto","tarjeta"]
+        if value not in valid_choices:
+            raise serializers.ValidationError("Forma de pago inválida.")
+        return value
+    
+    def validate(self, data):
+        forma_pago = data.get('forma_de_pago')
+        monto_mixto = data.get('monto_mixto')
+
+        if forma_pago == "mixto":
+            if monto_mixto is None:
+                raise serializers.ValidationError("El monto para pago mixto es requerido.")
+        return data
+
+# ! DEPRECATED
 class ComprobanteSerializer(serializers.Serializer):
     comprobante = serializers.FileField(required=False, allow_null=True)
 
@@ -74,11 +94,10 @@ class ComprobanteSerializer(serializers.Serializer):
             raise serializers.ValidationError("El archivo excede los 5 MB.")
         return file
 
+# ! DEPRECATED
 class CheckoutSerializer(serializers.Serializer):
     nombre = serializers.CharField()
     apellido = serializers.CharField()
-    email = serializers.EmailField()
-    telefono = serializers.IntegerField()
     dni_cuit = serializers.CharField()
     razon_social = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     condicion_iva = serializers.CharField()
@@ -91,12 +110,6 @@ class CheckoutSerializer(serializers.Serializer):
         if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', value):
             raise serializers.ValidationError("El nombre solo debe contener letras y espacios.")
         return value
-    
-    def validate_telefono(self, value):
-        value_str = str(value)
-        if not re.match(r'^\d{8,15}$', value_str):
-            raise serializers.ValidationError("El teléfono debe contener solo números y tener entre 8 y 15 dígitos.")
-        return value_str
 
     def validate_apellido(self, value):
         if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', value):

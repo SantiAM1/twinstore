@@ -1,0 +1,9 @@
+{% for sucursal in sucursales %}
+<input type="radio" value="{{sucursal.point_id}}" name="sucursales" id="sucursal_{{ forloop.counter }}" data-name="{{ sucursal.nombre }}" data-direccion="{{ sucursal.direccion }}" data-point_id="{{ sucursal.point_id }}" required>
+<label class="shipping-methods-item shipping-label shipping-generic" for="sucursal_{{ forloop.counter }}">
+    <div class="shipping-methods-info">
+        <strong>{{ sucursal.nombre }}</strong>
+        <p>{{ sucursal.direccion }}</p>
+    </div>
+</label>
+{% endfor %}

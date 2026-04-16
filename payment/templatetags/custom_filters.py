@@ -2,6 +2,7 @@ from django import template
 from django.core import signing
 from django.utils.timesince import timesince
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 
 register = template.Library()
 
@@ -68,3 +69,30 @@ def mul(value, arg):
         return float(value) * float(arg)
     except (ValueError, TypeError):
         return ''
+    
+@register.filter
+def fecha_humana(value):
+    if not value:
+        return ""
+
+    if isinstance(value, str):
+        dt = parse_datetime(value)
+    else:
+        dt = value
+
+    if not dt:
+        return value
+
+    if timezone.is_aware(dt):
+        dt = timezone.localtime(dt)
+
+    meses = [
+        "enero", "febrero", "marzo", "abril", "mayo", "junio",
+        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+    ]
+
+    dia = dt.day
+    mes = meses[dt.month - 1]
+    anio = dt.year
+
+    return f"{dia} de {mes} del {anio}"

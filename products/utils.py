@@ -78,37 +78,29 @@ class IngresoStockResource(resources.ModelResource):
         """
         Aquí ocurre la magia: Traducimos el SKU a Objetos reales.
         """
-        sku = row.get('SKU') # Leemos la columna cruda del Excel
-        print(sku)
+        sku = row.get('SKU')
         if not sku:
             raise ValidationError("El campo SKU es obligatorio.")
         
         sku = str(sku).strip()
         
-        # 1. Intentamos buscar como VARIANTE primero (La mayoría de los casos)
         variante_encontrada = Variante.objects.filter(sku=sku).first()
         
         if variante_encontrada:
             instance.variante = variante_encontrada
             instance.producto = variante_encontrada.producto
         else:
-            # 2. Si no es variante, buscamos como PRODUCTO SIMPLE
             producto_encontrado = Producto.objects.filter(sku=sku).first()
             
             if producto_encontrado:
-                # VALIDACIÓN CRÍTICA:
-                # Si encontramos el producto, pero este TIENE variantes, prohibimos el ingreso.
-                # El usuario debería haber usado el SKU de la variante (ej: Rojo), no del padre.
                 if producto_encontrado.variantes.exists():
                      raise ValidationError(f"El producto '{sku}' tiene variantes. Debes usar el SKU específico (Color/Talle), no el del padre.")
                 
                 instance.producto = producto_encontrado
                 instance.variante = None
             else:
-                # 3. No existe nada
                 raise ValidationError(f"No se encontró ningún Producto o Variante con el SKU: {sku}")
 
-        # Asignar usuario si está disponible
         request = kwargs.get('request', None)
         if request and hasattr(request, 'user'):
             instance.creado_por = request.user

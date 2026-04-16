@@ -1,0 +1,28 @@
+<form class="generic-expand animate" id="shipping-domicilio" novalidate>
+    <h3>¿A que domicilio?</h3>
+    <div class="generic-row">
+        <div class="generic-input">
+            <label for="id_calle">Calle*</label>
+            <input type="text" maxlength="50" placeholder="Av. Cabildo" id="id_calle" name="calle_domicilio" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+        <div class="generic-input">
+            <label for="id_altura">Altura*</label>
+            <input type="text" maxlength="50" placeholder="13200" id="id_altura" inputmode="numeric" name="altura_domicilio" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+    </div>
+    <div class="generic-input">
+        <label for="id_referencias">Referencias</label>
+        <input type="text" maxlength="50" placeholder="Piso 5B, No funciona el timbre" id="id_referencias" name="referencias_domicilio">
+        <p class="msg-required"></p>
+    </div>
+    <button type="button" class="generic-button btn-2 left" id="btn-shipping-domicilio">
+        <code>Confimar</code><div class="btn-loader"></div>
+    </button>
+</form>
+<div class="shipping-result shipping-generic hide" id="standard_delivery-result">
+    <strong>Domicilio</strong>
+    <span></span>
+    <button type="button" class="shipping-reset" data-value="3a">Editar</button>
+</div>

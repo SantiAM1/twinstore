@@ -1,0 +1,88 @@
+<form class="generic-item checkout max-content-h {% if hidden %}hide{% endif %}" id="facturacion" data-api="/carro/api/checkout/validar-facturacion/" novalidate>
+    <h3>Datos de facturación</h3>
+    <div class="generic-row">
+        <div class="generic-input">
+            <label for="id_nombre">Nombre*</label>
+            <input type="text" id="id_nombre" name="nombre" class="api-required">
+            <p class="msg-required"></p>
+        </div>
+        <div class="generic-input">
+            <label for="id_apellido">Apellido(s)*</label>
+            <input type="text" id="id_apellido" name="apellido" class="api-required">
+            <p class="msg-required"></p>
+        </div>
+    </div>
+    <div class="generic-row-50">
+        <div class="generic-input">
+            <label for="id_condicion_iva">Condición frente al IVA</label>
+            <select class="api-required" id="id_condicion_iva" name="condicion_iva" required>
+                <option value="" selected disabled>Condición frente al IVA*</option>
+                <option value="A">Responsable Inscripto</option>
+                <option value="B">Consumidor Final</option>
+                <option value="C">Monotributista</option>
+            </select>
+            <p class="msg-required"></p>
+        </div>
+        <div class="generic-input">
+            <label for="id_dni_cuit">DNI/CUIT*</label>
+            <input type="text" maxlength="30" placeholder="12345678" inputmode="numeric" id="id_dni_cuit" name="dni_cuit" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+    </div>
+    <div class="generic-input">
+        <label for="id_razon_social">Razón social (Si aplica)</label>
+        <input type="text" maxlength="30" placeholder="" id="id_razon_social" name="razon_social">
+        <p class="msg-required"></p>
+    </div>
+    <h3>Dirección de facturación</h3>
+    <div class="generic-row-50">
+        <div class="generic-input">
+            <label for="id_direccion">Dirección (calle,altura y piso)*</label>
+            <input type="text" maxlength="50" placeholder="Av. Cabildo 1111 Piso 5B" id="id_direccion" name="direccion" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+        <div class="generic-input">
+            <label for="id_codigo_postal">Código Postal*</label>
+            <input type="text" maxlength="30" placeholder="1111" inputmode="numeric" id="id_codigo_postal" name="codigo_postal" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+    </div>
+    <div class="generic-row-50">
+        <div class="generic-input">
+            <label for="id_localidad">Localidad*</label>
+            <input type="text" maxlength="30" placeholder="CABA" id="id_localidad" name="localidad" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+        <div class="generic-input">
+            <label for="id_provincia">Provincia*</label>
+            <select class="api-required" id="id_provincia" name="provincia" required>
+                <option value="" selected disabled>Provincia*</option>
+                <option value="A">Ciudad Autónoma de Buenos Aires</option>
+                <option value="B">Buenos Aires</option>
+                <option value="C">Catamarca</option>
+                <option value="H">Chaco</option>
+                <option value="U">Chubut</option>
+                <option value="X">Córdoba</option>
+                <option value="W">Corrientes</option>
+                <option value="E">Entre Ríos</option>
+                <option value="P">Formosa</option>
+                <option value="Y">Jujuy</option>
+                <option value="L">La Pampa</option>
+                <option value="F">La Rioja</option>
+                <option value="M">Mendoza</option>
+                <option value="N">Misiones</option>
+                <option value="Q">Neuquén</option>
+                <option value="R">Río Negro</option>
+                <option value="I">Salta</option>
+                <option value="J">San Juan</option>
+                <option value="D">San Luis</option>
+                <option value="Z">Santa Cruz</option>
+                <option value="S">Santa Fe</option>
+                <option value="G">Santiago del Estero</option>
+                <option value="V">Tierra del Fuego</option>
+                <option value="T">Tucumán</option>
+            </select>
+            <p class="msg-required"></p>
+        </div>
+    </div>
+</form>

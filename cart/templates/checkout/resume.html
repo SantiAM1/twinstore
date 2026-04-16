@@ -1,0 +1,27 @@
+{% load custom_filters %}
+<div class="generic-item resume checkout">
+    <div class="billing-resume">
+        <h3>Resumen</h3>
+        {% for item in carrito %}
+        <article class="billing-resume-article">
+            <img src="{{item.imagen}}" alt="{{item.nombre}}" height="60" width="60">
+            <div>
+                <span>{% if item.cantidad > 1 %}<p>{{item.cantidad}} x </p>{% endif %}{{item.nombre}}</span>
+                <p>{{item.variante}}</p>
+            </div>
+            <aside>
+                {% if item.precio_anterior %}<p>{{item.precio_anterior|formato_pesos}}</p>{% endif %}
+                <strong>{{item.precio|formato_pesos}}</strong>
+            </aside>
+        </article>
+        {% endfor %}
+    </div>
+    <div class="billing-resume-end">
+        <span class="billing-resume-sub"><code>Subtotal</code><p>{{precio_subtotal|formato_pesos}}</p></span>
+        {% if descuento %}<span class="billing-resume-sub"><code>Descuento</code><p>-{{descuento|formato_pesos}}</p></span>{% endif %}
+        <span class="billing-resume-sub hide" id="billing-cupon"><code>Cupon</code><p></p></span>
+        <span class="billing-resume-sub hide" id="billing-envio"><code>Envío</code><p></p></span>
+        <span class="billing-resume-sub hide" id="billing-adicional"><code>Adicional</code><p></p></span>
+        <span class="billing-resume-total" id="billing-total"><code>Total</code><p>{{precio_total|formato_pesos}}</p></span>
+    </div>
+</div>

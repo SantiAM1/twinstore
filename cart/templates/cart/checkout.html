@@ -6,25 +6,31 @@
 {% endblock meta %}
 
 {% block head %}
-<title>Facturacion - {{config.nombre_tienda}}</title>
+<title>Checkout - {{config.nombre_tienda}}</title>
 {% endblock head %}
 
 {% block content %}
-<form class="generic-box" id="form-checkout" data-api="{% url 'cart:api_checkout' %}" data-validate="{% url 'cart:api_validar_facturacion' %}" novalidate>
-    {% csrf_token %}
-    <input type="hidden" name="step3-check" value="false">
-    {% include 'partials/generic-header.html' with title="Facturación" %}
-    {% include 'checkout/facturacion-step1.html' %}
-    {% include 'checkout/forma-pago-step2.html' %}
-    {% include 'checkout/transferencia-step3.html' %}
-</form>
-{% include 'checkout/buy-finish.html' %}
+<div class="generic-box checkout">
+    {% include 'checkout/bar-track.html' %}
+    <section class="generic-data checkout">
+        {% include 'checkout/facturacion.html' with hidden=False %}
+        {% include 'checkout/envio.html' with hidden=True %}
+        {% include 'checkout/pago.html' with hidden=True %}
+        {% include 'checkout/confirmacion.html' with hidden=True %}
+        {% include 'checkout/resume.html' %}
+    </section>
+    {% include 'checkout/buttom-btns.html' %}
+</div>
 {% endblock content %}
 
 {% block myscripts %}
 {% compress js %}
-<script src="{% static 'js/animation.js' %}"></script>
 <script src="{% static 'js/perfil-get.js' %}"></script>
-<script src="{% static 'js/facturacion.js' %}"></script>
+<script src="{% static 'js/checkout/base.js' %}"></script>
+<script src="{% static 'js/checkout/handlers.js' %}"></script>
+<script src="{% static 'js/checkout/bartrack.js' %}"></script>
+<script src="{% static 'js/checkout/pago.js' %}"></script>
+<script src="{% static 'js/checkout/shipping.js' %}"></script>
+<script src="{% static 'js/checkout/facturacion.js' %}"></script>
 {% endcompress %}
 {% endblock myscripts %}

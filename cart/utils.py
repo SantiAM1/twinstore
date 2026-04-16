@@ -14,10 +14,12 @@ from datetime import timedelta
 from django.core import signing
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from core.types import ConfigDict
-from cart.types import CarritoDict
+from cart.types import CarritoDict,CheckoutData
 from core.utils import get_configuracion_tienda,gen_cache_key
 from products.utils_debug import debug_queries
+from decimal import Decimal
 
 def crear_venta(carrito:dict,request:HttpRequest,checkout_serializer:dict,forma_pago,comprobante=None,) -> tuple[str, str|None]:
     """
@@ -153,7 +155,6 @@ def obtener_carrito(request:HttpRequest) -> list[CarritoDict]:
     CART_CACHE_KEY = gen_cache_key(key,request)
     carrito = cache.get(CART_CACHE_KEY)
 
-    print(carrito)
     if carrito:
         request._cached_carrito = carrito
         return carrito
@@ -368,6 +369,51 @@ def obtener_total(carrito:list[CarritoDict]):
     precio_total = sum(item['precio'] for item in carrito)
     descuento = sum(item['ahorro'] for item in carrito)
     return precio_total,precio_subtotal,descuento
+
+def obtener_total_checkout(request:HttpRequest):
+    """
+    Retorna los valores que integran el checkout.
+    * precio_total: El total final a pagar.
+    * adicional: El monto adicional aplicado por la forma de pago (si existe).
+    * costo_envio: El costo de envío aplicado (si existe).
+    * cupon: El monto descontado por el cupón aplicado (si existe).
+    * monto_mercadopago: El monto que se pagará a través de Mercado Pago (si la forma de pago es mercado_pago o mixto).
+    * monto_transferencia: El monto que se pagará a través de transferencia (si la forma de pago es mixto).
+    """
+    precio_total, adicional, costo_envio, cupon, monto_mercadopago, monto_transferencia = (0,0,0,0,0,0)
+    carrito = obtener_carrito(request)
+    checkout_data:CheckoutData = request.session.get('checkout',{})
+
+    # > 1. Subtotal del carrito
+    precio_total,_,_ = obtener_total(carrito)
+
+    # > 2. Aplicar descuento por cupon (si existe)
+    if checkout_data.get('cupon',''):
+        cupon_aplicado = precio_total*(Decimal('1') - (Decimal(checkout_data['cupon']['descuento'])/Decimal('100')))
+        cupon = precio_total - cupon_aplicado
+        precio_total = cupon_aplicado
+
+    # > 3. Aplicar costo de envío (si existe)
+    costo_envio = checkout_data['envio_seleccionado']['precio'] if checkout_data.get('envio_seleccionado') else 0
+    precio_total += Decimal(costo_envio)
+    
+    # > 4. Aplicar adicional por forma de pago (si existe)
+    if checkout_data.get('pago'):
+        # * Mixto
+        if checkout_data['pago']['es_mixto']:
+            print("Calculando adicional para pago mixto...")  # Debug
+            monto_transferencia = Decimal(checkout_data['pago']['monto_transferencia'])
+            monto_mercadopago = round((precio_total-monto_transferencia)*Decimal(settings.MERCADOPAGO_COMMISSION),2)
+            adicional = monto_mercadopago - (precio_total - monto_transferencia)
+        # * Mercado Pago
+        elif checkout_data['pago']['forma_de_pago'] == 'mercado_pago':
+            monto_mercadopago = round(precio_total*Decimal(settings.MERCADOPAGO_COMMISSION),2)
+            adicional = monto_mercadopago - precio_total
+
+    precio_total += Decimal(adicional)
+    
+    return precio_total, adicional, costo_envio, cupon, monto_mercadopago, monto_transferencia
+
 
 def clear_carrito_cache(request:HttpRequest):
     """

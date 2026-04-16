@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     shared-mime-info \
     && apt-get clean
 
-# EntryPoints primero (evita sobrescribir si el proyecto tiene archivos con mismo nombre)
+# EntryPoints
 COPY entrypoint.sh /entrypoint.sh
 COPY entrypoint-celery.sh /entrypoint-celery.sh
 COPY entrypoint-beat.sh /entrypoint-beat.sh
@@ -22,10 +22,7 @@ RUN chmod +x /entrypoint.sh /entrypoint-celery.sh /entrypoint-beat.sh
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copiar el proyecto al contenedor
 COPY . .
 
-# Exponer puerto solo para web
 EXPOSE 8000
-# Usar entrypoint personalizado
 ENTRYPOINT ["/entrypoint.sh"]

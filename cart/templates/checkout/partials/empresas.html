@@ -1,0 +1,26 @@
+{% load custom_filters %}
+{% for empresa in empresas %}
+<input type="radio" name="metodo_envio" id="empresa_{{forloop.counter}}" data-name="{{empresa.carrier_name}}" data-price="{{empresa.precio|formato_pesos}}" data-date="{{empresa.fecha_entrega|fecha_humana}}" data-service_name="{{empresa.service_name}}" data-service_code="{{empresa.service_code}}" data-id="{{forloop.counter}}" required>
+<label class="shipping-methods-item shipping-label shipping-generic" for="empresa_{{forloop.counter}}">
+    <img src="{{empresa.carrier_logo}}" alt="{{empresa.carrier_name}}" height="30">
+    <div class="shipping-methods-info">
+        <strong>{{empresa.service_name}}
+            {% for tag in empresa.tags %}
+                {% if tag == 'fastest' %}
+                <code>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-bolt"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11" /></svg>
+                    Rapido
+                </code>
+                {% elif tag == 'cheapest' %}
+                <code>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-moneybag-minus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9.5 3h5a1.5 1.5 0 0 1 1.5 1.5a3.5 3.5 0 0 1 -3.5 3.5h-1a3.5 3.5 0 0 1 -3.5 -3.5a1.5 1.5 0 0 1 1.5 -1.5" /><path d="M12.5 21h-4.5a4 4 0 0 1 -4 -4v-1a8 8 0 0 1 15.943 -.958" /><path d="M16 19h6" /></svg>
+                    Barato
+                </code>
+                {% endif %}
+            {% endfor %}
+        </strong>
+        <p>Entrega estimada: {{empresa.fecha_entrega|fecha_humana}}</p>
+    </div>
+    <span>{{empresa.precio|formato_pesos}}</span>
+</label>
+{% endfor %}

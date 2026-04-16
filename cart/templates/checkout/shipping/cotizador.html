@@ -1,0 +1,54 @@
+<form class="generic-expand animate" id="cotizador" novalidate>
+    <h3>¿Donde lo enviamos?</h3>
+    <div class="generic-input">
+        <label for="id_localidad">Localidad*</label>
+        <input type="text" maxlength="50" placeholder="Palermo" id="id_localidad" name="localidad_cotiza" class="api-required" required>
+        <p class="msg-required"></p>
+    </div>
+    <div class="generic-row">
+        <div class="generic-input">
+            <label for="id_codigo_postal">Código Postal*</label>
+            <input type="text" maxlength="4" placeholder="1111" inputmode="numeric" id="id_codigo_postal" name="codigo_postal_cotiza" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+        <div class="generic-input">
+            <label for="id_provincia">Provincia*</label>
+            <select class="api-required" id="id_provincia" name="provincia_cotiza" required>
+                <option value="" selected disabled>Provincia*</option>
+                <option value="Ciudad Autónoma de Buenos Aires">Ciudad Autónoma de Buenos Aires</option>
+                <option value="Buenos Aires">Buenos Aires</option>
+                <option value="Catamarca">Catamarca</option>
+                <option value="Chaco">Chaco</option>
+                <option value="Chubut">Chubut</option>
+                <option value="Córdoba">Córdoba</option>
+                <option value="Corrientes">Corrientes</option>
+                <option value="Entre Ríos">Entre Ríos</option>
+                <option value="Formosa">Formosa</option>
+                <option value="Jujuy">Jujuy</option>
+                <option value="La Pampa">La Pampa</option>
+                <option value="La Rioja">La Rioja</option>
+                <option value="Mendoza">Mendoza</option>
+                <option value="Misiones">Misiones</option>
+                <option value="Neuquén">Neuquén</option>
+                <option value="Río Negro">Río Negro</option>
+                <option value="Salta">Salta</option>
+                <option value="San Juan">San Juan</option>
+                <option value="San Luis">San Luis</option>
+                <option value="Santa Cruz">Santa Cruz</option>
+                <option value="Santa Fe">Santa Fe</option>
+                <option value="Santiago del Estero">Santiago del Estero</option>
+                <option value="Tierra del Fuego">Tierra del Fuego</option>
+                <option value="Tucumán">Tucumán</option>
+            </select>
+            <p class="msg-required"></p>
+        </div>
+    </div>
+    <button type="button" class="generic-button btn-2 left" id="btn-cotizar">
+        <code>Cotizar envío</code><div class="btn-loader"></div>
+    </button>
+</form>
+<div class="shipping-result shipping-generic hide" id="cotizador-result">
+    <strong>¿Donde lo enviamos?</strong>
+    <span></span>
+    <button type="button" class="shipping-reset" data-value="1">Editar</button>
+</div>

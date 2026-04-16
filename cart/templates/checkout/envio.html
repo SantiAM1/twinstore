@@ -1,0 +1,22 @@
+<div class="generic-item checkout max-content-h {% if hidden %}hide{% endif %}" id="envio">
+    <h3>Envío</h3>
+    <form class="shipping-labels">
+        <input type="radio" name="retiro_envio" id="local">
+        <label for="local" class="shipping-label shipping-generic">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-map-pin shipping-method"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0" /></svg>
+            <strong>Retiro por local</strong>
+            <p>¡Gratis! Nosotros te avisamos cuando este listo!</p>
+        </label>
+        <input type="radio" name="retiro_envio" id="domicilio">
+        <label for="domicilio" class="shipping-label shipping-generic">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-truck-delivery shipping-method"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M15 17a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" /><path d="M3 9l4 0" /></svg>
+            <strong>Envío a domicilio / Sucursal</strong>
+            <p>Recibe tu pedido en las proximas horas!</p>
+        </label>
+    </form>
+    {% include 'checkout/shipping/cotizador.html' %}
+    {% include 'checkout/shipping/empresas.html' %}
+    {% include 'checkout/shipping/sucursales.html' %}
+    {% include 'checkout/shipping/domicilio.html' %}
+    {% include 'checkout/shipping/recibidor.html' %}
+</div>

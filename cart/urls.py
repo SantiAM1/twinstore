@@ -9,7 +9,8 @@ from .views import (
     ValidarPagoMixtoView,
     CheckoutView,
     ValidarFacturacionView,
-    AdicionalesCheckoutView
+    AdicionalesCheckoutView,
+    ValidarFormaPagoView
 )
 
 app_name = 'cart'
@@ -25,4 +26,5 @@ urlpatterns = [
     path("api/checkout/finalizar/",CheckoutView.as_view(),name="api_checkout"),
     path("api/checkout/validar-facturacion/",ValidarFacturacionView.as_view(),name="api_validar_facturacion"),
     path("api/checkout/adicionales/",AdicionalesCheckoutView.as_view(),name="api_adicionales_checkout"),
+    path("api/checkout/validar-pago/",ValidarFormaPagoView.as_view(),name="api_validar_pago"),
 ]

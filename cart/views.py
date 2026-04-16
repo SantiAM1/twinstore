@@ -23,22 +23,26 @@ from .utils import (
     validar_compra,
     sumar_carrito,
     eliminar_del_carrito,
-    actualizar_carrito
+    actualizar_carrito,
+    obtener_total_checkout
     )
-from .models import Producto, Carrito, Pedido
 
 from .context_processors import carrito_total
 from .permissions import TieneCarrito
 from .decorators import requiere_carrito
+from .types import CheckoutData
 from .serializers import (
     AgregarAlCarritoSerializer,
     EliminarPedidoSerializer,
     ActualizarPedidoSerializer,
     CuponSerializer,
     PagoMixtoSerializer,
-    CheckoutSerializer,
     AdicionalesCheckoutSerializer,
-    ComprobanteSerializer
+     ValidarPagoSerializer,
+    # ! DEPRECATED
+    ComprobanteSerializer,
+    CheckoutSerializer,
+    # !
 )
 
 from rest_framework.views import APIView
@@ -47,6 +51,20 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 from decimal import Decimal
+
+LABEL_CONDICION_IVA = {
+    "A": "Responsable Inscripto",
+    "B": "Consumidor Final",
+    "C": "Monotributista",
+}
+
+LABEL_FORMA_PAGO = {
+    "efectivo": "Efectivo",
+    "transferencia": "Transferencia",
+    "tarjeta": "Tarjeta de crédito/débito",
+    "mercado_pago": "Mercado Pago",
+    "mixto": "Pago Mixto: Mercado Pago + Transferencia bancaria",
+}
 
 # ----- APIS ----- #
 class ActualizarPedidoView(APIView):
@@ -150,27 +168,30 @@ class AgregarAlCarritoView(APIView):
 class ValidarCuponView(APIView):
     permission_classes = [TieneCarrito,BloquearSiMantenimiento]
     throttle_classes = [CalcularPedidoThrottle]
-    def post(self,request):
+    def post(self,request:HttpRequest):
         serializer = CuponSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors,status=400)
         
         codigo = serializer.validated_data.get("codigo").upper()
+        if request.session.get('checkout',{}).get('cupon',None):
+            del request.session['checkout']['cupon']
+            request.session.modified = True
 
         try:
             cupon = Cupon.objects.get(codigo=codigo)
-            carrito = obtener_carrito(request)
-            precio_total, _, _ = obtener_total(carrito)
+            checkout_data:CheckoutData = request.session.get('checkout',{})
+            checkout_data['cupon'] = {
+                "codigo": cupon.codigo,
+                "descuento": str(cupon.descuento)
+            }
+            request.session['checkout'] = checkout_data
+            request.session.modified = True
 
-            cupon_descuento = (precio_total * cupon.descuento) / 100
-            total_precio = precio_total - cupon_descuento
+            print(obtener_total_checkout(request))
+            precio_total,_,_,cupon,_,_ = obtener_total_checkout(request)
 
-            checkout = obtener_crear_checkout(request)
-            checkout.cupon_id = cupon.id
-            checkout.descuento = cupon_descuento
-            checkout.save()
-
-            return Response({'cupon': f"-{formato_pesos(cupon_descuento)}", 'total': formato_pesos(total_precio)},status=200)
+            return Response({"precio_total": formato_pesos(precio_total),"descuento": f"-{formato_pesos(cupon)}"},status=200)
         
         except Cupon.DoesNotExist:
             if request.session.get('cupon',''):
@@ -179,6 +200,7 @@ class ValidarCuponView(APIView):
 
             return Response({"error": "Cupón inválido o inactivo."}, status=404)
 
+# ! DEPRECATED
 class ValidarPagoMixtoView(APIView):
     permission_classes = [TieneCarrito,BloquearSiMantenimiento]
     throttle_classes = [CalcularPedidoThrottle]
@@ -210,13 +232,75 @@ class ValidarPagoMixtoView(APIView):
 
         return Response({"mercadopago":formato_pesos(pago_mp),"adicional":formato_pesos(adicional),"total":formato_pesos(total),"transferencia":formato_pesos(pago_transferencia)},status=200)
 
+# ----- Validar datos de facturación ----- #
 class ValidarFacturacionView(APIView):
     permission_classes = [BloquearSiMantenimiento,IsAuthenticated]
     def post(self, request:HttpRequest):
         serializer = CheckoutSerializer(data=request.data)
         if serializer.is_valid():
-            return Response({"valid": True}, status=status.HTTP_200_OK)
+            checkout_data = request.session.get('checkout',{})
+            checkout_data['facturacion'] = serializer.validated_data
+            request.session['checkout'] = checkout_data
+            request.session.modified = True
+            label_condicion = LABEL_CONDICION_IVA.get(serializer.validated_data.get('condicion_iva',''),'')
+            return Response(status=status.HTTP_200_OK,data={
+                "nombre_completo":f"{serializer.validated_data['nombre']} {serializer.validated_data['apellido']}",
+                "dni_cuit":serializer.validated_data['dni_cuit'],
+                "condicion_iva":label_condicion,
+                "direccion":f"{serializer.validated_data['direccion']}, {serializer.validated_data['localidad']}, {serializer.validated_data['codigo_postal']}",
+                })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# ----- Validar forma de pago ----- #
+class ValidarFormaPagoView(APIView):
+    def post(self,request:HttpRequest):
+        serializer = ValidarPagoSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors,status=400)
+        
+        data = serializer.validated_data
+        forma_de_pago = data.get('forma_de_pago')
+
+        checkout:CheckoutData = request.session.get('checkout',{})
+        if checkout.get('pago',{}):
+            del request.session['checkout']['pago']
+            request.session.modified = True
+
+        pago_data = {
+            'forma_de_pago': forma_de_pago,
+            'es_mixto': False
+        }
+
+        if forma_de_pago == 'mixto':
+            # * Validar monto mixto
+            precio_total, _, _ = obtener_total(obtener_carrito(request))
+            monto_mixto = data.get('monto_mixto')
+            if monto_mixto is None or monto_mixto <= 0:
+                return Response({"error": "Monto mixto inválido.","mixto": True}, status=400)
+            if monto_mixto >= (precio_total*Decimal('0.95')):
+                return Response({"error": "El monto mixto no puede ser mayor o igual al 95% del total.","mixto": True}, status=400)
+            
+            pago_data['es_mixto'] = True
+            pago_data['monto_transferencia'] = str(monto_mixto)
+
+        checkout['pago'] = pago_data
+        request.session['checkout'] = checkout
+        request.session.modified = True
+
+        precio_total, adicional, _, _, monto_mercadopago, monto_transferencia = obtener_total_checkout(request)
+
+        return Response(
+                {
+                    "pago_total": formato_pesos(precio_total),
+                    "monto_transferencia": formato_pesos(monto_transferencia) if monto_transferencia else None,
+                    "monto_mercadopago": formato_pesos(monto_mercadopago) if monto_mercadopago else None,
+                    "adicional": formato_pesos(adicional) if adicional else None,
+                    "mixto": pago_data['es_mixto'],
+                    "title": LABEL_FORMA_PAGO.get(forma_de_pago,''),
+                    "forma_de_pago": forma_de_pago,
+                },
+                status=200
+            )
 
 class CheckoutView(APIView):
     permission_classes = [BloquearSiMantenimiento,IsAuthenticated]
@@ -295,16 +379,18 @@ class AdicionalesCheckoutView(APIView):
 @requiere_carrito
 @bloquear_si_mantenimiento
 def finalizar_compra(request: HttpRequest):
-    from core.utils import get_datos_banc
-    datos_bancarios = get_datos_banc()
+    checkout = request.session.get('checkout',{})
+    if checkout:
+        del request.session['checkout']
+        request.session.modified = True
+
     carrito = obtener_carrito(request)
     precio_total,precio_subtotal,descuento = obtener_total(carrito)
-    return render(request, 'cart/new_checkout.html',{
+    return render(request, 'cart/checkout.html',{
         'carrito':carrito,
         'precio_total':precio_total,
         'precio_subtotal':precio_subtotal,
         'descuento':descuento,
-        'datos_bancarios':datos_bancarios
         })
 
 # ----- Ver el carro -----#
