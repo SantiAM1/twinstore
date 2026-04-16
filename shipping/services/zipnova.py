@@ -38,7 +38,7 @@ class ZipnovaService:
         return headers
 
     # def cotizar(self, cp_destino: str, peso: float, dimensiones: Dict[str, int],obj: Producto | Variante, valor_declarado: float = 10000) -> Dict[str, Any]:
-    def cotizar(self, carrito: list[CarritoDict], cuidad: str, estado: str, codigo_postal: str) -> Dict[str, Any]:
+    def cotizar(self, carrito: list[CarritoDict], destino: dict[str, str]) -> Dict[str, Any]:
         endpoint = f"{self.BASE_URL}/shipments/quote"
         declared_value, _, _ = obtener_total(carrito)
 
@@ -58,9 +58,9 @@ class ZipnovaService:
                 } for item in carrito
             ],
             "destination": {
-                "city": cuidad,
-                "state": estado,
-                "zipcode": codigo_postal
+                "city": destino['cuidad'],
+                "state": destino['estado'],
+                "zipcode": destino['codigo_postal']
             }
         }
 

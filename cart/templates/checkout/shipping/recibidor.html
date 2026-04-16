@@ -1,0 +1,35 @@
+<form class="generic-expand animate" id="shipping-reciver" novalidate>
+    <h3>¿Quien recibe/retira?</h3>
+    <div class="generic-row-50">
+        <div class="generic-input">
+            <label for="id_nombre_completo">Nombre Completo*</label>
+            <input type="text" maxlength="50" placeholder="José Perez" id="id_nombre_completo" name="nombre_reciver" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+        <div class="generic-input">
+            <label for="id_dni">DNI*</label>
+            <input type="text" maxlength="50" placeholder="12345678" inputmode="numeric" id="id_dni" name="dni_reciver" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+    </div>
+    <div class="generic-row">
+        <div class="generic-input">
+            <label for="id_email">Email*</label>
+            <input type="email" maxlength="50" placeholder="tuemail@mail.com" id="id_email" name="email_reciver" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+        <div class="generic-input">
+            <label for="id_telefono">Telefono*</label>
+            <input type="text" maxlength="50" placeholder="1234567891" inputmode="numeric" id="id_telefono" name="phone_reciver" class="api-required" required>
+            <p class="msg-required"></p>
+        </div>
+    </div>
+    <button type="button" class="generic-button btn-2 left" id="btn-user-reciver">
+        <code>Confimar</code><div class="btn-loader"></div>
+    </button>
+</form>
+<div class="shipping-result shipping-generic hide" id="user-reciver-result-1">
+    <strong>¿Quien recibe/retira?</strong>
+    <span></span>
+    <button type="button" class="shipping-reset" data-value="4">Editar</button>
+</div>

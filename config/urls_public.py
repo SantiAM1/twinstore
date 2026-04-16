@@ -33,8 +33,9 @@ dummy_patterns_admin = ([
     path('url17',response_404,name="products_etiquetas_changelist"),
     path('url18',response_404,name="products_tokenreseña_changelist"),
     path('url19',response_404,name="core_homesection_changelist"),
-    path('url20',response_404,name="core_datosbancarios_changelist"),
-    path('url21',response_404,name="core_mercadopagoconfig_changelist"),
+    path('url20/<int:pk>',response_404,name="core_datosbancarios_change"),
+    path('url21/<int:pk>',response_404,name="core_mercadopagoconfig_change"),
+    path('url22',response_404,name="shipping_shippingconfig_changelist"),
 ], 'admin')
 
 

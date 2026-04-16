@@ -216,12 +216,11 @@ def cache_clear(request):
 
 @staff_member_required
 def test(request):
+    from cart.utils import obtener_total_checkout
+    test = obtener_total_checkout(request)
+    checkout_data = request.session.get('checkout',{})
 
-    messages.info(request,"Esto es un mensaje de prueba.")
-    messages.success(request, "Mensaje de exito!")
-    messages.error(request, "Mensaje de error")
-
-    return render(request, "core/test.html", {})
+    return render(request, "core/test.html", {"data":checkout_data,"test":test})
 
 @staff_member_required
 def toggle_mantenimiento(request: HttpRequest):

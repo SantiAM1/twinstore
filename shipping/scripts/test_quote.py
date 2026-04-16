@@ -46,3 +46,4 @@ def run():
 
     carrito = CARRITO
     resultado = service.cotizar(carrito,cuidad="Palermo",estado="Capital federal",codigo_postal="1425")
+    print(resultado)

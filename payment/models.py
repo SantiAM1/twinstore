@@ -254,8 +254,13 @@ class TicketDePago(models.Model):
         RECHAZADO = 'rechazado', 'Rechazado'
         PENDIENTE = 'pendiente', 'Pendiente'
 
+    class Tipo(models.TextChoices):
+        MPAGO = 'mercado_pago', 'Mercado Pago'
+        TRANS = 'transferencia', 'Transferencia'
+
     venta = models.ForeignKey(Venta,on_delete=models.CASCADE,related_name='tickets')
     estado = models.CharField(max_length=20,choices=Estado.choices,default=Estado.PENDIENTE)
+    tipo = models.CharField(max_length=20,choices=Tipo.choices,default=Tipo.MPAGO)
     monto = models.DecimalField(max_digits=10,decimal_places=2)
     merchant_order_id = models.CharField(max_length=100, blank=True, null=True)
     creado = models.DateTimeField(auto_now_add=True,blank=True,null=True)

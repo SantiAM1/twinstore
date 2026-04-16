@@ -21,8 +21,10 @@ env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 #  * Cargar la variable de entorno del archivo .env
-MERCADOPAGO_PERCENTAJE = 0.0642
-MERCADOPAGO_COMMISSION = (MERCADOPAGO_PERCENTAJE*(1.315))+1
+from decimal import Decimal
+MERCADOPAGO_PERCENTAJE = Decimal('0.0642')
+IMPUESTOS = Decimal('1.315')
+MERCADOPAGO_COMMISSION = (MERCADOPAGO_PERCENTAJE * IMPUESTOS) + Decimal('1')
 DJANGO_SECRET_KEY = env("DJANGO_SECRET_KEY")
 SECRET_KEY = DJANGO_SECRET_KEY
 
@@ -159,7 +161,7 @@ CONTENT_SECURITY_POLICY = {
             "https://fonts.gstatic.com",
             "data:"
         ],
-        "img-src": ["'self'", "data:"],
+        "img-src": ["'self'", "data:","https://zippincore.s3.amazonaws.com",],
         "frame-src": [
             "'self'",
             "https://www.google.com",
