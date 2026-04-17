@@ -2,8 +2,7 @@ from django.contrib import admin,messages
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 
-from .models import Venta,ComprobanteTransferencia,EstadoPedido,Cupon,TicketDePago,VentaDetalle
-from users.models import DatosFacturacion
+from .models import Venta,ComprobanteTransferencia,EstadoPedido,Cupon,TicketDePago,VentaDetalle,DatosFacturacion
 
 from unfold.admin import ModelAdmin,TabularInline,StackedInline
 from unfold.decorators import display

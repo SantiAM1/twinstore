@@ -2,9 +2,9 @@ from django.http import HttpRequest
 import mercadopago
 from django.utils import timezone
 from products.models import Producto,Variante
-from payment.models import EstadoPedido,Cupon,Venta,ComprobanteTransferencia,VentaDetalle
-from users.models import DatosFacturacion,User
-from cart.models import Carrito, CheckOutData,Pedido
+from payment.models import EstadoPedido,Cupon,Venta,ComprobanteTransferencia,VentaDetalle,DatosFacturacion
+from users.models import User
+from cart.models import Carrito,Pedido
 from payment.models import TicketDePago
 from django.core.cache import cache
 from django.db import transaction
@@ -28,7 +28,10 @@ def crear_venta(carrito:dict,request:HttpRequest,checkout_serializer:dict,forma_
     Devuelve el merchant_order_id generado para la Venta creada.
     """
     precio_total,_,_ = obtener_total(carrito)
-    checkout = obtener_crear_checkout(request)
+    
+    # checkout = obtener_crear_checkout(request)
+    # ! DEPRECATED
+    checkout:CheckoutData = obtener_total_checkout(request)
 
     precio_total -= checkout.descuento if checkout and checkout.descuento else 0
     precio_total += checkout.adicional if checkout and checkout.adicional else 0
@@ -504,27 +507,8 @@ def crear_facturacion(data:dict,venta:Venta) -> None:
         localidad=data['localidad'],
     )
 
-def obtener_crear_checkout(request:HttpRequest) -> CheckOutData|None:
-    """
-    Obtiene el checkout.
-
-    Si no existe, crea un nuevo registro de CheckOutData y lo devuelve.
-    """
-    checkout_id = request.session.get('checkout_id','')
-    if checkout_id:
-        try:
-            checkout_data = CheckOutData.objects.get(id=checkout_id, usuario=request.user)
-            return checkout_data
-        except CheckOutData.DoesNotExist:
-            return None
-    else:
-        checkout_data = CheckOutData.objects.create(
-            usuario=request.user,
-        )
-        request.session['checkout_id'] = checkout_data.id
-    return checkout_data
-
-def generar_ticket(venta:Venta,checkout:CheckOutData,forma_pago:str) -> TicketDePago:
+# ! DEPRECATED
+def generar_ticket(venta:Venta,checkout:None,forma_pago:str) -> TicketDePago:
     """
     Genera un ticket de pago para la Venta proporcionada.
     """

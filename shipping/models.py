@@ -27,3 +27,16 @@ class ShippingConfig(models.Model):
 
     def __str__(self):
         return f"Configuración {self.provider}"
+
+class DireccionEnvio(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="direcciones_envio")
+    nombre_completo = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=20)
+    direccion = models.CharField(max_length=255)
+    ciudad = models.CharField(max_length=100)
+    provincia = models.CharField(max_length=100)
+    codigo_postal = models.CharField(max_length=10)
+    instrucciones_adicionales = models.TextField(blank=True, default="")
+
+    def __str__(self):
+        return f"Dirección de envío de {self.user.email} - {self.direccion}, {self.ciudad}"

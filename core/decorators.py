@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.core.cache import cache
 from .utils import get_configuracion_tienda
+from functools import wraps
 
 def bloquear_si_mantenimiento(view_func):
     """
@@ -25,3 +26,26 @@ def bloquear_si_mantenimiento(view_func):
 
         return view_func(request, *args, **kwargs)
     return _wrapped_view
+
+def excluir_de_public(request=None,retorno={}):
+    """
+    Decorador para excluir vistas del esquema público.
+    Si el usuario está en el esquema público, se devuelve un JSON vacío o el retorno especificado.
+    """
+    if request:
+        return (hasattr(request, 'tenant') and request.tenant.schema_name == 'public')
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            request = None
+            for arg in args:
+                if hasattr(arg, 'tenant'):
+                    request = arg
+                    break
+            if not request and 'request' in kwargs:
+                request = kwargs['request']
+            if request and hasattr(request, 'tenant') and request.tenant.schema_name == 'public':
+                return retorno
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator

@@ -16,6 +16,9 @@
 
 {% block content %}
 
+{% if request.tenant.schema_name == 'public' %}
+    hola
+{% else %}
 {% include 'admin/styles.html' %}
 
 {% include 'admin/top-index.html' %}
@@ -30,5 +33,6 @@
 {% include 'admin/prod_chart_review.html' %}
 
 {% include 'admin/footer.html' %}
+{% endif %}
 
 {% endblock %}

@@ -234,7 +234,6 @@ class EstadoPedido(models.Model):
         verbose_name = "Notificacion"
         verbose_name_plural = "Notificaciones"
 
-
 class PagoRecibidoMP(models.Model):
     payment_id = models.CharField(max_length=100, unique=True)
     merchant_order_id = models.CharField(max_length=100, blank=True, null=True)
@@ -314,6 +313,7 @@ class TicketDePago(models.Model):
     def __str__(self):
         return f"Monto a depositar: {self.monto}"
 
+# ! DEPRECATED
 class ComprobanteTransferencia(models.Model):
     ESTADOS = [
         ('aprobado','Aprobado'),
@@ -355,3 +355,90 @@ class Cupon(models.Model):
 
     def __str__(self):
         return f"{self.codigo} - %{self.descuento}"
+
+class DatosBancarios(models.Model):
+    """
+    Información bancaria para pagos.
+    """
+    banco = models.CharField(max_length=100,default="")
+    titular_cuenta = models.CharField(max_length=100,default="")
+    numero_cuenta = models.CharField(max_length=50,default="")
+    cbu = models.CharField(max_length=50,default="")
+    alias = models.CharField(max_length=50,default="")
+    imagen_banco = models.ImageField(upload_to='bancos_logos/', help_text="Logo del banco. (Opcional)", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Dato Bancario"
+        verbose_name_plural = "Datos Bancarios"
+
+    def __str__(self):
+        return f"{self.banco} - {self.titular_cuenta}"
+
+class MercadoPagoConfig(models.Model):
+    """
+    Configuración de MercadoPago.
+    """
+    public_key = models.CharField(max_length=200, default="", help_text="Clave pública de MercadoPago.")
+    access_token = models.CharField(max_length=200, default="", help_text="Token de acceso de MercadoPago.")
+    webhook_key = models.CharField(max_length=200, default="", help_text="Clave para poder recibir pagos.")
+
+    class Meta:
+        verbose_name = "Configuración de MercadoPago"
+        verbose_name_plural = "Configuraciones de MercadoPago"
+
+    def __str__(self):
+        return "MercadoPago"
+    
+class DatosFacturacion(models.Model):
+    class CondicionIVA(models.TextChoices):
+        RESP_INSC = 'A', 'Responsable Inscripto'
+        CONSUMIDOR_FINAL = 'B', 'Consumidor Final'
+        MONOTRIBUTO = 'C', 'Monotributo'
+        EXENTO = 'E', 'Exento'
+        NO_RESPONSABLE = 'N', 'No Responsable'
+    
+    class Provincia(models.TextChoices):
+        CABA = 'A', 'Ciudad Autónoma de Buenos Aires'
+        BUENOS_AIRES = 'B', 'Buenos Aires'
+        CATAMARCA = 'C', 'Catamarca'
+        CHACO = 'H', 'Chaco'
+        CHUBUT = 'U', 'Chubut'
+        CORDOBA = 'X', 'Córdoba'
+        CORRIENTES = 'W', 'Corrientes'
+        ENTRE_RIOS = 'E', 'Entre Ríos'
+        FORMOSA = 'P', 'Formosa'
+        JUJUY = 'Y', 'Jujuy'
+        LA_PAMPA = 'L', 'La Pampa'
+        LA_RIOJA = 'F', 'La Rioja'
+        MENDOZA = 'M', 'Mendoza'
+        MISIONES = 'N', 'Misiones'
+        NEUQUEN = 'Q', 'Neuquén'
+        RIO_NEGRO = 'R', 'Río Negro'
+        SALTA = 'I', 'Salta'
+        SAN_JUAN = 'J', 'San Juan'
+        SAN_LUIS = 'D', 'San Luis'
+        SANTA_CRUZ = 'Z', 'Santa Cruz'
+        SANTA_FE = 'S', 'Santa Fe'
+        SANTIAGO_ESTERO = 'G', 'Santiago del Estero'
+        TIERRA_FUEGO = 'V', 'Tierra del Fuego'
+        TUCUMAN = 'T', 'Tucumán'
+
+    venta = models.OneToOneField(Venta, on_delete=models.CASCADE, related_name="facturacion")
+    nombre = models.CharField(max_length=50)
+    apellido = models.CharField(max_length=50)
+    razon_social = models.CharField(max_length=255, blank=True)
+    dni_cuit = models.CharField(max_length=20)
+    condicion_iva = models.CharField(max_length=1, choices=CondicionIVA.choices)
+    telefono = models.CharField(max_length=20, blank=True)
+    email = models.EmailField()
+    codigo_postal = models.CharField(max_length=10)
+    provincia = models.CharField(max_length=1, choices=Provincia.choices)
+    direccion = models.CharField(max_length=255)
+    localidad = models.CharField(max_length=255,null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Facturación"
+        verbose_name_plural = "Datos de Facturación"
+
+    def __str__(self):
+        return f"Datos Facturación #{self.id} - {self.nombre} {self.apellido}"

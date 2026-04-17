@@ -83,6 +83,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'csp.middleware.CSPMiddleware',
+    # ! DEPRECATED: En un futuro esto deberia bloquear a un usuario si el dueño no pago el servicio.
     'core.middleware.mantenimiento.MantenimientoGlobalMiddleware',
 ]
 
@@ -91,9 +92,18 @@ SHARED_APPS = (
     'customers',
     'website',
     
+    'unfold',
+    'unfold.contrib.import_export',
+    
+    'axes',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.sessions',
+    'django.contrib.messages',
     'django.contrib.contenttypes',
     'django.contrib.staticfiles',
     
+    'users',
     'django_cleanup.apps.CleanupConfig',
     'compressor',
     'django_extensions',
@@ -111,14 +121,14 @@ TENANT_APPS = (
     'django.contrib.admin',
     
     'django.contrib.auth',
+    'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'axes',
-    
-    'rest_framework',
-
-    'import_export',
     'django.contrib.sitemaps',
+
+    'axes',
+    'rest_framework',
+    'import_export',
 
     'users',
     'core',
@@ -129,6 +139,7 @@ TENANT_APPS = (
     'shipping'
 )
 
+# Con esta lógica, Unfold (que viene de SHARED_APPS) quedará primero en la lista final
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
 AUTHENTICATION_BACKENDS = [
@@ -189,7 +200,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.carrito_total',
-                'cart.context_processors.limpiar_checkout',
                 'core.context_processors.evento_activo_context',
                 'core.context_processors.config_context',
             ],
@@ -582,12 +592,12 @@ UNFOLD = {
                     {
                         "title": _("Tus datos bancarios"),
                         "icon": "account_balance",
-                        "link": reverse_lazy('admin:core_datosbancarios_change',args=[1]),
+                        # "link": reverse_lazy('admin:payment_datosbancarios_change',args=[1]),
                     },
                     {
                         "title": _("Mercado Pago"),
                         "icon": "payment",
-                        "link": reverse_lazy('admin:core_mercadopagoconfig_change',args=[1]),
+                        # "link": reverse_lazy('admin:payment_mercadopagoconfig_change',args=[1]),
                     },
                     {
                         "title": _("Configuración de envíos"),

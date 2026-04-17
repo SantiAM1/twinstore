@@ -1,11 +1,15 @@
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
-from .models import Venta,ComprobanteTransferencia,EstadoPedido,TicketDePago
-from users.emails import mail_estado_pedido_html
+from .models import Venta,ComprobanteTransferencia,EstadoPedido,TicketDePago,DatosFacturacion
+from users.emails import mail_estado_pedido_html,mail_buy_send_html
 from products.services import gestionar_stock_venta
 from products.models import MovimientoStock
 from django.utils import timezone
 from core.utils import get_configuracion_tienda
+
+@receiver(post_save, sender=DatosFacturacion)
+def enviar_mail_compra(sender, instance, **kwargs):
+    mail_buy_send_html(instance.venta,instance.email)
 
 @receiver(post_save,sender=EstadoPedido)
 def estados_requiere_revision(sender, instance, created, **kwargs):

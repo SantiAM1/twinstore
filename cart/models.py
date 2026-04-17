@@ -46,16 +46,3 @@ class Carrito(models.Model):
 
     def get_total(self):
         return sum(pedido.get_total_precio() for pedido in self.pedidos.all())
-
-class CheckOutData(models.Model):
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    cupon_id = models.PositiveIntegerField(blank=True,null=True)
-    adicional = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
-    forma_de_pago = models.CharField(max_length=50,blank=True,null=True)
-    creado = models.DateTimeField(auto_now_add=True)
-    completado = models.BooleanField(default=False)
-    descuento = models.DecimalField(max_digits=10,decimal_places=2,blank=True,null=True)
-    mixto = models.DecimalField(max_digits=10,decimal_places=2,blank=True,null=True)
-
-    def __str__(self):
-        return f"Checkout de: {self.usuario.username}"

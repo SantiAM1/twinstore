@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
-from core.models import Tienda,DatosBancarios,MercadoPagoConfig
+from core.models import Tienda
+from payment.models import MercadoPagoConfig, DatosBancarios
 from django.contrib.auth.models import Group, Permission
 from django.contrib.auth import get_user_model
 from products.models import Proveedor, SubCategoria, Categoria, Marca, Etiquetas, Producto
