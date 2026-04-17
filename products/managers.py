@@ -1,6 +1,5 @@
 from django.db import models
 
-from core.utils import get_configuracion_tienda
 from django.db.models import Q , Count, QuerySet, Sum, Value, Prefetch
 from django.db.models.functions import Coalesce
 from .types import GridContext
@@ -35,6 +34,7 @@ class ProductQuerySet(models.QuerySet):
 
     def precargado(self,prefetchs_comunes = ["imagenes_producto"]):
         from products.models import Variante
+        from core.utils import get_configuracion_tienda
         config = get_configuracion_tienda()
         modo_estricto = config.get('modo_stock') == 'estricto'
 

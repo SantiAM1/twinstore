@@ -1,6 +1,7 @@
 from payment.models import Venta
 from django.http import HttpRequest
 from products.models import AjusteStock
+from core.decorators import excluir_de_public
 
 from .utils import (
     dashboard_tabs,
@@ -13,8 +14,9 @@ from .utils import (
     ultimas_reseñas
 )
 
-
 def dashboard_callback(request: HttpRequest, context: dict) -> dict:
+    if excluir_de_public(request):
+        return context
     # imports basicos
     line_type = request.GET.get('line_type','ingresos')
     periodo, fecha_inicio,fecha_anterior = filtro_fechas(request)
@@ -43,17 +45,18 @@ def dashboard_callback(request: HttpRequest, context: dict) -> dict:
 
     return context
 
+@excluir_de_public(retorno=0)
 def ajuste_stock(request: HttpRequest) -> int:
     count = AjusteStock.objects.filter(resuelto=False).count()
     return count
 
+@excluir_de_public(retorno=0)
 def ventas_verificacion(request: HttpRequest) -> int:
     count = Venta.objects.filter(requiere_revision=True).count()
     return count
 
+@excluir_de_public(retorno=["Sitio ADMIN", "success"])
 def environment_callback(request: HttpRequest) -> list[str]:
-    if request.tenant.schema_name == 'public':
-        return []
     from core.utils import get_configuracion_tienda
     
     config = get_configuracion_tienda(request)

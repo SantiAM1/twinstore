@@ -5,6 +5,7 @@ from django.utils.html import format_html
 from django.templatetags.static import static
 from customers.models import Client
 from unfold.sections import TableSection
+from .decorators import excluir_de_public
 
 from .models import (
     Tienda,
@@ -14,51 +15,52 @@ from .models import (
     HomeBannerMedio,
     HomeCarouselBento,
     HomeProductGrid,
-    MercadoPagoConfig,
-    DatosBancarios,
+    # MercadoPagoConfig,
+    # DatosBancarios,
     HomeStaticBento
 )
 
-@admin.register(MercadoPagoConfig)
-class MercadoPagoConfigAdmin(ModelAdmin):
-    list_display = ('public_key', 'access_token')
-    readonly_fields = ['advertencia']
+# ! DEPRECATED
+# @admin.register(MercadoPagoConfig)
+# class MercadoPagoConfigAdmin(ModelAdmin):
+#     list_display = ('public_key', 'access_token')
+#     readonly_fields = ['advertencia']
     
-    def get_fieldsets(self, request, obj = None):
-        if request.tenant.plan == Client.Plan.BASIC:
-            return ((None, {'fields': ('advertencia',)}),)
-        return (
-                (None, {
-                    'fields': ('public_key','access_token','webhook_key')
-                }),
-            )
+#     def get_fieldsets(self, request, obj = None):
+#         if request.tenant.plan == Client.Plan.BASIC:
+#             return ((None, {'fields': ('advertencia',)}),)
+#         return (
+#                 (None, {
+#                     'fields': ('public_key','access_token','webhook_key')
+#                 }),
+#             )
 
-    def advertencia(self, obj):
-        return f"No tienes permiso para completar estos campos. Tu plan es 'Básico'"
+#     def advertencia(self, obj):
+#         return f"No tienes permiso para completar estos campos. Tu plan es 'Básico'"
 
-    def has_change_permission(self, request, obj = ...):
-        if request.tenant.plan == Client.Plan.BASIC:
-            return False
-        return True
+#     def has_change_permission(self, request, obj = ...):
+#         if request.tenant.plan == Client.Plan.BASIC:
+#             return False
+#         return True
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#     def has_delete_permission(self, request, obj=None):
+#         return False
 
-    def has_add_permission(self, request):
-        return False
+#     def has_add_permission(self, request):
+#         return False
 
-    def has_view_permission(self, request, obj = ...):
-        return True
+#     def has_view_permission(self, request, obj = ...):
+#         return True
 
-@admin.register(DatosBancarios)
-class DatosBancariosAdmin(ModelAdmin):
-    list_display = ('banco', 'numero_cuenta', 'alias','titular_cuenta')
+# @admin.register(DatosBancarios)
+# class DatosBancariosAdmin(ModelAdmin):
+#     list_display = ('banco', 'numero_cuenta', 'alias','titular_cuenta')
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+#     def has_delete_permission(self, request, obj=None):
+#         return False
 
-    def has_add_permission(self, request):
-        return False
+#     def has_add_permission(self, request):
+#         return False
 
 class HomeCarouselBentoInline(StackedInline):
     model = HomeCarouselBento
@@ -242,6 +244,7 @@ class EventosPromocionesAdmin(ModelAdmin):
         }),
     )
 
+    @excluir_de_public(retorno=False)
     def has_add_permission(self, request):
         if EventosPromociones.objects.count() > 0:
             return False

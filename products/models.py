@@ -1,6 +1,5 @@
 from django.db import models
 from django.db.models import Sum
-from core.utils import get_configuracion_tienda
 from django.utils.text import slugify
 from django.urls import reverse
 from django.templatetags.static import static
@@ -154,6 +153,7 @@ class Producto(models.Model):
 
     def calcular_precio_sin_evento(self):
         from core.models import Tienda
+        from core.utils import get_configuracion_tienda
         config = get_configuracion_tienda()
         if config['divisa'] == Tienda.Divisas.USD:
             self.precio_base = round(self.precio_divisa * config['valor_dolar'], 2)

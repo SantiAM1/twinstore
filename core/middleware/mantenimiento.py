@@ -8,6 +8,7 @@ class MantenimientoGlobalMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
+    # ! DEPRECATED
     def __call__(self, request: HttpRequest):
         if request.tenant.schema_name == 'public':
             return self.get_response(request)

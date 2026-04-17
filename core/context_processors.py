@@ -2,10 +2,10 @@ from core.models import EventosPromociones
 from django.utils import timezone
 from django.core.cache import cache
 from core.utils import get_configuracion_tienda,gen_cache_key
+from .decorators import excluir_de_public
 
+@excluir_de_public(retorno={})
 def evento_activo_context(request):
-    if request.tenant.schema_name == 'public':
-        return {}
     def obtener_evento():
         ahora = timezone.now()
         evento = EventosPromociones.objects.filter(
@@ -26,8 +26,7 @@ def evento_activo_context(request):
     
     return {'evento_activo': evento_activo}
 
+@excluir_de_public(retorno={})
 def config_context(request):
-    if request.tenant.schema_name == 'public':
-        return {}
     today = timezone.now().date()
     return {'config': get_configuracion_tienda(request), 'today': today}

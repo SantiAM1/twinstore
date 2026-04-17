@@ -1,7 +1,9 @@
-from .models import Carrito,CheckOutData
+from .models import Carrito
 from django.db.models import Sum
 from django.http import HttpRequest
+from core.decorators import excluir_de_public
 
+@excluir_de_public(retorno={})
 def carrito_total(request:HttpRequest):
     if request.path.startswith('/admin/'):
         return {}
@@ -16,11 +18,3 @@ def carrito_total(request:HttpRequest):
         total_productos = sum(val['cantidad'] for val in carrito.values())
 
     return {'total_productos': total_productos if total_productos > 0 else 0}
-
-def limpiar_checkout(request:HttpRequest):
-    checkout_id = request.session.get('checkout_id')
-    if checkout_id:
-        CheckOutData.objects.filter(id=checkout_id, completado=False).delete()
-        request.session.pop('checkout_id', None)
-        request.session.modified = True
-    return {}

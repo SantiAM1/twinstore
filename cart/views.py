@@ -19,7 +19,6 @@ from .utils import (
     obtener_total,
     clear_carrito_cache,
     crear_venta,
-    obtener_crear_checkout,
     validar_compra,
     sumar_carrito,
     eliminar_del_carrito,
@@ -224,7 +223,7 @@ class ValidarPagoMixtoView(APIView):
         adicional = pago_mp - (total_carrito - pago_transferencia)
         total = pago_mp + pago_transferencia
 
-        checkout = obtener_crear_checkout(request)
+        checkout = obtener_total_checkout(request)
         checkout.forma_de_pago = 'mixto'
         checkout.mixto = pago_mp
         checkout.adicional = adicional
@@ -331,6 +330,7 @@ class CheckoutView(APIView):
 
         return Response({'success':True,'order_id':order_id,'init_point':init_point if init_point else None},status=200)
 
+# ! DEPRECATED
 class AdicionalesCheckoutView(APIView):
     permission_classes = [BloquearSiMantenimiento,IsAuthenticated]
     throttle_classes = [CalcularPedidoThrottle]
@@ -345,7 +345,7 @@ class AdicionalesCheckoutView(APIView):
         carrito = obtener_carrito(request)
         precio_total, _, _ = obtener_total(carrito)
 
-        checkout = obtener_crear_checkout(request)
+        checkout = obtener_total_checkout(request)
 
         if request.data.get('forma_de_pago') == 'mercado_pago':
             total_compra = round(precio_total*Decimal(settings.MERCADOPAGO_COMMISSION),2)

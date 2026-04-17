@@ -1,5 +1,6 @@
 from decimal import Decimal
-from .models import Tienda,MercadoPagoConfig,DatosBancarios
+from .models import Tienda
+from payment.models import MercadoPagoConfig, DatosBancarios
 from django.core.cache import cache
 from django.conf import settings
 from django.utils.encoding import smart_str
