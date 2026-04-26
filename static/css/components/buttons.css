@@ -1,0 +1,151 @@
+.generic-button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 0.5rem;
+  border: 1px solid var(--color-gray-1);
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  text-decoration: none;
+  display: block;
+
+  &.max-250 {
+    max-width: 250px;
+  }
+
+  &.facturacion {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    justify-content: center;
+    max-width: 150px;
+    margin-top: 0;
+  }
+
+  & .btn-loader {
+    width: 25px;
+    height: 25px;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    opacity: 0;
+    display: none;
+    transition: opacity 0.2s ease;
+  }
+
+  &.loading {
+    pointer-events: none;
+    opacity: 0.8;
+    display: grid;
+    place-content: center;
+
+    code {
+      display: none;
+    }
+
+    & .btn-loader {
+      opacity: 1;
+      display: block;
+    }
+  }
+
+  &.left {
+    margin-left: auto;
+    max-width: 200px;
+  }
+
+  &.margin {
+    margin-top: 2rem;
+  }
+
+  &.btn-1 {
+    border: 1px solid var(--primary-color-2);
+    background-color: var(--bg-white);
+    color: var(--primary-color-2);
+
+    &.warning {
+      border-color: var(--msg-error);
+      color: var(--msg-error);
+
+      &:hover {
+        background-color: color-mix(
+          in srgb,
+          var(--msg-error) 20%,
+          transparent 80%
+        );
+      }
+    }
+
+    .btn-loader {
+      border: 3px solid var(--primary-color-2);
+      border-top-color: var(--color-gray-3);
+    }
+
+    &:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--primary-color),
+        transparent 90%
+      );
+    }
+  }
+
+  &.btn-2 {
+    background-color: var(--primary-color-2);
+    color: #fff;
+
+    &.warning {
+      background-color: var(--msg-error);
+      color: #fff;
+
+      &:hover {
+        background-color: color-mix(
+          in srgb,
+          var(--msg-error) 80%,
+          transparent 20%
+        );
+      }
+    }
+
+    .btn-loader {
+      border: 3px solid #fff;
+      border-top-color: var(--primary-color);
+    }
+
+    &:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--primary-color-2),
+        transparent 20%
+      );
+      color: #fff;
+    }
+  }
+
+  &.not-ready {
+    opacity: 0.5;
+    cursor: unset;
+    pointer-events: none;
+  }
+  &.not-ready:hover {
+    background-color: transparent;
+  }
+}
+
+.password-toggle {
+  position: absolute;
+  right: 4px;
+  top: 5px;
+
+  svg {
+    color: var(--color-gray-4);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+  }
+  svg:hover {
+    background-color: var(--color-gray-2);
+  }
+}

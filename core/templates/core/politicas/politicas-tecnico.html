@@ -6,9 +6,14 @@
 <meta name="robots" content="index, follow">
 {% endblock meta %}
 
-{% block head %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/components/generic-header.css' %}">
+<link rel="stylesheet" href="{% static 'css/pages/policy.css' %}">
+{% endblock extra_css %}
+
+{% block title %}
 <title>Politicas de servicio técnico - {{config.nombre_tienda}}</title>
-{% endblock head %}
+{% endblock title %}
 
 {% block content %}
 <section class="generic-box">

@@ -1,0 +1,10 @@
+.generic-box {
+  &.checkout {
+    gap: 1rem;
+
+    .subtitle {
+      color: var(--color-gray-4);
+      font-size: 0.9rem;
+    }
+  }
+}

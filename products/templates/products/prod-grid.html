@@ -5,9 +5,16 @@
 {% include 'components/grid/meta.html' %}
 {% endblock meta %}
 
-{% block head %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/prod-grid.css' %}">
+<link rel="stylesheet" href="{% static 'css/components/products-cards.css' %}">
+<link rel="stylesheet" href="{% static 'css/components/utilities.css' %}">
+<link rel="stylesheet" href="{% static 'css/components/generic-header.css' %}">
+{% endblock extra_css %}
+
+{% block title %}
 <title>{{title}} - {{config.nombre_tienda}}</title>
-{% endblock head %}
+{% endblock title %}
 
 {% block content %}
 <section class="generic-box">

@@ -1,0 +1,34 @@
+.generic-flip {
+  svg {
+    transition: transform 0.3s ease;
+  }
+  &.flip svg {
+    transform: rotate(180deg);
+  }
+}
+
+.generic-expand {
+  max-height: 0;
+  overflow: hidden;
+
+  &.expand {
+    max-height: 1000px;
+  }
+  &.animate {
+    transition: max-height 0.4s ease;
+  }
+}
+
+.generic-select {
+  background-color: transparent;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border: none;
+  color: var(--color-gray-1);
+  border-bottom: 1px solid #888888;
+  cursor: pointer;
+}

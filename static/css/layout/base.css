@@ -1,0 +1,155 @@
+body {
+  background-color: var(--bg);
+}
+
+body.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main.main-content {
+  flex: 1;
+  padding-top: 7.5rem;
+  overflow-x: hidden;
+}
+
+.generic-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-flow: column;
+  padding-bottom: 30px;
+  margin: 10px;
+}
+
+.generic-data {
+  max-width: 1200px;
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.generic-item {
+  width: 100%;
+  background-color: var(--bg-white);
+  border-radius: 15px;
+  box-shadow: 0 15px 15px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+
+  h3,
+  h2 {
+    font-weight: 400;
+    color: var(--color-gray-1);
+    margin-top: 1rem;
+    font-size: 1.1rem;
+  }
+  h2 {
+    font-size: 1.3rem;
+  }
+  h3:first-child {
+    margin-top: 0.3rem;
+  }
+  h1 {
+    color: var(--color-gray-5);
+    font-size: 2rem;
+    font-weight: 500;
+  }
+  &.max-content-h {
+    max-height: max-content;
+  }
+
+  &.max-content-w {
+    max-width: max-content;
+  }
+}
+
+.generic-link {
+  text-decoration: none;
+  color: var(--primary-color-2);
+
+  &.wtap {
+    color: #00b837;
+  }
+}
+
+.generic-hover {
+  transition: color 0.3s ease;
+}
+
+.generic-hover:hover {
+  color: var(--primary-color);
+}
+
+.msg-default {
+  background-color: var(--bg-white);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  font-family: Arial, sans-serif;
+  position: fixed;
+  top: 150px;
+  right: 20px;
+  animation: slideMsg 5.4s ease forwards;
+  z-index: 100000;
+}
+
+.msg-box {
+  padding: 20px;
+  position: relative;
+
+  span {
+    border: 2px solid var(--color-gray-2);
+    border-radius: 5px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    animation: fillBar 5s linear forwards;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-gray-1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    svg {
+      min-width: 30px;
+      min-height: 30px;
+    }
+
+    svg.success {
+      color: var(--success-dark);
+    }
+    svg.error {
+      color: var(--error);
+    }
+    svg.info {
+      color: var(--primary-color-2);
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .msg-default {
+    top: 70px;
+    right: 10px;
+
+    p {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+@media (max-width: 1000px) {
+  .generic-data {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 720px) {
+  main.main-content {
+    padding-top: 2.75rem;
+  }
+}

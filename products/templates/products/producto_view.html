@@ -5,11 +5,17 @@
 {% include 'components/view/prod-meta.html' %}
 {% endblock meta %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/prod-view.css' %}">
+<link rel="stylesheet" href="{% static 'css/components/buttons.css' %}">
+<link rel="stylesheet" href="{% static 'css/components/utilities.css' %}">
+<link rel="stylesheet" href="{% static 'css/components/generic-header.css' %}">
+{% endblock extra_css %}
 
-{% block head %}
+{% block title %}
 <title>{{producto.nombre}} - {{config.nombre_tienda}}</title>
 <link rel="stylesheet" href="{% static 'css/libs/swiper-bundle.min.css' %}">
-{% endblock head %}
+{% endblock title %}
 
 {% block theme %}product{% endblock theme %}
 

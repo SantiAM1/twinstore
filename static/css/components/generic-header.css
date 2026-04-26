@@ -1,0 +1,32 @@
+.generic-header-nav {
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-1);
+
+  a {
+    font-size: 1.5rem;
+    color: var(--primary-color-2);
+    background-color: var(--color-gray-2);
+    text-align: center;
+    width: 30px;
+    border-radius: 10px;
+    display: flex;
+  }
+
+  h1 {
+    font-weight: 400;
+    color: var(--color-gray-1);
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 1000px) {
+  .generic-header-nav {
+    margin-bottom: 0.5rem;
+  }
+}

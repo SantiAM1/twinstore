@@ -1,0 +1,55 @@
+:root {
+  --gradient: linear-gradient(45deg, rgb(56, 144, 226), rgb(25, 106, 211));
+  --primary-color: #1173d4;
+  --primary-color-2: #1987ee;
+  --error: #ee1919;
+  --success: #59f06d;
+  --success-dark: #28a745;
+  --last-units: #ffb400;
+  --size-dot: 10px;
+  --size-ring: 14px;
+  --bg: #ededed;
+  --bg-prod: #f8f8f8;
+  --bg-white: #fff;
+  --color-gray-1: #333;
+  --color-gray-2: #d6d6d6;
+  --color-gray-3: #eeeeee;
+  --color-gray-4: #818181;
+  --color-gray-5: #222222;
+  --color-gray-6: #4e4e4e;
+
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --discount: #ff4d4d;
+
+  --border-1: #c0c0c0;
+  --border-2: #e0e0e0;
+
+  --border-error: rgba(255, 2, 2, 0.3);
+  --msg-error: #ff7c7c;
+
+  --cart-border: color-mix(in srgb, var(--primary-color-2), transparent 30%);
+}
+
+body[data-theme="dark"] {
+  --bg: #121212;
+  --bg-prod: #1a1a1a;
+  --bg-white: #252525;
+
+  --color-gray-1: #e0e0e0;
+  --color-gray-2: #444444;
+  --color-gray-3: #333333;
+  --color-gray-4: #a0a0a0;
+  --color-gray-5: #ffffff;
+  --color-gray-6: #b0b0b0;
+
+  --cart-border: rgba(20, 109, 241, 1);
+  --cart-border: color-mix(in srgb, var(--primary-color-2), transparent 0%);
+  --bg-glass: rgba(30, 30, 30, 0.8);
+
+  --border-1: #444444;
+  --border-2: #555555;
+  --error: #f13f3f;
+
+  --primary-color: color-mix(in srgb, var(--primary-color-2), transparent 10%);
+  --box-shadow-card: 0 4px 6px rgba(0, 0, 0, 0.3);
+}

@@ -11,10 +11,13 @@
 <link rel="canonical" href="https://twinstore.com.ar/">
 {% endblock meta %}
 
-{% block head %}
+{% block extra_css %}
+{% endblock extra_css %}
+
+{% block title %}
 <title>{{config.nombre_tienda}} | Hardware, Notebooks, Celulares y Accesorios en Argentina</title>
 <link rel="stylesheet" href="{% static 'css/libs/swiper-bundle.min.css' %}">
-{% endblock head %}
+{% endblock title %}
 
 {% block content %}
 <h1 class="visually-hidden">{{config.nombre_tienda}} - Tienda de Hardware, Notebooks y Tecnología en Argentina</h1>

@@ -1,0 +1,5 @@
+.generic-box {
+  &.landing {
+    margin: 0;
+  }
+}

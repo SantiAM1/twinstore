@@ -1,0 +1,183 @@
+/* ! DEPRECATED: This file is no longer used. Please refer to styles.css for any necessary styles. */
+.circle-stack {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  grid-auto-rows: 70px;
+  justify-items: center;
+  align-items: center;
+  position: relative;
+
+  img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--bg-white);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    transition:
+      transform 0.3s ease,
+      z-index 0.3s ease;
+  }
+  img:first-child {
+    margin-left: 0;
+  }
+  img:hover {
+    transform: scale(1.1);
+    z-index: 2;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.orders-main {
+  display: flex;
+  gap: 2rem;
+  justify-content: start;
+
+  p {
+    color: #7a7a7a;
+    font-size: 0.9rem;
+  }
+  span {
+    padding: 0.25rem 1rem;
+    display: inline-block;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 300;
+    margin-left: 1rem;
+  }
+}
+
+.orders-btns {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  .orders-extand-help {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  a {
+    color: var(--color-gray-1);
+  }
+
+  button,
+  a {
+    background-color: var(--color-gray-3);
+    height: max-content;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 5px;
+    display: flex;
+    cursor: pointer;
+    transition:
+      background-color 0.3s ease,
+      transform 0.3s ease;
+    color: var(--color-gray-5);
+
+    svg {
+      transition: transform 0.3s ease;
+    }
+  }
+  button:hover,
+  a:hover {
+    background-color: var(--color-gray-2);
+  }
+  button.active {
+    background-color: var(--color-gray-2);
+    color: var(--primary-color-2);
+  }
+  button:last-child.active svg {
+    transform: rotate(180deg);
+  }
+}
+
+.generic-data {
+  &.orders {
+    flex-direction: column;
+  }
+}
+
+.orders-manage {
+  display: flex;
+  gap: 0.5rem;
+
+  button {
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 12px;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition:
+      opacity 0.3s ease,
+      scale 0.3s ease;
+
+    &.comprobante {
+      color: #fff;
+      background-color: var(--color-gray-5);
+    }
+
+    &.arrepentimiento {
+      color: #fff;
+      border: 1px solid var(--discount);
+      background-color: transparent;
+      color: var(--discount);
+    }
+
+    &.mercadopago {
+      color: #fff;
+      background: var(--gradient);
+    }
+
+    &.factura {
+      background-color: transparent;
+      color: var(--color-gray-1);
+      border: 1px solid var(--color-gray-1);
+    }
+
+    &:hover {
+      opacity: 0.9;
+      scale: 0.98;
+    }
+  }
+}
+
+.orders-info {
+  width: 100%;
+}
+
+@media (max-width: 1000px) {
+  .orders-btns {
+    justify-content: space-between;
+    width: 100%;
+  }
+  .orders-manage {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 720px) {
+  .circle-stack {
+    grid-template-columns: repeat(6, 60px);
+    img {
+      width: 60px;
+      height: 60px;
+    }
+  }
+  .orders-main {
+    flex-direction: column;
+    gap: 0.25rem;
+
+    code {
+      display: none;
+    }
+  }
+  .orders-main span {
+    margin-top: 0.25rem;
+  }
+  .generic-item.orders {
+    padding: 0.5rem;
+  }
+}
