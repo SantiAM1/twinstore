@@ -414,7 +414,7 @@ class Variante(models.Model):
         valores = list(self.valores.all())
         for valor in valores:
             if valor.tipo.slug == 'color':
-                imgs = valor.imagenes_asociadas.all()
+                imgs = [img for img in valor.imagenes_asociadas.all() if img.producto_id == self.producto_id]
                 if imgs:
                     img = imgs[0]
                     return img.imagen_200.url if img.imagen_200 else img.imagen.url
