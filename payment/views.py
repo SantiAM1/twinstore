@@ -1,22 +1,18 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse,HttpRequest
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib import messages
 from django.core import signing
 from django.core.signing import BadSignature
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 
 from core.permissions import BloquearSiMantenimiento
 from core.throttling import ModalUsers
-from cart.utils import preference_mp
+from payment.utils import preference_mp
+from orders.models import Venta
 
-from .templatetags.custom_filters import formato_pesos
-from .serializers import ComprobanteSerializer,IntSigned
-from .models import Venta,ComprobanteTransferencia,TicketDePago,EstadoPedido
+from .models import TicketDePago
 from .webhook import (
     check_hmac_signature,
     requests_header,
@@ -24,6 +20,7 @@ from .webhook import (
     crear_pago_mp,
     obtener_ticket,
     validar_ticket)
+from .serializers import IntSigned
 
 import logging
 logger = logging.getLogger('mercadopago')
@@ -69,53 +66,6 @@ def webhook_mercadopago(request):
 
         return HttpResponse(status=200)
 
-class DatosComprobante(APIView):
-    permission_classes = [IsAuthenticated,BloquearSiMantenimiento]
-    throttle_classes = [ModalUsers]
-    def post(self, request: HttpRequest):
-        serializer = IntSigned(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors,status=400)
-        id_signed = serializer.validated_data.get('numero_firmado')
-        try:
-            id_venta = signing.loads(id_signed)
-        except BadSignature:
-            return Response({"error": "ID de venta inválido."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        venta = get_object_or_404(Venta, id=id_venta, usuario=request.user)
-        monto = venta.monto_tranferir()
-
-        return Response({'monto':formato_pesos(monto), 'id_firmado':id_signed}, status=status.HTTP_200_OK)
-
-class SubirComprobante(APIView):
-    permission_classes = [IsAuthenticated,BloquearSiMantenimiento]
-    throttle_classes = [ModalUsers]
-    def post(self, request: HttpRequest):
-        serializer = ComprobanteSerializer(data=request.data)
-        if not serializer.is_valid():
-            messages.error(request, "Error al subir el comprobante.")
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        data = serializer.validated_data
-        comprobante_file = data.get('comprobante')
-        id_signed = data.get('venta_id')
-
-        try:
-            id_venta = signing.loads(id_signed)
-        except BadSignature:
-            return Response({"error": "ID de venta inválido."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        venta = get_object_or_404(Venta, id=id_venta, usuario=request.user)
-
-        ComprobanteTransferencia.objects.create(
-            venta=venta,
-            file=comprobante_file
-        )
-
-        messages.success(request, "Comprobante subido exitosamente.")
-
-        return Response({"reload":True},status=status.HTTP_200_OK)
-
 class InitPointMPView(APIView):
     permission_classes = [BloquearSiMantenimiento]
     throttle_classes = [ModalUsers]
@@ -148,38 +98,6 @@ class InitPointMPView(APIView):
             
         except TicketDePago.DoesNotExist:
             return Response(status=404)
-
-class ArrepentimientoPostView(APIView):
-    permission_classes = [IsAuthenticated,BloquearSiMantenimiento]
-    throttle_classes = [ModalUsers]
-    def post(self, request: HttpRequest):
-        serializer = IntSigned(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors,status=400)
-        venta_signed = serializer.validated_data.get('numero_firmado')
-        try:
-            venta_id = signing.loads(venta_signed)
-        except BadSignature:
-            return Response({'error':'Firma inválida'},status=400)
-        
-        venta = get_object_or_404(Venta,id=venta_id,usuario=request.user)
-        if not venta.verificar_arrepentimiento():
-            return Response({'error':'No se puede solicitar el arrepentimiento'},status=400)
-        
-        venta.estado = 'arrepentido'
-        venta.requiere_revision = True
-        EstadoPedido.objects.get_or_create(
-            venta=venta,
-            estado="Arrepentimiento (Servidor)",
-            defaults={
-                "comentario": "Arrepentimiento solicitado por el cliente"
-            }
-        )
-        venta.save()
-
-        messages.success(request,'Arrepentimiento solicitado con éxito')
-
-        return Response({'reload':True},status=200)
 
 def payment_success(request):
     merchant_order_id = request.GET.get('merchant_order_id','')

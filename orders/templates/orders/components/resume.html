@@ -4,10 +4,13 @@
         <h3>Resumen</h3>
         {% for item in carrito %}
         <article class="billing-resume-article">
-            <img src="{{item.imagen}}" alt="{{item.nombre}}" height="60" width="60">
+            <div class="billing-resume-img">
+                <img src="{{item.imagen}}" alt="{{item.nombre}}" height="60" width="60">
+                {% if item.cantidad > 1 %}<p>x{{item.cantidad}}</p>{% endif %}
+            </div>
             <div>
-                <span>{% if item.cantidad > 1 %}<p>{{item.cantidad}} x </p>{% endif %}{{item.nombre}}</span>
-                <p>{{item.variante}}</p>
+                <span>{{item.nombre}}</span>
+                {% if item.variante %}<p>{{item.variante}}</p>{% endif %}
             </div>
             <aside>
                 {% if item.precio_anterior %}<p>{{item.precio_anterior|formato_pesos}}</p>{% endif %}

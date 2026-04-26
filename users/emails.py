@@ -35,7 +35,7 @@ def mail_recuperar_cuenta_html(usuario) -> None:
     enviar_mail_recuperar_cuenta.delay(mail_data,usuario.email,schema_name)
 
 @debug_pass
-def mail_buy_send_html(venta,user_email):
+def mail_buy_send_html(venta):
     """
     Envía el mail de compra exitosa
     """
@@ -54,7 +54,7 @@ def mail_buy_send_html(venta,user_email):
 
     schema_name = getattr(connection, 'schema_name', 'public')
 
-    enviar_mail_compra.delay(venta_data, user_email,schema_name)
+    enviar_mail_compra.delay(venta_data, venta.usuario.email, schema_name)
 
 @debug_pass
 def mail_estado_pedido_html(venta,user_email):

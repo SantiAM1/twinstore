@@ -2,7 +2,7 @@ from .models import TokenUsers
 from .decorators import login_required_modal
 from .emails import mail_recuperar_cuenta_html
 
-from payment.models import Venta
+from orders.models import Venta
 from cart.utils import merge_carts,clear_carrito_cache,clear_cache_header
 from core.permissions import BloquearSiMantenimiento
 from core.throttling import ModalUsers,MiCuentaThrottle

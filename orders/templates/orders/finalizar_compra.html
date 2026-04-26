@@ -11,15 +11,15 @@
 
 {% block content %}
 <div class="generic-box checkout">
-    {% include 'checkout/bar-track.html' %}
+    {% include 'orders/components/bar-track.html' %}
     <section class="generic-data checkout">
-        {% include 'checkout/facturacion.html' with hidden=False %}
-        {% include 'checkout/envio.html' with hidden=True %}
-        {% include 'checkout/pago.html' with hidden=True %}
-        {% include 'checkout/confirmacion.html' with hidden=True %}
-        {% include 'checkout/resume.html' %}
+        {% include 'orders/components/facturacion.html' with hidden=False %}
+        {% include 'orders/components/envio.html' with hidden=True %}
+        {% include 'orders/components/pago.html' with hidden=True %}
+        {% include 'orders/components/confirmacion.html' with hidden=True %}
+        {% include 'orders/components/resume.html' %}
     </section>
-    {% include 'checkout/buttom-btns.html' %}
+    {% include 'orders/components/buttom-btns.html' %}
 </div>
 {% endblock content %}
 

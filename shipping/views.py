@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from django.template.loader import render_to_string
 from django.http import HttpRequest
 
-from cart.utils import obtener_carrito,obtener_total_checkout
+from cart.utils import obtener_carrito
+from orders.utils import obtener_total_checkout
 
 from payment.templatetags.custom_filters import formato_pesos,fecha_humana
 
@@ -31,7 +32,7 @@ class CotizarEnvioAPI(APIView):
             'codigo_postal': data['codigo_postal_cotiza']
         }
         cotizacion = service.cotizar(carrito, destino)
-        html = render_to_string('checkout/partials/empresas.html',{'empresas':cotizacion})
+        html = render_to_string('orders/partials/empresas.html',{'empresas':cotizacion})
 
         checkout_data = request.session.get('checkout',{})
         checkout_data['shipping'] = cotizacion
@@ -63,7 +64,7 @@ class ObtenerSucursalesAPI(APIView):
             return Response(status=400)
     
     
-        html = render_to_string('checkout/partials/sucursales.html',{'sucursales':item_encontrado.get('sucursales',[])})
+        html = render_to_string('orders/partials/sucursales.html',{'sucursales':item_encontrado.get('sucursales',[])})
 
         return Response({"html":html},status=200)
     
