@@ -1,12 +1,12 @@
 {% if not user.is_authenticated %}
 <section class="generic-modal" data-modalId="users">
-    <form class="generic-box users" data-modal="signin" data-api="{% url 'users:api_login' %}" novalidate>
+    <form class="generic-box modal" data-modal="signin" data-api="{% url 'users:api_login' %}" novalidate>
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}" class="api-required next-login">
         <button type="button" class="generic-modal-close-2" data-modalId="users">
             <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
         </button>
-        <div class="generic-item users">
+        <div class="generic-item modal">
             <h2>Iniciar Sesión</h2>
             <span>Ingresá tus datos para continuar</span>
             <div class="generic-input-2">
@@ -29,11 +29,11 @@
             <p>¿Olvidaste tu contraseña? hace click <a href="" class="generic-modal-navegator" data-nav="recuperar-usuario">aca</a>.</p>
         </div>
     </form>
-    <form class="generic-box users hide" data-modal="recuperar-usuario" data-api="{% url 'users:api_recuperar_cuenta' %}">
+    <form class="generic-box modal hide" data-modal="recuperar-usuario" data-api="{% url 'users:api_recuperar_cuenta' %}">
         <button type="button" class="generic-modal-close-2" data-modalId="users">
             <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
         </button>
-        <div class="generic-item users">
+        <div class="generic-item modal">
             <h2>Recuperar cuenta</h2>
             <span>Para comenzar ingresá tu email</span>
             <div class="generic-input-2">
@@ -46,11 +46,11 @@
             <button type="button" class="generic-modal-navegator generic-button btn-2" data-nav="signin">Volver</button>
         </div>
     </form>
-    <form class="generic-box users hide" data-modal="nueva-contraseña" data-api="{% url 'users:api_nueva_contraseña' %}">
+    <form class="generic-box modal hide" data-modal="nueva-contraseña" data-api="{% url 'users:api_nueva_contraseña' %}">
         <button type="button" class="generic-modal-close-2" data-modalId="users">
             <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
         </button>
-        <div class="generic-item users">
+        <div class="generic-item modal">
             <h2>Recuperar cuenta</h2>
             <span>ingresá tu nueva contraseña</span>
             <div class="generic-input-2">
@@ -75,11 +75,11 @@
             <button type="submit" class="generic-button btn-1"><code>Confirmar</code><div class="btn-loader"></div></button>
         </div>
     </form>
-    <form class="generic-box users hide" data-modal="recuperar-cuenta" data-api="{% url 'users:api_verificar_token' %}">
+    <form class="generic-box modal hide" data-modal="recuperar-cuenta" data-api="{% url 'users:api_verificar_token' %}">
         <button type="button" class="generic-modal-close-2" data-modalId="users">
             <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
         </button>
-        <div class="generic-item users">
+        <div class="generic-item modal">
             <h2>Recuperar cuenta</h2>
             <span>Verificá tu correo e ingresá el codigo</span>
             <div class="generic-input-2">
@@ -91,12 +91,12 @@
             <button type="submit" class="generic-button btn-1"><code>Validar</code><div class="btn-loader"></div></button>
         </div>
     </form>
-    <form class="generic-box users hide" data-modal="verificar-cuenta" data-api="{% url 'users:api_verificar_token' %}">
+    <form class="generic-box modal hide" data-modal="verificar-cuenta" data-api="{% url 'users:api_verificar_token' %}">
         <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}" class="api-required next-login-validar">
         <button type="button" class="generic-modal-close-2" data-modalId="users">
             <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
         </button>
-        <div class="generic-item users">
+        <div class="generic-item modal">
             <h2>Verificar cuenta</h2>
             <span>Revisá tu correo e ingresá el codigo</span>
             <div class="generic-input-2">
@@ -108,11 +108,11 @@
             <button type="submit" class="generic-button btn-1"><code>Validar</code><div class="btn-loader"></div></button>
         </div>
     </form>
-    <form class="generic-box users hide" data-modal="signup" data-api="{% url 'users:api_register' %}">
+    <form class="generic-box modal hide" data-modal="signup" data-api="{% url 'users:api_register' %}">
         <button type="button" class="generic-modal-close-2" data-modalId="users">
             <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
         </button>
-        <div class="generic-item users">
+        <div class="generic-item modal">
             <h2>Registarse</h2>
             <span>Completá tus datos</span>
             <div class="generic-input-2">
@@ -163,11 +163,11 @@
 </section>
 {% endif %}
 <section class="generic-modal" data-modalId="pedidos">
-    <form class="generic-box users animate-modal" data-api="{% url 'users:api_ver_pedido' %}"> 
+    <form class="generic-box modal animate-modal" data-api="{% url 'users:api_ver_pedido' %}"> 
         <button type="button" class="generic-modal-close-2" data-modalId="pedidos">
             <svg  xmlns="http://www.w3.org/2000/svg"  width="25"  height="25"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-circle-x"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-6.489 5.8a1 1 0 0 0 -1.218 1.567l1.292 1.293l-1.292 1.293l-.083 .094a1 1 0 0 0 1.497 1.32l1.293 -1.292l1.293 1.292l.094 .083a1 1 0 0 0 1.32 -1.497l-1.292 -1.293l1.292 -1.293l.083 -.094a1 1 0 0 0 -1.497 -1.32l-1.293 1.292l-1.293 -1.292l-.094 -.083z" /></svg>
         </button>
-        <div class="generic-item users">
+        <div class="generic-item modal">
             <h2>Buscar un pedido</h2>
             <span></span>
             <div class="generic-input-2">

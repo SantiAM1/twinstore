@@ -5,9 +5,14 @@
 <meta name="robots" content="noindex, nofollow">
 {% endblock meta %}
 
-{% block head %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/cart.css' %}">
+<link rel="stylesheet" href="{% static 'css/components/generic-header.css' %}">
+{% endblock extra_css %}
+
+{% block title %}
 <title>Carrito - {{config.nombre_tienda}}</title>
-{% endblock head %}
+{% endblock title %}
 
 {% block content %}
 <section class="generic-box">

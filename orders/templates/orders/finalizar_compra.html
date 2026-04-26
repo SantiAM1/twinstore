@@ -5,9 +5,15 @@
 <meta name="robots" content="noindex, nofollow">
 {% endblock meta %}
 
-{% block head %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/orders.css' %}">
+<link rel="stylesheet" href="{% static 'css/layout/orders.css' %}">
+<link rel="stylesheet" href="{% static 'css/components/utilities.css' %}">
+{% endblock extra_css %}
+
+{% block title %}
 <title>Checkout - {{config.nombre_tienda}}</title>
-{% endblock head %}
+{% endblock title %}
 
 {% block content %}
 <div class="generic-box checkout">

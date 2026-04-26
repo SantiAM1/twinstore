@@ -1,0 +1,106 @@
+.generic-data {
+  /* ! DEPRECATED: This class is no longer used in future updates. */
+  .userdata-box {
+    width: 100%;
+    min-height: 450px;
+    margin: 0 1rem;
+
+    .users-navbar {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid var(--color-gray-2);
+      margin-bottom: 1rem;
+
+      a.active {
+        border-bottom: 2px solid var(--primary-color-2);
+        color: var(--color-gray-5);
+        pointer-events: none;
+      }
+      a:hover {
+        border-bottom: 2px solid var(--primary-color-2);
+      }
+      a:last-child {
+        margin-left: auto;
+      }
+    }
+
+    h2,
+    h3 {
+      font-weight: 500;
+      color: var(--color-gray-1);
+    }
+
+    h3 {
+      margin-top: 1rem;
+    }
+
+    form {
+      max-width: 600px;
+    }
+  }
+}
+
+/* ! DEPRECATED: This class is no longer used in future updates. */
+.users-navbar a {
+  padding: 0.5rem 0;
+  border-bottom: 2px solid var(--color-gray-2);
+  color: var(--color-gray-4);
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border 0.2s ease;
+}
+
+/* ! DEPRECATED: This class is no longer used in future updates. */
+.generic-item {
+  &.orders {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    &.empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      svg {
+        color: var(--primary-color-2);
+      }
+    }
+  }
+  .orders h3 {
+    font-weight: 600;
+  }
+}
+
+/* ! DEPRECATED: This class is no longer used in future updates. */
+.element-required {
+  &.error {
+    border: 1px solid var(--error);
+
+    &:focus {
+      border-bottom: 2px solid rgb(180, 0, 0);
+    }
+
+    & + .msg-required {
+      display: block;
+    }
+  }
+}
+
+/* ! DEPRECATED: This class is no longer used in future updates. */
+@media (max-width: 1000px) {
+  .generic-data .userdata-box {
+    width: auto;
+  }
+}
+
+/* ! DEPRECATED: This class is no longer used in future updates. */
+@media (max-width: 720px) {
+  .generic-data .userdata-box {
+    margin: 0;
+  }
+}
