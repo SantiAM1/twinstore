@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.db.models import Sum
 from .models import LoteStock, MovimientoStock, AjusteStock
-from payment.models import Venta,VentaDetalle
+from orders.models import Venta,VentaDetalle
 
 def gestionar_stock_venta(venta: Venta) -> bool:
     """

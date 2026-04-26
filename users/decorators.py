@@ -4,6 +4,9 @@ from urllib.parse import quote
 from django.conf import settings
 
 def login_required_modal(view_func):
+    """
+    Dispara el modal de inicio de sesion si el usuario no esta autenticado.
+    """
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:

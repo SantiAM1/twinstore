@@ -41,9 +41,11 @@
     {% endblock content %}
     </main>
     <!--- Footer --->
-    {% cache 600 footer_main request.tenant.schema_name|default:"public" %}
-        {% include 'footer.html' %}
-    {% endcache %}
+    {% block footer %}
+        {% cache 600 footer_main request.tenant.schema_name|default:"public" %}
+            {% include 'footer.html' %}
+        {% endcache %}
+    {% endblock footer %}
 </body>
 <!--- MSG --->
 {% include 'msg.html' %}

@@ -28,7 +28,7 @@
         <label for="id_cupon">Ingresá el código</label>
         <div class="billing-aplicar-row">
             <input type="text" id="id_cupon" placeholder="XXXXXX">
-            <button type="button" class="generic-button btn-1 facturacion" id="submitCupon" data-api="{% url 'cart:validar-cupon' %}"><code>Aplicar</code><div class="btn-loader"></div></button>
+            <button type="button" class="generic-button btn-1 facturacion" id="submitCupon" data-api="{% url 'orders:validar-cupon' %}"><code>Aplicar</code><div class="btn-loader"></div></button>
         </div>
         <p class="msg-required"></p>
     </div>

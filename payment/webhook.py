@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.core import signing
 
-from .models import PagoRecibidoMP,EstadoPedido,TicketDePago
+from .models import PagoRecibidoMP,TicketDePago
+from orders.models import EstadoPedido
 
 from decimal import Decimal
 import hmac

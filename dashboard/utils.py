@@ -8,7 +8,7 @@ from django.utils.html import format_html
 from django.db.models import QuerySet,TimeField,DateField,Count,Sum,OuterRef, Subquery,F,Sum,Value
 from django.db.models.functions import TruncHour,TruncDay,TruncMonth,TruncYear,Coalesce
 from core.utils import get_configuracion_tienda
-from payment.models import Venta,VentaDetalle
+from orders.models import Venta,VentaDetalle
 from payment.templatetags.custom_filters import formato_pesos
 from products.models import MovimientoStock,LoteStock,Producto
 from django.contrib.auth import get_user_model
@@ -57,7 +57,7 @@ def ultimos_pedidos(ventas: Venta) -> dict:
             "height": 300,
             "headers": ["Orden", "Total","Estado"],
             "rows": [
-                [format_html("<a href=\"{}\" style='color:var(--color-primary-500); font-weight: 400;'>#{}</a>", reverse_lazy("admin:payment_venta_change", args=[venta.id]), venta.merchant_order_id), formato_pesos(venta.total_compra), label_estado(venta)] for venta in ventas
+                [format_html("<a href=\"{}\" style='color:var(--color-primary-500); font-weight: 400;'>#{}</a>", reverse_lazy("admin:orders_venta_change", args=[venta.id]), venta.merchant_order_id), formato_pesos(venta.total_compra), label_estado(venta)] for venta in ventas
             ]
         }
 

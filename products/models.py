@@ -585,7 +585,7 @@ class MovimientoStock(models.Model):
     tipo = models.CharField(max_length=20, choices=Tipo.choices)
     cantidad = models.PositiveIntegerField()
     lote = models.ForeignKey(LoteStock, on_delete=models.SET_NULL, null=True, blank=True)
-    venta = models.ForeignKey('payment.Venta', on_delete=models.SET_NULL, null=True, blank=True)
+    venta = models.ForeignKey('orders.Venta', on_delete=models.SET_NULL, null=True, blank=True)
     fecha = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -595,7 +595,7 @@ class MovimientoStock(models.Model):
         ordering = ['-fecha']
 
 class AjusteStock(models.Model):
-    venta = models.ForeignKey('payment.Venta', on_delete=models.CASCADE, related_name='ajustes_stock')
+    venta = models.ForeignKey('orders.Venta', on_delete=models.CASCADE, related_name='ajustes_stock')
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
     variante = models.ForeignKey(Variante, on_delete=models.SET_NULL, null=True, blank=True,)
     cantidad_faltante = models.IntegerField()

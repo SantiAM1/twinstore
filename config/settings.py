@@ -136,7 +136,8 @@ TENANT_APPS = (
     'cart',
     'payment',
     'dashboard',
-    'shipping'
+    'shipping',
+    'orders',
 )
 
 # Con esta lógica, Unfold (que viene de SHARED_APPS) quedará primero en la lista final
@@ -497,7 +498,7 @@ UNFOLD = {
                     {
                         "title": _("Ventas"),
                         "icon": "inventory_2",
-                        "link": reverse_lazy('admin:payment_venta_changelist'),
+                        "link": reverse_lazy('admin:orders_venta_changelist'),
                         "badge": "dashboard.views.ventas_verificacion",
                         "badge_variant": "info",
                         "badge_style": "solid",
@@ -592,12 +593,12 @@ UNFOLD = {
                     {
                         "title": _("Tus datos bancarios"),
                         "icon": "account_balance",
-                        # "link": reverse_lazy('admin:payment_datosbancarios_change',args=[1]),
+                        "link": reverse_lazy('admin:payment_datosbancarios_change',args=[1]),
                     },
                     {
                         "title": _("Mercado Pago"),
                         "icon": "payment",
-                        # "link": reverse_lazy('admin:payment_mercadopagoconfig_change',args=[1]),
+                        "link": reverse_lazy('admin:payment_mercadopagoconfig_change',args=[1]),
                     },
                     {
                         "title": _("Configuración de envíos"),

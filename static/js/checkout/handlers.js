@@ -8,6 +8,20 @@ const billingAdicional = document.getElementById("billing-adicional");
 const steps = ["facturacion", "envio", "pago", "confirmacion"];
 let currentStepIndex = 0;
 
+// > Editar desde confirmacion
+document.querySelectorAll(".confirm-edit").forEach((btn) => {
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const step = btn.dataset.step;
+    const index = parseInt(btn.dataset.index);
+    document.getElementById(steps[currentStepIndex]).classList.add("hide");
+    currentStepIndex = index;
+    document.getElementById(steps[currentStepIndex]).classList.remove("hide");
+    setTrack(currentStepIndex);
+    nextBtn.querySelector("code").innerHTML = "Continuar";
+  });
+});
+
 // > Boton siguiente
 nextBtn.addEventListener("click", async (e) => {
   e.preventDefault();
@@ -270,10 +284,7 @@ const stepHandlers = {
             : null,
       };
 
-      const response = await axios.post(
-        "/carro/api/checkout/validar-pago/",
-        payload,
-      );
+      const response = await axios.post("/pedidos/api/validar-pago/", payload);
       const data = response.data;
       console.log(data);
       if (data.mixto) {
@@ -339,6 +350,37 @@ const stepHandlers = {
       }
       return false;
     }
+  },
+  confirmacion: async () => {
+    try {
+      const response = await axios.post("/pedidos/api/finalizar-compra/");
+      data = response.data;
+      console.log(data);
+      if (data.message) {
+        apiMessage(data.message, data.type);
+        return false;
+      } else if (data.redirect) {
+        apiRedirect(data.redirect);
+        return false;
+      } else if (data.init_point) {
+        console.log("Redirigiendo a Mercado Pago...");
+        window.location.href = data.init_point;
+        return false;
+      } else if (data.merchant_order_id) {
+        return true;
+      } else {
+        alert(
+          "Hubo un error al finalizar la compra. Por favor, intenta nuevamente.",
+        );
+        return false;
+      }
+    } catch (e) {
+      console.error("Error al finalizar la compra:", e.response?.data || e);
+      alert(
+        "Hubo un error al finalizar la compra. Por favor, intenta nuevamente.",
+      );
+    }
+    return false;
   },
 };
 

@@ -1,4 +1,4 @@
-from payment.models import Venta
+from orders.models import Venta
 from django.http import HttpRequest
 from products.models import AjusteStock
 from core.decorators import excluir_de_public
